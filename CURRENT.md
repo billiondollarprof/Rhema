@@ -120,6 +120,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   records to the new account's pending zone before the move, then move.
   The app runs on a workers.dev address in the hospital account until the
   move, then gets the real domain.
+  Checked 2026-10-27 at his request: records do NOT move with the domain
+  (Cloudflare docs), and a pending zone can hold records in advance. Cloudflare
+  does not document whether DNS answers pause for a short time during the
+  switch. Resend, if a record goes missing, marks a verified domain
+  "temporary failure" and checks again for 72 hours before failing it. So:
+  hospital staff go live only AFTER the move (6 Nov), and the move is done at
+  a quiet time. Before go-live, Resend must show Verified again.
 - Invite his own Supabase login into the hospital's Supabase organisation,
   so the agent's Supabase tools can reach the project.
 - Supabase project region and name (rename to rhema-hospital).
