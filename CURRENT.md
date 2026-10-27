@@ -110,7 +110,15 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 
 ### Waiting on Anthony
 
-- Domain move from his Cloudflare account to the hospital's (in progress).
+- Domain move from his Cloudflare account to the hospital's. Done so far:
+  new account has the zone added (Free plan, bots blocked, Pending,
+  nameservers cheryl and tim). DNSSEC is off in the old account. BLOCKED by
+  Cloudflare until the domain is 10 days old ("registered within the last
+  10 days"). Do NOT delete the domain. Plan for the wait: add the Resend
+  records in the OLD account now so email codes work today, add the same
+  records to the new account's pending zone before the move, then move.
+  The app runs on a workers.dev address in the hospital account until the
+  move, then gets the real domain.
 - Invite his own Supabase login into the hospital's Supabase organisation,
   so the agent's Supabase tools can reach the project.
 - Supabase project region and name (rename to rhema-hospital).
