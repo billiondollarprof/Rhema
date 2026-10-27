@@ -437,6 +437,24 @@ Neither is ever shown to anybody.
 
 # Rules written for Rhema
 
+## The Humanizer runs on everything we write
+
+Anthony, 2026-10-27: "you are using the humanizer... so that everything you
+are writing, not too many text, write properly."
+
+The Humanizer skill is in `.claude/skills/humanizer`. It is a list of the
+signs of machine written text, taken from Wikipedia's "Signs of AI writing"
+guide. Every README, guide, commit message, screen text and reply goes
+through it before it is shown to anyone. Where the Humanizer and Anthony's
+voice rules above disagree, his voice wins. The Humanizer never adds a
+fact, a number or a name that he did not give.
+
+## Skills
+
+Vetted open skills live in `.claude/skills/`, with their sources and
+licences in `.claude/skills/SOURCES.md`. Nothing gets added to that folder
+without being read whole first.
+
 ## Patient data
 
 This system holds real patients' medical records. That is the most serious

@@ -86,6 +86,22 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 29. **Later, possibly: bundle as a desktop app and a mobile app** (Tauri,
     Capacitor), since the UI already fits any screen.
 
+### From 2026-10-27, third message
+
+30. **"Skip the email authentication now. Let's get the app working."** Email
+    codes, Resend and the domain move all wait for 6 November. Everything
+    else goes ahead now.
+31. **"Download the humanizer into our GitHub repo"** and use it on
+    everything written. Done: `.claude/skills/humanizer`, rule in
+    `CLAUDE.md`. Can come off once he confirms.
+32. **"Look for any open source... any skill... before we use the skill, you
+    look at it and say it matches."** Done: 13 skills read and saved, with
+    the list and reasons in `.claude/skills/SOURCES.md`.
+33. **Files to write, one step at a time, when he is back:** README,
+    licence, and the rest of the repo foundation.
+34. **Aim: app built within about 10 days, test runs and small fixes after,
+    then plug in email and install.** No need to wait for day 14.
+
 ### Decided
 
 - 2026-10-27: Repo made private (he confirmed).
