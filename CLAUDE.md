@@ -485,10 +485,14 @@ thing in this repo, and every other rule bends around it.
 The full reasoning, with the checked free limits and their sources, is in
 `PLAN.md`. In short:
 
-- **Next.js** (React and Node.js underneath) for the screens and the server
-  code, written in TypeScript.
-- **Neon** (serverless Postgres) for the database, in the hospital's own
-  Neon account.
+- **Next.js** (React and Node.js underneath) for the screens, built as a
+  static app (plain files), written in TypeScript.
+- **One Cloudflare Worker** (a small program on Cloudflare) that serves
+  those files and runs the server jobs: invites, push alerts, email.
+- **Supabase** (Postgres with sign in, live updates and storage) for the
+  database, in the hospital's own Supabase account. Chosen over Neon on
+  2026-10-27, because Neon's free plan gives about 400 hours a month and the
+  hospital's daytime use alone is about 480.
 - **Resend** for email: sign in codes and patient documents.
 - **Cloudflare** for hosting, the domain and file storage (R2), in the
   hospital's own Cloudflare account.
@@ -515,16 +519,16 @@ explained before it runs.**
 On top of that, for this project:
 
 - **Every change to the database shape is a migration file in the repo.**
-  Nobody changes the live database by hand in the Neon console. The repo is
+  Nobody changes the live database by hand in the Supabase dashboard. The repo is
   the record of what the database looks like.
-- **Migrations run first on a Neon branch** (a copy of the database that
-  costs nothing and can be thrown away). CI creates the branch, runs the
-  migration and the tests against it, then deletes it. Only then does the
-  migration reach the real database.
+- **Migrations run first on a local copy.** CI starts a throwaway Supabase
+  database inside the GitHub runner (the computer GitHub lends for each
+  check), runs every migration and the access tests against it, then throws
+  it away. Only then does the migration reach the real database.
 - **Additive by default.** A migration that drops or renames a column, or
   deletes rows, is asked for in plain words first, whatever the checks say.
-- **Backups are checked, not assumed.** The Neon free plan only lets you go
-  back 6 hours. The nightly backup in `PLAN.md` is what protects the
+- **Backups are checked, not assumed.** The Supabase free plan has no
+  backups you can restore yourself. The nightly backup in `PLAN.md` is what protects the
   hospital, so a failed backup is treated as an outage.
 
 ## Branching, CI and deploying

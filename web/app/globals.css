@@ -1,0 +1,34 @@
+/*
+ * globals.css: base colours and type for the whole app.
+ * The values come from the Rema demo (indexrema.html), so the built app
+ * looks like the demo the hospital already approved.
+ */
+:root {
+  --bg: #f1f4f9;
+  --ink: #0f2238;
+  --mut: #64748b;
+  --line: #e5eaf2;
+  --nv: #0a2a5e;
+  --bl: #1f5fd0;
+  --grn: #2e7d5b;
+  --red: #d32f2f;
+  --amb: #ef6c00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    14px/1.45 'Plus Jakarta Sans',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}

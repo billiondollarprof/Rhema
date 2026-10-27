@@ -1,0 +1,13 @@
+{
+  "name": "worker",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260101.0",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.5"
+  }
+}

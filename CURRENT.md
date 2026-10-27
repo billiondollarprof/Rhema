@@ -97,12 +97,20 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 32. **"Look for any open source... any skill... before we use the skill, you
     look at it and say it matches."** Done: 13 skills read and saved, with
     the list and reasons in `.claude/skills/SOURCES.md`.
-33. **Files to write, one step at a time, when he is back:** README,
-    licence, and the rest of the repo foundation.
+33. **Files to write: README, licence, and the repo foundation.** Done
+    2026-10-27: README, LICENSE, the Next.js and Worker skeleton,
+    `npm run verify`, CI and deploy workflows, the first Python check. Comes
+    off once he has seen it on the testing address.
 34. **Aim: app built within about 10 days, test runs and small fixes after,
     then plug in email and install.** No need to wait for day 14.
 
 ### Decided
+
+- 2026-10-27: Licence. "The entire back end for this particular project
+  belongs to Rhema." StellaXafe keeps its general foundation and can build
+  similar systems for other clients, but never reuses this project's code as
+  it is. Written into LICENSE. The proposal says the hospital owns
+  everything, so the director should agree this one line.
 
 - 2026-10-27: Repo made private (he confirmed).
 - 2026-10-27: 2 weeks, not 8.
@@ -153,6 +161,11 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 ---
 
 ## State of the repo
+
+2026-10-27: the foundation is in. `npm run verify` passes all six checks
+(format, lint, types, tests, Python dash check, build). The holding screen
+was run under `wrangler dev` and screenshotted at phone and desktop widths,
+in both themes. Deploy waits for the Cloudflare secrets.
 
 Session 1 wrote the rules and the plan only. There is no app code yet.
 The proposal PDF and the Rema demo file are not in the repo, on purpose:

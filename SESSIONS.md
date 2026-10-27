@@ -4,6 +4,17 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+## Session 2: 2026-10-27, the foundation
+
+- LICENSE written to his rule: the hospital owns this project, StellaXafe
+  keeps its general foundation.
+- README, `.gitignore`, the Next.js static app and the Worker, one
+  `wrangler.jsonc`, `npm run verify`, CI and deploy workflows.
+- First Python file, `checks/copy_check.py`, with line by line comments.
+  Proved it fails on a planted em dash.
+- vitest 3 had 2 critical advisories, moved to vitest 5: 0 vulnerabilities.
+- `CLAUDE.md` stack and database sections changed from Neon to Supabase.
+
 ## Session 1: 2026-10-27, planning
 
 Anthony started the project: client is RHEMA Medical Center, 8 week

@@ -1,0 +1,46 @@
+RHEMA Medical Center Hospital Operations System
+Copyright (c) 2026 RHEMA Medical Center. All rights reserved.
+Built by StellaXafe Technologies Limited (RC 8354207).
+
+This is not an open source licence. Nobody may copy, change, publish, share
+or use this code without written permission, as set out below.
+
+1. What belongs to RHEMA Medical Center
+
+   Everything made for this project belongs to RHEMA Medical Center. That
+   covers the application code in this repository, the database structure
+   and everything stored in it, the settings for the hospital's accounts,
+   the screens and designs made for the hospital, and the hospital's name
+   and branding.
+
+2. What StellaXafe keeps
+
+   StellaXafe Technologies Limited keeps ownership of its general know-how
+   and its general foundation. That means the methods, the working process,
+   and the general tools that are not specific to this hospital, such as
+   check scripts, build and deployment pipelines, and general screen
+   patterns. StellaXafe may build similar systems for other clients on that
+   same foundation.
+
+   StellaXafe will not give or sell this project's code, data, designs or
+   branding to anyone else, and will not hand over this system as it is to
+   another client.
+
+3. Nobody else
+
+   No other person or company gets any right to this code. To use any part
+   of it, ask RHEMA Medical Center in writing.
+
+4. Parts made by others
+
+   Some parts of this repository were made by other people and keep their
+   own licences. These include the packages listed in package.json and the
+   skills listed in .claude/skills/SOURCES.md. Those licences apply to those
+   parts.
+
+5. No warranty
+
+   The code is provided as it is. The support StellaXafe gives is the
+   support agreed in the signed proposal, and nothing more is promised here.
+
+Contact: StellaXafe Technologies Limited, 09066284656.

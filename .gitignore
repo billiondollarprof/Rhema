@@ -1,0 +1,20 @@
+# Installed packages and build output. These are rebuilt, never committed.
+node_modules/
+web/.next/
+web/out/
+.wrangler/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets. Keys live in GitHub secrets and Cloudflare secrets, never here.
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Python
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store

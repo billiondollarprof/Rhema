@@ -1,0 +1,7 @@
+node_modules
+web/.next
+web/out
+.wrangler
+.claude/skills
+package-lock.json
+*.md
