@@ -98,16 +98,25 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   numbers: 720 hours minus 8 night hours x 30 = 480 daytime hours, and
   Neon free gives about 400. So Neon free runs out around day 25 every
   month. Recommended Supabase for this project, Neon for a later one.
-  WAITING for his yes before the database is set up.
+  He said yes: **Supabase** for this project.
+- 2026-10-27: Domain is spelled with an H: rhemamedical.app.
+- 2026-10-27: Hospital Gmail is rhemamedical7@gmail.com. Cloudflare, Supabase
+  and Resend accounts opened with it. Passwords live only in the Drive doc.
+- 2026-10-27: "I'm prioritizing their job over my CV." When a choice is
+  safer for the client, it wins.
 - 2026-10-27: Next.js for front and back end. Neon, not Supabase. Resend
   for email. The hospital gets its own Cloudflare account. PWA first.
   Two branches, `testing` and `main`, with CI and CD.
 
 ### Waiting on Anthony
 
+- Domain move from his Cloudflare account to the hospital's (in progress).
+- Invite his own Supabase login into the hospital's Supabase organisation,
+  so the agent's Supabase tools can reach the project.
+- Supabase project region and name (rename to rhema-hospital).
+
 - Yes or no to the stack and the plan in `PLAN.md`.
 - Yes or no to the AWS uptime watcher.
-- Supabase or Neon, after the 480 hour sum.
 
 ---
 
