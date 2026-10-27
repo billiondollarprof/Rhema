@@ -57,8 +57,39 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     noted for a public hospital website if they order one. `PLAN.md` 10.
 19. **He is opening the Neon account.** Steps in the session 1 reply.
 
+### From 2026-10-27, second message
+
+20. **"We are going to actually rush this thing. So we only have about 2
+    weeks."** The 8 week timeline in `PLAN.md` 12 is replaced by 2 weeks.
+21. **"Create a folder in the drive and name it clients folder... each
+    client will have its own credential file."** Done: "Clients Folder" in
+    his Drive, with "RHEMA Medical Center Credentials" inside (blank
+    template, he fills it). Can come off once he confirms.
+22. **REMIND HIM: "we are probably going to create a private repo that
+    will not carry code but will carry credentials. That will be later, so
+    you will remind me."**
+23. **He is making a temporary Gmail for the hospital** and opening every
+    account for this job with it (Cloudflare, Neon, Resend).
+24. **Email OTP first**, then the back end and front end, "everything that
+    is important at once".
+25. **Sign in:** the admin invites, the person signs in once with an email
+    code, then a 4 digit PIN unlocks the screen after inactivity (as in
+    the demo).
+26. **Notifications on the installed app**, with vibration, and an
+    emergency "call attention" alert that vibrates stronger. Calls later,
+    not now.
+27. **Email address admin@ on the hospital domain.** He says the domain is
+    remamedical.app (no S, .app). Spelling to be confirmed against the
+    hospital name RHEMA.
+28. **Agents get API tokens through GitHub secrets, never through the
+    chat.** Some setup he does by hand so he learns the platforms.
+29. **Later, possibly: bundle as a desktop app and a mobile app** (Tauri,
+    Capacitor), since the UI already fits any screen.
+
 ### Decided
 
+- 2026-10-27: Repo made private (he confirmed).
+- 2026-10-27: 2 weeks, not 8.
 - 2026-10-27: Next.js for front and back end. Neon, not Supabase. Resend
   for email. The hospital gets its own Cloudflare account. PWA first.
   Two branches, `testing` and `main`, with CI and CD.
@@ -66,7 +97,6 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 ### Waiting on Anthony
 
 - Yes or no to the stack and the plan in `PLAN.md`.
-- Public or private repo.
 - Yes or no to the AWS uptime watcher.
 - How to tell the director the database is Neon, not Supabase
   (`PLAN.md` 4).
