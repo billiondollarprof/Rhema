@@ -114,7 +114,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   new account has the zone added (Free plan, bots blocked, Pending,
   nameservers cheryl and tim). DNSSEC is off in the old account. BLOCKED by
   Cloudflare until the domain is 10 days old ("registered within the last
-  10 days"). Do NOT delete the domain. Plan for the wait: add the Resend
+  10 days"). Registered 27 October 2026, so the move opens on **6 November
+  2026**. Do NOT delete the domain. Plan for the wait: add the Resend
   records in the OLD account now so email codes work today, add the same
   records to the new account's pending zone before the move, then move.
   The app runs on a workers.dev address in the hospital account until the
