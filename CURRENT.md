@@ -90,6 +90,15 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 
 - 2026-10-27: Repo made private (he confirmed).
 - 2026-10-27: 2 weeks, not 8.
+- 2026-10-27: Static Next.js front end on Cloudflare, plus a Cloudflare
+  Worker for the back end.
+- 2026-10-27: AWS uptime watcher: yes.
+- 2026-10-27: Night use is rare (mostly nurses). Count nights as 8 hours.
+- 2026-10-27: He chose Neon, then asked whether Supabase is better. The
+  numbers: 720 hours minus 8 night hours x 30 = 480 daytime hours, and
+  Neon free gives about 400. So Neon free runs out around day 25 every
+  month. Recommended Supabase for this project, Neon for a later one.
+  WAITING for his yes before the database is set up.
 - 2026-10-27: Next.js for front and back end. Neon, not Supabase. Resend
   for email. The hospital gets its own Cloudflare account. PWA first.
   Two branches, `testing` and `main`, with CI and CD.
@@ -98,8 +107,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 
 - Yes or no to the stack and the plan in `PLAN.md`.
 - Yes or no to the AWS uptime watcher.
-- How to tell the director the database is Neon, not Supabase
-  (`PLAN.md` 4).
+- Supabase or Neon, after the 480 hour sum.
 
 ---
 
