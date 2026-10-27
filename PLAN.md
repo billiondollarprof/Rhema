@@ -1,5 +1,16 @@
 # PLAN.md
 
+> **Changed since this was first written (2026-10-27, same day).** Read
+> these first, they override the sections below.
+>
+> - **Database: Supabase, not Neon.** Neon free gives about 400 hours a
+>   month; the hospital's daytime use alone is about 480. Supabase free has
+>   no hours limit. Its live updates replace the Durable Objects plan.
+> - **Shape: Next.js built as a static app on Cloudflare, plus one
+>   Cloudflare Worker for the server jobs** (push alerts, email, invites).
+> - **Timeline: about 10 days, not 8 weeks.** See section 13.
+> - **Domain move opens 6 November 2026.** Email codes and Resend wait for it.
+
 The plan for building the RHEMA Medical Center Hospital Operations System.
 Written 2026-10-27, in the first planning session. Nothing here is built
 yet. Every free limit below was checked on 2026-10-27, with the source next
@@ -363,3 +374,39 @@ The proposal promises 8 weeks.
 | 3 to 5 | Core build | Registration, patient ID, search, queue, medical record, lab, pharmacy, payments, chat, alerts, announcements, documents, activity logs |
 | 6 to 7 | Testing and training | Staff try it with made up patients, fixes, quick guides |
 | 8 | Go live | Live address, handover pack |
+
+---
+
+## 13. Build order (replaces the 8 week table)
+
+One step at a time. Each step is finished, used and checked before the
+next starts. Nothing here needs the domain or Resend.
+
+1. **Repo foundation.** README, licence, `.gitignore`, the `testing`
+   branch, and the Next.js and Worker skeleton. Also `npm run verify` and
+   the first CI workflow.
+2. **Wire the accounts.** Anthony invites his own Supabase login into the
+   hospital's Supabase organisation. Then he puts the Cloudflare and
+   Supabase keys in GitHub secrets. First deploy to a free `workers.dev`
+   address.
+3. **Database.** Tables for all 13 modules, RLS (row level security: the
+   database itself decides who may read each row), the activity log, and
+   made up test patients. First Python file: the fake data check.
+4. **Sign in for testing.** Supabase's own built in email sends codes only
+   to the project's team members, a few an hour. That is enough for
+   Anthony to test with until Resend is connected on 6 November. Also the
+   4 digit PIN screen lock, as in the demo.
+5. **Screens, module by module, from the Rema demo:** home and queue,
+   register, find and edit, send to room, medical record, laboratory,
+   pharmacy, payments, documents and printing.
+6. **Talking to each other:** messages, notifications, announcements,
+   call attention, with live updates.
+7. **Admin:** invite staff, permissions, activity logs.
+8. **Installed app:** PWA install, push alerts, vibration, and the strong
+   emergency alert.
+9. **Safety net:** nightly backup, the AWS uptime watcher in Python, and
+   the smoke test after every deploy.
+10. **Walkthrough:** every screen used as each role, on a phone and a
+    desktop, both themes. Then fixes.
+11. **6 November:** move the domain, connect Resend, switch email codes to
+    the real domain, check Resend shows Verified, then go live and install.
