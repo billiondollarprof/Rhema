@@ -199,6 +199,28 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     `docs/DATABASE.md`.
 57. Plan updated to version 2 in `docs/DATABASE.md`. Waiting for his yes.
 
+### From 2026-10-28, seventh message
+
+58. **No alert spam.** "Do not be spamming people that do not ask for
+    notification." A lab result alerts only the doctor who requested it.
+    Updating a record alerts nobody. Front desk never gets lab results.
+    Written into `docs/DATABASE.md`. (This narrows the hospital's note that
+    said lab information goes to the front desk and nursing station: the
+    lab can still send a result to the nursing station on purpose.)
+59. **The lab never sees the medical history.** It can add a lab report to
+    the record without a request; the doctor sees it in the history later.
+60. **Lab statuses**: front desk takes payment, then "Awaiting test"; the
+    lab enters the result, then "Completed".
+61. **Screens: minimal but complete.** Critical information shows straight
+    away; everything else sits under a heading that opens like a drop down
+    (lab reports, nurses' notes, vitals history and so on). For the build
+    of the patient record screen.
+62. **Later, not now:** scanning a paper document and the system reading
+    it, once the hospital has a scanner. Propose it then.
+63. **Later, maybe:** voice notes that turn into text, reusing his church
+    speech to text work (the Bible display project) once it works well.
+    Possibly with AI to help write the records. Undecided.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project

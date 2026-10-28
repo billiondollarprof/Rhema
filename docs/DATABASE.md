@@ -142,7 +142,7 @@ What each line adds:
 | Nursing station comment / report | `nursing_notes`: a nurse's comment or report on a patient, with time and author |
 | Medications given, and the time given | `medications_given`: the medicine, the dose, **the exact time given**, and who gave it (borrowed: a medication administration record) |
 | Vital signs | nurses record vital signs (section 8) |
-| Lab information to front desk and nursing station | a finished lab result alerts the doctor who asked, the front desk and the nursing stations |
+| Lab information to front desk and nursing station | the lab can **send** a result to a named person or desk on purpose, for example the nursing station. Nobody gets an alert they did not ask for (section 10) |
 | Current medications, for the nursing station | the patient's list of medicines they are on now, shown on the nursing station screen |
 
 The system stays light: no scanning, no barcodes. A nurse opens a patient
@@ -187,22 +187,32 @@ can never be skipped.
 
 Status: Written, Waiting for payment, Paid, At pharmacy, Dispensed, Voided.
 
-**Lab requests** work the same way:
+**Lab requests**:
 
 1. The doctor sends the request to the Front Desk for payment, or straight
    to the Laboratory.
-2. The lab marks it **In progress**, then **Result ready**, with the
-   result text or a file.
-3. The result alerts the doctor, the Front Desk and the nursing stations.
+2. Front Desk records the payment, and the request shows **Awaiting test**.
+3. The lab does the test and enters the result. The request shows
+   **Completed**.
+4. **Only the doctor who asked gets an alert.** Nobody else is alerted.
 
-Status: Requested, Waiting for payment, Paid, In progress, Result ready,
-Voided.
+Status: Requested, Awaiting test, Completed, Voided.
+
+**The lab can also add a report without a request**, for example a test the
+patient came in for directly. The report goes into the patient's record, and
+nobody is alerted. The next time a doctor opens the record, it is there in
+the history.
+
+**`lab_reports`**: the test, the result text or file, who did it, when, and
+the request it answers if there was one.
 
 **Who sees what (security):**
 - The Front Desk sees the medicine names and prices so it can charge, but
   not the notes, conditions or vitals.
 - The Pharmacy sees prescriptions only.
-- The Laboratory sees its requests only.
+- The Laboratory sees its requests and the patient's name and number. It
+  can add a lab report to the record. It never sees the medical history.
+- The Front Desk never sees lab results.
 
 ---
 
@@ -220,6 +230,14 @@ Voided.
 
 Nurses and the nursing stations message and send alerts like every other
 department.
+
+**Alerts only go to the person they are for.** Anthony, 2026-10-28: "do not
+be spamming people that do not ask for notification." So:
+- A lab result alerts the doctor who requested it, and nobody else.
+- Updating a record alerts nobody.
+- "Call attention", a message, or a result sent on purpose alerts the
+  person or desk it was sent to.
+- Nobody gets an alert about something that is not their business.
 
 ---
 
