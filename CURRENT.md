@@ -233,7 +233,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 
 ### From 2026-10-28, keys
 
-65. **Second Supabase project `rhema-testing` created** (Paris, automatic
+65. **Second Supabase project `rhema-testing` created** (meant to be Paris, came out Ireland, automatic
     RLS left off). His own account was removed from the hospital
     organisation (it blocked the second free project, and is not needed).
     That cut off the first github-ci token, which had been made in his own
@@ -245,6 +245,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     `.github/workflows/db-testing.yml` applies migrations to the testing
     project only. The live project gets migrations from main only, after his
     yes on the SQL.
+    APPLIED to testing 2026-10-28 (Database (testing) run 40652458500):
+    the foundation migration went on, then the check said ACTIVE_HEALTHY,
+    0 security warnings, database login works. Both projects re-checked
+    with their own password (Supabase check run 40652220065).
+    Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
+    eu-west-3 (Paris). Asked Anthony whether to keep it or recreate it.
+    WAITING for his yes to apply the same SQL to the live database.
 
 ### Decided
 
