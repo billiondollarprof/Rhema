@@ -198,7 +198,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 - Supabase's security advisor shows 2 warnings on a fresh project: SECURITY
   DEFINER functions that the public and signed in users can run. To be
   looked at and closed when the first migration is written.
-- Still to add: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+- Cloudflare secrets added 2026-10-28: `CLOUDFLARE_API_TOKEN` (Edit
+  Cloudflare Workers template on the hospital account, with Pages, Builds,
+  Agents and Containers removed, User Memberships read, Workers
+  Observability edit, no expiry, replaced at handover) and
+  `CLOUDFLARE_ACCOUNT_ID`. No dashboard link between GitHub and Cloudflare
+  is needed: the deploy workflow uses the token.
 
 ### Waiting on Anthony
 
