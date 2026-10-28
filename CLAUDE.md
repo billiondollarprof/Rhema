@@ -566,6 +566,10 @@ explained before it runs.**
    destroy data).
 4. Wait. Anthony approves it or he does not.
 
+For a migration, his approval is given once, for the testing database.
+After it passes there, it goes to live without a second ask (see "Once
+testing passes, it goes live" below).
+
 On top of that, for this project:
 
 - **Every change to the database shape is a migration file in the repo.**
@@ -594,9 +598,31 @@ stops a hospital front desk.
    Look at it there: both themes, a phone and a desktop, click the things.
 4. Only then merge `testing` into `main`, which deploys to the live address.
 
-Claude does not merge to `main` without being asked. Pushing to `testing`
-does not need asking, because nobody outside sees it. Hotfixes straight to
-`main` are allowed only when the live system is broken.
+### Once testing passes, it goes live
+
+Anthony, 2026-10-28: "Once you test something and the test passes
+properly, you can put it in the live. So write it as a rule... That's the
+whole essence of creating a test."
+
+So this is a standing permission, and it replaces asking every time.
+
+- **When a change has passed everything on `testing`, Claude merges it
+  into `main` without asking again.** That means: CI green, the testing
+  deploy and its smoke test green, and, for a database change, the
+  testing database took it with 0 new security warnings.
+- **The live database follows the same way.** A migration that went onto
+  the testing database cleanly goes onto the live one from `main`. The
+  workflow `db-live.yml` refuses any migration that the testing database
+  does not already have, so nothing can reach live untested.
+- **What it never covers.** A change that deletes, drops or renames
+  anything still gets asked for in plain words first. So does a design
+  decision. And a red check anywhere means stop and say so, never work
+  around it.
+- **Every move to live gets a short report**: what went live, and what the
+  checks said.
+
+Pushing to `testing` does not need asking, because nobody outside sees it.
+Hotfixes straight to `main` are allowed only when the live system is broken.
 
 **After anything lands on `main`, merge `main` back into `testing` straight
 away**, so `testing` is only ever ahead of `main` or level with it.

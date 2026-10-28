@@ -250,10 +250,36 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     0 security warnings, database login works. Both projects re-checked
     with their own password (Supabase check run 40652220065).
     Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
-    eu-west-3 (Paris). Asked Anthony whether to keep it or recreate it.
-    WAITING for his yes to apply the same SQL to the live database.
+    eu-west-3 (Paris). He said keep it.
+
+### From 2026-10-28, after testing passed
+
+66. **Security against attackers, not only RLS.** "Making sure that the
+    hospital's database is protected, their code is not exposed publicly,
+    and every code is clean, readable." Next steps for it: npm audit in CI
+    (CLAUDE.md already promises it, not built yet), security headers on
+    the Worker, GitHub secret scanning, the advisor check failing CI on a
+    new warning, rate limits on sign in.
+67. **Docs an engineer can jump into.** "An engineer just goes to a
+    particular section and they know what to do." Every file and doc keeps
+    a header and numbered sections. Add a short map at the top of README.
+68. **Walk him through the AWS piece when it is time.**
+69. **Unstable network.** "Is it possible... when the network is poor, the
+    doctor will still get the details? Then when the network is strong, the
+    details can go to the server." Answered in chat with three options
+    (offline queue on each device, a backup internet line, a small local
+    server in the hospital). WAITING for his choice.
+70. **Cron jobs.** He asked where the system needs one. Answered: nightly
+    backup, the renewal and maintenance reminders, the AWS uptime watcher.
+    Cloudflare Worker cron triggers are free. Build with those items.
 
 ### Decided
+
+- 2026-10-28: Keep the testing project in Ireland. "As long as there's no
+  impact... keep the Ireland like that."
+- 2026-10-28: Once a change passes on testing, it goes live without asking
+  again. Written into CLAUDE.md ("Once testing passes, it goes live").
+  `db-live.yml` refuses any migration the testing database does not have.
 
 - 2026-10-28: Database plan approved. Updates alert nobody; people see them
   when they open the record. Alerts only for what was requested or sent on
