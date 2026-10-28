@@ -49,19 +49,22 @@ jobs:
       # ===== 1. Build both database addresses =====
       # Same method as db-testing.yml: ask Supabase for the pooler address,
       # then connect with the password. The passwords are masked in the log.
+      # The function writes straight to GITHUB_ENV. It must not be called
+      # inside $( ), because then the mask line would end up inside the
+      # address (that broke the first run, 2026-10-28, before anything ran).
       - name: Build the database addresses
         run: |
           address() {
             pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-              "https://api.supabase.com/v1/projects/$1/config/database/pooler")
+              "https://api.supabase.com/v1/projects/$2/config/database/pooler")
             host=$(echo "$pooler" | jq -r '.[0].db_host')
             user=$(echo "$pooler" | jq -r '.[0].db_user')
-            pass=$(P="$2" python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["P"],safe=""))')
+            pass=$(P="$3" python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["P"],safe=""))')
             echo "::add-mask::$pass"
-            echo "postgresql://$user:$pass@$host:5432/postgres"
+            echo "$1=postgresql://$user:$pass@$host:5432/postgres" >> "$GITHUB_ENV"
           }
-          echo "LIVE_URL=$(address "$LIVE_REF" "$LIVE_PASSWORD")" >> "$GITHUB_ENV"
-          echo "TESTING_URL=$(address "$TESTING_REF" "$TESTING_PASSWORD")" >> "$GITHUB_ENV"
+          address LIVE_URL "$LIVE_REF" "$LIVE_PASSWORD"
+          address TESTING_URL "$TESTING_REF" "$TESTING_PASSWORD"
 
       # ===== 2. The guard: testing must already have every migration =====
       - name: Refuse anything the testing database has not taken
