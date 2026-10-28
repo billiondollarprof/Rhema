@@ -188,10 +188,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 - Invite his own Supabase login into the hospital's Supabase organisation:
   DONE 2026-10-28, he accepted it. But the agent's Supabase connector was
   authorised for the StellaXafe organisation only, so it still cannot see
-  "Rhema Medical Center". He must reconnect the Supabase connector at
-  claude.ai/customize/connectors, tick BOTH organisations on Supabase's
-  approval screen, then start a NEW session (connectors load at session
-  start). First thing in that session: list_projects and confirm the
+  "Rhema Medical Center". Supabase's approval screen allows only ONE
+  organisation per connection (seen 2026-10-28). So: the connector points at
+  Rhema Medical Center for this build, and gets switched back to StellaXafe
+  Ecosystem when StellaXafe work resumes (about a minute, at
+  claude.ai/customize/connectors). Migrations do not depend on the
+  connector anyway: CI applies them with the SUPABASE_ACCESS_TOKEN secret.
+  After switching, start a NEW session (connectors load at session start). First thing in that session: list_projects and confirm the
   hospital project (ref ntfvckqczpmylskusgft) and its region.
 - Supabase project region and name (rename to rhema-hospital).
 
