@@ -204,6 +204,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   Observability edit, no expiry, replaced at handover) and
   `CLOUDFLARE_ACCOUNT_ID`. No dashboard link between GitHub and Cloudflare
   is needed: the deploy workflow uses the token.
+- **Testing address LIVE 2026-10-28:**
+  https://rhema-hospital-testing.rhemamedical.workers.dev (Deploy run
+  40623406107, attempt 3, smoke test passed). workers.dev subdomain:
+  rhemamedical. This environment cannot open workers.dev, so the live
+  check is GitHub's smoke test plus the local screenshots of the same build.
+  Adding a Playwright screenshot of the live address to the deploy workflow
+  is on the list.
 
 ### Waiting on Anthony
 
