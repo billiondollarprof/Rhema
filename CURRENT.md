@@ -110,9 +110,15 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     hospital name, "HOSPITAL OPERATIONS SYSTEM"), "a little bit kind of
     animated... has some shimmer". It covers the screen when idle. Swap the
     "RH" mark for the real hospital logo when he gets it. The image as sent
-    spells the name "REMA HOSPITAL", without the H: asked him to confirm
-    before anything is built. Waiting for his confirmation of the request.
-36. **Question, answered in chat 2026-10-28:** how to resell or repurpose
+    spells the name "REMA HOSPITAL", without the H. He confirmed RHEMA.
+    Built 2026-10-28 in `web/components/IdleScreen.tsx`, drawn in code:
+    drifting waves, glowing light ribbons, a breathing ring, a shimmer across
+    the name, and no movement when the device asks for reduced motion. Shown
+    at the root address for now. Checked at 320, 375 and 1440 wide. Comes off
+    when he has seen it on the testing address.
+36. **Question, answered 2026-10-28 and saved to Drive** as "09 - BUSINESS -
+    Reselling the Hospital System to Other Nigerian Hospitals" (Discovery
+    folder): how to resell or repurpose
     the system for other hospitals, and where to find Nigerian hospitals that
     have not gone digital.
 

@@ -1,0 +1,172 @@
+/*
+ * IdleScreen.module.css: the look and the movement of the RHEMA idle screen.
+ * Every animation is slow on purpose. This screen sits on a desk for hours,
+ * so it should feel calm, never busy.
+ */
+
+/* ===== 1. The screen ===== */
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 90% at 50% 20%, #1b5fd6 0%, #0d3a9a 45%, #061f63 100%);
+  color: #fff;
+}
+
+/* ===== 2. Waves ===== */
+.waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.waveSlow,
+.waveMid,
+.waveFast {
+  animation-name: drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.waveSlow {
+  animation-duration: 60s;
+}
+.waveMid {
+  animation-duration: 42s;
+  animation-direction: reverse;
+}
+.waveFast {
+  animation-duration: 30s;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-1600px);
+  }
+}
+
+.topGlow {
+  position: absolute;
+  inset: -20% 10% auto;
+  height: 60%;
+  background: radial-gradient(closest-side, rgba(120, 190, 255, 0.35), transparent);
+  pointer-events: none;
+}
+
+/* ===== 3. The mark in its ring ===== */
+.centre {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  text-align: center;
+  /* Lift the group a little above the middle, as in the design. */
+  margin-top: -6vh;
+}
+
+.ring {
+  width: clamp(110px, 22vw, 190px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 3px solid #7cc8ff;
+  background: radial-gradient(circle, rgba(10, 40, 110, 0.65), rgba(6, 31, 99, 0.25));
+  animation: breathe 5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 18px rgba(90, 180, 255, 0.35),
+      inset 0 0 14px rgba(90, 180, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 42px rgba(90, 180, 255, 0.7),
+      inset 0 0 22px rgba(90, 180, 255, 0.35);
+  }
+}
+
+.mark {
+  font-size: clamp(44px, 9vw, 82px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: linear-gradient(115deg, #ffffff 0%, #ffffff 40%, #41b8ff 55%, #ffffff 70%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+/* ===== 4. The name and the shimmer ===== */
+.name {
+  margin: 10px 0 0;
+  font-size: clamp(26px, 5.6vw, 58px);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  /* A band of light slides across the white letters. */
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #ffffff 42%,
+    #9fdcff 50%,
+    #ffffff 58%,
+    #ffffff 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: clamp(11px, 1.7vw, 20px);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  color: #8fd0ff;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  60%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+/* ===== 5. Footer ===== */
+.footer {
+  position: absolute;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== 6. People who switched motion off on their device ===== */
+@media (prefers-reduced-motion: reduce) {
+  .waveSlow,
+  .waveMid,
+  .waveFast,
+  .ring,
+  .mark,
+  .name {
+    animation: none;
+  }
+}
