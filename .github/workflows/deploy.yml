@@ -52,7 +52,11 @@ jobs:
       - name: Deploy to Cloudflare
         if: steps.gate.outputs.ready == 'yes'
         id: deploy
+        # pipefail: without it, "| tee" hides a failed deploy behind tee's
+        # own success, and the step goes green when nothing was deployed.
+        # Found 2026-10-28, when a bad account ID still showed success.
         run: |
+          set -o pipefail
           npx wrangler deploy --name "$WORKER_NAME" | tee deploy.log
           url=$(grep -o 'https://[a-z0-9.-]*workers\.dev' deploy.log | head -1)
           echo "url=$url" >> "$GITHUB_OUTPUT"
