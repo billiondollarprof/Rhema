@@ -166,6 +166,22 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   for email. The hospital gets its own Cloudflare account. PWA first.
   Two branches, `testing` and `main`, with CI and CD.
 
+### Access, as it stands (2026-10-28)
+
+- GitHub secrets set: `SUPABASE_ACCESS_TOKEN` (a scoped token from the
+  hospital account, named github-ci, locked to the rhema-hospital project:
+  read and write on Database and Migrations only, read on the rest, nothing
+  that can delete, pause or restore the project) and `SUPABASE_DB_PASSWORD`.
+- The Supabase connector stays on StellaXafe. RHEMA's database is reached
+  through GitHub Actions. This environment blocks Supabase addresses, so a
+  token here would not work anyway.
+- `ops/supabase_check.py` and `.github/workflows/supabase-check.yml` prove
+  the access. Sign in settings (email codes, Resend) are set by hand in the
+  dashboard, because a token able to change them could also delete the
+  project.
+- At handover: delete the github-ci token and give the hospital a fresh one.
+- Still to add: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+
 ### Waiting on Anthony
 
 - Domain move from his Cloudflare account to the hospital's. Done so far:
