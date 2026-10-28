@@ -180,6 +180,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   dashboard, because a token able to change them could also delete the
   project.
 - At handover: delete the github-ci token and give the hospital a fresh one.
+- PROVED 2026-10-28 (run 40616871905): the token reaches the project, the
+  project is ACTIVE_HEALTHY in **eu-west-3 (Paris)**, and the database
+  password logs in through the pooler (PostgreSQL 17.11). The project is
+  still named "rhemamedical7@gmail.com's Project"; rename to rhema-hospital.
+- Supabase's security advisor shows 2 warnings on a fresh project: SECURITY
+  DEFINER functions that the public and signed in users can run. To be
+  looked at and closed when the first migration is written.
 - Still to add: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 
 ### Waiting on Anthony
