@@ -221,6 +221,16 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     speech to text work (the Bible display project) once it works well.
     Possibly with AI to help write the records. Undecided.
 
+### From 2026-10-28, database step
+
+64. **First migration built and proved**, not yet applied to the hospital's
+    database: `supabase/migrations/20261028120000_foundation.sql` (staff,
+    rooms, families, patients, activity log) with its undo file and 15
+    security tests. Each test was proved to catch a deliberate break
+    locally. CI run 40645788977 passed all 15 on a real throwaway Supabase,
+    plus undo and redo. WAITING for Anthony's yes to apply it to the live
+    database, and for his answer on a second Supabase project for testing.
+
 ### Decided
 
 - 2026-10-28: Database plan approved. Updates alert nobody; people see them
