@@ -21,3 +21,10 @@ the file where you can see it working. Read this to revise.
 | `len()` | Count the items in a list. | `checks/copy_check.py` |
 | `sys.exit(1)` | Stop and tell the computer "this failed". | `checks/copy_check.py` |
 | `if __name__ == "__main__":` | Only run this when the file is run directly. | `checks/copy_check.py` |
+| `os.environ.get("NAME", "")` | Read a value GitHub put in the environment, or `""` if it is missing. | `ops/supabase_check.py` |
+| `with ... as ...:` | Open something, use it, and close it again by itself at the end. | `ops/supabase_check.py` |
+| `json.loads(text)` | Turn JSON text into Python lists and dictionaries. | `ops/supabase_check.py` |
+| `.get("key", [])` on a dictionary | Look up a key, with a safe default if it is not there. | `ops/supabase_check.py` |
+| `list[0]` | The first item in a list. Counting starts at 0. | `ops/supabase_check.py` |
+| `subprocess.run([...])` | Run another program from Python and collect its answer. | `ops/supabase_check.py` |
+| `!=` | "Is not equal to". | `ops/supabase_check.py` |

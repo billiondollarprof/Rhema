@@ -1,0 +1,32 @@
+# supabase-check.yml: proves GitHub can reach the hospital's Supabase
+# project with the secrets that were added. Runs ops/supabase_check.py.
+# It runs when that script or this file changes on testing, and can also be
+# started by hand from the Actions tab.
+name: Supabase check
+
+on:
+  push:
+    branches: [testing]
+    paths:
+      - ops/supabase_check.py
+      - .github/workflows/supabase-check.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+      - name: Check Supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: python ops/supabase_check.py
