@@ -122,6 +122,22 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     the system for other hospitals, and where to find Nigerian hospitals that
     have not gone digital.
 
+### From 2026-10-28, second message
+
+37. **Renewal reminder built into the app.** One month before the domain
+    renews (and any other yearly cost), the system reminds the admin inside
+    the app and emails the hospital's decision makers, telling them to
+    contact StellaXafe for the renewal. "Instead of waiting for Cloudflare to
+    remind them." The domain is the only yearly cost the hospital pays, about
+    $14 a year. To be built with the admin module, using a scheduled job.
+38. **Maintenance reminder every 3 months**, telling the admin to contact
+    StellaXafe for a system check and bug fixes. It starts after the 3
+    months of free support in the proposal; the paid maintenance plan after
+    that is discussed separately with the hospital. Same scheduled job.
+39. **"Upgrade to Team" seen in Supabase.** Answered: inviting a member
+    worked on the free plan and nothing was paid. Team is an optional paid
+    plan we do not need.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project
@@ -169,8 +185,14 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
   "temporary failure" and checks again for 72 hours before failing it. So:
   hospital staff go live only AFTER the move (6 Nov), and the move is done at
   a quiet time. Before go-live, Resend must show Verified again.
-- Invite his own Supabase login into the hospital's Supabase organisation,
-  so the agent's Supabase tools can reach the project.
+- Invite his own Supabase login into the hospital's Supabase organisation:
+  DONE 2026-10-28, he accepted it. But the agent's Supabase connector was
+  authorised for the StellaXafe organisation only, so it still cannot see
+  "Rhema Medical Center". He must reconnect the Supabase connector at
+  claude.ai/customize/connectors, tick BOTH organisations on Supabase's
+  approval screen, then start a NEW session (connectors load at session
+  start). First thing in that session: list_projects and confirm the
+  hospital project (ref ntfvckqczpmylskusgft) and its region.
 - Supabase project region and name (rename to rhema-hospital).
 
 - Yes or no to the stack and the plan in `PLAN.md`.
