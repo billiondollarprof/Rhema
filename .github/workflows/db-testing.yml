@@ -39,14 +39,24 @@ jobs:
         with:
           version: 2.122.0
 
-      - name: Connect to the testing project
-        run: supabase link --project-ref "$TESTING_REF" --password "$SUPABASE_DB_PASSWORD"
+      # No "supabase link": it asks for more than our narrow key may do.
+      # Instead, ask Supabase only for the pooler address (allowed), then
+      # connect straight to the database with its password.
+      - name: Build the database address
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$TESTING_REF/config/database/pooler")
+          host=$(echo "$pooler" | jq -r '.[0].db_host')
+          user=$(echo "$pooler" | jq -r '.[0].db_user')
+          pass=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"],safe=""))')
+          echo "::add-mask::$pass"
+          echo "DB_URL=postgresql://$user:$pass@$host:5432/postgres" >> "$GITHUB_ENV"
 
       - name: Show what will be applied
-        run: supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD"
+        run: supabase db push --db-url "$DB_URL" --dry-run
 
       - name: Apply it
-        run: supabase db push --password "$SUPABASE_DB_PASSWORD"
+        run: supabase db push --db-url "$DB_URL"
 
       - uses: actions/setup-python@v5
         with:
