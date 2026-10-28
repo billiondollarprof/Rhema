@@ -8,11 +8,11 @@
 -- option added this function, and the security advisor warned that anybody
 -- (anon) and any signed in user (authenticated) could call it through the
 -- web API. Anthony approved closing it on 2026-10-28.
-
-The line names "public" (every role) as well as anon and authenticated.
-Postgres lets every role run a new function by default, so revoking from
-anon and authenticated alone leaves them able to run it. That was proved
-on a local copy before this line changed.
+--
+-- The line names "public" (every role) as well as anon and authenticated.
+-- Postgres lets every role run a new function by default, so revoking from
+-- anon and authenticated alone leaves them able to run it. That was proved
+-- on a local copy before this line changed.
 --
 -- The function only exists on the live project. Testing and CI were made
 -- without that option, so there this file does nothing. Supabase itself
