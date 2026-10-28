@@ -197,7 +197,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Bahmni (admission, discharge, transfer) and Open Hospital (patients,
     visits, medicines, admissions). Ideas only, marked "(borrowed)" in
     `docs/DATABASE.md`.
-57. Plan updated to version 2 in `docs/DATABASE.md`. Waiting for his yes.
+57. Plan updated to version 2 in `docs/DATABASE.md`. **Approved 2026-10-28.**
 
 ### From 2026-10-28, seventh message
 
@@ -222,6 +222,10 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Possibly with AI to help write the records. Undecided.
 
 ### Decided
+
+- 2026-10-28: Database plan approved. Updates alert nobody; people see them
+  when they open the record. Alerts only for what was requested or sent on
+  purpose. Full record: doctors, nurses, matron only. Lock screen 10 minutes.
 
 - 2026-10-27: Licence. "The entire back end for this particular project
   belongs to Rhema." StellaXafe keeps its general foundation and can build

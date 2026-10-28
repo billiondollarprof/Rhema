@@ -1,5 +1,10 @@
 # DATABASE.md
 
+**Approved by Anthony on 2026-10-28.** Lock screen default 10 minutes. The
+full medical record is for doctors, nurses and the matron only. The front
+desk sees what the RHEMA demo shows it (registration, payments, the journey,
+and prescriptions or results sent to it on purpose).
+
 The plan for the RHEMA database. Version 2, written 2026-10-28, for Anthony
 to approve before any SQL runs.
 
@@ -236,7 +241,10 @@ be spamming people that do not ask for notification." So:
 - A lab result alerts the doctor who requested it, and nobody else.
 - Updating a record alerts nobody.
 - "Call attention", a message, or a result sent on purpose alerts the
-  person or desk it was sent to.
+  person or desk it was sent to. The lab can send a result on purpose to the
+  front desk or the nursing station when it matters.
+- Everyone else sees new information when they next open the patient. The
+  record is always current, so nobody needs an alert to find it.
 - Nobody gets an alert about something that is not their business.
 
 ---
