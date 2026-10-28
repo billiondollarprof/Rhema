@@ -274,12 +274,23 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     doctor will still get the details? Then when the network is strong, the
     details can go to the server." Answered in chat with three options
     (offline queue on each device, a backup internet line, a small local
-    server in the hospital). WAITING for his choice.
+    server in the hospital). He chose 1 and 2 (see Decided). Then asked:
+    "is it possible they can open any screen and type in something if the
+    network is down, and also be able to find patients?... Is that really
+    safe?" Answered: typing on any open screen, yes. Offline patient search
+    means patient details kept on the computer, so proposed a limited, wiped
+    on sign out version. WAITING for his choice on offline search.
 70. **Cron jobs.** He asked where the system needs one. Answered: nightly
     backup, the renewal and maintenance reminders, the AWS uptime watcher.
     Cloudflare Worker cron triggers are free. Build with those items.
 
 ### Decided
+
+- 2026-10-28: Poor network: option 1 (offline queue, anybody already
+  signed in keeps working through a drop, saves go up when the network is
+  back) and option 2 (backup internet, which the hospital switches on by
+  hand in under 5 minutes; they use Starlink). Staff are told the limit:
+  what is typed offline reaches the doctor only when the network is back.
 
 - 2026-10-28: Keep the testing project in Ireland. "As long as there's no
   impact... keep the Ireland like that."
