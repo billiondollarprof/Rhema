@@ -104,6 +104,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 34. **Aim: app built within about 10 days, test runs and small fixes after,
     then plug in email and install.** No need to wait for day 14.
 
+### From 2026-10-28
+
+35. **Holding screen: use his image** (blue waves, "RH" mark in a circle,
+    hospital name, "HOSPITAL OPERATIONS SYSTEM"), "a little bit kind of
+    animated... has some shimmer". It covers the screen when idle. Swap the
+    "RH" mark for the real hospital logo when he gets it. The image as sent
+    spells the name "REMA HOSPITAL", without the H: asked him to confirm
+    before anything is built. Waiting for his confirmation of the request.
+36. **Question, answered in chat 2026-10-28:** how to resell or repurpose
+    the system for other hospitals, and where to find Nigerian hospitals that
+    have not gone digital.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project
@@ -165,7 +177,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 2026-10-27: the foundation is in. `npm run verify` passes all six checks
 (format, lint, types, tests, Python dash check, build). The holding screen
 was run under `wrangler dev` and screenshotted at phone and desktop widths,
-in both themes. Deploy waits for the Cloudflare secrets.
+in both themes. Deploy waits for the Cloudflare secrets. First CI run on `testing`
+passed on GitHub (run 40601990216).
 
 Session 1 wrote the rules and the plan only. There is no app code yet.
 The proposal PDF and the Rema demo file are not in the repo, on purpose:
