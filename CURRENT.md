@@ -14,7 +14,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 ### From 2026-10-27 (session 1)
 
 1. **Check the demo is the updated one by comparing it with Lana.**
-   Done: the Rema demo is the newer one, Lana is an older copy. See
+   Done: the RHEMA demo is the newer one, Lana is an older copy. See
    `PLAN.md` section 1. *Can come off once he confirms.*
 2. **Plan the stack: Next.js front and back end, Neon instead of Supabase,
    Resend for email.** Planned in `PLAN.md`. Waiting for his yes.
@@ -164,8 +164,40 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 ### From 2026-10-28, fifth message
 
 46. **"Move to the next on the list"**: the database. Plan written in
-    `docs/DATABASE.md` from the Rema demo's fields. Waiting for his yes on
+    `docs/DATABASE.md` from the RHEMA demo's fields. Waiting for his yes on
     the plan and on the five safety choices before any SQL is written.
+
+### From 2026-10-28, sixth message
+
+47. **"It is Rhema, R-H-E-M-A."** Every "Rema" in our files changed to
+    RHEMA (the demo's file name `indexrema.html` stays as he saved it).
+48. **The hospital's note**, word for word: "Medical Reports for both
+    nursing mothers and other patients. Nursing Station; Comment/report.
+    They note the medications given/the vital signs. They note the time the
+    medication was given. Sending Lab information to to the front desk and
+    to the nursing station. Also EMR where the records of their medications
+    they're currently taking is; this is for the nursing station."
+49. **Nursing stations (two)**: nurses message, record vitals, record
+    medications given with the time, write comments and reports, and see
+    each patient's current medications.
+50. **Prescription flow**: doctor sends to front desk; front desk charges,
+    marks paid, then sends to pharmacy. The doctor can also send straight
+    to pharmacy or lab, and request from them.
+51. **Patient status**: visiting, in consultation, admitted, discharged.
+    Light EMR only, no scanning.
+52. **Money in naira with 2 decimal places**, not kobo.
+53. **Patient numbers start RMC-** (RHEMA Medical Center), assigned
+    automatically.
+54. **PIN lock after idle** (5 or 15 minutes, "anyone that suits"): planned
+    10 minutes, changeable by the admin. **Session ends after 24 hours
+    without use**, then a fresh sign in.
+55. **Lock screen replaces the idle screen**: the PIN pad on the RHEMA idle
+    design, with the animation.
+56. **Look at simple open-source hospital systems for inspiration.** Done:
+    Bahmni (admission, discharge, transfer) and Open Hospital (patients,
+    visits, medicines, admissions). Ideas only, marked "(borrowed)" in
+    `docs/DATABASE.md`.
+57. Plan updated to version 2 in `docs/DATABASE.md`. Waiting for his yes.
 
 ### Decided
 
@@ -276,6 +308,6 @@ in both themes. Deploy waits for the Cloudflare secrets. First CI run on `testin
 passed on GitHub (run 40601990216).
 
 Session 1 wrote the rules and the plan only. There is no app code yet.
-The proposal PDF and the Rema demo file are not in the repo, on purpose:
+The proposal PDF and the RHEMA demo file are not in the repo, on purpose:
 the repo is public, and both are confidential. They go in once it is
 private.

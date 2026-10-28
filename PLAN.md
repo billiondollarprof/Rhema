@@ -22,24 +22,24 @@ Read `CLAUDE.md` first for how we work. Read `CURRENT.md` for what is open.
 
 ## 1. Which demo is the real one
 
-**The Rema demo is the updated one. It is not the same as the Lana demo.**
+**The RHEMA demo is the updated one. It is not the same as the Lana demo.**
 
 How we know: the two files were compared line by line.
 
 - The Lana file is 189 lines and has 7 screens: call attention, documents,
   find, invite, lab, register, send to room.
-- The Rema file is 420 lines and has 12 screens. It has all 7 of those, and
+- The RHEMA file is 420 lines and has 12 screens. It has all 7 of those, and
   adds medical record, payments, edit patient, activity logs and a patient
   picker. It also has the email code sign in, the Week / Month / Year /
   5 years chart, "Show more" on phones, and the Plus Jakarta Sans font.
 - The proposal PDF screenshots (dashboard, register with next of kin and
   payment, medical record, send with a note, messages with groups,
-  documents) match the Rema file, not the Lana one.
-- The one thing Lana has that Rema does not is the "office view" (the app
+  documents) match the RHEMA file, not the Lana one.
+- The one thing Lana has that RHEMA does not is the "office view" (the app
   drawn on a monitor on a desk). That was a demo effect, so losing it is
   expected.
 
-So the Lana file Anthony has is an older copy. The Rema file is the
+So the Lana file Anthony has is an older copy. The RHEMA file is the
 reference we build from.
 
 ---
@@ -64,7 +64,7 @@ reference we build from.
 StellaXafe feels instant because clicking never reloads the page. Next.js
 does the same thing when it is built that way: it loads the next screen
 before you click (prefetch), keeps data you already saw on the device, and
-shows a change on screen before the save finishes. The Rema demo already
+shows a change on screen before the save finishes. The RHEMA demo already
 behaves like this, so the build keeps that feel.
 
 ---
@@ -396,7 +396,7 @@ next starts. Nothing here needs the domain or Resend.
    to the project's team members, a few an hour. That is enough for
    Anthony to test with until Resend is connected on 6 November. Also the
    4 digit PIN screen lock, as in the demo.
-5. **Screens, module by module, from the Rema demo:** home and queue,
+5. **Screens, module by module, from the RHEMA demo:** home and queue,
    register, find and edit, send to room, medical record, laboratory,
    pharmacy, payments, documents and printing.
 6. **Talking to each other:** messages, notifications, announcements,

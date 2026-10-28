@@ -18,9 +18,9 @@ Log of each work session. Newest at the top. Keep entries short.
 ## Session 1: 2026-10-27, planning
 
 Anthony started the project: client is RHEMA Medical Center, 8 week
-build from the Rema demo and the proposal.
+build from the RHEMA demo and the proposal.
 
-- Compared the Rema and Lana demos. Rema is the newer one (12 screens
+- Compared the RHEMA and Lana demos. RHEMA is the newer one (12 screens
   against 7, and it matches the proposal screenshots).
 - Checked the free limits for Neon, Resend, Cloudflare R2, Workers,
   Durable Objects, Vercel and AWS, with sources, in `PLAN.md`.
