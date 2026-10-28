@@ -254,7 +254,10 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     ACTIVE_HEALTHY, login works, 2 warnings, both about
     `public.rls_auto_enable()` (Supabase's own function from the automatic
     RLS option): anon and signed in users can call it. Not ours. Proposed
-    to Anthony: revoke EXECUTE from anon and authenticated. WAITING.
+    to Anthony: revoke EXECUTE from anon and authenticated. He said yes.
+    Local test showed that alone does not work (every role can run a new
+    function by default), so the migration also names public. WAITING for
+    his yes on that fuller line before it goes to testing and live.
     Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
     eu-west-3 (Paris). He said keep it.
 
@@ -279,12 +282,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     network is down, and also be able to find patients?... Is that really
     safe?" Answered: typing on any open screen, yes. Offline patient search
     means patient details kept on the computer, so proposed a limited, wiped
-    on sign out version. WAITING for his choice on offline search.
+    on sign out version. He chose "limited offline" (see Decided). Build it
+    with sign in and the first screens, because it needs both.
 70. **Cron jobs.** He asked where the system needs one. Answered: nightly
     backup, the renewal and maintenance reminders, the AWS uptime watcher.
     Cloudflare Worker cron triggers are free. Build with those items.
 
 ### Decided
+
+- 2026-10-28: Limited offline search. Only name, RMC number and phone kept
+  on the computer, scrambled, the key lost at sign out, everything wiped at
+  sign out and at the 24 hour expiry. Medical records are never kept on the
+  computer.
 
 - 2026-10-28: Poor network: option 1 (offline queue, anybody already
   signed in keeps working through a drop, saves go up when the network is
