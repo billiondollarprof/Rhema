@@ -161,6 +161,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 45. He cannot open the link on his tablet yet because of a VPN on it. His
     to fix.
 
+### From 2026-10-28, fifth message
+
+46. **"Move to the next on the list"**: the database. Plan written in
+    `docs/DATABASE.md` from the Rema demo's fields. Waiting for his yes on
+    the plan and on the five safety choices before any SQL is written.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project
