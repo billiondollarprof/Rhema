@@ -149,6 +149,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     `CLAUDE.md`. Still to build: the rollback workflow, the advisor check in
     CI, the dependency audit in CI, and the first project skills.
 
+### From 2026-10-28, fourth message
+
+42. **Idle screen seen live on his phone: "the animation is good, almost
+    unnoticed though."** Asked whether he wants it a little stronger.
+43. **Later: replace "Server: Ready" with "Powered by StellaXafe
+    Technologies Limited"**, as free marketing. Do it when the sign in
+    screen takes over the root address (the server status then moves to
+    the smoke test only).
+44. **RH logo stays a stand in** until the hospital sends its real logo.
+45. He cannot open the link on his tablet yet because of a VPN on it. His
+    to fix.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project
