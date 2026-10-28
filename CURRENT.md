@@ -231,6 +231,17 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     plus undo and redo. WAITING for Anthony's yes to apply it to the live
     database, and for his answer on a second Supabase project for testing.
 
+### From 2026-10-28, keys
+
+65. **Second Supabase project `rhema-testing` created** (Paris, automatic
+    RLS left off). His own account was removed from the hospital
+    organisation (it blocked the second free project, and is not needed).
+    That cut off the first github-ci token, which had been made in his own
+    account. A new `github-ci` token was made in the hospital account,
+    covering both projects. Live project re-checked with it 2026-10-28:
+    passed (run 40616871905, attempt 3). WAITING for the testing project ID
+    and a check that `SUPABASE_TESTING_DB_PASSWORD` is set.
+
 ### Decided
 
 - 2026-10-28: Database plan approved. Updates alert nobody; people see them
