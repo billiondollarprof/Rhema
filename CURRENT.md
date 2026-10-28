@@ -290,6 +290,16 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     backup, the renewal and maintenance reminders, the AWS uptime watcher.
     Cloudflare Worker cron triggers are free. Build with those items.
 
+71. **Supabase sign in settings.** He asked (2026-10-28) "can you set up the
+    Supabase auth yourself?" No: the github-ci key has Auth Config on read
+    only, on purpose (least access), and he does not want a new key. So he
+    sets 4 things by hand in both projects: sign ups off, the Magic Link
+    template sends a code, code expiry 600 seconds, Site URL. Steps given in
+    chat 2026-10-28. Until Resend (6 Nov), Supabase's own email only sends
+    to members of the hospital organisation, a few emails an hour.
+    WAITING for him to do the steps. Then CI reads the settings on every
+    run, so a change made by mistake shows up.
+
 ### Decided
 
 - 2026-10-28: Limited offline search. Only name, RMC number and phone kept
