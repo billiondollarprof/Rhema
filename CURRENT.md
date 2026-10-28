@@ -249,6 +249,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     the foundation migration went on, then the check said ACTIVE_HEALTHY,
     0 security warnings, database login works. Both projects re-checked
     with their own password (Supabase check run 40652220065).
+    APPLIED to LIVE 2026-10-28 (Database (live) run 40655032057), through
+    `db-live.yml` after the guard confirmed testing had it. Live check:
+    ACTIVE_HEALTHY, login works, 2 warnings, both about
+    `public.rls_auto_enable()` (Supabase's own function from the automatic
+    RLS option): anon and signed in users can call it. Not ours. Proposed
+    to Anthony: revoke EXECUTE from anon and authenticated. WAITING.
     Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
     eu-west-3 (Paris). He said keep it.
 
