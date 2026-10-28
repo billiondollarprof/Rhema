@@ -302,6 +302,10 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 
 ### Decided
 
+- 2026-10-28: Sign in works the same on testing and live (real email
+  codes on both). Offered a "Sign in as" list of made up staff on testing
+  only; he chose "proceed with the 13 steps" on both projects instead.
+
 - 2026-10-28: Limited offline search. Only name, RMC number and phone kept
   on the computer, scrambled, the key lost at sign out, everything wiped at
   sign out and at the 24 hour expiry. Medical records are never kept on the
