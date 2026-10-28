@@ -138,6 +138,17 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     worked on the free plan and nothing was paid. Team is an optional paid
     plan we do not need.
 
+### From 2026-10-28, third message
+
+40. **Code standard: cleaner than StellaXafe.** Modular, each section on its
+    own, no section bleeding into another, short direct headers, Humanizer
+    on every comment and doc, easy for a human engineer to carry on.
+    Written into `CLAUDE.md` ("The standard for this code").
+41. **Quick revert for any change**, **security from day one**, **checks
+    before every pull request**, **skills for repeated tasks**. Rules in
+    `CLAUDE.md`. Still to build: the rollback workflow, the advisor check in
+    CI, the dependency audit in CI, and the first project skills.
+
 ### Decided
 
 - 2026-10-27: Licence. "The entire back end for this particular project

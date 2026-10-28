@@ -455,6 +455,56 @@ Vetted open skills live in `.claude/skills/`, with their sources and
 licences in `.claude/skills/SOURCES.md`. Nothing gets added to that folder
 without being read whole first.
 
+## The standard for this code
+
+Anthony, 2026-10-28: "I even want this hospital's own project to be
+cleaner... modular codes, each section on its own... there'll be no
+bleeding of any section to another section... so a human engineer can
+carry on with it."
+
+StellaXafe is the bar. This repo has to be cleaner than it.
+
+- **One folder per part of the app, and parts do not reach into each
+  other.** Patients code lives in the patients folder. If the laboratory
+  needs a patient, it goes through the shared code in `web/lib/`, never by
+  importing a file from inside `web/app/patients/`. Shared code is only
+  what two or more parts really use.
+- **Every file opens with a short header**: what it is, why it exists, what
+  it must never do. Then numbered sections. Direct words, no padding, and
+  every comment goes through the Humanizer.
+- **As basic as possible.** The slowest engineer in the room must be able
+  to read it. No clever tricks.
+- **It behaves like a native app.** Separate pages for reading the code, one
+  app on the screen, no page reloads.
+
+## Every change can be undone
+
+- **One change, one pull request.** A pull request never mixes a fix with a
+  feature, so either can be taken back alone with `git revert`.
+- **Database changes come in pairs.** Every migration that adds something
+  ships with the SQL that removes it again, kept next to it in the repo.
+- **A bad deploy is rolled back, not hot fixed.** Cloudflare keeps the
+  previous versions of the Worker. The rollback workflow puts the last good
+  one back in under a minute, then the fix goes through `testing` as normal.
+
+## Security from day one
+
+- **RLS on every table from the moment it is created.** A table without
+  row level security does not get merged. CI runs Supabase's security
+  advisor on every change, and a new warning fails the build.
+- **Least access for every key.** Each token gets only the permissions its
+  job needs, and the reason is written in `CURRENT.md`.
+- **Dependencies are audited in CI.** A package with a known high or
+  critical problem fails the build.
+
+## Before a pull request
+
+`npm run verify` must pass, and the change must have been used by hand
+(see "Nothing is finished until it has been walked through"). Anything
+an agent does more than twice becomes a skill in `.claude/skills/`, so the
+next agent runs the skill instead of working it out again and spending
+credits on it.
+
 ## Patient data
 
 This system holds real patients' medical records. That is the most serious
