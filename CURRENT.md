@@ -258,6 +258,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Local test showed that alone does not work (every role can run a new
     function by default), so the migration also names public. WAITING for
     his yes on that fuller line. YES given 2026-10-28 ("yes, fuller line").
+    DONE 2026-10-28: Database (live) run 40668021266. Live now shows 0
+    security warnings, the same as testing.
     Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
     eu-west-3 (Paris). He said keep it.
 
