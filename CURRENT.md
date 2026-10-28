@@ -239,8 +239,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     That cut off the first github-ci token, which had been made in his own
     account. A new `github-ci` token was made in the hospital account,
     covering both projects. Live project re-checked with it 2026-10-28:
-    passed (run 40616871905, attempt 3). WAITING for the testing project ID
-    and a check that `SUPABASE_TESTING_DB_PASSWORD` is set.
+    passed (run 40616871905, attempt 3). Testing project ID:
+    **nfrvwvqmfxudaarfuwxg**. Its password is in the GitHub secret named
+    **SUPABASE_TESTING** (his name for it; the code uses that name).
+    `.github/workflows/db-testing.yml` applies migrations to the testing
+    project only. The live project gets migrations from main only, after his
+    yes on the SQL.
 
 ### Decided
 

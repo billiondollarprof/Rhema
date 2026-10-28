@@ -1,7 +1,12 @@
-# supabase-check.yml: proves GitHub can reach the hospital's Supabase
-# project with the secrets that were added. Runs ops/supabase_check.py.
-# It runs when that script or this file changes on testing, and can also be
-# started by hand from the Actions tab.
+# supabase-check.yml: proves GitHub can reach both hospital Supabase
+# projects with the secrets that were added, and prints Supabase's security
+# warnings for each. Runs ops/supabase_check.py once per project.
+#
+# Secret names, as Anthony created them:
+#   SUPABASE_ACCESS_TOKEN  one key for both projects (made in the hospital
+#                          account, named github-ci)
+#   SUPABASE_DB_PASSWORD   the live database password
+#   SUPABASE_TESTING       the testing database password
 name: Supabase check
 
 on:
@@ -18,6 +23,17 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: live
+            ref: ntfvckqczpmylskusgft
+            password_secret: SUPABASE_DB_PASSWORD
+          - name: testing
+            ref: nfrvwvqmfxudaarfuwxg
+            password_secret: SUPABASE_TESTING
+    name: check (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,8 +41,9 @@ jobs:
           python-version: '3.13'
       - name: Make sure psql is installed
         run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
-      - name: Check Supabase
+      - name: Check Supabase (${{ matrix.name }})
         env:
+          SUPABASE_PROJECT_REF: ${{ matrix.ref }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_DB_PASSWORD: ${{ secrets[matrix.password_secret] }}
         run: python ops/supabase_check.py

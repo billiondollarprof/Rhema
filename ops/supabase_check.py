@@ -8,8 +8,9 @@
 #     3. Can we log in to the database itself with the password?
 #
 # How it runs:
-#   On GitHub Actions only (.github/workflows/supabase-check.yml), because
-#   that is where the secrets live. It reads them from the environment.
+#   On GitHub Actions only, because that is where the secrets live. It reads
+#   them from the environment. It checks one project per run: the live one
+#   or the testing one, whichever SUPABASE_PROJECT_REF names.
 #
 # What it must never do:
 #   Print a secret, or read any table that could hold patient data. It only
@@ -37,9 +38,11 @@ import urllib.request
 
 # ===== 2. Settings =====
 
-# The project's ID (its "ref"). It is part of the project's web address, so
-# it is not a secret.
-PROJECT_REF = "ntfvckqczpmylskusgft"
+# Which project to check. Its ID (its "ref") is part of its web address, so
+# it is not a secret. If none is given, check the live project.
+#   live:    ntfvckqczpmylskusgft
+#   testing: nfrvwvqmfxudaarfuwxg
+PROJECT_REF = os.environ.get("SUPABASE_PROJECT_REF", "ntfvckqczpmylskusgft")
 
 # os.environ.get reads a value that GitHub put in the environment.
 # The second value, "", is what we get if it is missing.
@@ -87,6 +90,8 @@ def main():
     print("Security warnings:", len(warnings))
     for warning in warnings:
         print("  -", warning.get("title"), "|", warning.get("level"))
+        # "detail" says exactly which table or function the warning is about.
+        print("    ", warning.get("detail"))
 
     # Check 3: log in to the database through Supabase's connection pooler
     # (the front door that shares connections). GitHub's computers cannot
