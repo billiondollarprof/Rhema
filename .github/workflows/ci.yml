@@ -25,3 +25,18 @@ jobs:
           python-version: '3.13'
       - run: npm ci
       - run: npm run verify
+
+  # The database: starts a throwaway Supabase on GitHub's computer, which
+  # applies every migration, then runs the security tests and proves every
+  # change can be undone. Nothing here touches the hospital's database.
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+      - name: Start a throwaway Supabase database
+        run: supabase db start
+      - name: Run the security tests, then undo and redo every change
+        run: scripts/db-test.sh "postgresql://postgres:postgres@127.0.0.1:54322/postgres" --tests-only
