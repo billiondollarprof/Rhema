@@ -426,6 +426,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Actions, it changes the testing account (rhemamedical7@gmail.com) to
     that role on the TESTING database only, admin tick kept on. He keeps
     Dr. Evans as plain admin ("just leave it like that").
+    Proved 2026-10-29 (run 40828938982, role admin, so nothing visible
+    changed). Also for him to look at each module and send corrections
+    before 6 Nov.
 
 ### Decided
 
