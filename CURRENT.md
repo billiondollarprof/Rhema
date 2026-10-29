@@ -581,6 +581,21 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     call is sent: "a bell icon... it animates somewhat and then marks
     good... very minimal, to know that, oh, I've called their attention."
 
+97e. **Call attention uses a phone icon, the bell is for notifications.**
+    (2026-10-29) "having the bell icon to represent call attention and also
+    represent notification... in three different places... If the top bar
+    is to call attention, then maybe we use call icon." Done 2026-10-29:
+    phone icon on the top bar button, the list, the floating card and the
+    Home tile. Rights fix: "yes, rights fix" 2026-10-29.
+97f. **The Home "Call attention" tile: maybe replace it.** (2026-10-29)
+    "if it is there [in the top bar], then that tab that is on the
+    dashboard that says call attention, maybe you look for something more
+    common with every other person and replace and put it there." Asked
+    him which job; the tile stays until he picks.
+97g. **Later: the call button gives two choices.** (2026-10-29) "by the
+    time we start putting voice call, then when you click on it, it gives
+    you two options: instant call attention or dial." Goes with VoIP in
+    docs/FUTURE-FEATURES.md.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 

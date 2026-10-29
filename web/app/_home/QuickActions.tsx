@@ -30,37 +30,37 @@ const FRONT_DESK: Action[] = [
   { icon: 'reg', label: 'Register patient', colour: '#1976d2', ready: true, job: REGISTER },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'door', label: 'Send to room', colour: '#7e57c2', ready: true, job: FIND },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const DOCTOR: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#1976d2', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: false, job: SOON },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const NURSE: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#00838f', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const PHARMACY: Action[] = [
   { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: false, job: SOON },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const LABORATORY: Action[] = [
   { icon: 'lab', label: 'Lab requests', colour: '#7e57c2', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#00897b', ready: false, job: SOON },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const ADMIN: Action[] = [
   { icon: 'users', label: 'Invite staff', colour: '#546e7a', ready: false, job: SOON },
   { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
-  { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
+  { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 
 const BY_ROLE: Record<string, Action[]> = {

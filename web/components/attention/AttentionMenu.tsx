@@ -1,12 +1,13 @@
 /*
  * components/attention/AttentionMenu.tsx: the bell in the top bar, and the
- * list that drops down from it.
+ * list that drops down from it. The icon is a phone, not a bell, because
+ * the bell means notifications (Anthony, 2026-10-29).
  *
  * Why: Anthony, 2026-10-29. "It's more like a drop down overlay that
  * doesn't shift anything on the interface. It just drop down like a
  * rolling paper." Front Desk first. One tap on a group rings it. Consultant
  * and Matron open their rooms. A small search finds a room by its number
- * or by the name of the person in it. When a call goes, its bell shakes and
+ * or by the name of the person in it. When a call goes, its phone shakes and
  * turns into a tick, "so the person knows: I've called their attention."
  *
  * Sections:
@@ -35,7 +36,7 @@ import {
 
 type MenuProps = { client: SupabaseClient; myRoomId: number | null; buttonClass: string }
 
-// ===== 1. The bell button =====
+// ===== 1. The Call attention button =====
 export default function AttentionMenu({ client, myRoomId, buttonClass }: MenuProps) {
   const { open, setOpen } = useAttentionMenu()
   const [directory, setDirectory] = useState<Directory | null>(null)
@@ -92,7 +93,7 @@ export default function AttentionMenu({ client, myRoomId, buttonClass }: MenuPro
         aria-controls="attention-list"
         aria-label="Call attention"
       >
-        <Icon name="bell" size={16} />
+        <Icon name="call" size={16} />
         <span>Call attention</span>
       </button>
 
@@ -172,7 +173,7 @@ function CallLine({ client, target }: { client: SupabaseClient; target: Target }
   async function call() {
     if (state === 'ringing') return
     setState('ringing')
-    // The bell shakes while the call is saved, for at least 0.6 seconds.
+    // The phone shakes while the call is saved, for at least 0.6 seconds.
     const [result] = await Promise.all([
       callAttention(client, target),
       new Promise((done) => setTimeout(done, 600)),
@@ -219,7 +220,7 @@ function CallLine({ client, target }: { client: SupabaseClient; target: Target }
             <path d="M20 6 9 17l-5-5" />
           </svg>
         ) : (
-          <Icon name="bell" size={16} />
+          <Icon name="call" size={16} />
         )}
       </span>
     </button>

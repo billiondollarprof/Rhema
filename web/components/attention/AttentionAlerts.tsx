@@ -1,6 +1,7 @@
 /*
  * components/attention/AttentionAlerts.tsx: the card that floats in when
- * somebody calls your room, with the bell.
+ * somebody calls your room. It rings with the bell sound, and shows a
+ * phone icon (the bell icon means notifications).
  *
  * Why: Anthony, 2026-10-29. "Once that attention is needed, even if they
  * are doing something on the computer, it can float immediately... with
@@ -21,6 +22,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import Icon from '@/components/shell/Icon'
 import { ringBell } from './bell'
 import styles from './attention.module.css'
 import {
@@ -106,19 +108,7 @@ export default function AttentionAlerts({
       {calls.map((call) => (
         <div key={call.id} className={styles.alert} role="status">
           <span className={`${styles.alertBell} ${styles.shake}`} aria-hidden="true">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg>
+            <Icon name="call" size={20} />
           </span>
           <div className={styles.alertText}>
             <b>
