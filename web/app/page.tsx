@@ -90,7 +90,8 @@ export default function HomePage() {
           </h2>
           <span>
             {roleLabel(staff.role)}
-            {staff.room ? ` · ${staff.room.name}` : ''}
+            {/* The room, unless it only repeats the role ("Pharmacy · Pharmacy"). */}
+            {staff.room && staff.room.name !== roleLabel(staff.role) ? ` · ${staff.room.name}` : ''}
           </span>
         </div>
 

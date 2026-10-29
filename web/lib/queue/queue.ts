@@ -44,6 +44,13 @@ export const STATUS_LABELS: Record<QueueStatus, string> = {
   done: 'Done',
 }
 
+// The words staff see for each patient category (stored in lower case).
+export const CATEGORY_LABELS: Record<string, string> = {
+  individual: 'Individual',
+  family: 'Family',
+  antenatal: 'Antenatal',
+}
+
 // Midnight today on this device. The hospital's devices are in Nigeria.
 function startOfToday(): string {
   const now = new Date()
