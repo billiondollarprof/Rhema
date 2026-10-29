@@ -8,7 +8,9 @@
 # a tiny question every day, the way the app would.
 #
 # What it asks: the list of rooms, with the public key and nobody signed in.
-# RLS answers with nothing, which is right: no data leaves the database.
+# The database refuses (people who are not signed in may read nothing), and
+# that refusal is the proof it was reached: the answer carries Postgres's
+# own "permission denied" code, 42501. No data leaves the database.
 #
 # Note: GitHub turns off timed workflows after 60 days with no pushes to the
 # repo. The Cloudflare timer planned in PLAN.md takes over before handover.
@@ -49,9 +51,11 @@ jobs:
           test -n "$key" || key=$(echo "$keys" | jq -r '[.[] | select(.name == "anon")][0].api_key // empty')
           test -n "$key" || { echo "No public key found"; exit 1; }
           for i in 1 2 3; do
-            code=$(curl -sS -o /dev/null -w '%{http_code}' \
-              -H "apikey: $key" "https://$REF.supabase.co/rest/v1/rooms?select=id&limit=1")
-            echo "Knock $i: HTTP $code"
-            test "$code" = "200" || exit 1
+            answer=$(curl -sS -H "apikey: $key" \
+              "https://$REF.supabase.co/rest/v1/rooms?select=id&limit=1")
+            echo "Knock $i: $(echo "$answer" | jq -r '.code // "rows"')"
+            # 42501 is the database itself saying no. Anything else (an
+            # outage page, a paused project) fails the job, so it is noticed.
+            echo "$answer" | jq -e '.code == "42501"' > /dev/null || exit 1
             sleep 5
           done
