@@ -227,9 +227,11 @@ try {
 
   step('Home now shows the new patient waiting in her room')
   await page.getByRole('link', { name: 'Home' }).click()
-  await page.getByText('Made Up Patient C').waitFor()
-  await page.getByText('Note: New today').waitFor()
-  await page
+  await page.getByText('Patient queue · Consultant Room 1').waitFor()
+  const queue = page.locator('#queue')
+  await queue.getByText('Made Up Patient C').waitFor()
+  await queue.getByText('Note: New today').waitFor()
+  await queue
     .getByText(/waiting \d+ min/)
     .first()
     .waitFor()
