@@ -394,7 +394,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     testing now shows 1 security warning, "Leaked Password Protection
     Disabled". It is about passwords (we use none), it appeared once a
     user existed, and switching it on needs the Pro plan. Live shows 0.
-    Asked Anthony whether it may go live with that warning on testing.
+    He said "go live" and to record why it is ignored. Recorded in
+    CLAUDE.md ("Accepted warnings") and ACCEPTED_WARNINGS in
+    ops/supabase_check.py.
+82. **Email inside the app for the admin.** "In the announcement section,
+    they can have another place where they used to type in their email and
+    send out email... and receive email as well... the admin can be seeing
+    email there... and be replying from there", from the hospital's own
+    address, without opening Gmail. Possible with Resend (sending and
+    receiving). Build after the domain move and Resend (6 Nov).
+83. **Desktop sign in until Resend.** His plan: open Gmail in Chrome on the
+    desktop, so the sign in link opens right there. Once Resend sends the
+    6 digit code instead, the phone and the desktop no longer need to match.
 
 ### Decided
 

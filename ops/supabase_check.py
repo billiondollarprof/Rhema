@@ -4,7 +4,8 @@
 #   It proves that GitHub can reach the hospital's Supabase project. It asks
 #   Supabase four questions and prints the answers:
 #     1. Does the project exist, which region is it in, and is it healthy?
-#     2. Does Supabase's security check find any warnings?
+#     2. Does Supabase's security check find any warnings? (Warnings
+#        Anthony has accepted, listed in section 2, are shown but not counted.)
 #     3. Can we log in to the database itself with the password?
 #     4. Are the sign in settings still the ones Anthony set by hand?
 #        (Sign ups off, email confirmation on, a 6 digit code that runs out
@@ -62,6 +63,18 @@ SITE_URLS = {
     "nfrvwvqmfxudaarfuwxg": "https://rhema-hospital-testing.rhemamedical.workers.dev",
 }
 
+# Security warnings Anthony has looked at and decided to accept. Each one is
+# still printed, marked "accepted", but it is not counted as a new warning.
+# The name on the left is Supabase's own name for the warning; the text on
+# the right is why it is accepted. Never add to this list without his yes.
+ACCEPTED_WARNINGS = {
+    # Accepted 2026-10-29. It checks passwords against lists of stolen
+    # passwords. This system uses no passwords (sign in is an email code
+    # and a PIN), so it protects nothing here, and switching it on needs
+    # Supabase's paid Pro plan.
+    "auth_leaked_password_protection": "No passwords are used; needs the Pro plan.",
+}
+
 
 # ===== 3. A helper that asks Supabase one question =====
 
@@ -98,8 +111,18 @@ def main():
     # .get("lints", []) means: give me the list called "lints", or an empty
     # list if there is none.
     warnings = advisors.get("lints", [])
-    print("Security warnings:", len(warnings))
+
+    # Split them: the ones Anthony accepted, and the real ones.
+    new_warnings = []
     for warning in warnings:
+        name = warning.get("name", "")
+        if name in ACCEPTED_WARNINGS:
+            print("  - accepted:", warning.get("title"), "|", ACCEPTED_WARNINGS[name])
+        else:
+            new_warnings.append(warning)
+
+    print("Security warnings:", len(new_warnings))
+    for warning in new_warnings:
         print("  -", warning.get("title"), "|", warning.get("level"))
         # "detail" says exactly which table or function the warning is about.
         print("    ", warning.get("detail"))

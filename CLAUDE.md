@@ -492,6 +492,17 @@ StellaXafe is the bar. This repo has to be cleaner than it.
 - **RLS on every table from the moment it is created.** A table without
   row level security does not get merged. CI runs Supabase's security
   advisor on every change, and a new warning fails the build.
+- **Accepted warnings are written down, with the reason.** A warning that
+  Anthony has looked at and accepted goes in `ACCEPTED_WARNINGS` in
+  `ops/supabase_check.py`. It is still printed but not counted. Every other
+  agent leaves it alone. The list today:
+  - `auth_leaked_password_protection` ("Leaked Password Protection
+    Disabled"), accepted 2026-10-29. It checks passwords against stolen
+    password lists. This system uses no passwords (email code and PIN), so
+    it protects nothing, and it needs the paid Pro plan. Do not try to fix
+    it.
+
+  Nothing goes on that list without his yes.
 - **Least access for every key.** Each token gets only the permissions its
   job needs, and the reason is written in `CURRENT.md`.
 - **Dependencies are audited in CI.** A package with a known high or

@@ -31,3 +31,4 @@ the file where you can see it working. Read this to revise.
 | `[]` then `.append(x)` | Start an empty list, then add one item to its end. | `ops/supabase_check.py` |
 | `.items()` on a dictionary | Give each pair (the name and its value) one at a time, for a loop. | `ops/supabase_check.py` |
 | `str(x)` | Turn a number or `True`/`False` into text, so it can join other text. | `ops/supabase_check.py` |
+| `if ... else` | Do one set of steps when something is true, and the other set when it is not. | `ops/supabase_check.py` |
