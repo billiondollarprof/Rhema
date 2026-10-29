@@ -27,6 +27,8 @@ begin
 end $$;
 
 create schema if not exists auth;
+-- Supabase keeps add-ons such as pgcrypto in a schema called extensions.
+create schema if not exists extensions;
 grant usage on schema auth to anon, authenticated, service_role;
 grant usage on schema public to anon, authenticated, service_role;
 

@@ -2,7 +2,8 @@
  * app/layout.tsx: the frame every screen of the RHEMA app sits inside.
  *
  * Why: sets the language, the page title, the phone friendly viewport, and
- * the base colours, once, for every screen.
+ * the base colours, once, for every screen. It also wraps every screen in
+ * the sign in state (lib/auth/session.tsx).
  *
  * Never: fetch patient data here. This file wraps every screen, including
  * the sign in screen, so anything loaded here loads for people who are not
@@ -10,6 +11,7 @@
  */
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/lib/auth/session'
 
 export const metadata: Metadata = {
   title: 'RHEMA Hospital',
@@ -28,7 +30,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
-      <body>{children}</body>
+      <body>
+        {/* Who is signed in and whether the screen is locked, for every
+            screen. It decides which screen shows, never what data a person
+            may read: the database decides that. */}
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }

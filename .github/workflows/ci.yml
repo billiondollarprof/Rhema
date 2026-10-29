@@ -7,6 +7,8 @@ on:
   pull_request:
   push:
     branches: [testing, main]
+  # Lets a feature branch be checked before anything reaches testing.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,3 +42,30 @@ jobs:
         run: supabase db start
       - name: Run the security tests, then undo and redo every change
         run: scripts/db-test.sh "postgresql://postgres:postgres@127.0.0.1:54322/postgres" --tests-only
+
+  # Sign in, used for real: a throwaway Supabase sends real codes to a local
+  # mailbox, and a browser signs two made up nurses in, sets PINs, locks,
+  # switches person and signs out. Screenshots are kept for a person to see.
+  signin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+      - run: npm ci
+      - name: Install the test browser
+        run: npm install --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+      - name: Sign in, used for real
+        run: scripts/e2e-signin.sh
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sign-in-screens
+          path: e2e-screens/
+          retention-days: 14

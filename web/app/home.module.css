@@ -1,0 +1,92 @@
+/*
+ * home.module.css: the home screen frame. The top bar is the demo's (.top):
+ * deep blue gradient, the person's badge and name on the left.
+ */
+
+/* ===== 1. Frame ===== */
+.blank {
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ===== 2. Top bar ===== */
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(100deg, #0a2a5e, #1565c0);
+  color: #fff;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.who b,
+.who small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.who small {
+  opacity: 0.75;
+}
+
+.topButton {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ===== 3. Body ===== */
+.body {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.card h3 {
+  margin: 0 0 6px;
+}
+
+.card p {
+  margin: 0 0 8px;
+  color: var(--mut);
+}
+
+.card small {
+  color: var(--mut);
+}
