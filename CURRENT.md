@@ -570,6 +570,17 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     (b) duplicate check with reuse, (c) age, (e) last seen. (d) allergies
     comes with the medical record (stage 2, needs SQL).
 
+100. **Medical record, database.** "Go ahead with the medical record"
+    (2026-10-29). Migration 20261029160000_medical_record.sql written and
+    tested locally, feature branch only: record openings (logged, 12 hour
+    window), medical profile, allergies, conditions, medications with
+    active, suspended, stopped and a status log, doses given with exact
+    time and giver, vital signs, nursing notes, consultation notes. 12
+    tests, every deliberate break caught. Test 8 found a real fault in the
+    foundation: "a void needs a reason" let an empty reason through on
+    patients; the same file fixes it (drop and re-add that one rule).
+    WAITING for his yes on the SQL.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
