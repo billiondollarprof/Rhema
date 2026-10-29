@@ -1,10 +1,18 @@
 /*
- * app/page.tsx: the home screen, at the root address.
+ * app/page.tsx: Home, the first screen after signing in.
  *
- * Why: this is where a signed in, unlocked person lands. For now it shows
- * who is signed in, with Lock screen and Sign out, and the server status
- * line. Each role's real home (the queue, the dashboard) is built in step 5
- * of PLAN.md section 13 and replaces section 3 below.
+ * Why: the RHEMA demo's home screen, made real. In order, top to bottom:
+ *   1. greeting, with role and room;
+ *   2. the closing time banner (front desk, after 5pm);
+ *   3. the four quick action buttons for this role;
+ *   4. today's count tiles;
+ *   5. the "Patients seen" chart;
+ *   6. the queue card for this role.
+ * The parts live in app/_home/, one file each. The data code is shared, in
+ * lib/queue/queue.ts.
+ *
+ * The page refreshes its numbers every 30 seconds until live updates are
+ * built with the messages module.
  *
  * Never: show patient data to somebody who is not signed in and unlocked.
  * The page sends them to the sign in or lock page first, and the database
@@ -12,67 +20,99 @@
  */
 'use client'
 
-import { useEffect, useState } from 'react'
-import PersonBadge from '@/components/auth/PersonBadge'
-import styles from './home.module.css'
+import { useCallback, useEffect, useState } from 'react'
+import AppShell from '@/components/shell/AppShell'
+import CountTiles from './_home/CountTiles'
+import QueueCard from './_home/QueueCard'
+import QuickActions from './_home/QuickActions'
+import SeenChart from './_home/SeenChart'
+import styles from './_home/home.module.css'
 import { roleLabel } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import {
+  loadOpenQueue,
+  loadTodayCounts,
+  type QueueEntry,
+  type TodayCounts,
+} from '@/lib/queue/queue'
 
-// ===== 1. Ask the Worker whether it is running =====
-function useWorkerStatus() {
-  const [status, setStatus] = useState<'checking' | 'ok' | 'down'>('checking')
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((response) => setStatus(response.ok ? 'ok' : 'down'))
-      .catch(() => setStatus('down'))
-  }, [])
-
-  return status
+function greetingWord() {
+  const hour = new Date().getHours()
+  return hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
 }
 
-// ===== 2. The screen =====
 export default function HomePage() {
   const auth = useAuth()
   useRightPage(auth.status, '/')
-  const server = useWorkerStatus()
+  const { client, staff } = auth
 
-  if (auth.status !== 'ready' || !auth.staff) return <div className={styles.blank} />
+  const [counts, setCounts] = useState<TodayCounts | null>(null)
+  const [entries, setEntries] = useState<QueueEntry[] | null>(null)
 
-  const staff = auth.staff
-  const roleWords =
-    roleLabel(staff.role) + (staff.can_admin && staff.role !== 'admin' ? ' · Admin' : '')
+  // ===== Data: today's counts and the open queue =====
+  const refresh = useCallback(async () => {
+    if (!client) return
+    const [newCounts, newEntries] = await Promise.all([
+      loadTodayCounts(client),
+      loadOpenQueue(client),
+    ])
+    setCounts(newCounts)
+    setEntries(newEntries)
+  }, [client])
+
+  useEffect(() => {
+    if (auth.status !== 'ready') return
+    let current = true
+    const run = () => {
+      if (current) refresh()
+    }
+    const first = window.setTimeout(run, 0)
+    const timer = window.setInterval(run, 30000)
+    return () => {
+      current = false
+      window.clearTimeout(first)
+      window.clearInterval(timer)
+    }
+  }, [auth.status, refresh])
+
+  if (auth.status !== 'ready' || !staff || !client) return <div className={styles.page} />
+
+  const closingTime = staff.role === 'front_desk' && new Date().getHours() >= 17
 
   return (
-    <main className={styles.app}>
-      <header className={styles.top}>
-        <PersonBadge name={staff.full_name} />
-        <div className={styles.who}>
-          <b>{staff.full_name}</b>
-          <small>{roleWords}</small>
+    <AppShell>
+      <div className={styles.page}>
+        {/* ===== 1. Greeting ===== */}
+        <div className={styles.greeting}>
+          <h2>
+            Good {greetingWord()}, {staff.full_name}
+          </h2>
+          <span>
+            {roleLabel(staff.role)}
+            {staff.room ? ` · ${staff.room.name}` : ''}
+          </span>
         </div>
-        <button className={styles.topButton} onClick={auth.lock}>
-          Lock screen
-        </button>
-        <button className={styles.topButton} onClick={auth.signOut}>
-          Sign out
-        </button>
-      </header>
 
-      {/* ===== 3. Placeholder until each role's home is built ===== */}
-      <section className={styles.body}>
-        <div className={styles.card}>
-          <h3>You are signed in</h3>
-          <p>
-            Your screens for {roleLabel(staff.role)} come next. The screen locks by itself after 10
-            minutes without use.
-          </p>
-          <small>
-            Server: {{ checking: 'Checking…', ok: 'Ready', down: 'Not reachable' }[server]}
-          </small>
-        </div>
-      </section>
-    </main>
+        {/* ===== 2. Closing time (front desk, after 5pm) ===== */}
+        {closingTime ? (
+          <div className={styles.banner}>
+            <div>
+              <b>It is closing time</b>
+              <small>Please sign out so the next shift can sign in with their own account.</small>
+            </div>
+            <button className={styles.button} onClick={auth.signOut}>
+              Sign out
+            </button>
+          </div>
+        ) : null}
+
+        {/* ===== 3 to 6 ===== */}
+        <QuickActions role={staff.role} />
+        <CountTiles counts={counts} />
+        <SeenChart client={client} />
+        <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
+      </div>
+    </AppShell>
   )
 }

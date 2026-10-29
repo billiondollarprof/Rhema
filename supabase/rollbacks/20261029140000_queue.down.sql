@@ -6,5 +6,6 @@
 -- needs Anthony's explicit yes in writing.
 -- =============================================================================
 
+drop function if exists public.patients_seen(text);
 drop table if exists public.queue_entries;
 drop type if exists public.queue_status;

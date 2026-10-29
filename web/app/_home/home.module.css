@@ -1,0 +1,298 @@
+/*
+ * home.module.css: the home screen. Values from the RHEMA demo (.acts,
+ * .act, .tiles, .tile, .card, .pc, .callb, .sg).
+ */
+
+/* ===== 1. Page ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.greeting h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.greeting span {
+  color: var(--mut);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  min-width: 0;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muted {
+  color: var(--mut);
+  margin: 0;
+}
+
+/* ===== 2. Banner (closing time) ===== */
+.banner {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fff7e6;
+  border: 1px solid #ffe0a3;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.banner div {
+  flex: 1;
+  min-width: 0;
+}
+
+.banner small {
+  display: block;
+  color: var(--mut);
+}
+
+/* ===== 3. Quick actions ===== */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action {
+  font: inherit;
+  color: #fff;
+  border: 0;
+  border-bottom: 5px solid color-mix(in srgb, var(--c), #000 40%);
+  border-radius: 20px;
+  padding: 14px;
+  text-align: left;
+  font-weight: 700;
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--c), #fff 8%),
+    color-mix(in srgb, var(--c), #000 24%)
+  );
+  box-shadow:
+    0 12px 22px -10px color-mix(in srgb, var(--c), #000 20%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  position: relative;
+}
+
+.action:disabled {
+  cursor: default;
+  filter: grayscale(0.55);
+  opacity: 0.6;
+}
+
+.soonTag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
+/* ===== 4. Count tiles ===== */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  border-top: 4px solid var(--c);
+  border-radius: 16px;
+}
+
+.tile b {
+  display: block;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.tile span {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+/* ===== 5. Chart ===== */
+.chartHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.chartHead > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.chartHead b {
+  font-size: 26px;
+}
+
+.segments {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  margin-top: 10px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.segments button {
+  font: inherit;
+  font-size: 12px;
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 6px 10px;
+  color: var(--mut);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.segments button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+
+.chart {
+  width: 100%;
+  height: 120px;
+  margin-top: 8px;
+  display: block;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mut);
+  font-size: 11px;
+}
+
+/* ===== 6. Queue ===== */
+.count {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: #e3f2fd;
+  color: var(--bl);
+}
+
+.queue {
+  display: grid;
+  gap: 8px;
+}
+
+.entry {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  background: #fff;
+}
+
+.entryTop {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.entryTop > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.entryTop small {
+  display: block;
+  color: var(--mut);
+}
+
+.note {
+  color: var(--amb) !important;
+}
+
+.status {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  background: #e4f3ec;
+  color: var(--grn);
+}
+
+.status[data-status='waiting'] {
+  background: #fff1de;
+  color: var(--amb);
+}
+
+.entryButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 34px;
+  padding: 5px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.primary {
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  border-color: #1f5fd0;
+  color: #fff;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ===== 7. Wider screens ===== */
+@media (min-width: 760px) {
+  .actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

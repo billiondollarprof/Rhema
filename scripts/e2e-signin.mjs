@@ -100,7 +100,7 @@ async function choosePin(page, pin) {
 }
 
 async function expectHome(page, name) {
-  await page.getByText('You are signed in').waitFor()
+  await page.getByText(`, ${name}`).first().waitFor()
   await page.getByText(name, { exact: true }).first().waitFor()
 }
 
@@ -153,6 +153,34 @@ try {
   await typeDigits(page, 'Type your PIN again', '4821')
   await expectHome(page, 'Test Nurse One')
   await shot(page, 'home-nurse-one')
+
+  step("Home: her room's queue shows only the patient in her room")
+  await page.getByText('Patient queue · Consultant Room 1').waitFor()
+  await page.getByText('Made Up Patient A').waitFor()
+  await page.getByText('Note: Please see him first').waitFor()
+  if (await page.getByText('Made Up Patient B').count()) {
+    throw new Error('A patient from another room showed in her queue')
+  }
+
+  step('She calls the patient in; a refresh keeps it')
+  await page.getByRole('button', { name: 'Call in patient' }).click()
+  await page.getByRole('button', { name: 'Finish visit' }).waitFor()
+  await page.reload()
+  await page.getByRole('button', { name: 'Finish visit' }).waitFor()
+  await shot(page, 'home-in-consultation')
+
+  step('She finishes the visit; the counts and the chart follow')
+  await page.getByRole('button', { name: 'Finish visit' }).click()
+  await page.getByText('No patients in your room right now.').waitFor()
+  await page.reload()
+  await page.getByText('No patients in your room right now.').waitFor()
+  await page.getByText('Completed today').waitFor()
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('b')].some(
+      (b) => b.nextElementSibling?.textContent === 'Completed today' && b.textContent === '1',
+    ),
+  )
+  await shot(page, 'home-after-visit')
 
   step('A refresh keeps her signed in and unlocked')
   await page.reload()

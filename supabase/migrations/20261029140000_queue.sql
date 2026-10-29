@@ -85,3 +85,38 @@ create policy queue_update on public.queue_entries
   for update to authenticated
   using ((select private.has_permission('patients')))
   with check ((select private.has_permission('patients')));
+
+
+-- ===== 5. "Patients seen" for the home screen chart (reads only) =====
+-- Counts finished visits per day (week, month), per month (year) or per
+-- year (5 years), in Nigerian time. It runs with the caller's own rights,
+-- so the queue's rules above still decide what it can count.
+
+create function public.patients_seen(period text)
+returns table (bucket date, total bigint)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select
+    date_trunc(
+      case when period in ('week', 'month') then 'day'
+           when period = 'year' then 'month'
+           else 'year' end,
+      finished_at at time zone 'Africa/Lagos'
+    )::date as bucket,
+    count(*) as total
+  from public.queue_entries
+  where status = 'done'
+    and finished_at >= now() - case period
+      when 'week'  then interval '7 days'
+      when 'month' then interval '30 days'
+      when 'year'  then interval '12 months'
+      else interval '5 years' end
+  group by 1
+  order by 1;
+$$;
+
+revoke execute on function public.patients_seen(text) from public, anon;
+grant  execute on function public.patients_seen(text) to authenticated;

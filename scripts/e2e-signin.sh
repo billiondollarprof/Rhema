@@ -30,6 +30,20 @@ psql "$DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
 insert into public.staff (id, full_name, email, role)
 select id, case email when 'nurse1@test.rhema' then 'Test Nurse One' else 'Test Nurse Two' end, email, 'nurse'
 from auth.users where email in ('nurse1@test.rhema', 'nurse2@test.rhema');
+
+-- For the home screen: Nurse One works in Consultant Room 1, one made up
+-- patient waits there, and another waits at the pharmacy.
+update public.staff set room_id = (select id from public.rooms where name = 'Consultant Room 1')
+where email = 'nurse1@test.rhema';
+insert into public.patients (full_name, date_of_birth, sex, created_by)
+select name, '1980-02-02', 'male', (select id from public.staff where email = 'nurse1@test.rhema')
+from (values ('Made Up Patient A'), ('Made Up Patient B')) as made_up(name);
+insert into public.queue_entries (patient_id, room_id, note, sent_by)
+select p.id, r.id, case when p.full_name like '%A' then 'Please see him first' end,
+       (select id from public.staff where email = 'nurse1@test.rhema')
+from public.patients p
+join public.rooms r on r.name = case when p.full_name like '%A' then 'Consultant Room 1' else 'Pharmacy' end
+where p.full_name like 'Made Up Patient %';
 SQL
 
 # ===== 3. Build the app against the throwaway Supabase and serve it =====

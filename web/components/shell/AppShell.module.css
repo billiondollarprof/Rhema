@@ -1,0 +1,154 @@
+/*
+ * AppShell.module.css: the frame. Values from the RHEMA demo (.top, .nav).
+ * Phone: menu along the bottom. 760px and wider: menu down the left.
+ */
+
+/* ===== 1. Whole screen ===== */
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ===== 2. Top bar ===== */
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(100deg, #0a2a5e, #1565c0);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.who b,
+.who small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.who small {
+  opacity: 0.75;
+}
+
+.topButton {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-height: 36px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* On small phones only the icons show, so the name keeps its room. */
+@media (max-width: 420px) {
+  .topButton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
+
+/* ===== 3. Body and menu ===== */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  min-height: 0;
+}
+
+.nav {
+  display: flex;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+}
+
+.navItem {
+  flex: 1;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  color: var(--mut);
+  font-size: 11px;
+  text-decoration: none;
+  position: relative;
+}
+
+.navItem.on {
+  color: var(--bl);
+  font-weight: 700;
+}
+
+.soon {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.soon em {
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+}
+
+@media (min-width: 760px) {
+  .body {
+    flex-direction: row;
+  }
+
+  .nav {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 96px;
+    flex: 0 0 96px;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    padding: 12px 4px;
+    position: sticky;
+    top: 58px;
+    height: calc(100dvh - 58px);
+  }
+
+  .navItem {
+    flex: 0 0 auto;
+    padding: 12px 2px;
+  }
+
+  .main {
+    padding: 20px 24px;
+  }
+}

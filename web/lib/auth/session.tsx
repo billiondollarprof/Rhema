@@ -48,6 +48,9 @@ export type StaffMember = {
   full_name: string
   role: string
   can_admin: boolean
+  room_id: number | null
+  // The room the admin gave them, e.g. "Consultant Room 1". Null if none.
+  room: { name: string; kind: string } | null
 }
 
 export type UnlockResult = 'ok' | 'wrong' | 'locked-out'
@@ -81,7 +84,7 @@ export function useAuth(): AuthState {
 async function loadStaff(client: SupabaseClient, id: string): Promise<StaffMember | null> {
   const { data } = await client
     .from('staff')
-    .select('id, full_name, role, can_admin')
+    .select('id, full_name, role, can_admin, room_id, room:rooms(name, kind)')
     .eq('id', id)
     .maybeSingle()
   return (data as StaffMember | null) ?? null

@@ -151,5 +151,26 @@ begin
 end $$;
 \echo 'PASS 7: every queue change is logged'
 
+-- ===== 8. The chart counts the finished visit, for staff only ===============
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f2"}', true);
+set local role authenticated;
+do $$
+begin
+  if (select coalesce(sum(total), 0) from public.patients_seen('week')) <> 1 then
+    raise exception 'FAIL 8: the chart did not count the finished visit';
+  end if;
+end $$;
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f3"}', true);
+set local role authenticated;
+do $$
+begin
+  if (select coalesce(sum(total), 0) from public.patients_seen('week')) <> 0 then
+    raise exception 'FAIL 8: staff without the patients permission got chart counts';
+  end if;
+end $$;
+reset role;
+\echo 'PASS 8: the chart counts finished visits, for staff with access only'
+
 rollback;
 \echo 'ALL QUEUE TESTS PASSED'
