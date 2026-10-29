@@ -244,4 +244,15 @@ begin
 end $$;
 \echo 'PASS 8: who sees a call on the screen is unchanged'
 
+
+
+-- ===== 9. pg_net is never labelled in the public schema =====
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_net' and extnamespace = 'public'::regnamespace) then
+    raise exception 'FAIL 9: pg_net is in the public schema (the security advisor flags it)';
+  end if;
+end $$;
+\echo 'PASS 9: pg_net is not in the public schema'
+
 rollback;
