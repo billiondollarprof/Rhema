@@ -12,24 +12,29 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$HERE"
 
-# ===== 1. Throwaway Supabase: database, sign in, API and the mailbox =====
-supabase start -x studio,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,postgres-meta,supavisor
+# ===== 1. Throwaway Supabase: database, sign in, API, live updates and the mailbox =====
+supabase start -x studio,storage-api,imgproxy,edge-runtime,logflare,vector,postgres-meta,supavisor
 eval "$(supabase status -o env)"
 KEY="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
 SECRET="${SERVICE_ROLE_KEY:-${SECRET_KEY:-}}"
 MAILPIT="${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}"
 test -n "$KEY" && test -n "$SECRET" || { echo "Local keys not found"; exit 1; }
 
-# ===== 2. Two made up nurses: a sign in account each, then a staff row =====
-for n in 1 2; do
+# ===== 2. Two made up nurses and a front desk: a sign in account each, then a staff row =====
+for who in nurse1 nurse2 desk1; do
   curl -fsS -X POST "$API_URL/auth/v1/admin/users" \
     -H "apikey: $SECRET" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" \
-    -d "{\"email\":\"nurse$n@test.rhema\",\"email_confirm\":true}" > /dev/null
+    -d "{\"email\":\"$who@test.rhema\",\"email_confirm\":true}" > /dev/null
 done
 psql "$DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
 insert into public.staff (id, full_name, email, role)
 select id, case email when 'nurse1@test.rhema' then 'Test Nurse One' else 'Test Nurse Two' end, email, 'nurse'
 from auth.users where email in ('nurse1@test.rhema', 'nurse2@test.rhema');
+
+-- For Call attention: a front desk person, at the Front Desk.
+insert into public.staff (id, full_name, email, role, room_id)
+select id, 'Test Desk One', email, 'front_desk', (select id from public.rooms where name = 'Front Desk')
+from auth.users where email = 'desk1@test.rhema';
 
 -- For the home screen: Nurse One works in Consultant Room 1, one made up
 -- patient waits there, and another waits at the pharmacy.
