@@ -557,6 +557,21 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     caller's own room; one tap sends the ring to everyone on duty there.
     No form, no typing. Replaces the demo's Call attention page (which
     had department, person and note).
+97c. **Call attention: how the list works, decided.** (2026-10-29) "yes
+    to both, go ahead with step 1". The call goes to a ROOM, never a
+    person: "it doesn't matter which person specifically is in that room
+    as long as that's the room they are calling." Front Desk, Nursing
+    Station, Laboratory and Pharmacy are groups on one shared computer:
+    one tap rings everyone on duty there ("It doesn't matter whether it's
+    Kichi or Amaka or Queen or Adora or Aminat"). Consultant opens a
+    second list of the consultant rooms registered (Room 1, 2, 3), and the
+    call goes to that room. Matron opens a list of the matron offices
+    registered. "If you want to call a particular person, you could have
+    just used a phone or use the chatting system." Step 1 (now): card and
+    bell for anyone with the app open. Step 2 (next): push when the app
+    is closed. Migration 20261029180000_attention_calls.sql written, 9
+    tests, 7 deliberate breaks all caught; feature branch only, waiting
+    for his yes on the SQL.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
