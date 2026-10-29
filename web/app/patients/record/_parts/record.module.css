@@ -1,0 +1,389 @@
+/*
+ * record.module.css: the medical record page. Same cards, type and colours
+ * as Home and the patients pages, so it feels like one app.
+ *
+ * Layout rules, so the page stays easy to read however much it holds:
+ *   - one card per part of the record, the same shape every time;
+ *   - inside a card, every line has the same three places: what it is on
+ *     the left, its status on the right, who and when underneath;
+ *   - colour only means something: green active, orange suspended, red
+ *     stopped or an allergy, grey voided.
+ */
+
+/* ===== 1. Page and header ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.header small {
+  color: var(--mut);
+}
+
+.muted {
+  color: var(--mut);
+  margin: 0;
+}
+
+.error {
+  color: var(--red);
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ===== 2. The allergy banner, always first ===== */
+.banner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 600;
+}
+
+.bannerRed {
+  background: #fdecea;
+  border: 1px solid #f5c2c0;
+  color: #b42318;
+}
+
+.bannerGreen {
+  background: #e8f5ee;
+  border: 1px solid #bfe3cf;
+  color: var(--grn);
+}
+
+.bannerAmber {
+  background: #fff7e6;
+  border: 1px solid #ffe0a3;
+  color: #9a5b00;
+}
+
+/* ===== 3. The two columns on a wide screen ===== */
+.columns {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.column {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+@media (min-width: 980px) {
+  .columns {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}
+
+/* ===== 4. A section card that folds open and shut ===== */
+.section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  min-width: 0;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.section > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.section > summary .count {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 1px 9px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--mut);
+}
+
+.section > summary .grow {
+  flex: 1;
+}
+
+.chevron {
+  color: var(--mut);
+  transition: transform 0.15s;
+}
+
+.section[open] > summary .chevron {
+  transform: rotate(90deg);
+}
+
+.body {
+  padding: 0 14px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+/* ===== 5. One line in a section ===== */
+.line {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.line:first-child {
+  border-top: 0;
+}
+
+.lineTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.lineTop > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lineMeta {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.voided {
+  opacity: 0.55;
+}
+
+.voided .what {
+  text-decoration: line-through;
+}
+
+.pill {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.green {
+  background: #e4f3ec;
+  color: var(--grn);
+}
+
+.orange {
+  background: #fff1de;
+  color: var(--amb);
+}
+
+.red {
+  background: #fdecea;
+  color: #b42318;
+}
+
+.grey {
+  background: var(--bg);
+  color: var(--mut);
+}
+
+/* Readings in one tidy row (vital signs). */
+.readings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 4px 0 0;
+}
+
+.readings div {
+  min-width: 0;
+}
+
+.readings dt {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.readings dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (min-width: 560px) {
+  .readings {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ===== 6. Small actions and the add forms ===== */
+.actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.small {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  min-height: 32px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.small:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.link {
+  border: 0;
+  background: none;
+  color: var(--mut);
+  padding: 4px 6px;
+}
+
+/* A Void link on its own lines up with the text above it. */
+.link:first-child {
+  padding-left: 0;
+}
+
+.primary {
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  border-color: #1f5fd0;
+  color: #fff;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.fields {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 4px;
+}
+
+.input {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 9px 10px;
+  min-height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+textarea.input {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.input:focus {
+  outline: 0;
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 4px rgba(31, 95, 208, 0.12);
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--bl);
+  color: var(--bl);
+  font-weight: 700;
+}
+
+.checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* ===== 7. Written notes, kept as typed ===== */
+.note {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.consult {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.consult dt {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.consult dd {
+  margin: 0;
+}

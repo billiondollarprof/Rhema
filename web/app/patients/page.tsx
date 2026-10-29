@@ -131,6 +131,7 @@ function FindPatient() {
                 key={chosen.id}
                 client={client}
                 staffId={staff.id}
+                canMedical={staff.can_medical}
                 patient={chosen}
                 onChanged={() => {
                   loadChosen()
