@@ -73,3 +73,10 @@ build from the RHEMA demo and the proposal.
   missing "revoke all" on the new table before live; fixed with his yes,
   and the local tests now give new tables Supabase's default rights so
   this cannot slip past again.
+
+- 2026-10-29, rules and skills: CLAUDE.md rewritten as short rules with one
+  page of "may do, must ask, never" (stories moved word for word to
+  docs/RULES-HISTORY.md). Finished requests moved to docs/DONE.md (108
+  requests: 40 open, 6 standing, 62 done). Four skills built and each run
+  once: ship, screens (overflow-audit.cjs finally exists), new-migration
+  (template with revoke all, local-db.sh, mutate.sh), switch-role.

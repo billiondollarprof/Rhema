@@ -8,122 +8,35 @@ Where the RHEMA Hospital Operations System stands. Read this first.
 ## ANTHONY'S OPEN REQUESTS
 
 **Read this before anything else in this file, and add to it the moment he
-asks for something.** A request comes off this list when it is built and
-checked, not when it is planned. (Rule from `CLAUDE.md`.)
+asks for something.** A request moves to `docs/DONE.md` when it is live
+and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
-### From 2026-10-27 (session 1)
+### Open
 
-1. **Check the demo is the updated one by comparing it with Lana.**
-   Done: the RHEMA demo is the newer one, Lana is an older copy. See
-   `PLAN.md` section 1. *Can come off once he confirms.*
-2. **Plan the stack: Next.js front and back end, Neon instead of Supabase,
-   Resend for email.** Planned in `PLAN.md`. Waiting for his yes.
-3. **Verify Neon can do this without a monthly fee.** Answered: yes, with
-   live alerts kept off the database and a nightly backup. `PLAN.md` 3.
-4. **Verify Neon works with Resend.** Answered: yes. `PLAN.md` 3.
+Numbers are kept from the full list, so older notes still match.
+
 5. **Is Cloudflare's free 10 GB per account or per project? If per
    account, move the domain to a new Cloudflare account for the hospital.**
    Answered: per account, so yes, new account, and the move is supported.
    The move itself is still to do. `PLAN.md` 3.
-6. **Decide public or private repo; write the README and licence "to
-   protect our work".** Recommendation: private (`PLAN.md` 5). README and
-   licence not written yet, waiting on the decision, because the licence
-   wording depends on who owns the code.
-7. **Carry over the rules from the StellaXafe repo (CLAUDE.md, AGENTS.md,
-   deploy rules).** Done in `CLAUDE.md`, with the signposts.
-8. **Apply StellaXafe's instant click to this app.** Written into
-   `CLAUDE.md` (project structure). To be built with the first screens.
 9. **PWA first; later maybe a very light desktop app, with a free place to
    download it from.** Planned in `PLAN.md` 9.
-10. **Two branches, testing and main, and CI and CD this time.** Rules in
-    `CLAUDE.md`, pipeline in `PLAN.md` 6. Not built yet.
-11. **Connect Google Drive to read his notes.** Already connected; notes
-    read. `PLAN.md` 11.
 12. **Use a little AWS, something free, to add a cloud stack.** Proposed:
     a Python uptime watcher on Lambda. `PLAN.md` 7. Waiting for his yes.
-13. **Use Node.js somewhere visible.** Next.js server code is Node.js. The
-    check scripts and CI tooling are Node.js too.
-14. **Automate how the agent checks its own code.** Rule in `CLAUDE.md`
-    ("Agents check their own work"), `npm run verify`. Not built yet.
-15. **Work as experts in DevOps, cloud and cybersecurity, using every free
-    resource.** Standing instruction.
 16. **Find free open skills on GitHub, save copies in his own GitHub, and
     create our own skills, including ones learned from StellaXafe.**
     Planned in `PLAN.md` 10. Not done yet.
-17. **Teach him Python line by line as we build; add Python where it
-    fits (validators, tracing).** Rule in `CLAUDE.md`, places in
-    `PLAN.md` 8. First Python file not written yet.
-18. **Plan the scroll effect.** The app does not need one. Scrollcraft is
-    noted for a public hospital website if they order one. `PLAN.md` 10.
-19. **He is opening the Neon account.** Steps in the session 1 reply.
-
-### From 2026-10-27, second message
-
-20. **"We are going to actually rush this thing. So we only have about 2
-    weeks."** The 8 week timeline in `PLAN.md` 12 is replaced by 2 weeks.
-21. **"Create a folder in the drive and name it clients folder... each
-    client will have its own credential file."** Done: "Clients Folder" in
-    his Drive, with "RHEMA Medical Center Credentials" inside (blank
-    template, he fills it). Can come off once he confirms.
 22. **REMIND HIM: "we are probably going to create a private repo that
     will not carry code but will carry credentials. That will be later, so
     you will remind me."**
-23. **He is making a temporary Gmail for the hospital** and opening every
-    account for this job with it (Cloudflare, Neon, Resend).
-24. **Email OTP first**, then the back end and front end, "everything that
-    is important at once".
-25. **Sign in:** the admin invites, the person signs in once with an email
-    code, then a 4 digit PIN unlocks the screen after inactivity (as in
-    the demo).
 26. **Notifications on the installed app**, with vibration, and an
     emergency "call attention" alert that vibrates stronger. Calls later,
     not now.
 27. **Email address admin@ on the hospital domain.** He says the domain is
     remamedical.app (no S, .app). Spelling to be confirmed against the
     hospital name RHEMA.
-28. **Agents get API tokens through GitHub secrets, never through the
-    chat.** Some setup he does by hand so he learns the platforms.
 29. **Later, possibly: bundle as a desktop app and a mobile app** (Tauri,
     Capacitor), since the UI already fits any screen.
-
-### From 2026-10-27, third message
-
-30. **"Skip the email authentication now. Let's get the app working."** Email
-    codes, Resend and the domain move all wait for 6 November. Everything
-    else goes ahead now.
-31. **"Download the humanizer into our GitHub repo"** and use it on
-    everything written. Done: `.claude/skills/humanizer`, rule in
-    `CLAUDE.md`. Can come off once he confirms.
-32. **"Look for any open source... any skill... before we use the skill, you
-    look at it and say it matches."** Done: 13 skills read and saved, with
-    the list and reasons in `.claude/skills/SOURCES.md`.
-33. **Files to write: README, licence, and the repo foundation.** Done
-    2026-10-27: README, LICENSE, the Next.js and Worker skeleton,
-    `npm run verify`, CI and deploy workflows, the first Python check. Comes
-    off once he has seen it on the testing address.
-34. **Aim: app built within about 10 days, test runs and small fixes after,
-    then plug in email and install.** No need to wait for day 14.
-
-### From 2026-10-28
-
-35. **Holding screen: use his image** (blue waves, "RH" mark in a circle,
-    hospital name, "HOSPITAL OPERATIONS SYSTEM"), "a little bit kind of
-    animated... has some shimmer". It covers the screen when idle. Swap the
-    "RH" mark for the real hospital logo when he gets it. The image as sent
-    spells the name "REMA HOSPITAL", without the H. He confirmed RHEMA.
-    Built 2026-10-28 in `web/components/IdleScreen.tsx`, drawn in code:
-    drifting waves, glowing light ribbons, a breathing ring, a shimmer across
-    the name, and no movement when the device asks for reduced motion. Shown
-    at the root address for now. Checked at 320, 375 and 1440 wide. Comes off
-    when he has seen it on the testing address.
-36. **Question, answered 2026-10-28 and saved to Drive** as "09 - BUSINESS -
-    Reselling the Hospital System to Other Nigerian Hospitals" (Discovery
-    folder): how to resell or repurpose
-    the system for other hospitals, and where to find Nigerian hospitals that
-    have not gone digital.
-
-### From 2026-10-28, second message
-
 37. **Renewal reminder built into the app.** One month before the domain
     renews (and any other yearly cost), the system reminds the admin inside
     the app and emails the hospital's decision makers, telling them to
@@ -134,23 +47,10 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     StellaXafe for a system check and bug fixes. It starts after the 3
     months of free support in the proposal; the paid maintenance plan after
     that is discussed separately with the hospital. Same scheduled job.
-39. **"Upgrade to Team" seen in Supabase.** Answered: inviting a member
-    worked on the free plan and nothing was paid. Team is an optional paid
-    plan we do not need.
-
-### From 2026-10-28, third message
-
-40. **Code standard: cleaner than StellaXafe.** Modular, each section on its
-    own, no section bleeding into another, short direct headers, Humanizer
-    on every comment and doc, easy for a human engineer to carry on.
-    Written into `CLAUDE.md` ("The standard for this code").
 41. **Quick revert for any change**, **security from day one**, **checks
     before every pull request**, **skills for repeated tasks**. Rules in
     `CLAUDE.md`. Still to build: the rollback workflow, the advisor check in
     CI, the dependency audit in CI, and the first project skills.
-
-### From 2026-10-28, fourth message
-
 42. **Idle screen seen live on his phone: "the animation is good, almost
     unnoticed though."** Asked whether he wants it a little stronger.
 43. **Later: replace "Server: Ready" with "Powered by StellaXafe
@@ -158,19 +58,6 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     screen takes over the root address (the server status then moves to
     the smoke test only).
 44. **RH logo stays a stand in** until the hospital sends its real logo.
-45. He cannot open the link on his tablet yet because of a VPN on it. His
-    to fix.
-
-### From 2026-10-28, fifth message
-
-46. **"Move to the next on the list"**: the database. Plan written in
-    `docs/DATABASE.md` from the RHEMA demo's fields. Waiting for his yes on
-    the plan and on the five safety choices before any SQL is written.
-
-### From 2026-10-28, sixth message
-
-47. **"It is Rhema, R-H-E-M-A."** Every "Rema" in our files changed to
-    RHEMA (the demo's file name `indexrema.html` stays as he saved it).
 48. **The hospital's note**, word for word: "Medical Reports for both
     nursing mothers and other patients. Nursing Station; Comment/report.
     They note the medications given/the vital signs. They note the time the
@@ -185,22 +72,6 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     to pharmacy or lab, and request from them.
 51. **Patient status**: visiting, in consultation, admitted, discharged.
     Light EMR only, no scanning.
-52. **Money in naira with 2 decimal places**, not kobo.
-53. **Patient numbers start RMC-** (RHEMA Medical Center), assigned
-    automatically.
-54. **PIN lock after idle** (5 or 15 minutes, "anyone that suits"): planned
-    10 minutes, changeable by the admin. **Session ends after 24 hours
-    without use**, then a fresh sign in.
-55. **Lock screen replaces the idle screen**: the PIN pad on the RHEMA idle
-    design, with the animation.
-56. **Look at simple open-source hospital systems for inspiration.** Done:
-    Bahmni (admission, discharge, transfer) and Open Hospital (patients,
-    visits, medicines, admissions). Ideas only, marked "(borrowed)" in
-    `docs/DATABASE.md`.
-57. Plan updated to version 2 in `docs/DATABASE.md`. **Approved 2026-10-28.**
-
-### From 2026-10-28, seventh message
-
 58. **No alert spam.** "Do not be spamming people that do not ask for
     notification." A lab result alerts only the doctor who requested it.
     Updating a record alerts nobody. Front desk never gets lab results.
@@ -211,60 +82,11 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     the record without a request; the doctor sees it in the history later.
 60. **Lab statuses**: front desk takes payment, then "Awaiting test"; the
     lab enters the result, then "Completed".
-61. **Screens: minimal but complete.** Critical information shows straight
-    away; everything else sits under a heading that opens like a drop down
-    (lab reports, nurses' notes, vitals history and so on). For the build
-    of the patient record screen.
 62. **Later, not now:** scanning a paper document and the system reading
     it, once the hospital has a scanner. Propose it then.
 63. **Later, maybe:** voice notes that turn into text, reusing his church
     speech to text work (the Bible display project) once it works well.
     Possibly with AI to help write the records. Undecided.
-
-### From 2026-10-28, database step
-
-64. **First migration built and proved**, not yet applied to the hospital's
-    database: `supabase/migrations/20261028120000_foundation.sql` (staff,
-    rooms, families, patients, activity log) with its undo file and 15
-    security tests. Each test was proved to catch a deliberate break
-    locally. CI run 40645788977 passed all 15 on a real throwaway Supabase,
-    plus undo and redo. WAITING for Anthony's yes to apply it to the live
-    database, and for his answer on a second Supabase project for testing.
-
-### From 2026-10-28, keys
-
-65. **Second Supabase project `rhema-testing` created** (meant to be Paris, came out Ireland, automatic
-    RLS left off). His own account was removed from the hospital
-    organisation (it blocked the second free project, and is not needed).
-    That cut off the first github-ci token, which had been made in his own
-    account. A new `github-ci` token was made in the hospital account,
-    covering both projects. Live project re-checked with it 2026-10-28:
-    passed (run 40616871905, attempt 3). Testing project ID:
-    **nfrvwvqmfxudaarfuwxg**. Its password is in the GitHub secret named
-    **SUPABASE_TESTING** (his name for it; the code uses that name).
-    `.github/workflows/db-testing.yml` applies migrations to the testing
-    project only. The live project gets migrations from main only, after his
-    yes on the SQL.
-    APPLIED to testing 2026-10-28 (Database (testing) run 40652458500):
-    the foundation migration went on, then the check said ACTIVE_HEALTHY,
-    0 security warnings, database login works. Both projects re-checked
-    with their own password (Supabase check run 40652220065).
-    APPLIED to LIVE 2026-10-28 (Database (live) run 40655032057), through
-    `db-live.yml` after the guard confirmed testing had it. Live check:
-    ACTIVE_HEALTHY, login works, 2 warnings, both about
-    `public.rls_auto_enable()` (Supabase's own function from the automatic
-    RLS option): anon and signed in users can call it. Not ours. Proposed
-    to Anthony: revoke EXECUTE from anon and authenticated. He said yes.
-    Local test showed that alone does not work (every role can run a new
-    function by default), so the migration also names public. WAITING for
-    his yes on that fuller line. YES given 2026-10-28 ("yes, fuller line").
-    DONE 2026-10-28: Database (live) run 40668021266. Live now shows 0
-    security warnings, the same as testing.
-    Region note: testing reports **eu-west-1 (Ireland)**, not Paris. Live is
-    eu-west-3 (Paris). He said keep it.
-
-### From 2026-10-28, after testing passed
-
 66. **Security against attackers, not only RLS.** "Making sure that the
     hospital's database is protected, their code is not exposed publicly,
     and every code is clean, readable." Next steps for it: npm audit in CI
@@ -289,93 +111,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 70. **Cron jobs.** He asked where the system needs one. Answered: nightly
     backup, the renewal and maintenance reminders, the AWS uptime watcher.
     Cloudflare Worker cron triggers are free. Build with those items.
-
-71. **Supabase sign in settings.** He asked (2026-10-28) "can you set up the
-    Supabase auth yourself?" No: the github-ci key has Auth Config on read
-    only, on purpose (least access), and he does not want a new key. So he
-    sets 4 things by hand in both projects: sign ups off, the Magic Link
-    template sends a code, code expiry 600 seconds, Site URL. Steps given in
-    chat 2026-10-28. Until Resend (6 Nov), Supabase's own email only sends
-    to members of the hospital organisation, a few emails an hour.
-    Progress 2026-10-29 (his screenshots, testing project): sign ups OFF,
-    code expiry 600 s, code length 6, all saved. The email template is
-    LOCKED: Supabase only lets you edit it once custom SMTP is set up. So
-    the template steps wait for Resend, and until then the email carries
-    Supabase's default sign in link. Still to do: Site URL on testing, and
-    the same steps on live. Then CI reads the settings on every run.
-    Redirect URLs: one each, `<address>/**` for the testing and live
-    workers.dev addresses. On 6 Nov, after the domain move, add the
-    rhemamedical.app address to Site URL and Redirect URLs on live.
-    "auth done" 2026-10-29 for both projects. Check 4 added to
-    `ops/supabase_check.py`: reads the sign in settings and fails if one
-    moved. Staff are NOT added to the Supabase organisation to receive
-    codes before Resend (members can see the database). Until Resend, only
-    rhemamedical7@gmail.com can receive a code.
-
-### From 2026-10-29
-
-72. **Nursing station sign in.** "In the nursing station, it's not per
-    person. I think there are about 4 nurses working together... if he
-    invites nursing station and uses a particular email for nursing
-    station, you are not able to know who did what." Same question for
-    other shared desks (lab). Proposed: every nurse has their own invite;
-    the station computer remembers the nurses who signed in on it; each
-    nurse taps their name and types their own PIN before doing anything,
-    so every line in the log carries a person's name. YES 2026-10-29:
-    "that's the correct way to do it." Same for lab, pharmacy and any
-    shared desk. Build it with sign in.
-73. **Show him the Cloudflare side as it is built.** "As you are doing it,
-    you can still be directing me to go and be looking at the backend,
-    where to go to see what you've done": for each Worker function, R2
-    bucket and setting, say where in the Cloudflare dashboard to see it.
 74. **AWS account.** He is checking whether he already has one, then
     opening it. Guide him through the AWS piece when he says it is ready.
-75. **Keep teaching the Python.** "Any new Python code you write, you help
-    me so I can still know it... I really liked that one." Standing rule,
-    already in CLAUDE.md; he asked for it to continue.
-76. **The director's note was checked against our records 2026-10-29.**
-    Every line of it is item 48 here and section 7 of docs/DATABASE.md.
-
-77. **Inviting staff: name, email, role, and the role gives the access.**
-    "When admin selects this person's role as a matron, the person
-    automatically gets the matron role access... it doesn't matter how many
-    doctors." Asked: consultants, and should the director have an account.
-    There is no matron role yet (roles: front desk, doctor, nurse, pharmacy,
-    laboratory, admin). Proposed 2026-10-29: add a matron role (starts with
-    nurse access plus announcements); consultants are doctors (the title
-    goes in the name, "Dr. ..."); the director is invited as admin, which
-    already includes medical records. A wrong email cannot be detected, so
-    the admin sees each invite as Waiting, Accepted or Expired, and can
-    resend or cancel it; an invite works once and runs out after 48 hours.
-    He said "yes, matron role, and director as admin" (2026-10-29), then
-    asked for admin as an extra power any role can be given, "just like
-    you add someone extra in WhatsApp to become an admin", changeable after
-    the invite, with the admin part in the same dashboard (no log out).
-    Built: migration 20261029100000_matron_and_admin_access.sql (matron
-    role, can_admin column, is_admin() reads can_admin, guard so the last
-    admin cannot be removed), undo file, 4 tests; every test proved to
-    catch a deliberate break. "yes, admin tick" 2026-10-29: sent to
-    testing, then live by his rule. DONE: testing run 40810731523, live
-    run 40811029651, both 0 warnings and all four checks passed. The admin
-    screens that use it come with the admin step of the build.
-
-78. **Sign in screen, with the backend.** "Go ahead with the sign in
-    screen" (2026-10-29). Built on the feature branch, not on testing yet:
-    sign in page (remembered people, email, 6 digit code, first PIN twice),
-    lock page (idle screen, tap for the PIN card, other people at a shared
-    desk tap their own name), lock after 10 minutes, signed out of the
-    device after 24 hours, 5 wrong PINs sign out. PIN migration
-    20261029120000_pin_lock.sql with undo and 7 tests (each proved to catch
-    a break). CI job `signin` signs two made up nurses in for real on a
-    throwaway Supabase: PASSED (run 40813601733). Screens checked at phone
-    and desktop, both themes; fixed the code boxes spilling at 320px and the
-    cursor after a wrong PIN. Workflow first-admin.yml makes the first
-    admin. "yes" to the PIN SQL and first admin 2026-10-29 (name: "Dr.
-    Anthony", rhemamedical7@gmail.com, invited and accepted on testing).
-79. **Dr. Evans (the director) to test.** Anthony will share the testing
-    account and pass on the code himself, for testing only. Told: then the
-    log shows Dr. Anthony for whatever Dr. Evans does; his own account comes
-    once Resend is connected.
 80. **Hospital email addresses.** Staff sign in with their own Gmail (no
     mailbox per staff). Up to 3 shared addresses on rhemamedical.app via
     Cloudflare Email Routing to the hospital Gmail. Asked which names
@@ -386,73 +123,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     (Gmail "send as" only if they want to write from them); records@
     routed so replies arrive, but sending is done by Resend; no-reply@
     needs nothing.
-81. **The testing account shows the director's name.** "Use his own name,
-    so that when he logs in, he will not feel awkward." First admin on
-    testing: full name "Dr. Evans", email rhemamedical7@gmail.com.
-    DONE 2026-10-29 (First admin run 40825242998). Sign in and the PIN are
-    on testing (Database (testing) run 40824628182). NOT moved to live yet:
-    testing now shows 1 security warning, "Leaked Password Protection
-    Disabled". It is about passwords (we use none), it appeared once a
-    user existed, and switching it on needs the Pro plan. Live shows 0.
-    He said "go live" and to record why it is ignored. Recorded in
-    CLAUDE.md ("Accepted warnings") and ACCEPTED_WARNINGS in
-    ops/supabase_check.py.
 82. **Email inside the app for the admin.** "In the announcement section,
     they can have another place where they used to type in their email and
     send out email... and receive email as well... the admin can be seeing
     email there... and be replying from there", from the hospital's own
     address, without opening Gmail. Possible with Resend (sending and
     receiving). Build after the domain move and Resend (6 Nov).
-83. **Desktop sign in until Resend.** His plan: open Gmail in Chrome on the
-    desktop, so the sign in link opens right there. Once Resend sends the
-    6 digit code instead, the phone and the desktop no longer need to match.
-
-84. **Keep Supabase from pausing.** "Is it possible that you set up a cron
-    ... that wakes up every 7 days or every 6 days?" Built
-    `.github/workflows/keep-awake.yml`: every day, three small requests to
-    each database with the public key (RLS returns nothing). A timer inside
-    Supabase may not count as user activity, so it knocks from outside.
-    Correction 2026-10-29: GitHub's 60 day switch-off is for public repos
-    only; this repo is private, so it keeps running. A Cloudflare timer in
-    the hospital's account is still added before handover, because this
-    one lives in Anthony's GitHub. Proved 2026-10-29 (run
-    40827203000): both databases answered, refusing with Postgres's own
-    42501, which shows the knock reached them and no data left.
-    Sign in, the PIN and the accepted warning went LIVE 2026-10-29
-    (Database (live) run 40826794056, Deploy run 40826794027).
-
-85. **See the app as each role before Resend.** "How do I log in as a
-    normal doctor or a front desk, since the email only sends for an
-    admin? Can we run an SQL code... on the testing branch." Built
-    `.github/workflows/testing-role.yml`: Anthony picks a role in GitHub
-    Actions, it changes the testing account (rhemamedical7@gmail.com) to
-    that role on the TESTING database only, admin tick kept on. He keeps
-    Dr. Evans as plain admin ("just leave it like that").
-    Proved 2026-10-29 (run 40828938982, role admin, so nothing visible
-    changed). Also for him to look at each module and send corrections
-    before 6 Nov.
-
-86. **Home screens.** "Go ahead with the home screens" (2026-10-29). Plan
-    shown to him, from the demo's home(): greeting with role and room;
-    4 quick actions per role (demo ACT list; ones whose page is not built
-    yet shown as "Soon", never as dead buttons); tiles (registered today,
-    in queue, in consultation, completed; lab pending once lab exists);
-    the queue card per role; patients seen chart; front desk closing time
-    banner; bottom bar on phone, side bar on desktop. Needs a new table,
-    queue_entries. "Online now" waits for messages (live presence).
-    "yes" to the queue SQL 2026-10-29 ("you can carry on with the SQL").
-    Migration 20261029140000_queue.sql with undo and 7 tests, each break
-    caught (one test was fixed after it passed for the wrong reason).
-    Home screens built on the feature branch 2026-10-29: frame (top bar,
-    bottom or side menu, Soon items), greeting, quick actions, count
-    tiles, Patients seen chart, queue card per role. Real walk-through on
-    GitHub passed (run 40832854613): a nurse sees only her room, calls a
-    patient in, refresh keeps it, finishes, Completed today shows 1.
-    Screens checked for three roles, both themes, phone and desktop, no
-    overflow at 320 to 390px. Added a read-only function patients_seen()
-    for the chart. "yes, chart function" 2026-10-29. LIVE 2026-10-29
-    (Database (live) run 40838983605, Deploy run 40838983622). Live staff
-    row for Dr. Evans made (First admin run 40838481441).
 87. **Keep awake: Cloudflare and other platforms.** He asked whether the
     Cloudflare timer expires, whether it does the same job as GitHub, why
     keep both, and said to use the same principle for Amara and
@@ -475,32 +151,6 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     (migrations, workflows, checks); only the IDs and secrets differ. To
     write: a setup checklist and one place for the IDs, so a new hospital
     is a copy plus new secrets.
-
-90. **Tell him what was borrowed from other hospital systems, and any
-    small detail that would help, if it does not complicate the flow.**
-    (2026-10-29.) Borrowed so far (ideas only, from Bahmni and Open
-    Hospital, marked "(borrowed)" in docs/DATABASE.md): one clear patient
-    status (Visiting, In consultation, Admitted, Discharged); an
-    admissions history, so every stay is kept; a medication record with
-    the exact time each dose was given and who gave it; mistakes voided
-    with a reason, never deleted. Small extras offered for his yes or no:
-    (a) how long each patient has been waiting, on the queue card;
-    (b) a warning at registration when a patient with the same name, date
-    of birth and phone already exists; (c) age worked out from the date of
-    birth; (d) allergies shown in red at the top of the record; (e) "last
-    seen" date in patient search. He picked all five, "a, b, c, d and e"
-    (2026-10-29). For (b): "should come with reuse this patient's
-    information since it's already there... you can open a new record"
-    (offer to open the existing patient instead of a duplicate).
-
-91. **Medications in the record: active, suspended, stopped.** (2026-10-29)
-    "Nurses... can suspend a particular drug, they can stop giving
-    somebody a particular medication... edit or update the medication...
-    suspended medicine... orange... stopped permanently, maybe red... still
-    giving it, maybe green or blue." Plus the record of each dose given,
-    with the exact time and who gave it. History kept: a change of status
-    never deletes the line. Build with the medical record (Patients
-    stage 2).
 92. **Download all the hospital's data.** "If the hospital want to download
     their data to their entire data, it should be there." An admin only
     export of every table, with the download itself written in the
@@ -516,21 +166,6 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 94. **Backup to a second Cloudflare account.** "Use a second Cloudflare
     account for backup of the data they are putting in." Nightly copy of
     the database export and the files to R2 in a separate account.
-
-95. **Staff profile page with a photo.** (2026-10-29) "A staff has a short
-    profile... they can upload their image." Also a selling point. Note:
-    the demo's invite screen says "Staff cannot change their own name or
-    photo. The administrator manages this." DECIDED 2026-10-29: dropped.
-    "No need... it's not a social media platform... everybody in the staff
-    know each other." Only the admin sets names; no photos.
-96. **Future features, kept separate.** Birthday wishes, wellness check-in
-    3 days after discharge, check-up reminder 1 month after, appointment
-    reminder the day before (WhatsApp then SMS), weekly digest for
-    consultants, print or send to email, staff VoIP calls, automatic
-    payment recording, voice typing. All written in
-    docs/FUTURE-FEATURES.md, in his words. Voice notes in chat stay in the
-    RHEMA plan (messages module), no special integration needed.
-
 97. **Call attention: a floating alert with a bell, now, not later.**
     (2026-10-29) "Once that attention is needed, even if they are doing
     something on the computer, it can float immediately... with the X to
@@ -544,111 +179,28 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     device's own notification sound, the custom bell plays when the app
     is open; and a browser only plays sound after the person has touched
     the page once (signing in counts).
-97b. **Call attention: two taps, by role or room, from the top bar.**
-    (2026-10-29) "That call attention button, it should not be something
-    that opens a new page... it's more like a drop down overlay that
-    doesn't shift anything on the interface. It just drop down like a
-    rolling paper... once they click on front desk immediately, it sends
-    the ring immediately... it doesn't call attention by name. It calls
-    attention by role... front desk is always at the top." So: a bell
-    button in the top bar (and the Call attention quick action) opens a
-    list that drops over the page without moving anything; Front Desk
-    first, then Matron, the other rooms and departments, never the
-    caller's own room; one tap sends the ring to everyone on duty there.
-    No form, no typing. Replaces the demo's Call attention page (which
-    had department, person and note).
-97c. **Call attention: how the list works, decided.** (2026-10-29) "yes
-    to both, go ahead with step 1". The call goes to a ROOM, never a
-    person: "it doesn't matter which person specifically is in that room
-    as long as that's the room they are calling." Front Desk, Nursing
-    Station, Laboratory and Pharmacy are groups on one shared computer:
-    one tap rings everyone on duty there ("It doesn't matter whether it's
-    Kichi or Amaka or Queen or Adora or Aminat"). Consultant opens a
-    second list of the consultant rooms registered (Room 1, 2, 3), and the
-    call goes to that room. Matron opens a list of the matron offices
-    registered. "If you want to call a particular person, you could have
-    just used a phone or use the chatting system." Step 1 (now): card and
-    bell for anyone with the app open. Step 2 (next): push when the app
-    is closed. Migration 20261029180000_attention_calls.sql: "yes, call
-    attention" 2026-10-29. He then asked for the double tap guard at 30
-    seconds, kept in the database ("15 seconds can even be 30 seconds"),
-    so it is 30 seconds plus a lock (two taps at the same moment: proven
-    locally, 1 call saved). Now a standing rule in CLAUDE.md.
-97d. **Call attention list: a small search, and a sent mark.** (2026-10-29)
-    "a little search bar should be on that attention drop-down... in case
-    they just know the room number... or they just type the matron's
-    name." Front Desk, Lab and the other groups stay as one tap. When a
-    call is sent: "a bell icon... it animates somewhat and then marks
-    good... very minimal, to know that, oh, I've called their attention."
-
-97e. **Call attention uses a phone icon, the bell is for notifications.**
-    (2026-10-29) "having the bell icon to represent call attention and also
-    represent notification... in three different places... If the top bar
-    is to call attention, then maybe we use call icon." Done 2026-10-29:
-    phone icon on the top bar button, the list, the floating card and the
-    Home tile. Rights fix: "yes, rights fix" 2026-10-29.
-    **97, 97b, 97c, 97d, 97e: step 1 LIVE 2026-10-29.** Testing and live
-    both 0 security warnings. CI proves it with two real screens: Nurse
-    One rings Front Desk, the desk screen gets the card live, a second tap
-    says Already sent, X keeps it closed after a refresh. Step 2 (push
-    when the app is closed) is next on this item.
-97f. **The Home "Call attention" tile: maybe replace it.** (2026-10-29)
-    "if it is there [in the top bar], then that tab that is on the
-    dashboard that says call attention, maybe you look for something more
-    common with every other person and replace and put it there." Asked
-    him which job. Decided 2026-10-29: "just leave the call attention at
-    the home screen tile. Just leave it." Done.
-97g. **Later: the call button gives two choices.** (2026-10-29) "by the
-    time we start putting voice call, then when you click on it, it gives
-    you two options: instant call attention or dial." Goes with VoIP in
-    docs/FUTURE-FEATURES.md.
-97h. **Review the agent rules and suggest skills.** (2026-10-29) "Is the
-    rules that I gave, are they too tight? Are there some rules that if
-    they are not there, it will allow Opus 5.5 to work better... rules
-    that I might not have included... things I've been repeating... that
-    could have been built as a skill." Review given in chat 2026-10-29;
-    waiting for his picks. Then Call attention step 2 (push).
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
-99. **Patients, stage 1, built 2026-10-29** (no new SQL): Find (name,
-    number or phone; age, last seen, in hospital now), Register (demo
-    form, age from date of birth, phone tidied, possible duplicate shown
-    with "Use this patient"), Edit, Send to room; Home quick actions and
-    the Patients menu switched on; waiting time on the queue card. Real
-    walk-through passed (run 40844700405). Screens checked at phone and
-    desktop, both themes, no overflow. Extras done: (a) waiting time,
-    (b) duplicate check with reuse, (c) age, (e) last seen. (d) allergies
-    comes with the medical record (stage 2, needs SQL).
+### Standing instructions
 
-100. **Medical record, database.** "Go ahead with the medical record"
-    (2026-10-29). Migration 20261029160000_medical_record.sql written and
-    tested locally, feature branch only: record openings (logged, 12 hour
-    window), medical profile, allergies, conditions, medications with
-    active, suspended, stopped and a status log, doses given with exact
-    time and giver, vital signs, nursing notes, consultation notes. 12
-    tests, every deliberate break caught. Test 8 found a real fault in the
-    foundation: "a void needs a reason" let an empty reason through on
-    patients; the same file fixes it (drop and re-add that one rule).
-    "yes, medical record" 2026-10-29, after he asked how opening and
-    voiding work (explained: staff can open any record any time; the app
-    logs the opening first; Void asks for a short reason, the line stays
-    greyed and crossed out). LIVE 2026-10-29: testing then live, 0
-    security warnings on both. Done.
-101. **Record screens: simple and seamless, and tidy the alignment.**
-    (2026-10-29) "Even though... they are complex information... the user
-    interface is laid out in a very seamless and simple way. Just the way
-    we started the dashboard." Also: "the way the thing displays on in
-    desktop... some that are not well aligned properly. So I need you to
-    align those." Improve, do not change: "Not changing it. No, don't
-    change it. What I just want is improvement to look even simpler."
-    Built 2026-10-29: /patients/record/?p=ID. Allergy banner first,
-    folding cards, one line shape everywhere, two columns on desktop.
-    The patient card's facts are grouped (Patient, Contact, Next of kin)
-    so they line up, and a Medical record button shows for medical staff.
-    Walked through with made up data: every control wrote the right row,
-    an empty reason and a bad number are refused, no overflow 320 to 390.
-    The real e2e now walks the record too. LIVE 2026-10-29. Done.
+These never come off the list.
+
+15. **Work as experts in DevOps, cloud and cybersecurity, using every free
+    resource.** Standing instruction.
+20. **"We are going to actually rush this thing. So we only have about 2
+    weeks."** The 8 week timeline in `PLAN.md` 12 is replaced by 2 weeks.
+28. **Agents get API tokens through GitHub secrets, never through the
+    chat.** Some setup he does by hand so he learns the platforms.
+34. **Aim: app built within about 10 days, test runs and small fixes after,
+    then plug in email and install.** No need to wait for day 14.
+73. **Show him the Cloudflare side as it is built.** "As you are doing it,
+    you can still be directing me to go and be looking at the backend,
+    where to go to see what you've done": for each Worker function, R2
+    bucket and setting, say where in the Cloudflare dashboard to see it.
+75. **Keep teaching the Python.** "Any new Python code you write, you help
+    me so I can still know it... I really liked that one." Standing rule,
+    already in CLAUDE.md; he asked for it to continue.
 
 ### Decided
 

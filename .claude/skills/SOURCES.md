@@ -30,3 +30,15 @@ skills (not open licence, and not needed).
 
 To add a skill later: read it whole, check its licence, check it runs
 nothing on its own, then add a row here.
+
+## Our own skills (written for Rhema, 2026-10-29)
+
+Built because an agent did these jobs by hand more than twice (CLAUDE.md
+section 14). No outside source.
+
+| Skill | What it does | Scripts it runs |
+| --- | --- | --- |
+| `ship` | feature branch to testing, wait for every check, then live, then report | `scripts/wait-runs.sh` |
+| `screens` | made up data, screenshots at phone and desktop, overflow check | `scripts/screens/serve.sh`, `scripts/screens/mock.cjs`, `scripts/overflow-audit.cjs` |
+| `new-migration` | migration, undo file and tests from a template; local run; deliberate break check | `scripts/new-migration.sh`, `scripts/local-db.sh`, `scripts/mutate.sh` |
+| `switch-role` | switches Anthony's testing account to another role | `.github/workflows/testing-role.yml` |
