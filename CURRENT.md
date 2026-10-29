@@ -389,6 +389,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 81. **The testing account shows the director's name.** "Use his own name,
     so that when he logs in, he will not feel awkward." First admin on
     testing: full name "Dr. Evans", email rhemamedical7@gmail.com.
+    DONE 2026-10-29 (First admin run 40825242998). Sign in and the PIN are
+    on testing (Database (testing) run 40824628182). NOT moved to live yet:
+    testing now shows 1 security warning, "Leaked Password Protection
+    Disabled". It is about passwords (we use none), it appeared once a
+    user existed, and switching it on needs the Pro plan. Live shows 0.
+    Asked Anthony whether it may go live with that warning on testing.
 
 ### Decided
 
