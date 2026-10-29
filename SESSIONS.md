@@ -58,3 +58,9 @@ build from the RHEMA demo and the proposal.
   settings, with accepted warnings written down).
 - Live and testing both have the account "Dr. Evans" (admin) for
   rhemamedical7@gmail.com.
+
+- 2026-10-29, later: medical record screens built (/patients/record/?p=ID)
+  and the medical record migration went live. Testing and live both show
+  0 security warnings. The sign in e2e now walks the record against the
+  real database rules: allergy, medicine, suspend and resume with a
+  reason, a dose, a refused reading, a void, and a refresh.

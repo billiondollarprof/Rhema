@@ -582,8 +582,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     "yes, medical record" 2026-10-29, after he asked how opening and
     voiding work (explained: staff can open any record any time; the app
     logs the opening first; Void asks for a short reason, the line stays
-    greyed and crossed out). On the testing database 2026-10-29, 0
-    security warnings.
+    greyed and crossed out). LIVE 2026-10-29: testing then live, 0
+    security warnings on both. Done.
 101. **Record screens: simple and seamless, and tidy the alignment.**
     (2026-10-29) "Even though... they are complex information... the user
     interface is laid out in a very seamless and simple way. Just the way
@@ -597,7 +597,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     so they line up, and a Medical record button shows for medical staff.
     Walked through with made up data: every control wrote the right row,
     an empty reason and a bad number are refused, no overflow 320 to 390.
-    The real e2e now walks the record too. Comes off the list once live.
+    The real e2e now walks the record too. LIVE 2026-10-29. Done.
 
 ### Decided
 
