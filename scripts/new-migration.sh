@@ -21,6 +21,12 @@ NAME="${1:?Give a short name, e.g. lab_requests}"
 [[ "$NAME" =~ ^[a-z0-9_]+$ ]] || { echo "Use lower case letters, numbers and _ only"; exit 2; }
 
 STAMP="$(date -u +%Y%m%d%H%M%S)"
+# Migrations run in name order, so a new one must sort after the newest one
+# already there (some were named with a later time of day than the clock).
+NEWEST="$(ls "$HERE/supabase/migrations" | sort | tail -1 | cut -c1-14)"
+if [[ -n "$NEWEST" && "$STAMP" < "$NEWEST" || "$STAMP" == "$NEWEST" ]]; then
+  STAMP="$((NEWEST + 100))"
+fi
 LAST_TEST="$(ls "$HERE/supabase/tests" | grep -E '^[0-9]{3}_' | sort | tail -1 | cut -c1-3)"
 NEXT_TEST="$(printf '%03d' $((10#${LAST_TEST:-0} + 1)))"
 UP="$HERE/supabase/migrations/${STAMP}_${NAME}.sql"

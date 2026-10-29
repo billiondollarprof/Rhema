@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   description: 'RHEMA Medical Center hospital workspace',
   // Staff only. Search engines must not list it.
   robots: { index: false, follow: false },
+  // So the app can be added to a phone's home screen. An iPhone only shows
+  // Call attention alerts for an app added this way.
+  manifest: '/manifest.webmanifest',
+  icons: { icon: '/icon-192.png', apple: '/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'RHEMA', statusBarStyle: 'black-translucent' },
 }
 
 export const viewport: Viewport = {

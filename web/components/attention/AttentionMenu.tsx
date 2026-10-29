@@ -13,7 +13,8 @@
  * Sections:
  *   1. The bell button, and opening and shutting
  *   2. One line: tap, the bell shakes, then the tick
- *   3. The list: search, groups, then Consultant and Matron
+ *   3. The list: search, groups, then Consultant and Matron, and at the
+ *      bottom the switch for alerts when the app is closed (AlertsSwitch)
  *
  * Never: open a new page, take a form, or ask for typing to send a call.
  * The search is only there to find a room faster.
@@ -23,6 +24,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Icon from '@/components/shell/Icon'
+import AlertsSwitch from './AlertsSwitch'
 import { useAttentionMenu } from './AttentionContext'
 import styles from './attention.module.css'
 import {
@@ -34,10 +36,15 @@ import {
   type Target,
 } from '@/lib/attention/attention'
 
-type MenuProps = { client: SupabaseClient; myRoomId: number | null; buttonClass: string }
+type MenuProps = {
+  client: SupabaseClient
+  staffId: string
+  myRoomId: number | null
+  buttonClass: string
+}
 
 // ===== 1. The Call attention button =====
-export default function AttentionMenu({ client, myRoomId, buttonClass }: MenuProps) {
+export default function AttentionMenu({ client, staffId, myRoomId, buttonClass }: MenuProps) {
   const { open, setOpen } = useAttentionMenu()
   const [directory, setDirectory] = useState<Directory | null>(null)
   const [words, setWords] = useState('')
@@ -160,6 +167,8 @@ export default function AttentionMenu({ client, myRoomId, buttonClass }: MenuPro
               ))}
             </>
           ) : null}
+          {/* Alerts when the app is closed (step 2). */}
+          <AlertsSwitch client={client} staffId={staffId} />
         </div>
       ) : null}
     </div>
