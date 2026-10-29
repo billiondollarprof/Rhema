@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
@@ -19,6 +20,7 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.4.3",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.5"
   }
 }

@@ -14,19 +14,26 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { AuthStatus } from './session'
 
-export function pathFor(status: AuthStatus): string | null {
+// The two pages that are not part of the signed in app.
+const SIGN_IN = '/sign-in/'
+const LOCK = '/lock/'
+
+// Where a person in this state belongs, when on `thisPage`. Null means
+// "stay here". A signed in, unlocked person may be on any app page; only
+// the sign in and lock pages send them on to Home.
+export function pathFor(status: AuthStatus, thisPage: string): string | null {
   if (status === 'loading') return null
-  if (status === 'locked') return '/lock/'
-  if (status === 'ready') return '/'
+  if (status === 'locked') return thisPage === LOCK ? null : LOCK
+  if (status === 'ready') return thisPage === SIGN_IN || thisPage === LOCK ? '/' : null
   // signed-out, needs-pin and not-configured all live on the sign in page.
-  return '/sign-in/'
+  return thisPage === SIGN_IN ? null : SIGN_IN
 }
 
 // Send the person to the right page if they are on the wrong one.
 export function useRightPage(status: AuthStatus, thisPage: string) {
   const router = useRouter()
   useEffect(() => {
-    const target = pathFor(status)
-    if (target && target !== thisPage) router.replace(target)
+    const target = pathFor(status, thisPage)
+    if (target) router.replace(target)
   }, [status, thisPage, router])
 }

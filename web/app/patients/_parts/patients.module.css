@@ -1,0 +1,337 @@
+/*
+ * patients.module.css: the patients pages (find, register, edit). Values
+ * from the RHEMA demo (.card, .sec, .shd, .fg, .fld, .sg, .pr, .srch).
+ */
+
+/* ===== 1. Page ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.head h2 {
+  margin: 0;
+  font-size: 22px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.muted {
+  color: var(--mut);
+  margin: 0;
+}
+
+.error {
+  color: var(--red);
+  margin: 0;
+}
+
+/* ===== 2. Section heading inside a card (demo .shd) ===== */
+.sectionHead {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sectionHead i {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #e6f0ff, #cfe0fb);
+  color: var(--bl);
+  flex-shrink: 0;
+}
+
+.sectionHead b {
+  display: block;
+  font-size: 15px;
+}
+
+.sectionHead small {
+  color: var(--mut);
+}
+
+/* ===== 3. Fields ===== */
+.fields {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 5px;
+}
+
+.input {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 10px;
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.input:focus {
+  outline: 0;
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 4px rgba(31, 95, 208, 0.12);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--red);
+}
+
+.hint {
+  display: block;
+  color: var(--bl);
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Two choice buttons side by side (demo .sg) */
+.segments {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
+.segments button {
+  font: inherit;
+  flex: 1;
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: var(--mut);
+  cursor: pointer;
+}
+
+.segments button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+
+/* ===== 4. Buttons ===== */
+.buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primary {
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  border-color: #1f5fd0;
+  color: #fff;
+  box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ===== 5. Search and results (demo .srch, .pr) ===== */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 10px;
+  color: var(--mut);
+}
+
+.search input {
+  font: inherit;
+  border: 0;
+  outline: 0;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--ink);
+  background: none;
+}
+
+.result {
+  font: inherit;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.result[aria-current='true'],
+.result:hover {
+  border-color: #8fb4f0;
+  background: #f4f8ff;
+}
+
+.result > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.result small {
+  display: block;
+  color: var(--mut);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: #e3f2fd;
+  color: var(--bl);
+  white-space: nowrap;
+}
+
+.tagBusy {
+  background: #fff1de;
+  color: var(--amb);
+}
+
+/* ===== 6. Find page: list and detail side by side when wide ===== */
+.split {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* ===== 7. Patient details (demo .kv) ===== */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.facts div {
+  min-width: 0;
+}
+
+.facts dt {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ok {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #e8f5ee;
+  border: 1px solid #bfe3cf;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.ok b {
+  font-size: 18px;
+}
+
+.warn {
+  display: grid;
+  gap: 10px;
+  background: #fff7e6;
+  border: 1px solid #ffe0a3;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+/* ===== 8. Wider screens ===== */
+@media (min-width: 760px) {
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) {
+  .split {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+  }
+  .twoColumns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+}

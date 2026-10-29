@@ -12,6 +12,9 @@
  * Changes show on screen at once and save behind (optimistic), and come
  * back if the save fails.
  *
+ * A waiting patient also shows how long they have waited (Anthony's pick
+ * (a), 2026-10-29).
+ *
  * Never: show the medical record here. Name, number, category, room, the
  * note and the status only.
  */
@@ -21,6 +24,7 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './home.module.css'
 import type { StaffMember } from '@/lib/auth/session'
+import { waitedSince } from '@/lib/patients/age'
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
@@ -126,6 +130,7 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
                   {entry.patient?.patient_number} ·{' '}
                   {CATEGORY_LABELS[entry.patient?.category ?? ''] ?? entry.patient?.category} ·
                   since {since(entry.created_at)}
+                  {entry.status === 'waiting' ? ` · waiting ${waitedSince(entry.created_at)}` : ''}
                 </small>
                 {entry.note ? <small className={styles.note}>Note: {entry.note}</small> : null}
               </div>

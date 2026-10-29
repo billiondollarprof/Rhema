@@ -7,49 +7,56 @@
  *
  * Never: let a button look pressable when it does nothing.
  */
+'use client'
+
+import { useRouter } from 'next/navigation'
 import Icon from '@/components/shell/Icon'
 import styles from './home.module.css'
 
 // ===== 1. The four buttons for each role, from the demo =====
-type Action = { icon: string; label: string; colour: string; ready: boolean; job: 'queue' | 'soon' }
+// job: 'queue' scrolls to the queue card; a page address opens that page;
+// 'soon' is a part not built yet.
+type Action = { icon: string; label: string; colour: string; ready: boolean; job: string }
 
-const QUEUE = 'queue' as const
-const SOON = 'soon' as const
+const QUEUE = 'queue'
+const SOON = 'soon'
+const FIND = '/patients/'
+const REGISTER = '/patients/register/'
 
 const FRONT_DESK: Action[] = [
-  { icon: 'reg', label: 'Register patient', colour: '#1976d2', ready: false, job: SOON },
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: false, job: SOON },
-  { icon: 'door', label: 'Send to room', colour: '#7e57c2', ready: false, job: SOON },
+  { icon: 'reg', label: 'Register patient', colour: '#1976d2', ready: true, job: REGISTER },
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
+  { icon: 'door', label: 'Send to room', colour: '#7e57c2', ready: true, job: FIND },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 const DOCTOR: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#1976d2', ready: true, job: QUEUE },
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: false, job: SOON },
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: false, job: SOON },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 const NURSE: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#00838f', ready: true, job: QUEUE },
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: false, job: SOON },
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 const PHARMACY: Action[] = [
   { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: QUEUE },
-  { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: false, job: SOON },
+  { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: false, job: SOON },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 const LABORATORY: Action[] = [
   { icon: 'lab', label: 'Lab requests', colour: '#7e57c2', ready: true, job: QUEUE },
-  { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: false, job: SOON },
+  { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#00897b', ready: false, job: SOON },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 const ADMIN: Action[] = [
   { icon: 'users', label: 'Invite staff', colour: '#546e7a', ready: false, job: SOON },
   { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: false, job: SOON },
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'bell', label: 'Call attention', colour: '#e53935', ready: false, job: SOON },
 ]
 
@@ -66,10 +73,13 @@ const BY_ROLE: Record<string, Action[]> = {
 // ===== 2. The buttons =====
 export default function QuickActions({ role }: { role: string }) {
   const actions = BY_ROLE[role] ?? ADMIN
+  const router = useRouter()
 
   function run(action: Action) {
     if (action.job === QUEUE) {
       document.getElementById('queue')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else if (action.job.startsWith('/')) {
+      router.push(action.job)
     }
   }
 

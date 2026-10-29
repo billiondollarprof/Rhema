@@ -24,10 +24,16 @@ import { useAuth } from '@/lib/auth/session'
 // ===== 1. The menu =====
 const MENU = [
   { href: '/', icon: 'home', label: 'Home', ready: true },
-  { href: '/patients/', icon: 'users', label: 'Patients', ready: false },
+  { href: '/patients/', icon: 'users', label: 'Patients', ready: true },
   { href: '/messages/', icon: 'msg', label: 'Messages', ready: false },
   { href: '/notifications/', icon: 'bell', label: 'Notifications', ready: false },
 ]
+
+// Home is lit only on Home; any other item is lit on its own pages too
+// (Patients stays lit on Register and Edit).
+function isHere(path: string, href: string) {
+  return href === '/' ? path === '/' : path.startsWith(href)
+}
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
@@ -65,8 +71,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.navItem} ${path === item.href ? styles.on : ''}`}
-                aria-current={path === item.href ? 'page' : undefined}
+                className={`${styles.navItem} ${isHere(path, item.href) ? styles.on : ''}`}
+                aria-current={isHere(path, item.href) ? 'page' : undefined}
               >
                 <Icon name={item.icon} size={22} />
                 {item.label}
