@@ -432,6 +432,16 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     changed). Also for him to look at each module and send corrections
     before 6 Nov.
 
+86. **Home screens.** "Go ahead with the home screens" (2026-10-29). Plan
+    shown to him, from the demo's home(): greeting with role and room;
+    4 quick actions per role (demo ACT list; ones whose page is not built
+    yet shown as "Soon", never as dead buttons); tiles (registered today,
+    in queue, in consultation, completed; lab pending once lab exists);
+    the queue card per role; patients seen chart; front desk closing time
+    banner; bottom bar on phone, side bar on desktop. Needs a new table,
+    queue_entries. "Online now" waits for messages (live presence).
+    WAITING for his yes on the queue SQL.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
