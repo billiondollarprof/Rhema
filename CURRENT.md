@@ -355,7 +355,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     role, can_admin column, is_admin() reads can_admin, guard so the last
     admin cannot be removed), undo file, 4 tests; every test proved to
     catch a deliberate break. "yes, admin tick" 2026-10-29: sent to
-    testing, then live by his rule.
+    testing, then live by his rule. DONE: testing run 40810731523, live
+    run 40811029651, both 0 warnings and all four checks passed. The admin
+    screens that use it come with the admin step of the build.
 
 ### Decided
 
