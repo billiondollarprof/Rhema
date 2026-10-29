@@ -547,6 +547,16 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
+99. **Patients, stage 1, built 2026-10-29** (no new SQL): Find (name,
+    number or phone; age, last seen, in hospital now), Register (demo
+    form, age from date of birth, phone tidied, possible duplicate shown
+    with "Use this patient"), Edit, Send to room; Home quick actions and
+    the Patients menu switched on; waiting time on the queue card. Real
+    walk-through passed (run 40844700405). Screens checked at phone and
+    desktop, both themes, no overflow. Extras done: (a) waiting time,
+    (b) duplicate check with reuse, (c) age, (e) last seen. (d) allergies
+    comes with the medical record (stage 2, needs SQL).
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
