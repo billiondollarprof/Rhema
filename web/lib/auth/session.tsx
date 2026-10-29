@@ -262,7 +262,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         emailRedirectTo: `${window.location.origin}/sign-in/`,
       },
     })
-    return error ? codeErrorMessage(error.code, 'The code could not be sent. Try again.') : null
+    if (!error) return null
+    // The error code only, never the email, so the browser log holds no
+    // personal details.
+    console.warn(`Sign in code request refused: ${error.code ?? error.status}`)
+    return codeErrorMessage(error.code, 'The code could not be sent. Try again.')
   }, [])
 
   const verifyCode = useCallback(
