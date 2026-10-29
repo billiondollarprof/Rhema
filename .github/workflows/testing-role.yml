@@ -1,0 +1,74 @@
+# testing-role.yml: switches the testing account to another role, so
+# Anthony can see the app as a front desk, a doctor, a nurse and so on.
+#
+# Why: until Resend is connected (6 November), Supabase only sends sign in
+# emails to rhemamedical7@gmail.com. So there is one account that can sign
+# in. Anthony, 2026-10-29: "how do I log in as a normal doctor or a front
+# desk... can we run an SQL code... on the testing branch". This changes
+# that one account's role on the TESTING database, then he refreshes the
+# app. The admin tick stays on, so he can always switch back.
+#
+# The SQL it runs (role from the form; the starting access for that role,
+# the same as an invite would give):
+#   update public.staff
+#   set role = <role>, can_medical = ..., can_pharmacy = ..., can_lab = ...,
+#       can_announce = ..., can_admin = true, can_logs = true
+#   where email = 'rhemamedical7@gmail.com';
+# It writes one row. It never touches the live database: the project ID
+# below is the testing one and cannot be changed from the form.
+#
+# Never: point this at the live project.
+name: Testing - switch my role
+
+on:
+  workflow_dispatch:
+    inputs:
+      role:
+        description: 'The role to try on the testing site'
+        required: true
+        default: front_desk
+        type: choice
+        options: [front_desk, doctor, nurse, matron, pharmacy, laboratory, admin]
+
+permissions:
+  contents: read
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # The TESTING project only. Fixed here on purpose.
+      REF: nfrvwvqmfxudaarfuwxg
+      PGPASSWORD: ${{ secrets.SUPABASE_TESTING }}
+      ROLE: ${{ inputs.role }}
+    steps:
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Switch the testing account's role
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/config/database/pooler")
+          export PGHOST=$(echo "$pooler" | jq -r '.[0].db_host')
+          export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
+          export PGPORT=5432 PGDATABASE=postgres
+          case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: that is the live project"; exit 1 ;; esac
+          changed=$(psql -v ON_ERROR_STOP=1 -At -v role="$ROLE" <<'SQL'
+          with changed as (
+            update public.staff
+            set role         = :'role'::public.staff_role,
+                can_medical  = :'role' in ('doctor', 'nurse', 'matron', 'admin'),
+                can_pharmacy = :'role' in ('pharmacy', 'doctor', 'admin'),
+                can_lab      = :'role' in ('laboratory', 'doctor', 'admin'),
+                can_announce = :'role' in ('admin', 'nurse', 'matron'),
+                can_admin    = true,
+                can_logs     = true
+            where email = 'rhemamedical7@gmail.com'
+            returning 1
+          )
+          select count(*) from changed;
+          SQL
+          )
+          test "$changed" = "1" || { echo "The testing account was not found"; exit 1; }
+          echo "Done: the testing account is now $ROLE. Refresh the app to see it."

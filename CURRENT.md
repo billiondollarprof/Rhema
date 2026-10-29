@@ -419,6 +419,14 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Sign in, the PIN and the accepted warning went LIVE 2026-10-29
     (Database (live) run 40826794056, Deploy run 40826794027).
 
+85. **See the app as each role before Resend.** "How do I log in as a
+    normal doctor or a front desk, since the email only sends for an
+    admin? Can we run an SQL code... on the testing branch." Built
+    `.github/workflows/testing-role.yml`: Anthony picks a role in GitHub
+    Actions, it changes the testing account (rhemamedical7@gmail.com) to
+    that role on the TESTING database only, admin tick kept on. He keeps
+    Dr. Evans as plain admin ("just leave it like that").
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
