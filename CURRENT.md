@@ -359,6 +359,19 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     run 40811029651, both 0 warnings and all four checks passed. The admin
     screens that use it come with the admin step of the build.
 
+78. **Sign in screen, with the backend.** "Go ahead with the sign in
+    screen" (2026-10-29). Built on the feature branch, not on testing yet:
+    sign in page (remembered people, email, 6 digit code, first PIN twice),
+    lock page (idle screen, tap for the PIN card, other people at a shared
+    desk tap their own name), lock after 10 minutes, signed out of the
+    device after 24 hours, 5 wrong PINs sign out. PIN migration
+    20261029120000_pin_lock.sql with undo and 7 tests (each proved to catch
+    a break). CI job `signin` signs two made up nurses in for real on a
+    throwaway Supabase: PASSED (run 40813601733). Screens checked at phone
+    and desktop, both themes; fixed the code boxes spilling at 320px and the
+    cursor after a wrong PIN. Workflow first-admin.yml makes the first
+    admin. WAITING for his yes on the PIN SQL and the first admin SQL.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
