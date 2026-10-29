@@ -1,0 +1,72 @@
+# testing-ring.yml: makes a Call attention call on the TESTING site from a
+# made up colleague, so Anthony can test the alert on his own phone.
+#
+# Why: the system never rings your own devices for a call you made yourself,
+# and until Resend (6 November) the testing site has only Anthony's account.
+# So this plays "Test Caller", a made up doctor in Consultant Room 1, and
+# calls the place Anthony picks. Then it prints what the Worker answered:
+# how many devices it sent to.
+#
+# The SQL it runs on the TESTING database (writes):
+#   1. once only: a sign in account and a staff row for "Test Caller"
+#      (made up; it can never sign in, because nobody receives its email);
+#   2. one row in attention_calls, from Test Caller to the place picked.
+#      The alert trigger then sends the push.
+#   3. reads back the Worker's reply from pg_net's log (read only).
+#
+# Never: point this at the live project. The project ID is fixed below.
+name: Testing - ring me
+
+on:
+  workflow_dispatch:
+    inputs:
+      call:
+        description: 'Which place to call'
+        required: true
+        default: front_desk
+        type: choice
+        options: [front_desk, nursing, laboratory, pharmacy, matron]
+
+permissions:
+  contents: read
+
+jobs:
+  ring:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # The TESTING project only. Fixed here on purpose.
+      REF: nfrvwvqmfxudaarfuwxg
+      PGPASSWORD: ${{ secrets.SUPABASE_TESTING }}
+      CALL: ${{ inputs.call }}
+    steps:
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Ring
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/config/database/pooler")
+          export PGHOST=$(echo "$pooler" | jq -r '.[0].db_host')
+          export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
+          export PGPORT=5432 PGDATABASE=postgres
+          case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: that is the live project"; exit 1 ;; esac
+          psql -v ON_ERROR_STOP=1 -q -v call="$CALL" <<'SQL'
+          -- 1. Test Caller, once only. Made up; can never sign in.
+          insert into auth.users (id, email, aud, role)
+          values ('00000000-0000-0000-0000-00000000ca11', 'test-caller@test.rhema', 'authenticated', 'authenticated')
+          on conflict (id) do nothing;
+          insert into public.staff (id, full_name, email, role, room_id)
+          select '00000000-0000-0000-0000-00000000ca11', 'Test Caller', 'test-caller@test.rhema', 'doctor', r.id
+          from public.rooms r where r.name = 'Consultant Room 1'
+          on conflict (id) do nothing;
+
+          -- 2. The call. The alert trigger sends the push.
+          insert into public.attention_calls (called_by, from_room_id, to_kind)
+          select s.id, s.room_id, :'call'::public.room_kind
+          from public.staff s where s.id = '00000000-0000-0000-0000-00000000ca11';
+          SQL
+          echo "Call made to $CALL. Waiting for the Worker's answer..."
+          sleep 8
+          psql -q -t -c "select status_code || ' ' || coalesce(content, '') from net._http_response order by created desc limit 1;" \
+            | sed 's/^ *//' | grep -v '^$' || echo "No answer recorded (no devices to ring, so nothing was sent)."
