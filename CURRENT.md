@@ -192,8 +192,13 @@ Numbers are kept from the full list, so older notes still match.
     check printed it and still said passed: fixed, a new warning now fails
     the run. Fix migration 20261029210000_pg_net_schema.sql (switch pg_net
     off and on again inside "extensions") is ready, CI green on the
-    feature branch. WAITING for his yes on that switch off. Not live.
-    Keys not made yet. Then: his phone test, then live.
+    feature branch. "yes" 2026-10-29: pg_net moved; testing and live both
+    0 warnings. LIVE 2026-10-29 (database and screens); the live site has
+    no keys yet, so it sends nothing until push-keys runs for live.
+    Testing keys made 2026-10-29 (push-keys run 40975381246; the Worker
+    refuses a wrong secret). Tool testing-ring.yml made, to ring his phone
+    from a made up "Test Caller". WAITING for his yes on that SQL, then
+    his phone test, then push-keys for live.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
