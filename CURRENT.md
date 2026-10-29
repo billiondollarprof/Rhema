@@ -413,7 +413,11 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     each database with the public key (RLS returns nothing). A timer inside
     Supabase may not count as user activity, so it knocks from outside.
     GitHub stops timed jobs after 60 days with no pushes, so the Cloudflare
-    timer takes this over before handover.
+    timer takes this over before handover. Proved 2026-10-29 (run
+    40827203000): both databases answered, refusing with Postgres's own
+    42501, which shows the knock reached them and no data left.
+    Sign in, the PIN and the accepted warning went LIVE 2026-10-29
+    (Database (live) run 40826794056, Deploy run 40826794027).
 
 ### Decided
 
