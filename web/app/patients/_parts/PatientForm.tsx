@@ -131,8 +131,8 @@ export default function PatientForm({ initial, saveLabel, busy, problem, onSave 
 
   return (
     <div className={styles.page}>
-      <div className={styles.twoColumns}>
-        <div className={styles.page}>
+      <div className={`${styles.twoColumns} ${styles.stack}`}>
+        <div className={styles.stack}>
           {/* ===== 3. Patient ===== */}
           <section className={styles.card}>
             <div className={styles.sectionHead}>

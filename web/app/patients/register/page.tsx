@@ -159,7 +159,11 @@ export default function RegisterPatientPage() {
               really is somebody else.
             </p>
             {matches.map((match) => (
-              <div key={match.id} className={styles.result} style={{ cursor: 'default' }}>
+              <div
+                key={match.id}
+                className={`${styles.result} ${styles.match}`}
+                style={{ cursor: 'default' }}
+              >
                 <div>
                   <b>{match.full_name}</b>
                   <small>
