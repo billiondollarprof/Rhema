@@ -191,6 +191,15 @@ def main():
         sys.exit(1)
 
     print("Sign in settings are as set: sign ups off, 6 digit code, 600 seconds.")
+
+    # A new security warning fails the run (CLAUDE.md section 10). This
+    # comes last, so the other checks still print their answers first.
+    # Until 2026-10-29 the warnings were printed but did not fail, so a run
+    # with 1 warning still said "All four checks passed".
+    if len(new_warnings) > 0:
+        print("FAILED: " + str(len(new_warnings)) + " new security warning(s), listed above.")
+        sys.exit(1)
+
     print("All four checks passed.")
 
 

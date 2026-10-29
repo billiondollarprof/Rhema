@@ -146,6 +146,48 @@
   gap: 2px;
 }
 
+/* The alerts switch at the bottom of the list. */
+.alertsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 10px 8px 4px 10px;
+  border-top: 1px solid var(--line);
+}
+
+.alertsRow small {
+  flex: 1;
+  min-width: 0;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.alertsButton {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.alertsOn {
+  background: var(--bl);
+  border-color: var(--bl);
+  color: #fff;
+}
+
+.alertsButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* ===== 2. The bell on each line, and the tick ===== */
 .mark {
   flex-shrink: 0;

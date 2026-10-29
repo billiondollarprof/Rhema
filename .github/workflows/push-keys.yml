@@ -1,0 +1,115 @@
+# push-keys.yml: makes the keys for Call attention alerts and puts them in
+# place, for the testing site or the live site.
+#
+# Why: Call attention step 2 (Anthony, 2026-10-29). Alerts reach a phone
+# even when the app is closed. That needs:
+#   - a VAPID key pair (proves the alerts come from our Worker), saved as
+#     Cloudflare secrets on that site's Worker;
+#   - a shared secret, saved both on the Worker and in that database's
+#     Vault, so only our database can ask the Worker to send an alert;
+#   - the Worker's address, saved in Vault, so the database knows where
+#     to send.
+# Nobody sees any of these. They never reach the chat or the code.
+#
+# Run it once per site, testing first. Running it again makes new keys;
+# phones then pick up the new key the next time the app opens.
+#
+# SQL it runs on that site's database (writes 2 rows in Vault):
+#   select vault.create_secret(<value>, '<name>') where the name is not there yet;
+#   select vault.update_secret(id, <value>) from vault.secrets where name = '<name>';
+# for the names rhema_push_url and rhema_push_secret.
+#
+# Never: print a key, or run "live" from any branch but main.
+name: Push keys
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Which site to set up'
+        required: true
+        default: testing
+        type: choice
+        options: [testing, live]
+
+permissions:
+  contents: read
+
+jobs:
+  keys:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      WORKER: ${{ inputs.site == 'live' && 'rhema-hospital' || 'rhema-hospital-testing' }}
+      REF: ${{ inputs.site == 'live' && 'ntfvckqczpmylskusgft' || 'nfrvwvqmfxudaarfuwxg' }}
+      PGPASSWORD: ${{ inputs.site == 'live' && secrets.SUPABASE_DB_PASSWORD || secrets.SUPABASE_TESTING }}
+    steps:
+      - name: Live only from main
+        if: inputs.site == 'live' && github.ref_name != 'main'
+        run: |
+          echo "Refusing: the live keys are only set up from main."
+          exit 1
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Make the keys
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          node scripts/push/make-keys.mjs "$RUNNER_TEMP/keys"
+          echo "::add-mask::$(cat "$RUNNER_TEMP/keys/push-secret.txt")"
+          echo "::add-mask::$(jq -r .d "$RUNNER_TEMP/keys/vapid-private.json")"
+
+      - name: Save them on the Worker
+        run: |
+          k="$RUNNER_TEMP/keys"
+          npx wrangler secret put VAPID_PUBLIC_KEY --name "$WORKER" < "$k/vapid-public.txt"
+          npx wrangler secret put VAPID_PRIVATE_JWK --name "$WORKER" < "$k/vapid-private.json"
+          npx wrangler secret put PUSH_SECRET --name "$WORKER" < "$k/push-secret.txt"
+
+      - name: Save the address and the shared secret in Vault
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/config/database/pooler")
+          export PGHOST=$(echo "$pooler" | jq -r '.[0].db_host')
+          export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
+          export PGPORT=5432 PGDATABASE=postgres
+          if [ "$WORKER" = "rhema-hospital-testing" ]; then
+            case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: testing must never touch live"; exit 1 ;; esac
+          fi
+          export PUSH_URL="https://$WORKER.rhemamedical.workers.dev"
+          export PUSH_SECRET="$(cat "$RUNNER_TEMP/keys/push-secret.txt")"
+          psql -v ON_ERROR_STOP=1 -q <<'SQL'
+          \getenv push_url PUSH_URL
+          \getenv push_secret PUSH_SECRET
+          select vault.create_secret(:'push_url', 'rhema_push_url')
+          where not exists (select 1 from vault.secrets where name = 'rhema_push_url');
+          select vault.update_secret(id, :'push_url') from vault.secrets where name = 'rhema_push_url';
+          select vault.create_secret(:'push_secret', 'rhema_push_secret')
+          where not exists (select 1 from vault.secrets where name = 'rhema_push_secret');
+          select vault.update_secret(id, :'push_secret') from vault.secrets where name = 'rhema_push_secret';
+          SQL
+          rm -rf "$RUNNER_TEMP/keys"
+
+      - name: Check the Worker took the keys
+        run: |
+          url="https://$WORKER.rhemamedical.workers.dev"
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS "$url/api/push/key" | grep -q publicKey; then
+              # A wrong secret must be refused.
+              code=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'X-Rhema-Push-Secret: wrong' \
+                -H 'Content-Type: application/json' -d '{}' "$url/api/push/attention")
+              test "$code" = "401" || { echo "A wrong secret was not refused ($code)"; exit 1; }
+              echo "Done: alerts are set up on $WORKER."; exit 0
+            fi
+            sleep 10
+          done
+          echo "The Worker did not pick up the keys"; exit 1

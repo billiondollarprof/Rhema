@@ -119,7 +119,11 @@ async function mockSupabase(page, extra = {}) {
     if (url.includes('/rpc/i_have_a_pin')) return json(true)
     if (req.method() !== 'GET') {
       writes.push(`${req.method()} ${url.split('/v1/')[1]} ${req.postData() || ''}`)
-      return json(url.includes('/rpc/') ? 'sent' : [], url.includes('/rpc/') ? 200 : 201)
+      // Database functions answer in their own shape; table writes answer 201.
+      if (url.includes('/rpc/call_attention')) return json('sent')
+      if (url.includes('/rpc/open_record')) return json(null)
+      if (url.includes('/rpc/')) return json([])
+      return json([], 201)
     }
     if (url.includes('/rest/v1/staff') && url.includes('room_id=not.is.null')) return json([])
     if (url.includes('/rest/v1/staff')) return json(staff)

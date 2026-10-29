@@ -64,7 +64,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <b>{staff.full_name}</b>
             <small>{roleWords}</small>
           </div>
-          <AttentionMenu client={client} myRoomId={staff.room_id} buttonClass={styles.topButton} />
+          <AttentionMenu
+            client={client}
+            staffId={staff.id}
+            myRoomId={staff.room_id}
+            buttonClass={styles.topButton}
+          />
           <button className={styles.topButton} onClick={auth.lock} aria-label="Lock screen">
             <Icon name="lock" size={16} />
             <span>Lock screen</span>

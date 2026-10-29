@@ -28,6 +28,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
 import { adoptSession, clientFor, dropClient, pendingClient } from './clients'
+import { forgetThisDevice } from '@/lib/attention/push'
 import {
   type DeviceAccount,
   getAccount,
@@ -124,6 +125,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ----- 3a. Sign one person out of this device only -----
   const signOutHere = useCallback(async (id: string, why: string | null) => {
+    // This person stops getting Call attention alerts on this device. A
+    // slow network never holds up signing out: after 3 seconds it carries on.
+    await Promise.race([
+      forgetThisDevice(clientFor(id)),
+      new Promise((done) => setTimeout(done, 3000)),
+    ])
     try {
       await clientFor(id).auth.signOut({ scope: 'local' })
     } catch {

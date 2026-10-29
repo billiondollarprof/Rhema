@@ -24,6 +24,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Icon from '@/components/shell/Icon'
 import { ringBell } from './bell'
+import { refreshAlerts } from '@/lib/attention/push'
 import styles from './attention.module.css'
 import {
   KIND_LABELS,
@@ -83,6 +84,8 @@ export default function AttentionAlerts({
     loadRecentCalls(client, staffId, 5).then((recent) => {
       if (current) take(recent, false)
     })
+    // If alerts are on in this browser, keep this person on it (step 2).
+    void refreshAlerts(client, staffId)
     // 1. Live.
     const stop = listenForCalls(client, staffId, (call) => take([call], true))
     // 2. The quiet check behind it.
