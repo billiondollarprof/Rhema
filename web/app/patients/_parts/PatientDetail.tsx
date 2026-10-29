@@ -6,8 +6,12 @@
  * from the date of birth), category, where the patient is now, when they
  * were last seen, contact and next of kin.
  *
+ * The facts are in three small groups (the patient, how to reach them,
+ * next of kin), so on a wide screen they line up in tidy rows.
+ *
  * Never: show the medical record here. It gets its own page, open only to
- * doctors, nurses and the matron, and every opening is logged.
+ * doctors, nurses and the matron, and every opening is logged. This card
+ * only shows the "Medical record" button to staff with that access.
  */
 'use client'
 
@@ -24,6 +28,7 @@ import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/qu
 type DetailProps = {
   client: SupabaseClient
   staffId: string
+  canMedical: boolean
   patient: PatientResult
   onChanged: () => void
 }
@@ -37,28 +42,52 @@ export function lastSeenWords(isoTime: string | null): string {
   })
 }
 
-export default function PatientDetail({ client, staffId, patient, onChanged }: DetailProps) {
+export default function PatientDetail({
+  client,
+  staffId,
+  canMedical,
+  patient,
+  onChanged,
+}: DetailProps) {
   const [sending, setSending] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
 
   // ===== 1. The facts, in the order the front desk asks for them =====
-  const facts: [string, string][] = [
-    ['Patient number', patient.patient_number],
-    ['Age', ageFrom(patient.date_of_birth)],
-    ['Date of birth', new Date(`${patient.date_of_birth}T00:00:00`).toLocaleDateString('en-GB')],
-    ['Sex', patient.sex === 'female' ? 'Female' : 'Male'],
-    ['Category', CATEGORY_LABELS[patient.category] ?? patient.category],
-    ['Last seen', lastSeenWords(patient.last_seen)],
-    ['Phone / WhatsApp', patient.phone ?? 'Not given'],
-    ['Email', patient.email ?? 'Not given'],
-    [
-      'Address',
-      [patient.address, patient.town, patient.lga, patient.state].filter(Boolean).join(', ') ||
-        'Not given',
-    ],
-    ['Next of kin', patient.next_of_kin_name ?? 'Not given'],
-    ['Relationship', patient.next_of_kin_relationship ?? 'Not given'],
-    ['Next of kin phone', patient.next_of_kin_phone ?? 'Not given'],
+  const groups: { title: string; facts: [string, string][] }[] = [
+    {
+      title: 'Patient',
+      facts: [
+        ['Patient number', patient.patient_number],
+        ['Age', ageFrom(patient.date_of_birth)],
+        [
+          'Date of birth',
+          new Date(`${patient.date_of_birth}T00:00:00`).toLocaleDateString('en-GB'),
+        ],
+        ['Sex', patient.sex === 'female' ? 'Female' : 'Male'],
+        ['Category', CATEGORY_LABELS[patient.category] ?? patient.category],
+        ['Last seen', lastSeenWords(patient.last_seen)],
+      ],
+    },
+    {
+      title: 'Contact',
+      facts: [
+        ['Phone / WhatsApp', patient.phone ?? 'Not given'],
+        ['Email', patient.email ?? 'Not given'],
+        [
+          'Address',
+          [patient.address, patient.town, patient.lga, patient.state].filter(Boolean).join(', ') ||
+            'Not given',
+        ],
+      ],
+    },
+    {
+      title: 'Next of kin',
+      facts: [
+        ['Name', patient.next_of_kin_name ?? 'Not given'],
+        ['Relationship', patient.next_of_kin_relationship ?? 'Not given'],
+        ['Phone', patient.next_of_kin_phone ?? 'Not given'],
+      ],
+    },
   ]
 
   const where = patient.open_visit
@@ -79,14 +108,19 @@ export default function PatientDetail({ client, staffId, patient, onChanged }: D
         </div>
       ) : null}
 
-      <dl className={styles.facts}>
-        {facts.map(([label, value]) => (
-          <div key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
-          </div>
-        ))}
-      </dl>
+      {groups.map((group) => (
+        <div key={group.title} className={styles.factGroup}>
+          <h3>{group.title}</h3>
+          <dl className={styles.facts}>
+            {group.facts.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ))}
 
       {/* ===== 2. What can be done from here ===== */}
       {sending ? (
@@ -114,6 +148,11 @@ export default function PatientDetail({ client, staffId, patient, onChanged }: D
           >
             Send to room
           </button>
+          {canMedical ? (
+            <Link className={styles.button} href={`/patients/record/?p=${patient.id}`}>
+              Medical record
+            </Link>
+          ) : null}
           <Link className={styles.button} href={`/patients/edit/?p=${patient.id}`}>
             Edit details
           </Link>

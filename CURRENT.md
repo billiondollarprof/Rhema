@@ -544,6 +544,19 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     device's own notification sound, the custom bell plays when the app
     is open; and a browser only plays sound after the person has touched
     the page once (signing in counts).
+97b. **Call attention: two taps, by role or room, from the top bar.**
+    (2026-10-29) "That call attention button, it should not be something
+    that opens a new page... it's more like a drop down overlay that
+    doesn't shift anything on the interface. It just drop down like a
+    rolling paper... once they click on front desk immediately, it sends
+    the ring immediately... it doesn't call attention by name. It calls
+    attention by role... front desk is always at the top." So: a bell
+    button in the top bar (and the Call attention quick action) opens a
+    list that drops over the page without moving anything; Front Desk
+    first, then Matron, the other rooms and departments, never the
+    caller's own room; one tap sends the ring to everyone on duty there.
+    No form, no typing. Replaces the demo's Call attention page (which
+    had department, person and note).
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
@@ -556,6 +569,35 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     desktop, both themes, no overflow. Extras done: (a) waiting time,
     (b) duplicate check with reuse, (c) age, (e) last seen. (d) allergies
     comes with the medical record (stage 2, needs SQL).
+
+100. **Medical record, database.** "Go ahead with the medical record"
+    (2026-10-29). Migration 20261029160000_medical_record.sql written and
+    tested locally, feature branch only: record openings (logged, 12 hour
+    window), medical profile, allergies, conditions, medications with
+    active, suspended, stopped and a status log, doses given with exact
+    time and giver, vital signs, nursing notes, consultation notes. 12
+    tests, every deliberate break caught. Test 8 found a real fault in the
+    foundation: "a void needs a reason" let an empty reason through on
+    patients; the same file fixes it (drop and re-add that one rule).
+    "yes, medical record" 2026-10-29, after he asked how opening and
+    voiding work (explained: staff can open any record any time; the app
+    logs the opening first; Void asks for a short reason, the line stays
+    greyed and crossed out). On the testing database 2026-10-29, 0
+    security warnings.
+101. **Record screens: simple and seamless, and tidy the alignment.**
+    (2026-10-29) "Even though... they are complex information... the user
+    interface is laid out in a very seamless and simple way. Just the way
+    we started the dashboard." Also: "the way the thing displays on in
+    desktop... some that are not well aligned properly. So I need you to
+    align those." Improve, do not change: "Not changing it. No, don't
+    change it. What I just want is improvement to look even simpler."
+    Built 2026-10-29: /patients/record/?p=ID. Allergy banner first,
+    folding cards, one line shape everywhere, two columns on desktop.
+    The patient card's facts are grouped (Patient, Contact, Next of kin)
+    so they line up, and a Medical record button shows for medical staff.
+    Walked through with made up data: every control wrote the right row,
+    an empty reason and a bad number are refused, no overflow 320 to 390.
+    The real e2e now walks the record too. Comes off the list once live.
 
 ### Decided
 
