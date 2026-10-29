@@ -321,7 +321,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     other shared desks (lab). Proposed: every nurse has their own invite;
     the station computer remembers the nurses who signed in on it; each
     nurse taps their name and types their own PIN before doing anything,
-    so every line in the log carries a person's name. WAITING for his yes.
+    so every line in the log carries a person's name. YES 2026-10-29:
+    "that's the correct way to do it." Same for lab, pharmacy and any
+    shared desk. Build it with sign in.
 73. **Show him the Cloudflare side as it is built.** "As you are doing it,
     you can still be directing me to go and be looking at the backend,
     where to go to see what you've done": for each Worker function, R2
@@ -333,6 +335,19 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     already in CLAUDE.md; he asked for it to continue.
 76. **The director's note was checked against our records 2026-10-29.**
     Every line of it is item 48 here and section 7 of docs/DATABASE.md.
+
+77. **Inviting staff: name, email, role, and the role gives the access.**
+    "When admin selects this person's role as a matron, the person
+    automatically gets the matron role access... it doesn't matter how many
+    doctors." Asked: consultants, and should the director have an account.
+    There is no matron role yet (roles: front desk, doctor, nurse, pharmacy,
+    laboratory, admin). Proposed 2026-10-29: add a matron role (starts with
+    nurse access plus announcements); consultants are doctors (the title
+    goes in the name, "Dr. ..."); the director is invited as admin, which
+    already includes medical records. A wrong email cannot be detected, so
+    the admin sees each invite as Waiting, Accepted or Expired, and can
+    resend or cancel it; an invite works once and runs out after 48 hours.
+    WAITING for his yes on the matron SQL and the director as admin.
 
 ### Decided
 
