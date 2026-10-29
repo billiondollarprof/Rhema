@@ -203,7 +203,7 @@ try {
 
   step('She sends the new patient to her room')
   await page.getByRole('button', { name: 'Send to room' }).click()
-  await page.getByLabel('Room').selectOption({ label: 'Consultant Room 1' })
+  await page.getByLabel('Room', { exact: true }).selectOption({ label: 'Consultant Room 1' })
   await page.getByLabel('Note for the staff there (optional)').fill('New today')
   await page.getByRole('button', { name: 'Send to room' }).last().click()
   await page.getByText('Sent to Consultant Room 1').waitFor()
