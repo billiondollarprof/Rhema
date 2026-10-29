@@ -303,6 +303,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     the template steps wait for Resend, and until then the email carries
     Supabase's default sign in link. Still to do: Site URL on testing, and
     the same steps on live. Then CI reads the settings on every run.
+    Redirect URLs: one each, `<address>/**` for the testing and live
+    workers.dev addresses. On 6 Nov, after the domain move, add the
+    rhemamedical.app address to Site URL and Redirect URLs on live.
 
 ### Decided
 
