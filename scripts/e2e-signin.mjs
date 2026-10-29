@@ -115,6 +115,13 @@ const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } })
 const problems = []
 page.on('pageerror', (error) => problems.push(error.message))
+// Browser messages go to the CI log, so a failure can be read without the
+// screenshots.
+page.on('console', (message) => {
+  if (message.type() === 'error' || message.type() === 'warning') {
+    console.log(`   browser ${message.type()}: ${message.text().slice(0, 300)}`)
+  }
+})
 
 try {
   step('A new device opens the app and lands on the email step')
@@ -215,6 +222,8 @@ try {
 } catch (error) {
   await page.screenshot({ path: `${SHOTS}/zz-failure.png`, fullPage: true }).catch(() => {})
   console.error('E2E SIGN IN FAILED:', error.message)
+  const onScreen = await page.innerText('body').catch(() => '')
+  console.error('On screen at the time:\n' + onScreen.slice(0, 1500))
   process.exitCode = 1
 } finally {
   await browser.close()
