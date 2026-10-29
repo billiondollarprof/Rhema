@@ -450,7 +450,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     patient in, refresh keeps it, finishes, Completed today shows 1.
     Screens checked for three roles, both themes, phone and desktop, no
     overflow at 320 to 390px. Added a read-only function patients_seen()
-    for the chart. "yes, chart function" 2026-10-29: sent to testing.
+    for the chart. "yes, chart function" 2026-10-29. LIVE 2026-10-29
+    (Database (live) run 40838983605, Deploy run 40838983622). Live staff
+    row for Dr. Evans made (First admin run 40838481441).
 87. **Keep awake: Cloudflare and other platforms.** He asked whether the
     Cloudflare timer expires, whether it does the same job as GitHub, why
     keep both, and said to use the same principle for Amara and
