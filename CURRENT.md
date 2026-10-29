@@ -443,6 +443,15 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     "yes" to the queue SQL 2026-10-29 ("you can carry on with the SQL").
     Migration 20261029140000_queue.sql with undo and 7 tests, each break
     caught (one test was fixed after it passed for the wrong reason).
+    Home screens built on the feature branch 2026-10-29: frame (top bar,
+    bottom or side menu, Soon items), greeting, quick actions, count
+    tiles, Patients seen chart, queue card per role. Real walk-through on
+    GitHub passed (run 40832854613): a nurse sees only her room, calls a
+    patient in, refresh keeps it, finishes, Completed today shows 1.
+    Screens checked for three roles, both themes, phone and desktop, no
+    overflow at 320 to 390px. Added a read-only function patients_seen()
+    for the chart. WAITING for his yes on that function before the queue
+    and home go to testing.
 87. **Keep awake: Cloudflare and other platforms.** He asked whether the
     Cloudflare timer expires, whether it does the same job as GitHub, why
     keep both, and said to use the same principle for Amara and
