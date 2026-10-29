@@ -347,7 +347,15 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     already includes medical records. A wrong email cannot be detected, so
     the admin sees each invite as Waiting, Accepted or Expired, and can
     resend or cancel it; an invite works once and runs out after 48 hours.
-    WAITING for his yes on the matron SQL and the director as admin.
+    He said "yes, matron role, and director as admin" (2026-10-29), then
+    asked for admin as an extra power any role can be given, "just like
+    you add someone extra in WhatsApp to become an admin", changeable after
+    the invite, with the admin part in the same dashboard (no log out).
+    Built: migration 20261029100000_matron_and_admin_access.sql (matron
+    role, can_admin column, is_admin() reads can_admin, guard so the last
+    admin cannot be removed), undo file, 4 tests; every test proved to
+    catch a deliberate break. On the feature branch only. WAITING for his
+    yes on the fuller SQL before it goes to testing and live.
 
 ### Decided
 
