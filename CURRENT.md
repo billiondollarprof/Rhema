@@ -596,11 +596,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     "if it is there [in the top bar], then that tab that is on the
     dashboard that says call attention, maybe you look for something more
     common with every other person and replace and put it there." Asked
-    him which job; the tile stays until he picks.
+    him which job. Decided 2026-10-29: "just leave the call attention at
+    the home screen tile. Just leave it." Done.
 97g. **Later: the call button gives two choices.** (2026-10-29) "by the
     time we start putting voice call, then when you click on it, it gives
     you two options: instant call attention or dial." Goes with VoIP in
     docs/FUTURE-FEATURES.md.
+97h. **Review the agent rules and suggest skills.** (2026-10-29) "Is the
+    rules that I gave, are they too tight? Are there some rules that if
+    they are not there, it will allow Opus 5.5 to work better... rules
+    that I might not have included... things I've been repeating... that
+    could have been built as a skill." Review given in chat 2026-10-29;
+    waiting for his picks. Then Call attention step 2 (push).
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
