@@ -450,8 +450,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     patient in, refresh keeps it, finishes, Completed today shows 1.
     Screens checked for three roles, both themes, phone and desktop, no
     overflow at 320 to 390px. Added a read-only function patients_seen()
-    for the chart. WAITING for his yes on that function before the queue
-    and home go to testing.
+    for the chart. "yes, chart function" 2026-10-29: sent to testing.
 87. **Keep awake: Cloudflare and other platforms.** He asked whether the
     Cloudflare timer expires, whether it does the same job as GitHub, why
     keep both, and said to use the same principle for Amara and
@@ -465,7 +464,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     database; LICENSE says this project's backend belongs to RHEMA, so the
     code itself is not published without the hospital's yes. Plan offered:
     a public demo site in StellaXafe's own accounts with made up data, plus
-    a case study. WAITING for his decision.
+    a case study. He said (2026-10-29): "Just leave it for the public
+    version for employers. It's okay. Just note everything down." Parked
+    until he raises it again; the plan above stands.
 89. **Same system for another hospital in 2 to 3 days.** "It will just be me
     creating a new Cloudflare account, Supabase account, and within 2 to 3
     days everything is already working." Everything is in the repo
