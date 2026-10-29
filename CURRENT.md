@@ -582,7 +582,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     "yes, medical record" 2026-10-29, after he asked how opening and
     voiding work (explained: staff can open any record any time; the app
     logs the opening first; Void asks for a short reason, the line stays
-    greyed and crossed out). Sent to testing.
+    greyed and crossed out). On the testing database 2026-10-29, 0
+    security warnings.
 101. **Record screens: simple and seamless, and tidy the alignment.**
     (2026-10-29) "Even though... they are complex information... the user
     interface is laid out in a very seamless and simple way. Just the way
@@ -590,6 +591,13 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     desktop... some that are not well aligned properly. So I need you to
     align those." Improve, do not change: "Not changing it. No, don't
     change it. What I just want is improvement to look even simpler."
+    Built 2026-10-29: /patients/record/?p=ID. Allergy banner first,
+    folding cards, one line shape everywhere, two columns on desktop.
+    The patient card's facts are grouped (Patient, Contact, Next of kin)
+    so they line up, and a Medical record button shows for medical staff.
+    Walked through with made up data: every control wrote the right row,
+    an empty reason and a bad number are refused, no overflow 320 to 390.
+    The real e2e now walks the record too. Comes off the list once live.
 
 ### Decided
 

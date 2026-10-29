@@ -232,15 +232,15 @@ try {
 
   step('She adds a severe allergy; the banner turns red')
   await page.getByRole('button', { name: '+ Add an allergy' }).click()
-  await page.getByLabel('Allergic to').fill('Penicillin')
-  await page.getByLabel('Reaction').fill('Rash')
+  await page.getByLabel('Allergic to', { exact: true }).fill('Penicillin')
+  await page.getByLabel('Reaction', { exact: true }).fill('Rash')
   await page.getByLabel('Severe reaction').check()
   await page.getByRole('button', { name: 'Add allergy' }).click()
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
 
   step('She adds a medicine, suspends it with a reason, and resumes it')
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
-  await page.getByLabel('Medicine').fill('Amlodipine')
+  await page.getByLabel('Medicine', { exact: true }).fill('Amlodipine')
   await page.getByLabel('Dose', { exact: true }).fill('5 mg')
   await page.getByLabel('How often').fill('Once daily')
   await page.getByRole('button', { name: 'Add medicine' }).click()
