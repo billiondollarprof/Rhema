@@ -2,10 +2,13 @@
 #
 # What this file does:
 #   It proves that GitHub can reach the hospital's Supabase project. It asks
-#   Supabase three questions and prints the answers:
+#   Supabase four questions and prints the answers:
 #     1. Does the project exist, which region is it in, and is it healthy?
 #     2. Does Supabase's security check find any warnings?
 #     3. Can we log in to the database itself with the password?
+#     4. Are the sign in settings still the ones Anthony set by hand?
+#        (Sign ups off, email confirmation on, a 6 digit code that runs out
+#        in 600 seconds, and the right Site URL and redirect address.)
 #
 # How it runs:
 #   On GitHub Actions only, because that is where the secrets live. It reads
@@ -50,6 +53,14 @@ ACCESS_TOKEN = os.environ.get("SUPABASE_ACCESS_TOKEN", "")
 DB_PASSWORD = os.environ.get("SUPABASE_DB_PASSWORD", "")
 
 API = "https://api.supabase.com/v1/projects/" + PROJECT_REF
+
+# The web address each project's sign in sends people back to. This is a
+# dictionary (a list of pairs): the project ID on the left, its address on
+# the right. Set by hand in the dashboard on 2026-10-29.
+SITE_URLS = {
+    "ntfvckqczpmylskusgft": "https://rhema-hospital.rhemamedical.workers.dev",
+    "nfrvwvqmfxudaarfuwxg": "https://rhema-hospital-testing.rhemamedical.workers.dev",
+}
 
 
 # ===== 3. A helper that asks Supabase one question =====
@@ -125,7 +136,39 @@ def main():
         sys.exit(1)
 
     print("Database login worked:", result.stdout.strip()[:60])
-    print("All three checks passed.")
+
+    # Check 4: the sign in settings. Our key may read them but not change
+    # them, so any change was made by hand in the dashboard. If one moved,
+    # say which one and fail, so it is noticed the same day.
+    auth = ask_supabase("/config/auth")
+    site_url = SITE_URLS.get(PROJECT_REF, "")
+
+    # Each pair is: the setting's name in Supabase, and the value it must have.
+    expected = {
+        "disable_signup": True,
+        "mailer_autoconfirm": False,
+        "mailer_otp_exp": 600,
+        "mailer_otp_length": 6,
+        "site_url": site_url,
+        "uri_allow_list": site_url + "/**",
+    }
+
+    # Start with no problems, then add one line for each setting that is wrong.
+    problems = []
+    # .items() gives each pair from the dictionary, one at a time.
+    for name, wanted in expected.items():
+        actual = auth.get(name)
+        if actual != wanted:
+            problems.append(name + " is " + str(actual) + ", should be " + str(wanted))
+
+    if len(problems) > 0:
+        print("Sign in settings have CHANGED:")
+        for problem in problems:
+            print("  -", problem)
+        sys.exit(1)
+
+    print("Sign in settings are as set: sign ups off, 6 digit code, 600 seconds.")
+    print("All four checks passed.")
 
 
 if __name__ == "__main__":

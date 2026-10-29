@@ -28,3 +28,6 @@ the file where you can see it working. Read this to revise.
 | `list[0]` | The first item in a list. Counting starts at 0. | `ops/supabase_check.py` |
 | `subprocess.run([...])` | Run another program from Python and collect its answer. | `ops/supabase_check.py` |
 | `!=` | "Is not equal to". | `ops/supabase_check.py` |
+| `[]` then `.append(x)` | Start an empty list, then add one item to its end. | `ops/supabase_check.py` |
+| `.items()` on a dictionary | Give each pair (the name and its value) one at a time, for a loop. | `ops/supabase_check.py` |
+| `str(x)` | Turn a number or `True`/`False` into text, so it can join other text. | `ops/supabase_check.py` |

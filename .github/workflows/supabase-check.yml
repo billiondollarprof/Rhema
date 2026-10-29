@@ -1,6 +1,7 @@
 # supabase-check.yml: proves GitHub can reach both hospital Supabase
 # projects with the secrets that were added, and prints Supabase's security
-# warnings for each. Runs ops/supabase_check.py once per project.
+# warnings and sign in settings for each. Runs ops/supabase_check.py once
+# per project.
 #
 # Secret names, as Anthony created them:
 #   SUPABASE_ACCESS_TOKEN  one key for both projects (made in the hospital

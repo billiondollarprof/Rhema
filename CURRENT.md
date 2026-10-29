@@ -306,6 +306,11 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Redirect URLs: one each, `<address>/**` for the testing and live
     workers.dev addresses. On 6 Nov, after the domain move, add the
     rhemamedical.app address to Site URL and Redirect URLs on live.
+    "auth done" 2026-10-29 for both projects. Check 4 added to
+    `ops/supabase_check.py`: reads the sign in settings and fails if one
+    moved. Staff are NOT added to the Supabase organisation to receive
+    codes before Resend (members can see the database). Until Resend, only
+    rhemamedical7@gmail.com can receive a code.
 
 ### Decided
 
