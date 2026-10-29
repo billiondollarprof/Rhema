@@ -544,6 +544,19 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     device's own notification sound, the custom bell plays when the app
     is open; and a browser only plays sound after the person has touched
     the page once (signing in counts).
+97b. **Call attention: two taps, by role or room, from the top bar.**
+    (2026-10-29) "That call attention button, it should not be something
+    that opens a new page... it's more like a drop down overlay that
+    doesn't shift anything on the interface. It just drop down like a
+    rolling paper... once they click on front desk immediately, it sends
+    the ring immediately... it doesn't call attention by name. It calls
+    attention by role... front desk is always at the top." So: a bell
+    button in the top bar (and the Call attention quick action) opens a
+    list that drops over the page without moving anything; Front Desk
+    first, then Matron, the other rooms and departments, never the
+    caller's own room; one tap sends the ring to everyone on duty there.
+    No form, no typing. Replaces the demo's Call attention page (which
+    had department, person and note).
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
