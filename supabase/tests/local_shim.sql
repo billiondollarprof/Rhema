@@ -51,3 +51,8 @@ as $$
 $$;
 
 grant execute on function auth.uid() to anon, authenticated, service_role;
+
+-- Supabase gives every new table in public full rights for these roles.
+-- Doing the same here means a migration that forgets "revoke all" fails on
+-- this machine too, not only in CI (that happened on 2026-10-29).
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;

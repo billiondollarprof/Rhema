@@ -9,13 +9,21 @@
  * be pressed. Each one switches on when its module is built (set `ready`
  * in section 1).
  *
+ * The frame also carries Call attention, because it must work on every
+ * screen: the bell in the top bar opens the list, and the cards float in
+ * over whatever screen is open (components/attention).
+ *
  * Never: show patient data in the frame itself. It is on every screen.
  */
 'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import Icon from './Icon'
+import AttentionAlerts from '@/components/attention/AttentionAlerts'
+import { AttentionMenuContext } from '@/components/attention/AttentionContext'
+import AttentionMenu from '@/components/attention/AttentionMenu'
 import PersonBadge from '@/components/auth/PersonBadge'
 import styles from './AppShell.module.css'
 import { roleLabel } from '@/lib/auth/roles'
@@ -38,62 +46,70 @@ function isHere(path: string, href: string) {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const path = usePathname()
+  const [attentionOpen, setAttentionOpen] = useState(false)
   const staff = auth.staff
-  if (!staff) return null
+  const client = auth.client
+  if (!staff || !client) return null
 
   const roleWords =
     roleLabel(staff.role) + (staff.can_admin && staff.role !== 'admin' ? ' · Admin' : '')
 
   return (
-    <div className={styles.app}>
-      {/* ===== 2. Top bar ===== */}
-      <header className={styles.top}>
-        <PersonBadge name={staff.full_name} />
-        <div className={styles.who}>
-          <b>{staff.full_name}</b>
-          <small>{roleWords}</small>
+    <AttentionMenuContext.Provider value={{ open: attentionOpen, setOpen: setAttentionOpen }}>
+      <div className={styles.app}>
+        {/* ===== 2. Top bar ===== */}
+        <header className={styles.top}>
+          <PersonBadge name={staff.full_name} />
+          <div className={styles.who}>
+            <b>{staff.full_name}</b>
+            <small>{roleWords}</small>
+          </div>
+          <AttentionMenu client={client} myRoomId={staff.room_id} buttonClass={styles.topButton} />
+          <button className={styles.topButton} onClick={auth.lock} aria-label="Lock screen">
+            <Icon name="lock" size={16} />
+            <span>Lock screen</span>
+          </button>
+          <button className={styles.topButton} onClick={auth.signOut} aria-label="Sign out">
+            <Icon name="out" size={16} />
+            <span>Sign out</span>
+          </button>
+        </header>
+
+        <div className={styles.body}>
+          {/* ===== 3. Menu ===== */}
+          <nav className={styles.nav} aria-label="Main menu">
+            {MENU.map((item) =>
+              item.ready ? (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.navItem} ${isHere(path, item.href) ? styles.on : ''}`}
+                  aria-current={isHere(path, item.href) ? 'page' : undefined}
+                >
+                  <Icon name={item.icon} size={22} />
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  key={item.href}
+                  className={`${styles.navItem} ${styles.soon}`}
+                  aria-disabled="true"
+                >
+                  <Icon name={item.icon} size={22} />
+                  {item.label}
+                  <em>Soon</em>
+                </span>
+              ),
+            )}
+          </nav>
+
+          {/* ===== 4. The screen itself ===== */}
+          <main className={styles.main}>{children}</main>
         </div>
-        <button className={styles.topButton} onClick={auth.lock} aria-label="Lock screen">
-          <Icon name="lock" size={16} />
-          <span>Lock screen</span>
-        </button>
-        <button className={styles.topButton} onClick={auth.signOut} aria-label="Sign out">
-          <Icon name="out" size={16} />
-          <span>Sign out</span>
-        </button>
-      </header>
 
-      <div className={styles.body}>
-        {/* ===== 3. Menu ===== */}
-        <nav className={styles.nav} aria-label="Main menu">
-          {MENU.map((item) =>
-            item.ready ? (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navItem} ${isHere(path, item.href) ? styles.on : ''}`}
-                aria-current={isHere(path, item.href) ? 'page' : undefined}
-              >
-                <Icon name={item.icon} size={22} />
-                {item.label}
-              </Link>
-            ) : (
-              <span
-                key={item.href}
-                className={`${styles.navItem} ${styles.soon}`}
-                aria-disabled="true"
-              >
-                <Icon name={item.icon} size={22} />
-                {item.label}
-                <em>Soon</em>
-              </span>
-            ),
-          )}
-        </nav>
-
-        {/* ===== 4. The screen itself ===== */}
-        <main className={styles.main}>{children}</main>
+        {/* ===== 5. Call attention cards, over every screen ===== */}
+        <AttentionAlerts client={client} staffId={staff.id} />
       </div>
-    </div>
+    </AttentionMenuContext.Provider>
   )
 }

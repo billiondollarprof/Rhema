@@ -557,6 +557,45 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     caller's own room; one tap sends the ring to everyone on duty there.
     No form, no typing. Replaces the demo's Call attention page (which
     had department, person and note).
+97c. **Call attention: how the list works, decided.** (2026-10-29) "yes
+    to both, go ahead with step 1". The call goes to a ROOM, never a
+    person: "it doesn't matter which person specifically is in that room
+    as long as that's the room they are calling." Front Desk, Nursing
+    Station, Laboratory and Pharmacy are groups on one shared computer:
+    one tap rings everyone on duty there ("It doesn't matter whether it's
+    Kichi or Amaka or Queen or Adora or Aminat"). Consultant opens a
+    second list of the consultant rooms registered (Room 1, 2, 3), and the
+    call goes to that room. Matron opens a list of the matron offices
+    registered. "If you want to call a particular person, you could have
+    just used a phone or use the chatting system." Step 1 (now): card and
+    bell for anyone with the app open. Step 2 (next): push when the app
+    is closed. Migration 20261029180000_attention_calls.sql: "yes, call
+    attention" 2026-10-29. He then asked for the double tap guard at 30
+    seconds, kept in the database ("15 seconds can even be 30 seconds"),
+    so it is 30 seconds plus a lock (two taps at the same moment: proven
+    locally, 1 call saved). Now a standing rule in CLAUDE.md.
+97d. **Call attention list: a small search, and a sent mark.** (2026-10-29)
+    "a little search bar should be on that attention drop-down... in case
+    they just know the room number... or they just type the matron's
+    name." Front Desk, Lab and the other groups stay as one tap. When a
+    call is sent: "a bell icon... it animates somewhat and then marks
+    good... very minimal, to know that, oh, I've called their attention."
+
+97e. **Call attention uses a phone icon, the bell is for notifications.**
+    (2026-10-29) "having the bell icon to represent call attention and also
+    represent notification... in three different places... If the top bar
+    is to call attention, then maybe we use call icon." Done 2026-10-29:
+    phone icon on the top bar button, the list, the floating card and the
+    Home tile. Rights fix: "yes, rights fix" 2026-10-29.
+97f. **The Home "Call attention" tile: maybe replace it.** (2026-10-29)
+    "if it is there [in the top bar], then that tab that is on the
+    dashboard that says call attention, maybe you look for something more
+    common with every other person and replace and put it there." Asked
+    him which job; the tile stays until he picks.
+97g. **Later: the call button gives two choices.** (2026-10-29) "by the
+    time we start putting voice call, then when you click on it, it gives
+    you two options: instant call attention or dial." Goes with VoIP in
+    docs/FUTURE-FEATURES.md.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
@@ -582,8 +621,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     "yes, medical record" 2026-10-29, after he asked how opening and
     voiding work (explained: staff can open any record any time; the app
     logs the opening first; Void asks for a short reason, the line stays
-    greyed and crossed out). On the testing database 2026-10-29, 0
-    security warnings.
+    greyed and crossed out). LIVE 2026-10-29: testing then live, 0
+    security warnings on both. Done.
 101. **Record screens: simple and seamless, and tidy the alignment.**
     (2026-10-29) "Even though... they are complex information... the user
     interface is laid out in a very seamless and simple way. Just the way
@@ -597,7 +636,7 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     so they line up, and a Medical record button shows for medical staff.
     Walked through with made up data: every control wrote the right row,
     an empty reason and a bad number are refused, no overflow 320 to 390.
-    The real e2e now walks the record too. Comes off the list once live.
+    The real e2e now walks the record too. LIVE 2026-10-29. Done.
 
 ### Decided
 

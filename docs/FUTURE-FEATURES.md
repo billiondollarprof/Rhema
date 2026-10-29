@@ -88,3 +88,11 @@ For the front desk (payments, registration), doctors and the matron
   not a social media platform").
 - **Call attention as a floating alert with a bell sound**: not future;
   built now with notifications (`CURRENT.md`, item 97).
+
+## The call button: call attention or dial
+
+Anthony, 2026-10-29: "by the time we start putting voice call, then when
+you click on it, it gives you two options: instant call attention or
+dial." When voice calls (VoIP) arrive, the phone button in the top bar
+opens two choices: Call attention, as it works today, or Dial, which
+starts a voice call to that room.

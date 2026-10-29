@@ -284,6 +284,42 @@ try {
   await page.getByText('Voided by Test Nurse One: Entered by mistake').waitFor()
   await shot(page, 'medical-record')
 
+  step('Call attention: the front desk signs in on a second screen')
+  const desk = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+  desk.on('pageerror', (error) => problems.push(`desk: ${error.message}`))
+  await desk.goto(`${APP}/sign-in/`)
+  await signInWithCode(desk, 'desk1@test.rhema')
+  await choosePin(desk, '2468')
+  await expectHome(desk, 'Test Desk One')
+  // Give the live line a moment to connect before the call goes.
+  await desk.waitForTimeout(2000)
+
+  step('Nurse One rings Front Desk in two taps; it says Sent')
+  await page.getByRole('button', { name: 'Call attention' }).first().click()
+  await page.getByRole('button', { name: /^Front Desk/ }).click()
+  await page.getByText('Sent', { exact: true }).waitFor()
+
+  step('The front desk screen gets the card live, without a refresh')
+  await desk.getByText('Consultant Room 1 needs Front Desk').waitFor({ timeout: 15000 })
+  await desk.getByText(/Test Nurse One · \d\d:\d\d/).waitFor()
+  await shot(desk, 'attention-card')
+
+  step('A second tap at once sends nothing new')
+  await page.waitForTimeout(3500)
+  await page.getByRole('button', { name: /^Front Desk/ }).click()
+  await page.getByText('Already sent').waitFor()
+  await page.keyboard.press('Escape')
+
+  step('The front desk closes the card with X, and it stays closed')
+  await desk.getByRole('button', { name: 'Close' }).click()
+  await desk.reload()
+  await expectHome(desk, 'Test Desk One')
+  await desk.waitForTimeout(1500)
+  if (await desk.getByText('Consultant Room 1 needs Front Desk').count()) {
+    throw new Error('A closed call came back after a refresh')
+  }
+  await desk.close()
+
   step('Home now shows the new patient waiting in her room')
   await page.getByRole('link', { name: 'Home' }).click()
   await page.getByText('Patient queue · Consultant Room 1').waitFor()

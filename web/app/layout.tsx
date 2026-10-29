@@ -11,6 +11,7 @@
  */
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import BellWaker from '@/components/attention/BellWaker'
 import { AuthProvider } from '@/lib/auth/session'
 
 export const metadata: Metadata = {
@@ -35,6 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             screen. It decides which screen shows, never what data a person
             may read: the database decides that. */}
         <AuthProvider>{children}</AuthProvider>
+        {/* Gets the Call attention bell ready on the first touch. */}
+        <BellWaker />
       </body>
     </html>
   )
