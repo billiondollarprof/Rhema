@@ -440,7 +440,29 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     the queue card per role; patients seen chart; front desk closing time
     banner; bottom bar on phone, side bar on desktop. Needs a new table,
     queue_entries. "Online now" waits for messages (live presence).
-    WAITING for his yes on the queue SQL.
+    "yes" to the queue SQL 2026-10-29 ("you can carry on with the SQL").
+    Migration 20261029140000_queue.sql with undo and 7 tests, each break
+    caught (one test was fixed after it passed for the wrong reason).
+87. **Keep awake: Cloudflare and other platforms.** He asked whether the
+    Cloudflare timer expires, whether it does the same job as GitHub, why
+    keep both, and said to use the same principle for Amara and
+    StellaXafe "so the platforms never sleep". Answered: Cloudflare Cron
+    Triggers do not expire and are free; same knock; GitHub kept as a
+    second line. Build the Cloudflare timer with the Worker jobs; then
+    offer the same for Amara and StellaXafe (their own repos).
+88. **Public version for employers.** "We are going to do the public version
+    of it... connected to... the live testing one in Supabase, or what? What
+    is actually your plan?" Answered: never the hospital's testing
+    database; LICENSE says this project's backend belongs to RHEMA, so the
+    code itself is not published without the hospital's yes. Plan offered:
+    a public demo site in StellaXafe's own accounts with made up data, plus
+    a case study. WAITING for his decision.
+89. **Same system for another hospital in 2 to 3 days.** "It will just be me
+    creating a new Cloudflare account, Supabase account, and within 2 to 3
+    days everything is already working." Everything is in the repo
+    (migrations, workflows, checks); only the IDs and secrets differ. To
+    write: a setup checklist and one place for the IDs, so a new hospital
+    is a copy plus new secrets.
 
 ### Decided
 
