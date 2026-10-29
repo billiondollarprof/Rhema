@@ -517,6 +517,19 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     account for backup of the data they are putting in." Nightly copy of
     the database export and the files to R2 in a separate account.
 
+95. **Staff profile page with a photo.** (2026-10-29) "A staff has a short
+    profile... they can upload their image." Also a selling point. Note:
+    the demo's invite screen says "Staff cannot change their own name or
+    photo. The administrator manages this." Asked him which he wants:
+    staff upload their own photo, or the admin does. WAITING.
+96. **Future features, kept separate.** Birthday wishes, wellness check-in
+    3 days after discharge, check-up reminder 1 month after, appointment
+    reminder the day before (WhatsApp then SMS), weekly digest for
+    consultants, print or send to email, staff VoIP calls, automatic
+    payment recording, voice typing. All written in
+    docs/FUTURE-FEATURES.md, in his words. Voice notes in chat stay in the
+    RHEMA plan (messages module), no special integration needed.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
