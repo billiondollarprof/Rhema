@@ -488,7 +488,34 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     (b) a warning at registration when a patient with the same name, date
     of birth and phone already exists; (c) age worked out from the date of
     birth; (d) allergies shown in red at the top of the record; (e) "last
-    seen" date in patient search. WAITING for his picks.
+    seen" date in patient search. He picked all five, "a, b, c, d and e"
+    (2026-10-29). For (b): "should come with reuse this patient's
+    information since it's already there... you can open a new record"
+    (offer to open the existing patient instead of a duplicate).
+
+91. **Medications in the record: active, suspended, stopped.** (2026-10-29)
+    "Nurses... can suspend a particular drug, they can stop giving
+    somebody a particular medication... edit or update the medication...
+    suspended medicine... orange... stopped permanently, maybe red... still
+    giving it, maybe green or blue." Plus the record of each dose given,
+    with the exact time and who gave it. History kept: a change of status
+    never deletes the line. Build with the medical record (Patients
+    stage 2).
+92. **Download all the hospital's data.** "If the hospital want to download
+    their data to their entire data, it should be there." An admin only
+    export of every table, with the download itself written in the
+    activity log.
+93. **Scans and other raw files.** "Ultra scan materials... store them
+    inside Google Drive... with their names... easy to pull out." He also
+    asked about Google Cloud's free 5 GB. Answered in chat: GCP's free
+    storage is 5 GB held at any one time (not a fresh 5 GB each month),
+    only in US regions, needs a billing card; Drive and GCP both put
+    patient files outside Nigeria and outside the database's access rules,
+    which the NDPA frame says he must decide on. Planned R2 (10 GB free in
+    the hospital's Cloudflare) remains the default until he decides.
+94. **Backup to a second Cloudflare account.** "Use a second Cloudflare
+    account for backup of the data they are putting in." Nightly copy of
+    the database export and the files to R2 in a separate account.
 
 ### Decided
 
