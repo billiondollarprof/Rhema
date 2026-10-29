@@ -312,6 +312,28 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     codes before Resend (members can see the database). Until Resend, only
     rhemamedical7@gmail.com can receive a code.
 
+### From 2026-10-29
+
+72. **Nursing station sign in.** "In the nursing station, it's not per
+    person. I think there are about 4 nurses working together... if he
+    invites nursing station and uses a particular email for nursing
+    station, you are not able to know who did what." Same question for
+    other shared desks (lab). Proposed: every nurse has their own invite;
+    the station computer remembers the nurses who signed in on it; each
+    nurse taps their name and types their own PIN before doing anything,
+    so every line in the log carries a person's name. WAITING for his yes.
+73. **Show him the Cloudflare side as it is built.** "As you are doing it,
+    you can still be directing me to go and be looking at the backend,
+    where to go to see what you've done": for each Worker function, R2
+    bucket and setting, say where in the Cloudflare dashboard to see it.
+74. **AWS account.** He is checking whether he already has one, then
+    opening it. Guide him through the AWS piece when he says it is ready.
+75. **Keep teaching the Python.** "Any new Python code you write, you help
+    me so I can still know it... I really liked that one." Standing rule,
+    already in CLAUDE.md; he asked for it to continue.
+76. **The director's note was checked against our records 2026-10-29.**
+    Every line of it is item 48 here and section 7 of docs/DATABASE.md.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
