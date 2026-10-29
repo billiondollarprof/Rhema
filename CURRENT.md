@@ -520,8 +520,9 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
 95. **Staff profile page with a photo.** (2026-10-29) "A staff has a short
     profile... they can upload their image." Also a selling point. Note:
     the demo's invite screen says "Staff cannot change their own name or
-    photo. The administrator manages this." Asked him which he wants:
-    staff upload their own photo, or the admin does. WAITING.
+    photo. The administrator manages this." DECIDED 2026-10-29: dropped.
+    "No need... it's not a social media platform... everybody in the staff
+    know each other." Only the admin sets names; no photos.
 96. **Future features, kept separate.** Birthday wishes, wellness check-in
     3 days after discharge, check-up reminder 1 month after, appointment
     reminder the day before (WhatsApp then SMS), weekly digest for
@@ -529,6 +530,22 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     payment recording, voice typing. All written in
     docs/FUTURE-FEATURES.md, in his words. Voice notes in chat stay in the
     RHEMA plan (messages module), no special integration needed.
+
+97. **Call attention: a floating alert with a bell, now, not later.**
+    (2026-10-29) "Once that attention is needed, even if they are doing
+    something on the computer, it can float immediately... with the X to
+    remove it... it doesn't affect what they are doing. If they were
+    typing, it just floats in." Sound: "the ringing bell sound. Kring!",
+    on the phone and on the computer. "This one is not a future feature.
+    This one is part of what we are doing now." Build with notifications:
+    a card that floats in a corner without taking the cursor, a bell
+    sound in the app, a phone or computer notification (push) when the
+    app is in the background. Told him: a push notification uses the
+    device's own notification sound, the custom bell plays when the app
+    is open; and a browser only plays sound after the person has touched
+    the page once (signing in counts).
+98. **Weekly digest: email, plus a notification in the app and on the
+    phone** (with sound), opening the digest in the app. (2026-10-29)
 
 ### Decided
 

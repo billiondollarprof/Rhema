@@ -28,7 +28,18 @@ Needs: a WhatsApp Business sender and an SMS provider (both paid per
 message in Nigeria), and a timer (Cloudflare cron) that checks every day
 who is due.
 
+To save money (Anthony, 2026-10-29: "which one do you think we don't need
+to send? Maybe the 1 month wellness message"): keep the appointment
+reminder on WhatsApp or SMS, because a missed appointment costs the
+hospital. Send the others by email first (free on Resend), and only by
+WhatsApp or SMS if the hospital chooses to pay for them. The 1 month
+check-up message is the first to drop.
+
 ## 2. Weekly digest for consultants
+
+Also a notification in the app and on the phone, with sound, that opens
+the digest in the app (Anthony, 2026-10-29).
+
 
 "Info at RHEMA Medical will be sending weekly digest to consultants'
 email, the Gmail they used to register." Fits inside Resend's free plan
@@ -52,7 +63,10 @@ Separate from "Call attention", which is only an alert.
 "Some medical centers include automatic payments registration... if a
 patient make a payment, they don't need to be entering it manually." For
 example, a bank transfer or POS payment recorded by itself from the
-bank's or POS provider's notification.
+bank's or POS provider's notification. Payment providers used in Nigeria
+(Paystack, Flutterwave, Moniepoint and others) send these notifications to
+an address we give them (a webhook). Until then, voice typing makes manual
+entry fast.
 
 ## 6. Voice typing (speech to text)
 
@@ -70,4 +84,7 @@ For the front desk (payments, registration), doctors and the matron
   needs no special integration: the browser records it, the file is kept
   in R2, and it is played back in the chat. It is built with the messages
   module.
-- **Staff profile with photo**: see `CURRENT.md`, item 95.
+- **Staff profile with photo**: dropped by Anthony on 2026-10-29 ("it's
+  not a social media platform").
+- **Call attention as a floating alert with a bell sound**: not future;
+  built now with notifications (`CURRENT.md`, item 97).
