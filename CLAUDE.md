@@ -503,6 +503,15 @@ StellaXafe is the bar. This repo has to be cleaner than it.
     it.
 
   Nothing goes on that list without his yes.
+- **A double action is stopped in the database, not only in the app.**
+  Anthony, 2026-10-29: "If you leave it just to code, it may not hold, but
+  if you run an SQL on the back end side... at least give it a delay."
+  Any action that must not happen twice (a call, a payment, a dose, a
+  message) is made through a database function that refuses the same
+  action from the same person within a set time, and takes a lock so two
+  taps at the same moment cannot both get through. 30 seconds is the
+  default. Anything to do with money uses at least 3 minutes, the way
+  banks do.
 - **Least access for every key.** Each token gets only the permissions its
   job needs, and the reason is written in `CURRENT.md`.
 - **Dependencies are audited in CI.** A package with a known high or

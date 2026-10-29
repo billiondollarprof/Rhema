@@ -569,9 +569,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     registered. "If you want to call a particular person, you could have
     just used a phone or use the chatting system." Step 1 (now): card and
     bell for anyone with the app open. Step 2 (next): push when the app
-    is closed. Migration 20261029180000_attention_calls.sql written, 9
-    tests, 7 deliberate breaks all caught; feature branch only, waiting
-    for his yes on the SQL.
+    is closed. Migration 20261029180000_attention_calls.sql: "yes, call
+    attention" 2026-10-29. He then asked for the double tap guard at 30
+    seconds, kept in the database ("15 seconds can even be 30 seconds"),
+    so it is 30 seconds plus a lock (two taps at the same moment: proven
+    locally, 1 call saved). Now a standing rule in CLAUDE.md.
+97d. **Call attention list: a small search, and a sent mark.** (2026-10-29)
+    "a little search bar should be on that attention drop-down... in case
+    they just know the room number... or they just type the matron's
+    name." Front Desk, Lab and the other groups stay as one tap. When a
+    call is sent: "a bell icon... it animates somewhat and then marks
+    good... very minimal, to know that, oh, I've called their attention."
+
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 

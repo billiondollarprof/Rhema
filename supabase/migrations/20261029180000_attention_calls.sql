@@ -27,8 +27,12 @@
 --   - A call is always made in the caller's own name, through
 --     call_attention(). Nobody can insert, change or delete a row directly.
 --   - Only the caller and the people called can read a call.
---   - The same person calling the same place twice within 15 seconds is
---     taken as a double tap: the second tap sends nothing new.
+--   - The same person calling the same place twice within 30 seconds is
+--     taken as a double tap: the second tap sends nothing new. This guard
+--     lives here in the database, not only in the app (Anthony,
+--     2026-10-29: "If you leave it just to code, it may not hold"). A lock
+--     makes two taps that arrive at the very same moment wait for each
+--     other, so the second one always sees the first.
 --   - Nobody can call their own room.
 --
 -- Never: put a patient's name or anything clinical in a call. There is no
@@ -129,13 +133,19 @@ begin
     raise exception 'You cannot call your own room' using errcode = '22023';
   end if;
 
-  -- A double tap: the same caller, the same place, in the last 15 seconds.
+  -- Two taps at the same moment wait here for each other. The lock is
+  -- per caller and per place called, and lets go when the call is saved.
+  perform pg_advisory_xact_lock(
+    hashtext('attention:' || (select auth.uid())::text || ':' || called_kind::text || ':' || coalesce(called_room::text, 'all'))
+  );
+
+  -- A double tap: the same caller, the same place, in the last 30 seconds.
   if exists (
     select 1 from public.attention_calls
     where called_by = (select auth.uid())
       and to_kind = called_kind
       and to_room_id is not distinct from called_room
-      and created_at > now() - interval '15 seconds'
+      and created_at > now() - interval '30 seconds'
   ) then
     return 'already_sent';
   end if;

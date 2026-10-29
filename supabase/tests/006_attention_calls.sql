@@ -101,7 +101,7 @@ set local role authenticated;
 do $$
 begin
   if public.call_attention('front_desk') <> 'already_sent' then
-    raise exception 'FAIL 2: a second tap within 15 seconds was not treated as a double tap';
+    raise exception 'FAIL 2: a second tap within 30 seconds was not treated as a double tap';
   end if;
 end $$;
 reset role;
