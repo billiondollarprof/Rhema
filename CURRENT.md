@@ -579,7 +579,17 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     tests, every deliberate break caught. Test 8 found a real fault in the
     foundation: "a void needs a reason" let an empty reason through on
     patients; the same file fixes it (drop and re-add that one rule).
-    WAITING for his yes on the SQL.
+    "yes, medical record" 2026-10-29, after he asked how opening and
+    voiding work (explained: staff can open any record any time; the app
+    logs the opening first; Void asks for a short reason, the line stays
+    greyed and crossed out). Sent to testing.
+101. **Record screens: simple and seamless, and tidy the alignment.**
+    (2026-10-29) "Even though... they are complex information... the user
+    interface is laid out in a very seamless and simple way. Just the way
+    we started the dashboard." Also: "the way the thing displays on in
+    desktop... some that are not well aligned properly. So I need you to
+    align those." Improve, do not change: "Not changing it. No, don't
+    change it. What I just want is improvement to look even simpler."
 
 ### Decided
 
