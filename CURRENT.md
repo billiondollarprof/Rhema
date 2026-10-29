@@ -179,6 +179,21 @@ Numbers are kept from the full list, so older notes still match.
     device's own notification sound, the custom bell plays when the app
     is open; and a browser only plays sound after the person has touched
     the page once (signing in counts).
+    **Step 1 LIVE 2026-10-29** (see docs/DONE.md, 97b to 97f).
+    **Step 2, push when the app is closed:** "yes" 2026-10-29. Built:
+    migration 20261029200000_push_devices.sql (device table; add and
+    remove your own device; a trigger sends through pg_net to the Worker,
+    with a secret from Vault), 8 tests on a real Supabase, deliberate
+    breaks all caught; the Worker encrypts and signs each push (10 tests);
+    sw.js, manifest and icons; a "Turn on" line in the Call attention list;
+    signing out removes you from the device; push-keys.yml makes the keys.
+    "Should run them and validate them" 2026-10-29: applied to testing,
+    but the advisor shows 1 new warning (pg_net in the public schema). The
+    check printed it and still said passed: fixed, a new warning now fails
+    the run. Fix migration 20261029210000_pg_net_schema.sql (switch pg_net
+    off and on again inside "extensions") is ready, CI green on the
+    feature branch. WAITING for his yes on that switch off. Not live.
+    Keys not made yet. Then: his phone test, then live.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
