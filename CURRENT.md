@@ -182,6 +182,19 @@ Numbers are kept from the full list, so older notes still match.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
+102. **Installation guide: install the app on phone and desktop.** (2026-10-29)
+    "We are going to put installation guide on a section... how to install
+    it on phone or on your desktop." On a desktop that has not installed
+    it: an Install button "somewhere... at the corner" (a banner is
+    optional: "or we forget about banner"); once installed it no longer
+    shows, and it comes back if they uninstall. For iOS and Mac Safari: real
+    screenshots of the real browser, with circles and arrows, "step one,
+    this, step two, the other one": tap Share, then Add to Home Screen. Cover
+    iPhone, iPad, macOS and Android/desktop. Heading catchy, for example
+    "Lightning fast download" or a progressive web app line: "for best
+    performance, you need to download it", because of notifications and
+    chat. Also useful when reselling to other hospitals. Not started.
+
 ### Standing instructions
 
 These never come off the list.
