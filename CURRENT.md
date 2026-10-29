@@ -474,6 +474,20 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     write: a setup checklist and one place for the IDs, so a new hospital
     is a copy plus new secrets.
 
+90. **Tell him what was borrowed from other hospital systems, and any
+    small detail that would help, if it does not complicate the flow.**
+    (2026-10-29.) Borrowed so far (ideas only, from Bahmni and Open
+    Hospital, marked "(borrowed)" in docs/DATABASE.md): one clear patient
+    status (Visiting, In consultation, Admitted, Discharged); an
+    admissions history, so every stay is kept; a medication record with
+    the exact time each dose was given and who gave it; mistakes voided
+    with a reason, never deleted. Small extras offered for his yes or no:
+    (a) how long each patient has been waiting, on the queue card;
+    (b) a warning at registration when a patient with the same name, date
+    of birth and phone already exists; (c) age worked out from the date of
+    birth; (d) allergies shown in red at the top of the record; (e) "last
+    seen" date in patient search. WAITING for his picks.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email
