@@ -407,6 +407,14 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     desktop, so the sign in link opens right there. Once Resend sends the
     6 digit code instead, the phone and the desktop no longer need to match.
 
+84. **Keep Supabase from pausing.** "Is it possible that you set up a cron
+    ... that wakes up every 7 days or every 6 days?" Built
+    `.github/workflows/keep-awake.yml`: every day, three small requests to
+    each database with the public key (RLS returns nothing). A timer inside
+    Supabase may not count as user activity, so it knocks from outside.
+    GitHub stops timed jobs after 60 days with no pushes, so the Cloudflare
+    timer takes this over before handover.
+
 ### Decided
 
 - 2026-10-28: Sign in works the same on testing and live (real email

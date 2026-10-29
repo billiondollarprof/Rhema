@@ -1,0 +1,57 @@
+# keep-awake.yml: knocks on both hospital databases once a day.
+#
+# Why: Supabase's free plan pauses a project that gets too few user
+# requests in 7 days ("a few user requests to the database each day" keeps
+# it awake, per Supabase's docs). The live project gets real use once the
+# hospital is on it; the testing project can go quiet. A paused project
+# stops the app until somebody presses Resume, so this asks each database
+# a tiny question every day, the way the app would.
+#
+# What it asks: the list of rooms, with the public key and nobody signed in.
+# RLS answers with nothing, which is right: no data leaves the database.
+#
+# Note: GitHub turns off timed workflows after 60 days with no pushes to the
+# repo. The Cloudflare timer planned in PLAN.md takes over before handover.
+#
+# Never: use the secret key here, or read anything with patient data.
+name: Keep databases awake
+
+on:
+  schedule:
+    # Every day at 06:37 UTC (07:37 in Nigeria).
+    - cron: '37 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  knock:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: live
+            ref: ntfvckqczpmylskusgft
+          - name: testing
+            ref: nfrvwvqmfxudaarfuwxg
+    name: knock (${{ matrix.name }})
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      REF: ${{ matrix.ref }}
+    steps:
+      - name: Ask the database a small question three times
+        run: |
+          keys=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/api-keys?reveal=false")
+          key=$(echo "$keys" | jq -r '[.[] | select(.type == "publishable")][0].api_key // empty')
+          test -n "$key" || key=$(echo "$keys" | jq -r '[.[] | select(.name == "anon")][0].api_key // empty')
+          test -n "$key" || { echo "No public key found"; exit 1; }
+          for i in 1 2 3; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' \
+              -H "apikey: $key" "https://$REF.supabase.co/rest/v1/rooms?select=id&limit=1")
+            echo "Knock $i: HTTP $code"
+            test "$code" = "200" || exit 1
+            sleep 5
+          done
