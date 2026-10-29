@@ -370,7 +370,18 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     throwaway Supabase: PASSED (run 40813601733). Screens checked at phone
     and desktop, both themes; fixed the code boxes spilling at 320px and the
     cursor after a wrong PIN. Workflow first-admin.yml makes the first
-    admin. WAITING for his yes on the PIN SQL and the first admin SQL.
+    admin. "yes" to the PIN SQL and first admin 2026-10-29 (name: "Dr.
+    Anthony", rhemamedical7@gmail.com, invited and accepted on testing).
+79. **Dr. Evans (the director) to test.** Anthony will share the testing
+    account and pass on the code himself, for testing only. Told: then the
+    log shows Dr. Anthony for whatever Dr. Evans does; his own account comes
+    once Resend is connected.
+80. **Hospital email addresses.** Staff sign in with their own Gmail (no
+    mailbox per staff). Up to 3 shared addresses on rhemamedical.app via
+    Cloudflare Email Routing to the hospital Gmail. Asked which names
+    hospitals use; suggested info@, records@ (patient reports), admin@.
+    Sign in codes come from no-reply@ through Resend (no mailbox needed).
+    WAITING for his pick. Set up on 6 Nov with the domain move.
 
 ### Decided
 
