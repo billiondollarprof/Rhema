@@ -12,7 +12,7 @@
  */
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import styles from './Auth.module.css'
 
 type CodeBoxesProps = {
@@ -36,6 +36,15 @@ export default function CodeBoxes({
   autoFocus = false,
 }: CodeBoxesProps) {
   const boxes = useRef<Array<HTMLInputElement | null>>([])
+  const group = useRef<HTMLDivElement | null>(null)
+
+  // When the boxes are emptied (a wrong PIN or code), put the cursor back in
+  // the first box, so the person can simply type again.
+  useEffect(() => {
+    if (value === '' && group.current?.contains(document.activeElement)) {
+      boxes.current[0]?.focus()
+    }
+  }, [value])
 
   // ===== 1. Put new digits in, starting at one box =====
   function fill(start: number, digits: string) {
@@ -64,7 +73,7 @@ export default function CodeBoxes({
 
   // ===== 3. The boxes =====
   return (
-    <div className={styles.boxes} role="group" aria-label={label}>
+    <div ref={group} className={styles.boxes} role="group" aria-label={label}>
       {Array.from({ length }, (_, index) => (
         <input
           key={index}

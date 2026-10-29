@@ -1,0 +1,75 @@
+# first-admin.yml: makes one person the hospital's admin, by hand, once.
+#
+# Why: the admin invites everybody else, but somebody has to be the first
+# admin. That person is added in the Supabase dashboard first (Authentication,
+# Users, Invite user), then this workflow gives them a staff row with the
+# admin role. Run it from GitHub: Actions, "First admin", Run workflow.
+#
+# The SQL it runs, for Anthony's approval:
+#   insert into public.staff (id, full_name, email, role)
+#   select id, <name>, email, 'admin' from auth.users where email = <email>
+#   on conflict (id) do nothing;
+# It writes one row. It changes nothing that already exists.
+#
+# Never: run it to change somebody who is already staff. The admin screens
+# do that, and they are logged.
+name: First admin
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'testing or live'
+        required: true
+        default: testing
+        type: choice
+        options: [testing, live]
+      email:
+        description: 'Their email (they must already be added in Supabase)'
+        required: true
+      full_name:
+        description: 'Their full name, as staff will see it'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      REF: ${{ inputs.project == 'live' && 'ntfvckqczpmylskusgft' || 'nfrvwvqmfxudaarfuwxg' }}
+      DB_PASSWORD: ${{ inputs.project == 'live' && secrets.SUPABASE_DB_PASSWORD || secrets.SUPABASE_TESTING }}
+      EMAIL: ${{ inputs.email }}
+      FULL_NAME: ${{ inputs.full_name }}
+    steps:
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Add the staff row
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/config/database/pooler")
+          export PGHOST=$(echo "$pooler" | jq -r '.[0].db_host')
+          export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
+          export PGPASSWORD="$DB_PASSWORD" PGPORT=5432 PGDATABASE=postgres
+          # The name and email go in as psql variables, never pasted into
+          # the SQL text, so nothing typed in the form can change the SQL.
+          added=$(psql -v ON_ERROR_STOP=1 -At -v email="$EMAIL" -v full_name="$FULL_NAME" <<'SQL'
+          with new_row as (
+            insert into public.staff (id, full_name, email, role)
+            select id, trim(:'full_name'), lower(email), 'admin'
+            from auth.users where lower(email) = lower(trim(:'email'))
+            on conflict (id) do nothing
+            returning 1
+          )
+          select count(*) from new_row;
+          SQL
+          )
+          if [ "$added" = "1" ]; then
+            echo "Done: the admin can now sign in."
+          else
+            echo "Nothing added. Either the email is not in Supabase's Users list yet, or this person is already staff."
+            exit 1
+          fi

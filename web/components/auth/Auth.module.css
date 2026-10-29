@@ -21,6 +21,9 @@
   padding: 26px;
   width: min(400px, 100%);
   display: grid;
+  /* One column that may shrink below its content's natural width, so wide
+     content (6 code boxes) squeezes instead of stretching the card. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
 }
@@ -117,10 +120,15 @@
   gap: 8px;
   justify-content: center;
   margin: 12px 0;
+  width: 100%;
 }
 
+/* Boxes share the card's width and never grow past 46px, so 6 of them fit
+   a 320px phone without spilling over the card's edge. */
 .box {
-  width: 46px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 46px;
   height: 56px;
   text-align: center;
   font: inherit;
@@ -144,7 +152,6 @@
     gap: 5px;
   }
   .box {
-    width: 38px;
     height: 50px;
   }
 }
