@@ -12,8 +12,11 @@
 # that refusal is the proof it was reached: the answer carries Postgres's
 # own "permission denied" code, 42501. No data leaves the database.
 #
-# Note: GitHub turns off timed workflows after 60 days with no pushes to the
-# repo. The Cloudflare timer planned in PLAN.md takes over before handover.
+# Note: GitHub's 60 day switch-off for timed workflows applies to public
+# repos only. This repo is private, so this keeps running. It still lives
+# in Anthony's GitHub, so before handover a Cloudflare timer (in the
+# hospital's own account) does the same knock, and this one can stay as a
+# second line.
 #
 # Never: use the secret key here, or read anything with patient data.
 name: Keep databases awake
