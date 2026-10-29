@@ -219,6 +219,20 @@ reset role;
 \echo 'PASS 7: calls are made only through call_attention, and never changed or deleted'
 
 
+-- The rights themselves, so a missing "revoke all" fails here too, not
+-- only on a database that gives new tables full rights.
+do $$
+begin
+  if has_table_privilege('authenticated', 'public.attention_calls', 'INSERT, UPDATE, DELETE, TRUNCATE') then
+    raise exception 'FAIL 7: signed in users still have write rights on calls';
+  end if;
+  if has_table_privilege('anon', 'public.attention_calls', 'SELECT, INSERT, UPDATE, DELETE, TRUNCATE') then
+    raise exception 'FAIL 7: the public has rights on calls';
+  end if;
+end $$;
+\echo 'PASS 7b: nobody holds a right to write calls directly'
+
+
 -- ===== 8. Not signed in, or no longer active: no calls =====
 set local role anon;
 do $$

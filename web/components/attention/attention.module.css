@@ -1,0 +1,309 @@
+/*
+ * attention.module.css: the Call attention list and the floating cards.
+ *
+ * Both float above the page (position: fixed), so nothing on the screen
+ * moves when they appear. The list unrolls from the top like paper. The
+ * cards sit in a corner, above the phone's bottom menu.
+ */
+
+/* ===== 1. The list that drops down ===== */
+.menuWrap {
+  flex-shrink: 0;
+}
+
+.panel {
+  position: fixed;
+  top: calc(62px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(70dvh, 560px);
+  overflow-y: auto;
+  z-index: 40;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 8px;
+  display: grid;
+  gap: 2px;
+  box-shadow:
+    0 2px 6px rgba(15, 34, 56, 0.08),
+    0 24px 48px -16px rgba(15, 34, 56, 0.35);
+  transform-origin: top;
+  animation: unroll 0.22s ease-out;
+}
+
+@keyframes unroll {
+  from {
+    clip-path: inset(0 0 100% 0 round 16px);
+    opacity: 0.6;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 16px);
+    opacity: 1;
+  }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  margin: 0 0 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: var(--mut);
+  min-height: 36px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: none;
+  padding: 7px 0;
+}
+
+.search:focus-within {
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 3px rgba(31, 95, 208, 0.12);
+}
+
+.quiet {
+  color: var(--mut);
+  margin: 6px 8px;
+  font-size: 13px;
+}
+
+/* One line: what it is on the left, the bell on the right. */
+.line,
+.fold {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 6px 8px 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.line:hover,
+.fold:hover {
+  background: var(--bg);
+}
+
+.lineText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.lineText small {
+  color: var(--mut);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fold span {
+  flex: 1;
+  font-weight: 700;
+}
+
+.fold small {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+.chevron {
+  color: var(--mut);
+  transition: transform 0.15s;
+}
+
+.fold[aria-expanded='true'] .chevron {
+  transform: rotate(90deg);
+}
+
+.rooms {
+  margin: 0 0 4px 12px;
+  padding-left: 6px;
+  border-left: 2px solid var(--line);
+  display: grid;
+  gap: 2px;
+}
+
+/* ===== 2. The bell on each line, and the tick ===== */
+.mark {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #e53935;
+  background: #fdecea;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.done {
+  color: #fff;
+  background: var(--grn);
+  animation: pop 0.25s ease-out;
+}
+
+.failed {
+  color: #fff;
+  background: var(--red);
+}
+
+.good {
+  color: var(--grn);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.bad {
+  color: var(--red);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.shake {
+  animation: shake 0.6s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-18deg);
+  }
+  40% {
+    transform: rotate(16deg);
+  }
+  60% {
+    transform: rotate(-10deg);
+  }
+  80% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ===== 3. The floating cards ===== */
+.alerts {
+  position: fixed;
+  right: 12px;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  width: min(340px, calc(100vw - 24px));
+  display: grid;
+  gap: 8px;
+  z-index: 50;
+  /* Taps between the cards reach the page underneath. */
+  pointer-events: none;
+}
+
+@media (min-width: 760px) {
+  .alerts {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+.alert {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #f5c2c0;
+  border-left: 4px solid #e53935;
+  border-radius: 14px;
+  box-shadow:
+    0 2px 6px rgba(15, 34, 56, 0.08),
+    0 20px 40px -16px rgba(15, 34, 56, 0.4);
+  animation: float-in 0.3s ease-out;
+}
+
+@keyframes float-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alertBell {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #e53935;
+  animation-iteration-count: 3;
+}
+
+.alertText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.alertText small {
+  color: var(--mut);
+}
+
+.close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--bg);
+  color: var(--mut);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .alert,
+  .shake,
+  .done {
+    animation: none;
+  }
+}
