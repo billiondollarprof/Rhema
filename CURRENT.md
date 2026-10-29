@@ -297,8 +297,12 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     template sends a code, code expiry 600 seconds, Site URL. Steps given in
     chat 2026-10-28. Until Resend (6 Nov), Supabase's own email only sends
     to members of the hospital organisation, a few emails an hour.
-    WAITING for him to do the steps. Then CI reads the settings on every
-    run, so a change made by mistake shows up.
+    Progress 2026-10-29 (his screenshots, testing project): sign ups OFF,
+    code expiry 600 s, code length 6, all saved. The email template is
+    LOCKED: Supabase only lets you edit it once custom SMTP is set up. So
+    the template steps wait for Resend, and until then the email carries
+    Supabase's default sign in link. Still to do: Site URL on testing, and
+    the same steps on live. Then CI reads the settings on every run.
 
 ### Decided
 
