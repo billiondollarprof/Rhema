@@ -23,9 +23,11 @@ strange. If the two files disagree, this one wins.
    record. A decision he makes goes in "Decided" so nobody asks again.
 4. **A request moves to `docs/DONE.md` when it is live and checked**, not
    when it is planned or pushed.
-5. **One feature, one session.** Once a feature is live, say so and
-   suggest a new chat. A long chat resends everything on every turn and
-   costs more each time. `CURRENT.md` is the handover, so nothing is lost.
+5. **One chat.** Anthony works in one long chat (his decision,
+   2026-10-29: "I want to be doing my work in one chat"). Do not suggest a
+   new chat. Keep `CURRENT.md` and `SESSIONS.md` up to date as you go,
+   because a long chat is shortened into a summary from time to time, and
+   those two files are what survives that in full.
 6. At the end, update `CURRENT.md` and `SESSIONS.md`.
 
 ## 2. What an agent may do, must ask, and must never do

@@ -204,6 +204,10 @@ These never come off the list.
 
 ### Decided
 
+- **One chat, not a new chat per feature.** (2026-10-29) "I don't want to
+  be using new chats. I want to be doing my work in one chat." CLAUDE.md
+  section 1 changed to match.
+
 - 2026-10-28: Sign in works the same on testing and live (real email
   codes on both). Offered a "Sign in as" list of made up staff on testing
   only; he chose "proceed with the 13 steps" on both projects instead.
