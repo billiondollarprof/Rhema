@@ -64,3 +64,12 @@ build from the RHEMA demo and the proposal.
   0 security warnings. The sign in e2e now walks the record against the
   real database rules: allergy, medicine, suspend and resume with a
   reason, a dose, a refused reading, a void, and a refresh.
+
+- 2026-10-29, later still: Call attention step 1 went live. A phone button
+  in the top bar drops a list (groups ring at once; Consultant and Matron
+  open their rooms; a small search). The card floats in and rings on the
+  called room's screens, live. The double tap guard is 30 seconds, in the
+  database, with a lock; this is now a rule in CLAUDE.md. CI caught a
+  missing "revoke all" on the new table before live; fixed with his yes,
+  and the local tests now give new tables Supabase's default rights so
+  this cannot slip past again.

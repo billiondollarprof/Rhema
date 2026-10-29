@@ -587,6 +587,11 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     is to call attention, then maybe we use call icon." Done 2026-10-29:
     phone icon on the top bar button, the list, the floating card and the
     Home tile. Rights fix: "yes, rights fix" 2026-10-29.
+    **97, 97b, 97c, 97d, 97e: step 1 LIVE 2026-10-29.** Testing and live
+    both 0 security warnings. CI proves it with two real screens: Nurse
+    One rings Front Desk, the desk screen gets the card live, a second tap
+    says Already sent, X keeps it closed after a refresh. Step 2 (push
+    when the app is closed) is next on this item.
 97f. **The Home "Call attention" tile: maybe replace it.** (2026-10-29)
     "if it is there [in the top bar], then that tab that is on the
     dashboard that says call attention, maybe you look for something more
