@@ -354,8 +354,8 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Built: migration 20261029100000_matron_and_admin_access.sql (matron
     role, can_admin column, is_admin() reads can_admin, guard so the last
     admin cannot be removed), undo file, 4 tests; every test proved to
-    catch a deliberate break. On the feature branch only. WAITING for his
-    yes on the fuller SQL before it goes to testing and live.
+    catch a deliberate break. "yes, admin tick" 2026-10-29: sent to
+    testing, then live by his rule.
 
 ### Decided
 
