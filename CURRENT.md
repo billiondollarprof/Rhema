@@ -381,7 +381,14 @@ checked, not when it is planned. (Rule from `CLAUDE.md`.)
     Cloudflare Email Routing to the hospital Gmail. Asked which names
     hospitals use; suggested info@, records@ (patient reports), admin@.
     Sign in codes come from no-reply@ through Resend (no mailbox needed).
-    WAITING for his pick. Set up on 6 Nov with the domain move.
+    He picked info@, records@, admin@ and no-reply@ (2026-10-29). Set up
+    on 6 Nov: info@ and admin@ routed in Cloudflare to the hospital Gmail
+    (Gmail "send as" only if they want to write from them); records@
+    routed so replies arrive, but sending is done by Resend; no-reply@
+    needs nothing.
+81. **The testing account shows the director's name.** "Use his own name,
+    so that when he logs in, he will not feel awkward." First admin on
+    testing: full name "Dr. Evans", email rhemamedical7@gmail.com.
 
 ### Decided
 
