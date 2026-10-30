@@ -182,6 +182,8 @@ Numbers are kept from the full list, so older notes still match.
     performance, you need to download it", because of notifications and
     chat. Also useful when reselling to other hospitals. Not started.
 
+    Built 2026-10-30: /install/ page, "Get RHEMA on every device", animated
+    steps for Android, iPhone, iPad, Windows and Mac. On testing.
 103. **A must-do "Allow alerts" card the first time on each device.**
     (2026-10-30) "At the first time the person is logging into that new
     computer, to that new phone, once the system knows it's new... it asks
@@ -192,6 +194,8 @@ Numbers are kept from the full list, so older notes still match.
     still has a Block choice; if Block is picked, the card stays and shows
     how to allow it in the settings.
 
+    Built 2026-10-30: the Allow card, middle of the screen, no X, only
+    Allow; Block shows how to switch it on, and Check again. On testing.
 104. **iPhone, iPad and Mac: install first, then the alerts card.**
     (2026-10-30) "If it is a Mac system, an iPad, the system forces them to
     download. So what now floats... will be the download instruction to
@@ -202,6 +206,9 @@ Numbers are kept from the full list, so older notes still match.
     installed app ("just the same way for the iPhone"). No website can
     install itself on iPhone or Safari, so the animation guides them.
     Goes with 102 and 103. Not started.
+    Built 2026-10-30: install card first on every device; one tap Install
+    where the browser allows it, the animated guide where it does not;
+    the Allow card only inside the installed app. On testing.
 105. **The alert should ring loud, not sound like a message.** (2026-10-30)
     "It just did tokotom as if one message pops in. So it didn't force
     serious ring." A web app cannot choose its own notification sound; the
@@ -218,7 +225,8 @@ Numbers are kept from the full list, so older notes still match.
     version and name the name." Done 2026-10-30: checkout v6, setup-node
     v6, setup-python v6, upload-artifact v6, supabase/setup-cli v2 (all
     checked to run on Node.js 24), and every job runs on ubuntu-24.04 by
-    name. Comes off once the runs are green.
+    name. Green on testing and live 2026-10-30; the Node.js note is gone
+    from the logs. Done.
 
 ### Standing instructions
 

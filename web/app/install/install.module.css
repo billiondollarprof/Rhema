@@ -1,0 +1,51 @@
+/*
+ * install.module.css: the "Get RHEMA on every device" page. Same card
+ * style as the install card in the app, so both feel like one thing.
+ */
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 16px 40px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+}
+
+.page h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tab {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  background: var(--bl);
+  border-color: var(--bl);
+  color: #fff;
+}
+
+.panel {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+}

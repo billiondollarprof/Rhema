@@ -26,6 +26,7 @@ const SCREENS = [
   { path: '/patients/register/', waitFor: 'Register patient' },
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
+  { path: '/install/', waitFor: 'Get RHEMA on every device' },
 ]
 
 // ===== 2. Walk them all =====

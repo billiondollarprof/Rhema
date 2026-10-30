@@ -11,7 +11,9 @@
  *
  * The frame also carries Call attention, because it must work on every
  * screen: the bell in the top bar opens the list, and the cards float in
- * over whatever screen is open (components/attention).
+ * over whatever screen is open (components/attention). And it carries the
+ * install and alerts cards each device goes through once
+ * (components/onboarding).
  *
  * Never: show patient data in the frame itself. It is on every screen.
  */
@@ -24,6 +26,7 @@ import Icon from './Icon'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
+import OnboardingGate from '@/components/onboarding/OnboardingGate'
 import PersonBadge from '@/components/auth/PersonBadge'
 import styles from './AppShell.module.css'
 import { roleLabel } from '@/lib/auth/roles'
@@ -114,6 +117,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* ===== 5. Call attention cards, over every screen ===== */}
         <AttentionAlerts client={client} staffId={staff.id} />
+
+        {/* ===== 6. Install and alerts, once per device (must-do cards) ===== */}
+        <OnboardingGate client={client} staffId={staff.id} />
       </div>
     </AttentionMenuContext.Provider>
   )
