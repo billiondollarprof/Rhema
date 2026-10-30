@@ -191,7 +191,7 @@
 
 .scene {
   width: 100%;
-  max-width: 280px;
+  max-width: 380px;
   height: auto;
   background: var(--bg);
   border-radius: 16px;
@@ -232,7 +232,9 @@
 
 .stepWords {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.45;
+  text-align: center;
   min-height: 42px;
   animation: slide 0.35s ease-out;
 }
