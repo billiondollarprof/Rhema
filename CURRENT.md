@@ -58,6 +58,8 @@ Numbers are kept from the full list, so older notes still match.
     screen takes over the root address (the server status then moves to
     the smoke test only).
 44. **RH logo stays a stand in** until the hospital sends its real logo.
+    (2026-10-30: replaced by the logo cut from the letterhead, request
+    114. A clean original file from the hospital would still be sharper.)
 48. **The hospital's note**, word for word: "Medical Reports for both
     nursing mothers and other patients. Nursing Station; Comment/report.
     They note the medications given/the vital signs. They note the time the
@@ -189,6 +191,16 @@ Numbers are kept from the full list, so older notes still match.
     remotely to be monitoring... during debugging." (2026-10-30) Needs a
     plain word with the director, because that account can see patient
     records (NDPA).
+
+115. **Laboratory (build step 5).** (2026-10-30) "do the laboratory."
+    Follows docs/DATABASE.md section 9 and requests 58 to 60. Said back to
+    him, waiting for his yes.
+116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
+    "Is it better we use an encrypted Google drive since it's 15gb... Or
+    we can use GCP... I think we should just use Cloudflare now. That means
+    I open another... Gmail account... so that I can open Cloudflare. Yeah?"
+    Answered: second Cloudflare, with a new Gmail. He is setting it up and
+    will add the token and the account ID to GitHub.
 
 ### Standing instructions
 
