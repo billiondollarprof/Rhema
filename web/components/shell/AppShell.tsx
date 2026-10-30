@@ -71,6 +71,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* ===== 2. Top bar ===== */}
         <header className={styles.top}>
           <Logo size={34} className={styles.topLogo} />
+          {/* A thin line keeps the hospital's logo apart from the person. */}
+          <span className={styles.topDivider} aria-hidden="true" />
           <PersonBadge name={staff.full_name} />
           <div className={styles.who}>
             <b>{staff.full_name}</b>

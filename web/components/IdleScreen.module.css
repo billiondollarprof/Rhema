@@ -102,9 +102,9 @@
   }
 }
 
-/* The logo fills most of the ring, with the glow around it. */
+/* The logo fills the ring, so the glow sits right around its edge. */
 .logo {
-  width: 84%;
+  width: 93%;
   height: auto;
 }
 
