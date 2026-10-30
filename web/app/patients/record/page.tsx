@@ -102,9 +102,17 @@ function PatientRecord() {
   if (auth.status !== 'ready' || !client || !staff) return null
 
   const back = id ? (
-    <Link className={buttons.button} href={`/patients/?p=${id}`}>
-      Back to patient
-    </Link>
+    <>
+      {/* Always in view, so a lab request never hides in a folded section. */}
+      {allowed && patient ? (
+        <Link className={`${buttons.button} ${buttons.primary}`} href={`/lab/request/?p=${id}`}>
+          Request lab
+        </Link>
+      ) : null}
+      <Link className={buttons.button} href={`/patients/?p=${id}`}>
+        Back to patient
+      </Link>
+    </>
   ) : null
 
   // ===== 3. The reasons the record cannot be shown =====

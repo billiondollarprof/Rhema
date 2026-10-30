@@ -347,7 +347,7 @@ try {
   }
 
   step('Lab: Nurse One requests a malaria test from the record, for payment')
-  await page.getByRole('link', { name: 'Request lab' }).click()
+  await page.getByRole('link', { name: 'Request lab' }).first().click()
   await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
   await page.getByRole('button', { name: 'Malaria test' }).click()
   await page.getByRole('button', { name: 'Send request' }).click()
