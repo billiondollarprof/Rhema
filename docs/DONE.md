@@ -567,3 +567,18 @@ this file.
     "Step 2 of 6" written under the picture; 5 seconds per step, and it
     stays on a step once tapped; arrows never cover words. Checked every
     step on iPhone, iPad, Android and Mac at phone width. LIVE. Done.
+110. **A livelier sign in screen with hospital pictures.** (2026-10-30)
+    "When it has downloaded, the interface does not really look that fine"
+    ... images "of doctors in hospital... smiley, healthy people, doctor
+    attending to patients... sliding in animated... the blue splash of the
+    color of the hospital on it", WebP, small but good quality, fitting
+    phone and desktop. Options he gave: ChatGPT images (one collage of 5
+    for desktop, one of 5 for phone, he generates, agent crops), a short
+    looping video, Unsplash pictures used online (as in Amara), or an
+    animation drawn in code. He asked for the agent's opinion and the
+    prompts. Unsplash and Pexels are blocked from the agent's machine.
+    He chose ChatGPT and sent both collages. Built 2026-10-30: 5 photos
+    per collage cut into web/public/signin/ (WebP, 24 to 44 KB each), a
+    slideshow behind the sign in card (components/auth/SignInPhotos.tsx),
+    blue wash, slow drift and zoom, 6 seconds each, cross-fade. Live
+    2026-10-30 (commit 58348d3), all checks green, smoke test passed.
