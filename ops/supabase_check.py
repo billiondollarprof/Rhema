@@ -2,14 +2,17 @@
 #
 # What this file does:
 #   It proves that GitHub can reach the hospital's Supabase project. It asks
-#   Supabase four questions and prints the answers:
+#   Supabase five questions and prints the answers:
 #     1. Does the project exist, which region is it in, and is it healthy?
 #     2. Does Supabase's security check find any warnings? (Warnings
 #        Anthony has accepted, listed in section 2, are shown but not counted.)
 #     3. Can we log in to the database itself with the password?
 #     4. Are the sign in settings still the ones Anthony set by hand?
-#        (Sign ups off, email confirmation on, a 6 digit code that runs out
-#        in 600 seconds, and the right Site URL and redirect address.)
+#        (Sign ups on since 2026-10-30, email confirmation on, a 6 digit
+#        code that runs out in 600 seconds, and the right Site URL and
+#        redirect address.)
+#     5. Is the invitation rule in place, so only invited emails can sign
+#        up? (Admin, request 112.)
 #
 # How it runs:
 #   On GitHub Actions only, because that is where the secrets live. It reads
@@ -168,7 +171,9 @@ def main():
 
     # Each pair is: the setting's name in Supabase, and the value it must have.
     expected = {
-        "disable_signup": True,
+        # Sign ups are ON since 2026-10-30 (Admin, option A, Anthony's
+        # choice). Check 5 below makes sure the invitation rule is there.
+        "disable_signup": False,
         "mailer_autoconfirm": False,
         "mailer_otp_exp": 600,
         "mailer_otp_length": 6,
@@ -190,7 +195,37 @@ def main():
             print("  -", problem)
         sys.exit(1)
 
-    print("Sign in settings are as set: sign ups off, 6 digit code, 600 seconds.")
+    print("Sign in settings are as set: sign ups on, 6 digit code, 600 seconds.")
+
+    # Check 5: sign ups are on, so the database rule that refuses any email
+    # without a waiting invitation must be in place. Without it, anybody
+    # could make a sign in account. Ask the database whether the rule
+    # (a trigger on auth.users) exists and is switched on.
+    rule_question = (
+        "select count(*) from pg_trigger "
+        "where tgname = 'rhema_only_invited_sign_ups' "
+        "and tgrelid = 'auth.users'::regclass and tgenabled <> 'D';"
+    )
+    # The same psql command as check 3, with this question instead.
+    rule = subprocess.run(
+        [
+            "psql",
+            "--host", pooler["db_host"],
+            "--port", "5432",
+            "--username", pooler["db_user"],
+            "--dbname", "postgres",
+            "--tuples-only",
+            "--command", rule_question,
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+    # .strip() removes the spaces psql puts around the answer, so "1" is "1".
+    if rule.returncode != 0 or rule.stdout.strip() != "1":
+        print("FAILED: sign ups are on but the invitation rule is missing or switched off.")
+        sys.exit(1)
+    print("Invitation rule is in place: only invited emails can sign up.")
 
     # A new security warning fails the run (CLAUDE.md section 10). This
     # comes last, so the other checks still print their answers first.
@@ -200,7 +235,7 @@ def main():
         print("FAILED: " + str(len(new_warnings)) + " new security warning(s), listed above.")
         sys.exit(1)
 
-    print("All four checks passed.")
+    print("All five checks passed.")
 
 
 if __name__ == "__main__":
