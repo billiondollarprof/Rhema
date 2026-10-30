@@ -33,14 +33,14 @@ jobs:
   migrate:
     # Only from main, even when started by hand.
     if: github.ref_name == 'main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       LIVE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       TESTING_PASSWORD: ${{ secrets.SUPABASE_TESTING }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: supabase/setup-cli@v1
+      - uses: actions/checkout@v6
+      - uses: supabase/setup-cli@v2
         with:
           version: 2.122.0
       - name: Make sure psql is installed
@@ -92,7 +92,7 @@ jobs:
         run: supabase db push --db-url "$LIVE_URL"
 
       # ===== 4. Check the live project after the change =====
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: Security check on the live project

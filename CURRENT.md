@@ -212,6 +212,14 @@ Numbers are kept from the full list, so older notes still match.
     can play a real alarm sound. DECIDED 2026-10-30: option (a). Built as
     part of 102 to 104.
 
+106. **Fix the GitHub notes: Node.js 20 and ubuntu-latest.** (2026-10-30)
+    "Fix the fixes for the notification on the Node.js and the Ubuntu
+    latest, apply them so that nothing takes us by surprise. Use newer
+    version and name the name." Done 2026-10-30: checkout v6, setup-node
+    v6, setup-python v6, upload-artifact v6, supabase/setup-cli v2 (all
+    checked to run on Node.js 24), and every job runs on ubuntu-24.04 by
+    name. Comes off once the runs are green.
+
 ### Standing instructions
 
 These never come off the list.
