@@ -93,3 +93,11 @@ build from the RHEMA demo and the proposal.
   the sign in link opens Safari, not the app). Sign in screen now has his
   5 hospital photos sliding behind the card under a blue wash (110). The
   lock page has its own idle screen, so it is unchanged.
+
+- 2026-10-30, Admin (112) live: invitations, staff list with suspend,
+  unsuspend and revoke behind the admin's PIN, rooms, activity log with
+  signed in times. Option A: Supabase sign ups on, a trigger on
+  auth.users refuses emails without a waiting invitation, and the
+  security check now has a fifth check for that rule. The real sign in
+  test in CI caught two faults before testing (link in an open tab, the
+  stranger message on a bare 500). Next: 114, logo and red accents.

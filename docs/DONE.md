@@ -592,3 +592,55 @@ this file.
     name; each photo zooms and drifts the whole 9.5 seconds it is seen,
     fades over 2.5 seconds. Live 2026-10-30, all checks green, smoke test
     passed.
+112. **Admin (build step 7): invite staff, staff list, rooms, activity
+    log.** (2026-10-30) His words, in order:
+    - Invite: "they get a one-time link by email. But whether or not they
+      click through the link, as long as they log in using that same email
+      that was invited... if they click through the link... the email is
+      already pasted there... some sort of like a deep link... if they do
+      not click the link, they can still type in the email as long as the
+      email has been activated."
+    - "72 hours instead of 48 hours for expiry... otherwise it expires and
+      the admin will see that this invitation has expired." An expired
+      invite can be sent again.
+    - "An admin can revoke... If admin revoke somebody, he can still add
+      that same person back."
+    - "The admin can change anybody's room or access and can switch a
+      person off. A switched off person can't sign in."
+    - Suspend and revoke are two things: "suspend does not mean the person
+      will have to get a new invitation." Unsuspended: "they might get an
+      email... that their account has been unsuspended." Suspended or
+      revoked: no email. Revoked: "can be re-added, and if they are
+      re-added, it means they are coming in again to start the account
+      again."
+    - "Those actions will always go with the pin, the admin's pin... the
+      same pin they are using to log in."
+    - Rooms: add and rename. Activity log: as the demo (per staff member,
+      signed in, signed out, time online, what they did).
+    - "Super simple system to use... easy flow."
+    - Asked: does the admin enter the server key? Answer: no, never.
+    - Asked to confirm the code is modular and healthy.
+    Done 2026-10-30, live (commit on main after "Merge testing into main:
+    Admin"): Admin menu for admins, tabs Staff, Invite, Rooms, Activity;
+    invitations 72 hours, Copy link until Resend; suspend, unsuspend,
+    revoke and cancel with the admin's PIN, checked in the database; the
+    database refuses sign ups without an invitation. Live and testing
+    security checks: all five passed, 0 warnings. Sign ups switched on in
+    both projects by Anthony.
+114. **The hospital's logo and real name, blue kept, a few red accents.**
+    (2026-10-30, sent the letterhead.) Name: RHEMA MEDICAL CENTRE, Former
+    License Office by Ojolu Junction, Sapele, Delta State, Nigeria. "Crop
+    out the logo and use the logo for where we have the... RH", in the
+    top bar, the app icon "when you download the app". "Keep blue. Blue
+    looks good... let the red be the accent... just a few places... maybe
+    at the top bar... red line as a divider." "Save my context window and
+    time. Focus our energy on something more important than color." To do
+    right after Admin (112). Letterhead kept in the chat uploads.
+    Done 2026-10-30: logo cut from the letterhead (web/public/logo.webp) in
+    the sign in card, the lock screen ring, the top bar, the install cards
+    and the install guide pictures; new app icons (192, 512, a maskable
+    512 for Android, Apple 180); name "Rhema Medical Centre" in the tab,
+    the installed app and the lock screen; red (#d9232d) only as a thin
+    line under the top bar and under the name on the lock screen. The
+    logo is cut from a 160 pixel copy, so it is slightly soft; a clean
+    file from the hospital would make it sharp.

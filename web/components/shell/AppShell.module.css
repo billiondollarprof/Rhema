@@ -23,6 +23,13 @@
   position: sticky;
   top: 0;
   z-index: 5;
+  /* The hospital's red as a thin divider, as on its letterhead (request 114). */
+  border-bottom: 3px solid var(--brand-red);
+}
+
+.topLogo {
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
 }
 
 .who {

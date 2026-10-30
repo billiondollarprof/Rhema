@@ -102,19 +102,23 @@
   }
 }
 
-.mark {
-  font-size: clamp(44px, 9vw, 82px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  background: linear-gradient(115deg, #ffffff 0%, #ffffff 40%, #41b8ff 55%, #ffffff 70%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 6s ease-in-out infinite;
+/* The logo fills most of the ring, with the glow around it. */
+.logo {
+  width: 84%;
+  height: auto;
 }
 
 /* ===== 4. The name and the shimmer ===== */
+/* The hospital's red, as on its letterhead: a short line under the name. */
+.redLine {
+  display: block;
+  width: 72px;
+  height: 3px;
+  border-radius: 2px;
+  margin: 12px auto 0;
+  background: var(--brand-red);
+}
+
 .name {
   margin: 10px 0 0;
   font-size: clamp(26px, 5.6vw, 58px);
@@ -172,7 +176,6 @@
   .waveMid,
   .waveFast,
   .ring,
-  .mark,
   .name {
     animation: none;
   }

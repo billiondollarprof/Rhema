@@ -15,8 +15,8 @@ import BellWaker from '@/components/attention/BellWaker'
 import { AuthProvider } from '@/lib/auth/session'
 
 export const metadata: Metadata = {
-  title: 'RHEMA Hospital',
-  description: 'RHEMA Medical Center hospital workspace',
+  title: 'Rhema Medical Centre',
+  description: 'Rhema Medical Centre, Sapele: hospital workspace',
   // Staff only. Search engines must not list it.
   robots: { index: false, follow: false },
   // So the app can be added to a phone's home screen. An iPhone only shows
