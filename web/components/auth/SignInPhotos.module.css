@@ -5,6 +5,8 @@
  * The photos fill the whole screen behind the card. The wash uses the same
  * blues as the sign in page before the photos (#0a2a5e, #1565c0, #42a5f5),
  * see through, so the photos show and the white card still stands out.
+ * Anthony, 2026-10-30: "not just a slideshow... floating gradually", so each
+ * photo zooms and drifts the whole time it shows, and the fades are slow.
  */
 
 /* ===== 1. The layer behind the card ===== */
@@ -17,12 +19,12 @@
   pointer-events: none;
 }
 
-/* ===== 2. One photo: hidden until its turn, then fades in ===== */
+/* ===== 2. One photo: hidden until its turn, then fades in slowly ===== */
 .photo {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 1.6s ease-in-out;
+  transition: opacity 2.5s ease-in-out;
 }
 
 .photo img {
@@ -30,6 +32,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  will-change: transform;
 }
 
 .showing {
@@ -43,52 +46,52 @@
   opacity: 1;
 }
 
-/* ===== 3. The slow drift and zoom, a different way for each photo ===== */
-.showing img,
-.leaving img {
-  animation: var(--move) 8s ease-out forwards;
+/* ===== 3. The float: a slow zoom and drift, a different way for each photo =====
+   It lasts the whole time the photo is on show, plus its fade out (7 + 2.5
+   seconds), so the photo never stops moving. Each photo names its own
+   animation, because some phones ignore an animation name given through a
+   variable. */
+.move1.showing img,
+.move1.leaving img,
+.move4.showing img,
+.move4.leaving img {
+  animation: float-in-right 9.5s ease-in-out forwards;
+}
+.move2.showing img,
+.move2.leaving img,
+.move5.showing img,
+.move5.leaving img {
+  animation: float-out-left 9.5s ease-in-out forwards;
+}
+.move3.showing img,
+.move3.leaving img {
+  animation: float-up 9.5s ease-in-out forwards;
 }
 
-.move1 {
-  --move: drift-right;
-}
-.move2 {
-  --move: drift-left;
-}
-.move3 {
-  --move: drift-up;
-}
-.move4 {
-  --move: drift-right;
-}
-.move5 {
-  --move: drift-left;
-}
-
-@keyframes drift-right {
+@keyframes float-in-right {
   from {
-    transform: scale(1.04) translate(-1.5%, 0);
+    transform: scale(1.02) translate(-3%, 1%);
   }
   to {
-    transform: scale(1.14) translate(1.5%, -1%);
+    transform: scale(1.2) translate(3%, -2%);
   }
 }
 
-@keyframes drift-left {
+@keyframes float-out-left {
   from {
-    transform: scale(1.14) translate(1.5%, 1%);
+    transform: scale(1.2) translate(3%, 2%);
   }
   to {
-    transform: scale(1.04) translate(-1.5%, 0);
+    transform: scale(1.02) translate(-3%, -1%);
   }
 }
 
-@keyframes drift-up {
+@keyframes float-up {
   from {
-    transform: scale(1.06) translate(0, 1.5%);
+    transform: scale(1.05) translate(0, 3%);
   }
   to {
-    transform: scale(1.14) translate(0, -1.5%);
+    transform: scale(1.2) translate(0, -3%);
   }
 }
 
@@ -110,8 +113,7 @@
   .photo {
     transition: none;
   }
-  .showing img,
-  .leaving img {
-    animation: none;
+  .photo img {
+    animation: none !important;
   }
 }

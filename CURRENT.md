@@ -179,6 +179,16 @@ Numbers are kept from the full list, so older notes still match.
     Done 2026-10-30: CARDS_PAUSED = true in OnboardingGate.tsx.
     HANDOVER LIST: set CARDS_PAUSED to false once sign in uses the 6 digit
     code (Resend, 6 November), and walk the cards through once more.
+111. **Photos on the lock screen too, and a real float, not a switch.**
+    (2026-10-30) "Before the admin, I think you should do it for the lock
+    screen because that's where they will also see it all the time... the
+    image is not really animated. It's not floating... slight zoom in, zoom
+    out... It's just switching instantly. It should be soft... not just a
+    slideshow, but just animating and changing." Then: "yes, start number
+    2, admin". Built 2026-10-30: photos behind the lock screen's waves and
+    name; each photo zooms and drifts the whole 9.5 seconds it is seen,
+    fades over 2.5 seconds. Going live.
+
 ### Standing instructions
 
 These never come off the list.

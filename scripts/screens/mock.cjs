@@ -48,10 +48,10 @@ const PATIENT = {
   open_visit: null,
 }
 
-// ===== 2. A signed in, unlocked person in the browser =====
+// ===== 2. A signed in person in the browser (unlocked unless locked: true) =====
 async function signIn(
   context,
-  { name = 'Chioma Eze', role = 'front_desk', roomId = 1, medical = false } = {},
+  { name = 'Chioma Eze', role = 'front_desk', roomId = 1, medical = false, locked = false } = {},
 ) {
   const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url')
   const exp = Math.floor(Date.now() / 1000) + 3600
@@ -70,7 +70,7 @@ async function signIn(
     },
   }
   await context.addInitScript(
-    ([id, s, n, r]) => {
+    ([id, s, n, r, l]) => {
       localStorage.setItem(
         'rhema-device-accounts',
         JSON.stringify([
@@ -80,14 +80,14 @@ async function signIn(
             email: 'made-up@example.com',
             role: r,
             lastActive: Date.now(),
-            locked: false,
+            locked: l,
           },
         ]),
       )
       localStorage.setItem('rhema-active-account', id)
       localStorage.setItem('rhema-auth-' + id, JSON.stringify(s))
     },
-    [STAFF_ID, session, name, role],
+    [STAFF_ID, session, name, role, locked],
   )
   const room = ROOMS.find((r) => r.id === roomId) ?? null
   context.__staff = {

@@ -25,11 +25,17 @@ const montserrat = Montserrat({ subsets: ['latin'], weight: ['500', '600'] })
 type IdleScreenProps = {
   // A small line at the bottom, such as the server status. Optional.
   footer?: React.ReactNode
+  // Something to show behind the waves, such as the hospital photos on the
+  // lock screen (Anthony, 2026-10-30). Optional.
+  behind?: React.ReactNode
 }
 
-export default function IdleScreen({ footer }: IdleScreenProps) {
+export default function IdleScreen({ footer, behind }: IdleScreenProps) {
   return (
     <main className={`${styles.screen} ${montserrat.className}`}>
+      {/* ===== 0. Optional layer behind everything (the lock screen photos) ===== */}
+      {behind ? <div className={styles.behind}>{behind}</div> : null}
+
       {/* ===== 1. The flowing waves, behind everything ===== */}
       <svg
         className={styles.waves}

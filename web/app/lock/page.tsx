@@ -4,7 +4,8 @@
  * Why: after 10 minutes without use, or when somebody taps "Lock screen",
  * the RHEMA idle screen covers the app (Anthony, 2026-10-28: the lock
  * screen uses the idle design). Tapping it opens the PIN card from the
- * demo: "Welcome back", 4 digits, Unlock.
+ * demo: "Welcome back", 4 digits, Unlock. Since 2026-10-30 the hospital
+ * photos float behind the idle screen, the same as on the sign in page.
  *
  * At a shared desk (Anthony, 2026-10-29) the card also lists the other
  * people signed in on this device. Each one taps their own name and types
@@ -19,6 +20,7 @@ import { useState } from 'react'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import IdleScreen from '@/components/IdleScreen'
 import PersonBadge from '@/components/auth/PersonBadge'
+import SignInPhotos from '@/components/auth/SignInPhotos'
 import styles from '@/components/auth/Auth.module.css'
 import { PIN_LENGTH } from '@/lib/auth/config'
 import { listAccounts, type DeviceAccount } from '@/lib/auth/device-accounts'
@@ -33,8 +35,9 @@ export default function LockPage() {
 
   return (
     <>
-      {/* ===== 1. The idle screen, until somebody taps it ===== */}
-      <IdleScreen footer={<span>Tap anywhere to unlock</span>} />
+      {/* ===== 1. The idle screen, until somebody taps it. The hospital
+          photos float behind it (Anthony, 2026-10-30). ===== */}
+      <IdleScreen footer={<span>Tap anywhere to unlock</span>} behind={<SignInPhotos />} />
       {!open ? (
         <button className={styles.tapArea} aria-label="Unlock" onClick={() => setOpen(true)} />
       ) : null}
