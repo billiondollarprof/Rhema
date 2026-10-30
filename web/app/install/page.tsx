@@ -11,6 +11,7 @@
  */
 'use client'
 
+import Logo from '@/components/brand/Logo'
 import Link from 'next/link'
 import { useState, useSyncExternalStore } from 'react'
 import InstallGuide from '@/components/onboarding/InstallGuide'
@@ -42,8 +43,8 @@ export default function InstallPage() {
 
   return (
     <main className={styles.page}>
-      <div className={card.badge} aria-hidden="true">
-        <span>RH</span>
+      <div className={`${card.badge} ${card.badgeLogo}`}>
+        <Logo size={58} />
       </div>
       <h1>Get RHEMA on every device</h1>
       <div className={card.explain}>

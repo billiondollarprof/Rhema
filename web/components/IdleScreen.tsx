@@ -3,13 +3,15 @@
  * is idle, and the holding screen at the root address for now.
  *
  * Why: Anthony's design (2026-10-28): deep blue, flowing light waves, the
- * hospital mark in a glowing ring, "RHEMA HOSPITAL" and "HOSPITAL OPERATIONS
+ * hospital mark in a glowing ring, the hospital's name and "HOSPITAL OPERATIONS
  * SYSTEM", gently animated with a shimmer. It is drawn in code (SVG and CSS),
  * not loaded as a picture, so it stays sharp on any screen, weighs almost
  * nothing, and can move.
  *
- * The "RH" mark is a stand in. When the hospital's real logo arrives, it
- * replaces the contents of section 3 only.
+ * Since 2026-10-30 (request 114) the ring holds the hospital's own logo,
+ * the name is RHEMA MEDICAL CENTRE, and a thin red line under it is one of
+ * the few red accents ("let the red be the accent, let the blue be the
+ * major color").
  *
  * Never: show patient data on this screen. It is what a passer by sees on
  * an unattended desk, so it shows the hospital's name and nothing else.
@@ -18,6 +20,7 @@
  */
 import { Montserrat } from 'next/font/google'
 import styles from './IdleScreen.module.css'
+import Logo from './brand/Logo'
 
 // Built into the app at build time, so no screen ever calls Google Fonts.
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['500', '600'] })
@@ -102,14 +105,16 @@ export default function IdleScreen({ footer, behind }: IdleScreenProps) {
       {/* ===== 2. Soft light at the top, like the design ===== */}
       <div className={styles.topGlow} aria-hidden="true" />
 
-      {/* ===== 3. The mark in its ring (swap for the real logo later) ===== */}
+      {/* ===== 3. The hospital's logo in its glowing ring ===== */}
       <div className={styles.centre}>
         <div className={styles.ring}>
-          <span className={styles.mark}>RH</span>
+          <Logo size={160} className={styles.logo} />
         </div>
 
         {/* ===== 4. The name, with the shimmer passing across it ===== */}
-        <h1 className={styles.name}>RHEMA HOSPITAL</h1>
+        <h1 className={styles.name}>RHEMA MEDICAL CENTRE</h1>
+        {/* A thin line in the hospital's red, as on its letterhead. */}
+        <span className={styles.redLine} aria-hidden="true" />
         <p className={styles.subtitle}>HOSPITAL OPERATIONS SYSTEM</p>
       </div>
 

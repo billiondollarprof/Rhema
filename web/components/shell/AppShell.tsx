@@ -1,7 +1,8 @@
 /*
  * components/shell/AppShell.tsx: the frame around every signed in screen.
  *
- * Why: the RHEMA demo's frame. A blue top bar with the person's badge,
+ * Why: the RHEMA demo's frame. A blue top bar with the hospital's logo, a
+ * thin red line under it (request 114), and the person's badge,
  * name and role, Lock screen and Sign out. Under it, the menu: a bar along
  * the bottom on a phone, a column down the left on a wider screen.
  *
@@ -30,6 +31,7 @@ import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
 import PersonBadge from '@/components/auth/PersonBadge'
+import Logo from '@/components/brand/Logo'
 import styles from './AppShell.module.css'
 import { roleLabel } from '@/lib/auth/roles'
 import { useAuth } from '@/lib/auth/session'
@@ -68,6 +70,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className={styles.app}>
         {/* ===== 2. Top bar ===== */}
         <header className={styles.top}>
+          <Logo size={34} className={styles.topLogo} />
           <PersonBadge name={staff.full_name} />
           <div className={styles.who}>
             <b>{staff.full_name}</b>

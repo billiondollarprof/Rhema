@@ -190,16 +190,6 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
-114. **The hospital's logo and real name, blue kept, a few red accents.**
-    (2026-10-30, sent the letterhead.) Name: RHEMA MEDICAL CENTRE, Former
-    License Office by Ojolu Junction, Sapele, Delta State, Nigeria. "Crop
-    out the logo and use the logo for where we have the... RH", in the
-    top bar, the app icon "when you download the app". "Keep blue. Blue
-    looks good... let the red be the accent... just a few places... maybe
-    at the top bar... red line as a divider." "Save my context window and
-    time. Focus our energy on something more important than color." To do
-    right after Admin (112). Letterhead kept in the chat uploads.
-
 ### Standing instructions
 
 These never come off the list.

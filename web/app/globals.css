@@ -12,6 +12,8 @@
   --bl: #1f5fd0;
   --grn: #2e7d5b;
   --red: #d32f2f;
+  /* The hospital's own red, from its letterhead. Accents only (request 114). */
+  --brand-red: #d9232d;
   --amb: #ef6c00;
 }
 

@@ -145,25 +145,15 @@ const ShareIcon = ({ x, y }: { x: number; y: number }) => (
 
 const RhemaIcon = ({ x, y, size = 30 }: { x: number; y: number; size?: number }) => (
   <g>
-    <rect x={x} y={y} width={size} height={size} rx={size * 0.24} fill="#0a2a5e" />
-    <circle
-      cx={x + size / 2}
-      cy={y + size / 2}
-      r={size * 0.3}
-      fill="none"
-      stroke="#fff"
-      strokeWidth="1.4"
+    {/* The app icon as it looks once installed: the hospital's logo on white. */}
+    <rect x={x} y={y} width={size} height={size} rx={size * 0.24} fill="#fff" stroke="#d5dde8" />
+    <image
+      href="/logo.webp"
+      x={x + size * 0.07}
+      y={y + size * 0.07}
+      width={size * 0.86}
+      height={size * 0.86}
     />
-    <text
-      x={x + size / 2}
-      y={y + size / 2 + size * 0.11}
-      textAnchor="middle"
-      fontSize={size * 0.3}
-      fontWeight="700"
-      fill="#fff"
-    >
-      RH
-    </text>
   </g>
 )
 

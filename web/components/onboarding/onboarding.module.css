@@ -74,6 +74,12 @@
   letter-spacing: 0.5px;
 }
 
+/* The hospital's logo in place of the old RH letters (request 114). */
+.badgeLogo {
+  background: #fff;
+  overflow: hidden;
+}
+
 .badgeRed {
   background: linear-gradient(135deg, #e53935, #c62828);
   box-shadow: 0 10px 22px -10px rgba(229, 57, 53, 0.8);

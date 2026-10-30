@@ -627,3 +627,20 @@ this file.
     database refuses sign ups without an invitation. Live and testing
     security checks: all five passed, 0 warnings. Sign ups switched on in
     both projects by Anthony.
+114. **The hospital's logo and real name, blue kept, a few red accents.**
+    (2026-10-30, sent the letterhead.) Name: RHEMA MEDICAL CENTRE, Former
+    License Office by Ojolu Junction, Sapele, Delta State, Nigeria. "Crop
+    out the logo and use the logo for where we have the... RH", in the
+    top bar, the app icon "when you download the app". "Keep blue. Blue
+    looks good... let the red be the accent... just a few places... maybe
+    at the top bar... red line as a divider." "Save my context window and
+    time. Focus our energy on something more important than color." To do
+    right after Admin (112). Letterhead kept in the chat uploads.
+    Done 2026-10-30: logo cut from the letterhead (web/public/logo.webp) in
+    the sign in card, the lock screen ring, the top bar, the install cards
+    and the install guide pictures; new app icons (192, 512, a maskable
+    512 for Android, Apple 180); name "Rhema Medical Centre" in the tab,
+    the installed app and the lock screen; red (#d9232d) only as a thin
+    line under the top bar and under the name on the lock screen. The
+    logo is cut from a 160 pixel copy, so it is slightly soft; a clean
+    file from the hospital would make it sharp.

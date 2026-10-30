@@ -27,6 +27,7 @@
 import { useEffect, useState } from 'react'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import PersonBadge from '@/components/auth/PersonBadge'
+import Logo from '@/components/brand/Logo'
 import SignInPhotos from '@/components/auth/SignInPhotos'
 import styles from '@/components/auth/Auth.module.css'
 import { CODE_LENGTH, PIN_LENGTH } from '@/lib/auth/config'
@@ -291,9 +292,7 @@ function Shell({
     <main className={styles.page}>
       <SignInPhotos />
       <section className={`${styles.card} ${styles.overPhotos}`}>
-        <div className={styles.mark} aria-hidden="true">
-          RH
-        </div>
+        <Logo size={72} className={styles.logo} />
         <h2>{title}</h2>
         {lead ? <p className={styles.lead}>{lead}</p> : null}
         {children}

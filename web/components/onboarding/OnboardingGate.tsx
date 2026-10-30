@@ -33,6 +33,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './onboarding.module.css'
+import Logo from '@/components/brand/Logo'
 import { alertsState, turnOnAlerts } from '@/lib/attention/push'
 import {
   canInstallNow,
@@ -187,8 +188,8 @@ export default function OnboardingGate({
         {/* ----- Install ----- */}
         {stage === 'install' ? (
           <>
-            <div className={styles.badge} aria-hidden="true">
-              <span>RH</span>
+            <div className={`${styles.badge} ${styles.badgeLogo}`}>
+              <Logo size={58} />
             </div>
             <h2 id="onboarding-title">Install RHEMA on this {device}</h2>
             <Explain
@@ -211,8 +212,8 @@ export default function OnboardingGate({
         {/* ----- Installed from this browser: now open the app ----- */}
         {stage === 'installed-elsewhere' ? (
           <>
-            <div className={styles.badge} aria-hidden="true">
-              <span>RH</span>
+            <div className={`${styles.badge} ${styles.badgeLogo}`}>
+              <Logo size={58} />
             </div>
             <h2 id="onboarding-title">RHEMA is installed</h2>
             <Explain
