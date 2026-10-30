@@ -420,3 +420,42 @@ this file.
     finished requests moved to docs/DONE.md. Skills built and each run
     once: ship, screens (with scripts/overflow-audit.cjs at last),
     new-migration, switch-role.
+97. **Call attention: a floating alert with a bell, now, not later.**
+    (2026-10-29) "Once that attention is needed, even if they are doing
+    something on the computer, it can float immediately... with the X to
+    remove it... it doesn't affect what they are doing. If they were
+    typing, it just floats in." Sound: "the ringing bell sound. Kring!",
+    on the phone and on the computer. "This one is not a future feature.
+    This one is part of what we are doing now." Build with notifications:
+    a card that floats in a corner without taking the cursor, a bell
+    sound in the app, a phone or computer notification (push) when the
+    app is in the background. Told him: a push notification uses the
+    device's own notification sound, the custom bell plays when the app
+    is open; and a browser only plays sound after the person has touched
+    the page once (signing in counts).
+    **Step 1 LIVE 2026-10-29** (see docs/DONE.md, 97b to 97f).
+    **Step 2, push when the app is closed:** "yes" 2026-10-29. Built:
+    migration 20261029200000_push_devices.sql (device table; add and
+    remove your own device; a trigger sends through pg_net to the Worker,
+    with a secret from Vault), 8 tests on a real Supabase, deliberate
+    breaks all caught; the Worker encrypts and signs each push (10 tests);
+    sw.js, manifest and icons; a "Turn on" line in the Call attention list;
+    signing out removes you from the device; push-keys.yml makes the keys.
+    "Should run them and validate them" 2026-10-29: applied to testing,
+    but the advisor shows 1 new warning (pg_net in the public schema). The
+    check printed it and still said passed: fixed, a new warning now fails
+    the run. Fix migration 20261029210000_pg_net_schema.sql (switch pg_net
+    off and on again inside "extensions") is ready, CI green on the
+    feature branch. "yes" 2026-10-29: pg_net moved; testing and live both
+    0 warnings. LIVE 2026-10-29 (database and screens); the live site has
+    no keys yet, so it sends nothing until push-keys runs for live.
+    Testing keys made 2026-10-29 (push-keys run 40975381246; the Worker
+    refuses a wrong secret). Tool testing-ring.yml made, to ring his phone
+    from a made up "Test Caller". PHONE TEST PASSED 2026-10-30 on his
+    Android, app closed and screen locked (testing-ring run 40992134202:
+    Worker "sent 1, gone 0, failed 0"; he got the alert). His note: "it
+    used my own phone's default notification tone... not really that loud...
+    I even thought it would have one kind serious ring" (see 105).
+    Live keys: Anthony ran push-keys for live himself 2026-10-30 (run
+    40995882870; the Worker check passed: key served, wrong secret
+    refused). DONE 2026-10-30.
