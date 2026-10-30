@@ -57,7 +57,13 @@ const LABORATORY: Action[] = [
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const ADMIN: Action[] = [
-  { icon: 'users', label: 'Invite staff', colour: '#546e7a', ready: false, job: SOON },
+  {
+    icon: 'users',
+    label: 'Invite staff',
+    colour: '#546e7a',
+    ready: true,
+    job: '/admin/?tab=invite',
+  },
   { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },

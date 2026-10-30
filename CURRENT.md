@@ -213,6 +213,16 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
+114. **The hospital's logo and real name, blue kept, a few red accents.**
+    (2026-10-30, sent the letterhead.) Name: RHEMA MEDICAL CENTRE, Former
+    License Office by Ojolu Junction, Sapele, Delta State, Nigeria. "Crop
+    out the logo and use the logo for where we have the... RH", in the
+    top bar, the app icon "when you download the app". "Keep blue. Blue
+    looks good... let the red be the accent... just a few places... maybe
+    at the top bar... red line as a divider." "Save my context window and
+    time. Focus our energy on something more important than color." To do
+    right after Admin (112). Letterhead kept in the chat uploads.
+
 ### Standing instructions
 
 These never come off the list.
@@ -234,6 +244,11 @@ These never come off the list.
     already in CLAUDE.md; he asked for it to continue.
 
 ### Decided
+
+- 2026-10-30: Invites use option A: Supabase "allow new users to sign up"
+  is on, and a database rule refuses any new email without a waiting
+  invitation under 72 hours old. No server key anywhere. He switched the
+  setting on himself the same day (screenshot, project "RHEMA MEDICALS").
 
 - 2026-10-30: Backup goes to a second Cloudflare account, not Google
   Drive. "I think second Cloudflare is better than Google Drive for

@@ -26,6 +26,15 @@ begin
   end if;
 end $$;
 
+-- Supabase's sign in service connects as supabase_auth_admin and adds
+-- every new sign in account to auth.users (Admin invites, 2026-10-30).
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'supabase_auth_admin') then
+    create role supabase_auth_admin nologin;
+  end if;
+end $$;
+
 create schema if not exists auth;
 -- Supabase keeps add-ons such as pgcrypto in a schema called extensions.
 create schema if not exists extensions;
@@ -51,6 +60,8 @@ as $$
 $$;
 
 grant execute on function auth.uid() to anon, authenticated, service_role;
+grant usage on schema auth to supabase_auth_admin;
+grant select, insert on auth.users to supabase_auth_admin;
 
 -- Supabase gives every new table in public full rights for these roles.
 -- Doing the same here means a migration that forgets "revoke all" fails on
