@@ -30,7 +30,7 @@ it goes live without asking again. This skill is that rule as steps.
 3. **If there was a migration, read the testing security line.** Open the
    log of the `Database (testing)` job (job id printed in step 2) with the
    GitHub tool `get_job_logs` (`return_content: true`, `tail_lines: 40`).
-   It must say `Security warnings: 0` and `All four checks passed.`
+   It must say `Security warnings: 0` and `All five checks passed.`
 4. **Red anywhere: stop.** Read the failed job's log, find the cause, fix
    it, and go back to step 1. Never switch a check off or skip a test. If
    the cause is outside this change, tell Anthony.

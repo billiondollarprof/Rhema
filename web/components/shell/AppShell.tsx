@@ -15,6 +15,8 @@
  * install and alerts cards each device goes through once
  * (components/onboarding).
  *
+ * A person with admin access also gets Admin in the menu (request 112).
+ *
  * Never: show patient data in the frame itself. It is on every screen.
  */
 'use client'
@@ -39,6 +41,10 @@ const MENU = [
   { href: '/messages/', icon: 'msg', label: 'Messages', ready: false },
   { href: '/notifications/', icon: 'bell', label: 'Notifications', ready: false },
 ]
+
+// Only for a person with admin access (request 112). The database checks
+// it again on every read and change.
+const ADMIN_ITEM = { href: '/admin/', icon: 'shield', label: 'Admin', ready: true }
 
 // Home is lit only on Home; any other item is lit on its own pages too
 // (Patients stays lit on Register and Edit).
@@ -86,7 +92,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className={styles.body}>
           {/* ===== 3. Menu ===== */}
           <nav className={styles.nav} aria-label="Main menu">
-            {MENU.map((item) =>
+            {(staff.can_admin ? [...MENU, ADMIN_ITEM] : MENU).map((item) =>
               item.ready ? (
                 <Link
                   key={item.href}

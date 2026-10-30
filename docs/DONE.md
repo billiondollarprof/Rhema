@@ -582,3 +582,13 @@ this file.
     slideshow behind the sign in card (components/auth/SignInPhotos.tsx),
     blue wash, slow drift and zoom, 6 seconds each, cross-fade. Live
     2026-10-30 (commit 58348d3), all checks green, smoke test passed.
+111. **Photos on the lock screen too, and a real float, not a switch.**
+    (2026-10-30) "Before the admin, I think you should do it for the lock
+    screen because that's where they will also see it all the time... the
+    image is not really animated. It's not floating... slight zoom in, zoom
+    out... It's just switching instantly. It should be soft... not just a
+    slideshow, but just animating and changing." Then: "yes, start number
+    2, admin". Built 2026-10-30: photos behind the lock screen's waves and
+    name; each photo zooms and drifts the whole 9.5 seconds it is seen,
+    fades over 2.5 seconds. Live 2026-10-30, all checks green, smoke test
+    passed.

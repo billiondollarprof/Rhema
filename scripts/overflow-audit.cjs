@@ -27,6 +27,10 @@ const SCREENS = [
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
   { path: '/install/', waitFor: 'Get RHEMA on every device' },
+  { path: '/admin/', waitFor: 'Tap a name', admin: true },
+  { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
+  { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },
+  { path: '/admin/?tab=activity', waitFor: 'activities today', admin: true },
 ]
 
 // ===== 2. Walk them all =====
@@ -38,6 +42,7 @@ const SCREENS = [
     await signIn(context, {
       role: screen.medical ? 'nurse' : 'front_desk',
       medical: Boolean(screen.medical),
+      admin: Boolean(screen.admin),
     })
     const page = await context.newPage()
     await mockSupabase(page)

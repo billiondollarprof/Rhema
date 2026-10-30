@@ -21,12 +21,26 @@ MAILPIT="${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}"
 test -n "$KEY" && test -n "$SECRET" || { echo "Local keys not found"; exit 1; }
 
 # ===== 2. Two made up nurses and a front desk: a sign in account each, then a staff row =====
+# Only an invited email can get a sign in account (Admin, 2026-10-30), so
+# each one is invited first. invited1 is left waiting: the walk through
+# signs in with it from the invitation link.
+psql "$DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+insert into public.staff_invites (email, full_name, role) values
+  ('nurse1@test.rhema',   'Test Nurse One',    'nurse'),
+  ('nurse2@test.rhema',   'Test Nurse Two',    'nurse'),
+  ('desk1@test.rhema',    'Test Desk One',     'front_desk'),
+  ('invited1@test.rhema', 'Test Invited One',  'laboratory');
+SQL
 for who in nurse1 nurse2 desk1; do
   curl -fsS -X POST "$API_URL/auth/v1/admin/users" \
     -H "apikey: $SECRET" -H "Authorization: Bearer $SECRET" -H "Content-Type: application/json" \
     -d "{\"email\":\"$who@test.rhema\",\"email_confirm\":true}" > /dev/null
 done
 psql "$DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+-- These three are set up by hand below, so their invitations are used.
+update public.staff_invites set status = 'accepted', accepted_at = now()
+where email in ('nurse1@test.rhema', 'nurse2@test.rhema', 'desk1@test.rhema');
+
 insert into public.staff (id, full_name, email, role)
 select id, case email when 'nurse1@test.rhema' then 'Test Nurse One' else 'Test Nurse Two' end, email, 'nurse'
 from auth.users where email in ('nurse1@test.rhema', 'nurse2@test.rhema');

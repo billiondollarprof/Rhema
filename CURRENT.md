@@ -179,15 +179,54 @@ Numbers are kept from the full list, so older notes still match.
     Done 2026-10-30: CARDS_PAUSED = true in OnboardingGate.tsx.
     HANDOVER LIST: set CARDS_PAUSED to false once sign in uses the 6 digit
     code (Resend, 6 November), and walk the cards through once more.
-111. **Photos on the lock screen too, and a real float, not a switch.**
-    (2026-10-30) "Before the admin, I think you should do it for the lock
-    screen because that's where they will also see it all the time... the
-    image is not really animated. It's not floating... slight zoom in, zoom
-    out... It's just switching instantly. It should be soft... not just a
-    slideshow, but just animating and changing." Then: "yes, start number
-    2, admin". Built 2026-10-30: photos behind the lock screen's waves and
-    name; each photo zooms and drifts the whole 9.5 seconds it is seen,
-    fades over 2.5 seconds. Going live.
+    HANDOVER LIST (6 November, with Resend): put the sign in code wording
+    (supabase/templates/magic_link.html) into BOTH hosted templates, "Magic
+    link" and "Confirm signup", because an invited person's first code
+    comes in the Confirm signup email. Then send the invitation and the
+    "your account is back on" emails through Resend (request 112).
+112. **Admin (build step 7): invite staff, staff list, rooms, activity
+    log.** (2026-10-30) His words, in order:
+    - Invite: "they get a one-time link by email. But whether or not they
+      click through the link, as long as they log in using that same email
+      that was invited... if they click through the link... the email is
+      already pasted there... some sort of like a deep link... if they do
+      not click the link, they can still type in the email as long as the
+      email has been activated."
+    - "72 hours instead of 48 hours for expiry... otherwise it expires and
+      the admin will see that this invitation has expired." An expired
+      invite can be sent again.
+    - "An admin can revoke... If admin revoke somebody, he can still add
+      that same person back."
+    - "The admin can change anybody's room or access and can switch a
+      person off. A switched off person can't sign in."
+    - Suspend and revoke are two things: "suspend does not mean the person
+      will have to get a new invitation." Unsuspended: "they might get an
+      email... that their account has been unsuspended." Suspended or
+      revoked: no email. Revoked: "can be re-added, and if they are
+      re-added, it means they are coming in again to start the account
+      again."
+    - "Those actions will always go with the pin, the admin's pin... the
+      same pin they are using to log in."
+    - Rooms: add and rename. Activity log: as the demo (per staff member,
+      signed in, signed out, time online, what they did).
+    - "Super simple system to use... easy flow."
+    - Asked: does the admin enter the server key? Answer: no, never.
+    - Asked to confirm the code is modular and healthy.
+113. **HANDOVER LIST: delete the test accounts once the hospital is up,
+    but keep his own account as a master account** "that I can use
+    remotely to be monitoring... during debugging." (2026-10-30) Needs a
+    plain word with the director, because that account can see patient
+    records (NDPA).
+
+114. **The hospital's logo and real name, blue kept, a few red accents.**
+    (2026-10-30, sent the letterhead.) Name: RHEMA MEDICAL CENTRE, Former
+    License Office by Ojolu Junction, Sapele, Delta State, Nigeria. "Crop
+    out the logo and use the logo for where we have the... RH", in the
+    top bar, the app icon "when you download the app". "Keep blue. Blue
+    looks good... let the red be the accent... just a few places... maybe
+    at the top bar... red line as a divider." "Save my context window and
+    time. Focus our energy on something more important than color." To do
+    right after Admin (112). Letterhead kept in the chat uploads.
 
 ### Standing instructions
 
@@ -210,6 +249,17 @@ These never come off the list.
     already in CLAUDE.md; he asked for it to continue.
 
 ### Decided
+
+- 2026-10-30: Invites use option A: Supabase "allow new users to sign up"
+  is on, and a database rule refuses any new email without a waiting
+  invitation under 72 hours old. No server key anywhere. He switched the
+  setting on himself the same day, on both projects (screenshots of
+  Rhema-testing and RHEMA MEDICALS). He said "yes, run the batch" for the
+  staff_invites migration the same day.
+
+- 2026-10-30: Backup goes to a second Cloudflare account, not Google
+  Drive. "I think second Cloudflare is better than Google Drive for
+  backup." Not ready yet: AWS and the second Cloudflare account.
 
 - **One chat, not a new chat per feature.** (2026-10-29) "I don't want to
   be using new chats. I want to be doing my work in one chat." CLAUDE.md

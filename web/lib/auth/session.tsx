@@ -21,6 +21,11 @@
  * Never: keep patient data here, and never decide what a person may see
  * from this state. It only decides which screen to show. What a person may
  * read is decided by RLS in the database, whatever this file says.
+ *
+ * Since Admin (request 112, 2026-10-30): a code can be asked for by any
+ * email, and the database refuses one with no waiting invitation. The
+ * first sign in uses the invitation. The app also tells the database when
+ * a person is using it, for the admin's activity log.
  */
 'use client'
 
@@ -106,7 +111,14 @@ function codeErrorMessage(code: string | undefined, fallback: string): string {
   if (code === 'email_address_not_authorized') {
     return 'This email cannot get codes yet. Until the hospital email is connected, only the main hospital address can sign in.'
   }
-  if (code === 'otp_disabled' || code === 'signup_disabled' || code === 'user_not_found') {
+  // unexpected_failure (or a bare 500): the database refused an email with
+  // no waiting invitation.
+  if (
+    code === 'otp_disabled' ||
+    code === 'signup_disabled' ||
+    code === 'user_not_found' ||
+    code === 'unexpected_failure'
+  ) {
     return 'We could not send a code to that email. Check it is the email your administrator invited.'
   }
   if (code === 'otp_expired') {
@@ -181,6 +193,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const finishSignIn = useCallback(
     async (session: Session): Promise<string | null> => {
       const personClient = await adoptSession(session)
+      // A first sign in after an invitation turns it into a staff account
+      // (Admin, request 112). Anybody else: nothing changes.
+      await personClient.rpc('accept_my_invite')
       const member = await loadStaff(personClient, session.user.id)
       if (!member) {
         await signOutHere(session.user.id, null)
@@ -265,12 +280,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [status, account])
 
+  // ----- 3f. Signed in and signed out times, for the activity log -----
+  // While a person uses the app, it tells the database "seen" every 3
+  // minutes. Locking, signing out or switching person ends the stretch.
+  useEffect(() => {
+    if (status !== 'ready' || !client) return
+    // A Supabase request only goes out once .then() is called on it.
+    const tell = (kind: string) => client.rpc('note_presence', { kind }).then(() => undefined)
+    const seen = () => tell('seen')
+    seen()
+    const timer = window.setInterval(seen, 3 * 60 * 1000)
+    return () => {
+      window.clearInterval(timer)
+      tell('end')
+    }
+  }, [status, client])
+
   // ===== 4. The actions screens can call =====
   const requestCode = useCallback(async (email: string) => {
     const { error } = await pendingClient().auth.signInWithOtp({
       email,
       options: {
-        shouldCreateUser: false,
+        // On, because an invited person has no sign in account yet. The
+        // database refuses any email without a waiting invitation.
+        shouldCreateUser: true,
         emailRedirectTo: `${window.location.origin}/sign-in/`,
       },
     })
@@ -278,7 +311,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // The error code only, never the email, so the browser log holds no
     // personal details.
     console.warn(`Sign in code request refused: ${error.code ?? error.status}`)
-    return codeErrorMessage(error.code, 'The code could not be sent. Try again.')
+    // The database refusing an email with no invitation comes back as a
+    // bare 500 with no code.
+    const code = error.code ?? (error.status === 500 ? 'unexpected_failure' : undefined)
+    return codeErrorMessage(code, 'The code could not be sent. Try again.')
   }, [])
 
   const verifyCode = useCallback(

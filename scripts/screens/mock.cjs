@@ -51,7 +51,14 @@ const PATIENT = {
 // ===== 2. A signed in person in the browser (unlocked unless locked: true) =====
 async function signIn(
   context,
-  { name = 'Chioma Eze', role = 'front_desk', roomId = 1, medical = false, locked = false } = {},
+  {
+    name = 'Chioma Eze',
+    role = 'front_desk',
+    roomId = 1,
+    medical = false,
+    locked = false,
+    admin = false,
+  } = {},
 ) {
   const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url')
   const exp = Math.floor(Date.now() / 1000) + 3600
@@ -94,7 +101,7 @@ async function signIn(
     id: STAFF_ID,
     full_name: name,
     role,
-    can_admin: false,
+    can_admin: admin,
     can_medical: medical,
     room_id: room?.id ?? null,
     room: room ? { name: room.name, kind: room.kind } : null,
@@ -126,7 +133,9 @@ async function mockSupabase(page, extra = {}) {
       return json([], 201)
     }
     if (url.includes('/rest/v1/staff') && url.includes('room_id=not.is.null')) return json([])
-    if (url.includes('/rest/v1/staff')) return json(staff)
+    // One person (the signed in one), or the staff list on the Admin page.
+    if (url.includes('/rest/v1/staff') && !url.includes('staff_'))
+      return json(single ? staff : [{ ...staff, email: 'made-up@example.com', is_active: true }])
     if (url.includes('/rest/v1/rooms')) return json(ROOMS)
     if (url.includes('/rest/v1/patients')) return json(single ? PATIENT : [PATIENT])
     if (url.includes('/auth/v1/user')) return json({ id: STAFF_ID })

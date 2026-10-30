@@ -3,6 +3,9 @@
  *
  * What it does: against a throwaway Supabase (started by CI) and the built
  * app, it walks through sign in as two made up nurses at one shared desk:
+ *   0. A stranger is refused. An invited person opens the invitation link,
+ *      finds the email typed in, signs in, chooses a PIN and reaches Home
+ *      (Admin, 2026-10-30).
  *   1. Nurse One signs in with an email code (read from the local mailbox
  *      that the throwaway Supabase sends to), and chooses a PIN.
  *   2. She locks the screen, types a wrong PIN, then the right one.
@@ -134,6 +137,28 @@ try {
   await page.getByRole('button', { name: 'Send me a code' }).click()
   await page.getByText('We could not send a code to that email').waitFor()
   await shot(page, 'sign-in-unknown-email')
+
+  step('An invited person opens the invitation link: the email is already typed in')
+  await page.goto(`${APP}/sign-in/#email=${encodeURIComponent('invited1@test.rhema')}`)
+  await page.getByText('Use the account your administrator created for you.').waitFor()
+  const filled = await page.getByLabel('Work email').inputValue()
+  if (filled !== 'invited1@test.rhema') throw new Error(`The link filled in "${filled}"`)
+  await clearMailbox()
+  await page.getByRole('button', { name: 'Send me a code' }).click()
+  await page.getByText('Enter your code').waitFor()
+  await typeDigits(page, 'Email code', await latestCode('invited1@test.rhema'))
+
+  step('The invitation becomes a staff account: PIN, then Home')
+  await choosePin(page, '2580')
+  await expectHome(page, 'Test Invited One')
+  await shot(page, 'home-invited-one')
+  await page.getByRole('button', { name: 'Sign out' }).click()
+  await page.getByText('Use the account your administrator created for you.').waitFor()
+
+  step('A stranger is still refused after that')
+  await page.getByLabel('Work email').fill('stranger@test.rhema')
+  await page.getByRole('button', { name: 'Send me a code' }).click()
+  await page.getByText('We could not send a code to that email').waitFor()
   await page.goto(`${APP}/sign-in/`)
 
   step('Nurse One signs in with a real email code')

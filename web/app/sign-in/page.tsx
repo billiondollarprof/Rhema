@@ -10,6 +10,9 @@
  *   3. Code             they type the 6 digit code from the email.
  *   4. First PIN        the first time, they choose a 4 digit PIN.
  *
+ * An invitation link opens step 2 with the email already typed in. Typing
+ * the email by hand works the same, as long as it was invited.
+ *
  * Until the hospital's own email sender is connected (planned for
  * 6 November), Supabase's email carries a sign in link instead of a code.
  * Opening that link on this device signs the person in too.
@@ -21,7 +24,7 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import PersonBadge from '@/components/auth/PersonBadge'
 import SignInPhotos from '@/components/auth/SignInPhotos'
@@ -34,15 +37,42 @@ import { useAuth } from '@/lib/auth/session'
 
 type Step = 'choose' | 'email' | 'code'
 
+// The invitation link carries the email after a # (sign-in/#email=...), so
+// the person arrives with it already typed in (Anthony, 2026-10-30).
+function emailFromLink(): string {
+  if (typeof window === 'undefined') return ''
+  const match = window.location.hash.match(/(?:^#|&)email=([^&]+)/)
+  return match ? decodeURIComponent(match[1]) : ''
+}
+
 export default function SignInPage() {
   const auth = useAuth()
   useRightPage(auth.status, '/sign-in/')
 
-  const [chosenStep, setStep] = useState<Step>('choose')
-  const [email, setEmail] = useState('')
+  const [linkEmail] = useState(emailFromLink)
+  const [chosenStep, setStep] = useState<Step>(linkEmail ? 'email' : 'choose')
+  const [email, setEmail] = useState(linkEmail)
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Take the email out of the address once it is in the box, so it does
+  // not stay in the browser's history. If the link is opened while this
+  // page is already open in the same tab, only the # changes, so listen
+  // for that too.
+  useEffect(() => {
+    const forget = () => window.history.replaceState(null, '', window.location.pathname)
+    if (linkEmail) forget()
+    function linkOpened() {
+      const found = emailFromLink()
+      if (!found) return
+      setEmail(found)
+      setStep('email')
+      forget()
+    }
+    window.addEventListener('hashchange', linkOpened)
+    return () => window.removeEventListener('hashchange', linkOpened)
+  }, [linkEmail])
 
   if (auth.status === 'loading') return <div className={styles.page} />
 

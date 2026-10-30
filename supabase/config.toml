@@ -175,8 +175,10 @@ enable_refresh_token_rotation = true
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-# Off, as on the hosted projects: only staff the admin invites get in.
-enable_signup = false
+# On, as on the hosted projects since 2026-10-30 (Admin, option A). The
+# database refuses every new email without a waiting invitation
+# (rhema_only_invited_sign_ups on auth.users), so only invited staff get in.
+enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
 enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
@@ -252,6 +254,12 @@ otp_expiry = 600
 # once the hospital's own email sender (Resend) is connected, because
 # Supabase only lets you edit templates after that.
 [auth.email.template.magic_link]
+subject = "Your RHEMA sign in code"
+content_path = "./supabase/templates/magic_link.html"
+
+# An invited person's very first code comes in the "confirm sign up" email
+# (Admin, 2026-10-30), so it carries the same code and the same words.
+[auth.email.template.confirmation]
 subject = "Your RHEMA sign in code"
 content_path = "./supabase/templates/magic_link.html"
 
