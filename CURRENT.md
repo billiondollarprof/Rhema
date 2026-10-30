@@ -253,7 +253,9 @@ These never come off the list.
 - 2026-10-30: Invites use option A: Supabase "allow new users to sign up"
   is on, and a database rule refuses any new email without a waiting
   invitation under 72 hours old. No server key anywhere. He switched the
-  setting on himself the same day (screenshot, project "RHEMA MEDICALS").
+  setting on himself the same day, on both projects (screenshots of
+  Rhema-testing and RHEMA MEDICALS). He said "yes, run the batch" for the
+  staff_invites migration the same day.
 
 - 2026-10-30: Backup goes to a second Cloudflare account, not Google
   Drive. "I think second Cloudflare is better than Google Drive for
