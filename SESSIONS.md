@@ -114,3 +114,9 @@ build from the RHEMA demo and the proposal.
   found Request lab hidden in a folded section; it moved to the header.
   Backup choice: second Cloudflare account with a new Gmail (116). He made
   the R2 buckets rhema-files and rhema-files-testing (7 day delete rule).
+
+- 2026-10-30, Laboratory slice 2 live (115 done): attach a photo or PDF
+  per test; photos shrunk to 2000 px WebP in the phone; the Worker stores
+  only for the Laboratory tick and serves only when the database lets the
+  person read the result; testing and live have their own R2 buckets
+  (wrangler env "testing"). He is making the backup account's R2 key.

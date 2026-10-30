@@ -192,29 +192,6 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
-115. **Laboratory (build step 5).** (2026-10-30) "do the laboratory."
-    Follows docs/DATABASE.md section 9 and requests 58 to 60. His answers
-    to the say back (2026-10-30):
-    - "Front desk usually add amount paid in naira not just tap paid and
-      they also add mode of payment just like during registration."
-    - "We can build the attach result infra now, also make sure that the
-      attached files is usually compressed without affecting the quality
-      of the document. PDF for a few pages is usually a few KBs."
-    - "The results should just be part of the patient's record/med
-      history, you only send a copy when a person requested for it so you
-      send to the person/notify the person while recording it into the
-      patients record simultaneously."
-    Slice 1 built 2026-10-30 (request, payment, results, alert); all
-    checks green on a throwaway Supabase. "Yes, run the lab SQL"
-    (2026-10-30). Buckets rhema-files and rhema-files-testing made by him,
-    the testing one deletes files after 7 days.
-    Slice 1 LIVE 2026-10-30 (merge 2a5fdaa): testing and live databases
-    took it, 0 warnings, all five checks passed; the real walk through
-    passed on testing. Slice 2 (attached files) built 2026-10-30: photos
-    shrunk in the phone to 2000 px WebP (a 3 MB printout photo became
-    192 KB and stays readable), PDFs as they are, 10 MB at most; the
-    Worker checks the Laboratory tick to store and the database to open.
-    "Go on the slides too" (2026-10-30) read as "go on slice two". Slice 2 next: attached result files, compressed.
 116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
     "Is it better we use an encrypted Google drive since it's 15gb... Or
     we can use GCP... I think we should just use Cloudflare now. That means
