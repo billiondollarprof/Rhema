@@ -179,6 +179,11 @@ Numbers are kept from the full list, so older notes still match.
     Done 2026-10-30: CARDS_PAUSED = true in OnboardingGate.tsx.
     HANDOVER LIST: set CARDS_PAUSED to false once sign in uses the 6 digit
     code (Resend, 6 November), and walk the cards through once more.
+    HANDOVER LIST (6 November, with Resend): put the sign in code wording
+    (supabase/templates/magic_link.html) into BOTH hosted templates, "Magic
+    link" and "Confirm signup", because an invited person's first code
+    comes in the Confirm signup email. Then send the invitation and the
+    "your account is back on" emails through Resend (request 112).
 112. **Admin (build step 7): invite staff, staff list, rooms, activity
     log.** (2026-10-30) His words, in order:
     - Invite: "they get a one-time link by email. But whether or not they
