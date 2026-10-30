@@ -27,6 +27,7 @@ import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
 import { DosesSection, MedicationsSection } from './_parts/Medications'
+import LabSection from './_parts/Lab'
 import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
 import styles from './_parts/record.module.css'
 import buttons from '../_parts/patients.module.css'
@@ -101,9 +102,17 @@ function PatientRecord() {
   if (auth.status !== 'ready' || !client || !staff) return null
 
   const back = id ? (
-    <Link className={buttons.button} href={`/patients/?p=${id}`}>
-      Back to patient
-    </Link>
+    <>
+      {/* Always in view, so a lab request never hides in a folded section. */}
+      {allowed && patient ? (
+        <Link className={`${buttons.button} ${buttons.primary}`} href={`/lab/request/?p=${id}`}>
+          Request lab
+        </Link>
+      ) : null}
+      <Link className={buttons.button} href={`/patients/?p=${id}`}>
+        Back to patient
+      </Link>
+    </>
   ) : null
 
   // ===== 3. The reasons the record cannot be shown =====
@@ -145,6 +154,7 @@ function PatientRecord() {
                 <VitalsSection {...props} />
                 <NursingNotesSection {...props} />
                 <ConsultationsSection {...props} />
+                <LabSection client={client} patientId={props.patientId} />
               </div>
               <div className={styles.column}>
                 <AllergiesSection {...props} />

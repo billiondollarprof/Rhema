@@ -30,14 +30,15 @@ self.addEventListener('push', (event) => {
       if (onScreen) return undefined
       return self.registration.showNotification(message.title, {
         body: message.body,
-        tag: `attention-${message.call_id}`,
+        // A lab result brings its own tag; a call uses its number.
+        tag: message.tag || `attention-${message.call_id}`,
         renotify: true,
         requireInteraction: true,
         // A strong pattern, so it is felt in a pocket (Android only).
         vibrate: [400, 150, 400, 150, 800],
         icon: '/icon-192.png',
         badge: '/badge-96.png',
-        data: { url: '/' },
+        data: { url: message.url || '/' },
       })
     }),
   )
@@ -48,9 +49,13 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      // The screen the notification points at, e.g. the patient's record.
+      const target = (event.notification.data && event.notification.data.url) || '/'
       const open = windows.find((w) => 'focus' in w)
-      if (open) return open.focus()
-      return self.clients.openWindow('/')
+      if (open) {
+        return open.focus().then((focused) => (target !== '/' ? focused.navigate(target) : focused))
+      }
+      return self.clients.openWindow(target)
     }),
   )
 })

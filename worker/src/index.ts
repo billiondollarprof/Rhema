@@ -9,7 +9,7 @@
  * `wrangler secret put` or from GitHub Actions. Never log patient details,
  * push addresses or keys.
  */
-import { sendToAll, type Device } from './push'
+import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
 export interface Env {
@@ -64,7 +64,14 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
     if (!(await sameSecret(request.headers.get('X-Rhema-Push-Secret') ?? '', env.PUSH_SECRET))) {
       return Response.json({ error: 'Not allowed' }, { status: 401 })
     }
-    let message: { call_id?: unknown; title?: unknown; body?: unknown; targets?: unknown }
+    let message: {
+      call_id?: unknown
+      title?: unknown
+      body?: unknown
+      tag?: unknown
+      url?: unknown
+      targets?: unknown
+    }
     try {
       message = await request.json()
     } catch {
@@ -92,6 +99,10 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
         title: typeof message.title === 'string' ? message.title : 'Call attention',
         body: message.body,
         call_id: message.call_id,
+        // A lab result (2026-10-30) brings its own tag and the screen to open.
+        // Only short plain tags and paths inside this app pass.
+        tag: safeTag(message.tag),
+        url: safeAppPath(message.url),
       },
       {
         publicKey: env.VAPID_PUBLIC_KEY,

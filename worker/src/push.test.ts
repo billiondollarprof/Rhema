@@ -3,7 +3,16 @@
 // make, then checks it can open the message and trust the signature.
 import { describe, expect, it } from 'vitest'
 import { handleApi } from './index'
-import { encryptFor, fromBase64Url, sendToAll, toBase64Url, vapidHeader, type Bytes } from './push'
+import {
+  encryptFor,
+  fromBase64Url,
+  safeAppPath,
+  safeTag,
+  sendToAll,
+  toBase64Url,
+  vapidHeader,
+  type Bytes,
+} from './push'
 
 const encoder = new TextEncoder()
 const text = (words: string): Bytes => new Uint8Array(encoder.encode(words))
@@ -200,5 +209,25 @@ describe('push routes', () => {
       VAPID_PUBLIC_KEY: 'public-part',
     })
     expect(await response.json()).toEqual({ publicKey: 'public-part' })
+  })
+})
+
+// ===== The tag and the screen a lab result alert may carry (2026-10-30) =====
+describe('safeAppPath and safeTag', () => {
+  it('keeps a path inside the app', () => {
+    expect(safeAppPath('/patients/record/?p=12')).toBe('/patients/record/?p=12')
+    expect(safeAppPath('/')).toBe('/')
+  })
+  it('refuses anything that leaves the app', () => {
+    expect(safeAppPath('//evil.example/x')).toBeUndefined()
+    expect(safeAppPath('https://evil.example')).toBeUndefined()
+    expect(safeAppPath('javascript:alert(1)')).toBeUndefined()
+    expect(safeAppPath('/a b')).toBeUndefined()
+    expect(safeAppPath(42)).toBeUndefined()
+  })
+  it('keeps a short plain tag only', () => {
+    expect(safeTag('lab-12')).toBe('lab-12')
+    expect(safeTag('Lab 12')).toBeUndefined()
+    expect(safeTag('x'.repeat(41))).toBeUndefined()
   })
 })

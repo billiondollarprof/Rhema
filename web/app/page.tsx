@@ -7,7 +7,9 @@
  *   3. the four quick action buttons for this role;
  *   4. today's count tiles;
  *   5. the "Patients seen" chart;
- *   6. the queue card for this role.
+ *   6. the queue card for this role;
+ *   7. the Laboratory card: payments, tests to do, or results ready
+ *      (request 115).
  * The parts live in app/_home/, one file each. The data code is shared, in
  * lib/queue/queue.ts.
  *
@@ -23,6 +25,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import AppShell from '@/components/shell/AppShell'
 import CountTiles from './_home/CountTiles'
+import LabCard from './_home/LabCard'
 import QueueCard from './_home/QueueCard'
 import QuickActions from './_home/QuickActions'
 import SeenChart from './_home/SeenChart'
@@ -113,6 +116,7 @@ export default function HomePage() {
         <CountTiles counts={counts} />
         <SeenChart client={client} />
         <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
+        <LabCard client={client} staff={staff} />
       </div>
     </AppShell>
   )

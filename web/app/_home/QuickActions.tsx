@@ -20,6 +20,8 @@ import styles from './home.module.css'
 type Action = { icon: string; label: string; colour: string; ready: boolean; job: string }
 
 const QUEUE = 'queue'
+// Scrolls to the Laboratory card (request 115).
+const LAB = 'lab'
 const SOON = 'soon'
 // Opens the Call attention list in the top bar, not a page.
 const ATTENTION = 'attention'
@@ -35,7 +37,7 @@ const FRONT_DESK: Action[] = [
 const DOCTOR: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#1976d2', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
-  { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: false, job: SOON },
+  { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: true, job: '/lab/request/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const NURSE: Action[] = [
@@ -51,7 +53,7 @@ const PHARMACY: Action[] = [
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const LABORATORY: Action[] = [
-  { icon: 'lab', label: 'Lab requests', colour: '#7e57c2', ready: true, job: QUEUE },
+  { icon: 'lab', label: 'Lab requests', colour: '#7e57c2', ready: true, job: LAB },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#00897b', ready: false, job: SOON },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
@@ -88,8 +90,8 @@ export default function QuickActions({ role }: { role: string }) {
   function run(action: Action) {
     if (action.job === ATTENTION) {
       attention.setOpen(true)
-    } else if (action.job === QUEUE) {
-      document.getElementById('queue')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else if (action.job === QUEUE || action.job === LAB) {
+      document.getElementById(action.job)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     } else if (action.job.startsWith('/')) {
       router.push(action.job)
     }

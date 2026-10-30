@@ -3,6 +3,8 @@
  *
  * What it does: against a throwaway Supabase (started by CI) and the built
  * app, it walks through sign in as two made up nurses at one shared desk:
+ *   (After Call attention: Nurse One requests a lab test, the front desk
+ *   takes the payment in naira, and the record shows it awaiting its test.)
  *   0. A stranger is refused. An invited person opens the invitation link,
  *      finds the email typed in, signs in, chooses a PIN and reaches Home
  *      (Admin, 2026-10-30).
@@ -343,6 +345,30 @@ try {
   if (await desk.getByText('Consultant Room 1 needs Front Desk').count()) {
     throw new Error('A closed call came back after a refresh')
   }
+
+  step('Lab: Nurse One requests a malaria test from the record, for payment')
+  await page.getByRole('link', { name: 'Request lab' }).first().click()
+  await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
+  await page.getByRole('button', { name: 'Malaria test' }).click()
+  await page.getByRole('button', { name: 'Send request' }).click()
+  await page.getByText('Sent to the Front Desk for payment: Malaria test.').waitFor()
+
+  step('Lab: the front desk takes 2,000 naira by POS; it leaves the list and stays gone')
+  await desk.reload()
+  await desk.getByText('Lab tests to pay for').waitFor()
+  await desk.getByText('Asked by Test Nurse One').waitFor()
+  await desk.getByRole('button', { name: 'Take payment' }).click()
+  await desk.getByLabel('Amount paid').fill('2,000')
+  await desk.getByRole('button', { name: 'POS' }).click()
+  await desk.getByRole('button', { name: 'Record payment' }).click()
+  await desk.getByText('Nothing waiting for payment.').waitFor()
+  await desk.reload()
+  await desk.getByText('Nothing waiting for payment.').waitFor()
+  await shot(desk, 'lab-paid')
+
+  step('Lab: the record shows the test awaiting its result')
+  await page.getByRole('link', { name: 'Open the record' }).click()
+  await page.getByText('Awaiting test').waitFor()
   await desk.close()
 
   step('Home now shows the new patient waiting in her room')

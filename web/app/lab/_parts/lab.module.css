@@ -1,0 +1,259 @@
+/*
+ * lab.module.css: the Laboratory screens (request 115): Request lab and
+ * Enter results. Values match the patients pages and the RHEMA demo
+ * (.card, .shd, .fld, the test chips).
+ */
+
+/* ===== 1. Page and card ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.page h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.sectionHead {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sectionHead i {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #efe7fb, #ddd0f5);
+  color: #7e57c2;
+  flex-shrink: 0;
+}
+
+.sectionHead div {
+  min-width: 0;
+}
+
+.sectionHead b {
+  display: block;
+  font-size: 15px;
+}
+
+.sectionHead small {
+  color: var(--mut);
+}
+
+.muted {
+  color: var(--mut);
+  margin: 0;
+  font-size: 13px;
+}
+
+.error {
+  color: var(--red);
+  margin: 0;
+}
+
+.good {
+  color: var(--grn);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ===== 2. Fields ===== */
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 5px;
+}
+
+.input {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 10px;
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+textarea.input {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.input:focus {
+  outline: 0;
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 4px rgba(31, 95, 208, 0.12);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== 3. Test chips: tap to choose (demo labChips) ===== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  background: #7e57c2;
+  border-color: #7e57c2;
+  color: #fff;
+}
+
+/* ===== 4. Where it goes: two choices side by side ===== */
+.segments {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.segments button {
+  font: inherit;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: var(--mut);
+  cursor: pointer;
+}
+
+.segments button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+
+/* ===== 5. Buttons ===== */
+.buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primary {
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  border-color: #1f5fd0;
+  color: #fff;
+  box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ===== 6. Patient picker and the patient line ===== */
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.person {
+  font: inherit;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.person:hover {
+  border-color: #8fb4f0;
+  background: #f4f8ff;
+}
+
+.person > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.person b {
+  display: block;
+}
+
+.person small {
+  display: block;
+  color: var(--mut);
+}
+
+/* ===== 7. One test's result box ===== */
+.result {
+  display: grid;
+  gap: 6px;
+  border-left: 3px solid #ddd0f5;
+  padding-left: 10px;
+}
