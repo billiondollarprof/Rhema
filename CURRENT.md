@@ -204,6 +204,9 @@ Numbers are kept from the full list, so older notes still match.
       history, you only send a copy when a person requested for it so you
       send to the person/notify the person while recording it into the
       patients record simultaneously."
+    Slice 1 built 2026-10-30 (request, payment, results, alert); all
+    checks green on a throwaway Supabase, waiting for his yes to the SQL
+    batch. Slice 2 next: attached result files, compressed.
 116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
     "Is it better we use an encrypted Google drive since it's 15gb... Or
     we can use GCP... I think we should just use Cloudflare now. That means
