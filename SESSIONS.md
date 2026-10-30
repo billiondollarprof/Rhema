@@ -106,3 +106,11 @@ build from the RHEMA demo and the proposal.
   blacks, same letters), fills the lock screen ring, a thin divider in the
   top bar; checked at phone sharpness (3x) and the icons as iPhone,
   Android and desktop show them. Live after his "go live".
+
+- 2026-10-30, Laboratory slice 1 live (115): payments table, lab requests
+  and results, Front Desk payment in naira with Cash, POS or Transfer,
+  Enter results and walk in results, the Lab results section in the
+  record, an alert only to the person who asked. The real walk through
+  found Request lab hidden in a folded section; it moved to the header.
+  Backup choice: second Cloudflare account with a new Gmail (116). He made
+  the R2 buckets rhema-files and rhema-files-testing (7 day delete rule).
