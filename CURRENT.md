@@ -197,8 +197,14 @@ Numbers are kept from the full list, so older notes still match.
     no keys yet, so it sends nothing until push-keys runs for live.
     Testing keys made 2026-10-29 (push-keys run 40975381246; the Worker
     refuses a wrong secret). Tool testing-ring.yml made, to ring his phone
-    from a made up "Test Caller". WAITING for his yes on that SQL, then
-    his phone test, then push-keys for live.
+    from a made up "Test Caller". PHONE TEST PASSED 2026-10-30 on his
+    Android, app closed and screen locked (testing-ring run 40992134202:
+    Worker "sent 1, gone 0, failed 0"; he got the alert). His note: "it
+    used my own phone's default notification tone... not really that loud...
+    I even thought it would have one kind serious ring" (see 105).
+    LEFT: push-keys for live. Agent was blocked from writing live secrets
+    by its safety guard; Anthony runs it himself (Actions, Push keys,
+    site live, from main). Then 97 moves to DONE.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
@@ -224,6 +230,25 @@ Numbers are kept from the full list, so older notes still match.
     requirement." Not started. Note: the phone's own "Allow?" question
     still has a Block choice; if Block is picked, the card stays and shows
     how to allow it in the settings.
+
+104. **iPhone, iPad and Mac: install first, then the alerts card.**
+    (2026-10-30) "If it is a Mac system, an iPad, the system forces them to
+    download. So what now floats... will be the download instruction to
+    install... You can even animate the process... click on the share
+    button, then click on the home screen... it's only when they have
+    downloaded it and open it will they allow for notification floating."
+    Same for Android: install first, then the Allow card inside the
+    installed app ("just the same way for the iPhone"). No website can
+    install itself on iPhone or Safari, so the animation guides them.
+    Goes with 102 and 103. Not started.
+105. **The alert should ring loud, not sound like a message.** (2026-10-30)
+    "It just did tokotom as if one message pops in. So it didn't force
+    serious ring." A web app cannot choose its own notification sound; the
+    phone uses its notification tone. Options given to him 2026-10-30:
+    (a) after install on Android, the app gets its own notification
+    setting, so each phone sets a loud ring tone for RHEMA once (a step in
+    the install guide); (b) later, a small native app wrapper (item 29)
+    can play a real alarm sound. Waiting for his choice.
 
 ### Standing instructions
 
