@@ -270,18 +270,24 @@ function ShareSheet({ x, y, w, scrolled }: { x: number; y: number; w: number; sc
   )
 }
 
-// A finger swiping up, to show "scroll down the menu".
+// A swipe up sign, to show "scroll down the menu". It sits beside the menu,
+// never on a row, and it is grey, because red rings are kept for the one
+// thing to tap (Anthony, 2026-10-30: "you only circle and highlight what
+// they need to click").
 function Swipe({ x, y }: { x: number; y: number }) {
   return (
-    <g className={styles.swipe}>
-      <circle cx={x} cy={y} r="9" fill="rgba(229,57,53,0.25)" stroke="#e53935" strokeWidth="2" />
-      <path
-        d={`M${x} ${y - 14} v-22 M${x - 5} ${y - 31} l5 -5 l5 5`}
-        stroke="#e53935"
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-      />
+    <g
+      className={styles.swipe}
+      stroke="#64748b"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={`M${x} ${y} v-34 M${x - 6} ${y - 28} l6 -6 l6 6`} strokeWidth="2.5" />
+      <path d={`M${x - 7} ${y + 4} q7 8 14 0`} strokeWidth="2" />
+      <text x={x} y={y + 18} textAnchor="middle" fontSize="7" fill="#64748b" stroke="none">
+        scroll
+      </text>
     </g>
   )
 }
@@ -354,7 +360,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
         <PhoneFrame tablet={tablet}>
           {tablet ? <Lines x={24} y={40} rows={10} width={80} /> : null}
           <ShareSheet x={sheet.x} y={sheet.y} w={sheet.w} scrolled={false} />
-          <Swipe x={sheet.x + sheet.w / 2} y={sheet.y + 140} />
+          <Swipe x={tablet ? sheet.x - 18 : sheet.x + sheet.w + 24} y={sheet.y + 120} />
         </PhoneFrame>
       )
     case 'sheet-scrolled':
