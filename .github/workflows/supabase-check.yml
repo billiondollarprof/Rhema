@@ -24,6 +24,8 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:

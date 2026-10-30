@@ -16,6 +16,8 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -33,6 +35,8 @@ jobs:
   # change can be undone. Nothing here touches the hospital's database.
   database:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: supabase/setup-cli@v2
@@ -48,6 +52,8 @@ jobs:
   # switches person and signs out. Screenshots are kept for a person to see.
   signin:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

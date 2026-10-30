@@ -24,6 +24,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

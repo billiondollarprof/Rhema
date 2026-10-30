@@ -36,6 +36,8 @@ permissions:
 jobs:
   switch:
     runs-on: ubuntu-24.04
+    # A stuck step fails after this many minutes, instead of 6 hours.
+    timeout-minutes: 20
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       # The TESTING project only. Fixed here on purpose.
