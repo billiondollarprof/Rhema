@@ -1,0 +1,256 @@
+/*
+ * onboarding.module.css: the install and alerts cards, and the guide.
+ *
+ * The card floats in the middle of the screen over a dimmed page, so it is
+ * seen (Anthony, 2026-10-30). The explanation sits beside a thin line that
+ * draws itself downward, then each line of text slides in beside it.
+ */
+
+/* ===== 1. The card in the middle ===== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 42, 94, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fade 0.25s ease-out;
+}
+
+.card {
+  width: min(420px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  background: #fff;
+  color: var(--ink);
+  border-radius: 22px;
+  padding: 24px 22px 20px;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  text-align: center;
+  box-shadow:
+    0 2px 8px rgba(15, 34, 56, 0.12),
+    0 30px 60px -20px rgba(15, 34, 56, 0.5);
+  animation: rise 0.35s ease-out;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(18px) scale(0.98);
+    opacity: 0;
+  }
+}
+
+/* The round mark at the top of the card. */
+.badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, #0a2a5e, #1565c0);
+  box-shadow: 0 10px 22px -10px rgba(21, 101, 192, 0.8);
+}
+
+.badge span {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.badgeRed {
+  background: linear-gradient(135deg, #e53935, #c62828);
+  box-shadow: 0 10px 22px -10px rgba(229, 57, 53, 0.8);
+}
+
+.badgeGreen {
+  background: linear-gradient(135deg, #2e7d5b, #1b5e40);
+  box-shadow: 0 10px 22px -10px rgba(46, 125, 91, 0.8);
+}
+
+/* ===== 2. The explanation beside a drawn line ===== */
+.explain {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+  padding-left: 16px;
+}
+
+.explain::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #1f5fd0, #4a86ee);
+  transform-origin: top;
+  animation: draw 0.4s ease-out both;
+}
+
+.explain p {
+  margin: 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: slide 0.35s ease-out both;
+}
+
+@keyframes draw {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+/* ===== 3. Buttons and small text ===== */
+.primary {
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  box-shadow: 0 12px 24px -12px rgba(31, 95, 208, 0.9);
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.help {
+  font-size: 13px;
+  color: var(--mut);
+}
+
+.small {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mut);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--red);
+}
+
+/* ===== 4. The animated guide ===== */
+.guide {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.scene {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  background: var(--bg);
+  border-radius: 16px;
+  animation: fade 0.35s ease-out;
+}
+
+.pulse {
+  fill: rgba(229, 57, 53, 0.25);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 1.2s ease-out infinite;
+}
+
+.arrow {
+  animation: point 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes point {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(4px, 4px);
+  }
+}
+
+.stepWords {
+  margin: 0;
+  font-size: 14px;
+  min-height: 42px;
+  animation: slide 0.35s ease-out;
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: #cbd5e1;
+  cursor: pointer;
+}
+
+.dot[aria-selected='true'] {
+  background: var(--bl);
+  width: 22px;
+  border-radius: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card,
+  .explain::before,
+  .explain p,
+  .scene,
+  .pulse,
+  .arrow,
+  .stepWords {
+    animation: none;
+  }
+}
