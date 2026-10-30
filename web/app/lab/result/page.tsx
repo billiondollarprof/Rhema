@@ -6,6 +6,9 @@
  * patient's record and the person who asked is alerted. With no request,
  * the lab picks the patient and types the test and result (a walk in).
  *
+ * Each test can also carry a photo or PDF of the printout (slice 2): a
+ * photo is shrunk in the phone before it is sent (lib/lab/files.ts).
+ *
  * Never: show the patient's medical history here. The lab sees the
  * patient's name and number, the tests and the note, and nothing else.
  */
@@ -18,12 +21,15 @@ import PatientPicker from '../_parts/PatientPicker'
 import styles from '../_parts/lab.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
-import { getLabRequest, recordResults, type LabRequest } from '@/lib/lab/lab'
+import { getLabRequest, recordResults, type LabRequest, type ResultItem } from '@/lib/lab/lab'
+import { prepareFile, sizeWords, uploadFile, type ReadyFile } from '@/lib/lab/files'
 import type { PatientResult } from '@/lib/patients/patients'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
-type Line = { test: string; result: string }
+// file: a photo (already shrunk) or PDF chosen for this test, sent when
+// Result ready is tapped.
+type Line = { test: string; result: string; file?: ReadyFile }
 
 function EnterResults() {
   const auth = useAuth()
@@ -56,7 +62,10 @@ function EnterResults() {
   if (auth.status !== 'ready' || !client || !staff) return null
 
   // ===== 2. Save =====
-  const complete = lines.every((line) => line.test.trim().length >= 2 && line.result.trim())
+  // Each test needs typed words or an attached file (or both).
+  const complete = lines.every(
+    (line) => line.test.trim().length >= 2 && (line.result.trim() || line.file),
+  )
   const patientName = request?.patient?.full_name ?? walkIn?.full_name ?? ''
   const patientNumber = request?.patient?.patient_number ?? walkIn?.patient_number ?? ''
 
@@ -64,19 +73,44 @@ function EnterResults() {
     if (!client) return
     setBusy(true)
     setError(null)
+    // First the files, one by one; then the results that point at them.
+    const items: ResultItem[] = []
+    for (const line of lines) {
+      const item: ResultItem = {
+        test: line.test.trim(),
+        result: line.result.trim() || 'See the attached file.',
+      }
+      if (line.file) {
+        const sent = await uploadFile(client, line.file)
+        if (typeof sent === 'string') {
+          setBusy(false)
+          setError(`${line.test}: ${sent}`)
+          return
+        }
+        item.file_key = sent.key
+        item.file_name = line.file.name
+        item.file_type = line.file.type
+        item.file_size = line.file.size
+      }
+      items.push(item)
+    }
     const problem = await recordResults(
       client,
       request ? request.id : null,
       request ? null : (walkIn?.id ?? null),
-      lines.map((line) => ({ test: line.test.trim(), result: line.result.trim() })),
+      items,
     )
     setBusy(false)
     if (problem) setError(problem)
     else setSaved(true)
   }
 
-  function change(index: number, part: keyof Line, value: string) {
+  function change(index: number, part: 'test' | 'result', value: string) {
     setLines((all) => all.map((line, at) => (at === index ? { ...line, [part]: value } : line)))
+  }
+
+  function setFile(index: number, file: ReadyFile | undefined) {
+    setLines((all) => all.map((line, at) => (at === index ? { ...line, file } : line)))
   }
 
   const notLab = !staff.can_lab
@@ -154,10 +188,15 @@ function EnterResults() {
                     <textarea
                       className={styles.input}
                       aria-label={`Result for ${line.test || 'this test'}`}
-                      placeholder="Result"
+                      placeholder={line.file ? 'Result (optional with a file)' : 'Result'}
                       maxLength={5000}
                       value={line.result}
                       onChange={(event) => change(index, 'result', event.target.value)}
+                    />
+                    <AttachFile
+                      label={line.test || 'this test'}
+                      file={line.file}
+                      onChange={(file) => setFile(index, file)}
                     />
                   </div>
                 ))
@@ -186,6 +225,62 @@ function EnterResults() {
         )}
       </div>
     </AppShell>
+  )
+}
+
+// ===== 3. Attach a photo or PDF to one test =====
+// The photo is shrunk straight away, so the size shown is what will be sent.
+function AttachFile({
+  label,
+  file,
+  onChange,
+}: {
+  label: string
+  file: ReadyFile | undefined
+  onChange: (file: ReadyFile | undefined) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  async function chosen(picked: File | undefined) {
+    if (!picked) return
+    setBusy(true)
+    setProblem(null)
+    const ready = await prepareFile(picked)
+    setBusy(false)
+    if (typeof ready === 'string') setProblem(ready)
+    else onChange(ready)
+  }
+
+  if (file) {
+    return (
+      <div className={styles.attached}>
+        <span>
+          Attached: {file.name} · {sizeWords(file.size)}
+        </span>
+        <button className={styles.button} onClick={() => onChange(undefined)}>
+          Remove
+        </button>
+      </div>
+    )
+  }
+  return (
+    <>
+      <label className={styles.attach}>
+        {busy ? 'Preparing…' : 'Attach photo or PDF'}
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          aria-label={`Attach a photo or PDF for ${label}`}
+          disabled={busy}
+          onChange={(event) => {
+            void chosen(event.target.files?.[0])
+            event.target.value = ''
+          }}
+        />
+      </label>
+      {problem ? <p className={styles.error}>{problem}</p> : null}
+    </>
   )
 }
 
