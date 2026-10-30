@@ -179,6 +179,40 @@ Numbers are kept from the full list, so older notes still match.
     Done 2026-10-30: CARDS_PAUSED = true in OnboardingGate.tsx.
     HANDOVER LIST: set CARDS_PAUSED to false once sign in uses the 6 digit
     code (Resend, 6 November), and walk the cards through once more.
+112. **Admin (build step 7): invite staff, staff list, rooms, activity
+    log.** (2026-10-30) His words, in order:
+    - Invite: "they get a one-time link by email. But whether or not they
+      click through the link, as long as they log in using that same email
+      that was invited... if they click through the link... the email is
+      already pasted there... some sort of like a deep link... if they do
+      not click the link, they can still type in the email as long as the
+      email has been activated."
+    - "72 hours instead of 48 hours for expiry... otherwise it expires and
+      the admin will see that this invitation has expired." An expired
+      invite can be sent again.
+    - "An admin can revoke... If admin revoke somebody, he can still add
+      that same person back."
+    - "The admin can change anybody's room or access and can switch a
+      person off. A switched off person can't sign in."
+    - Suspend and revoke are two things: "suspend does not mean the person
+      will have to get a new invitation." Unsuspended: "they might get an
+      email... that their account has been unsuspended." Suspended or
+      revoked: no email. Revoked: "can be re-added, and if they are
+      re-added, it means they are coming in again to start the account
+      again."
+    - "Those actions will always go with the pin, the admin's pin... the
+      same pin they are using to log in."
+    - Rooms: add and rename. Activity log: as the demo (per staff member,
+      signed in, signed out, time online, what they did).
+    - "Super simple system to use... easy flow."
+    - Asked: does the admin enter the server key? Answer: no, never.
+    - Asked to confirm the code is modular and healthy.
+113. **HANDOVER LIST: delete the test accounts once the hospital is up,
+    but keep his own account as a master account** "that I can use
+    remotely to be monitoring... during debugging." (2026-10-30) Needs a
+    plain word with the director, because that account can see patient
+    records (NDPA).
+
 ### Standing instructions
 
 These never come off the list.
@@ -200,6 +234,10 @@ These never come off the list.
     already in CLAUDE.md; he asked for it to continue.
 
 ### Decided
+
+- 2026-10-30: Backup goes to a second Cloudflare account, not Google
+  Drive. "I think second Cloudflare is better than Google Drive for
+  backup." Not ready yet: AWS and the second Cloudflare account.
 
 - **One chat, not a new chat per feature.** (2026-10-29) "I don't want to
   be using new chats. I want to be doing my work in one chat." CLAUDE.md
