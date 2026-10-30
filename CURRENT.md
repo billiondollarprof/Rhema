@@ -171,6 +171,26 @@ Numbers are kept from the full list, so older notes still match.
 
 
 
+109. **Pause the install and alerts cards until handover.** (2026-10-30)
+    "I can't use the link to log in... it will open the default browser,
+    and the default browser is Safari... I think we should pause the ask
+    for now. Then... before we hand over to the hospital... we can now
+    bring it back... I'll just use code to log in instead of the link."
+    Done 2026-10-30: CARDS_PAUSED = true in OnboardingGate.tsx.
+    HANDOVER LIST: set CARDS_PAUSED to false once sign in uses the 6 digit
+    code (Resend, 6 November), and walk the cards through once more.
+110. **A livelier sign in screen with hospital pictures.** (2026-10-30)
+    "When it has downloaded, the interface does not really look that fine"
+    ... images "of doctors in hospital... smiley, healthy people, doctor
+    attending to patients... sliding in animated... the blue splash of the
+    color of the hospital on it", WebP, small but good quality, fitting
+    phone and desktop. Options he gave: ChatGPT images (one collage of 5
+    for desktop, one of 5 for phone, he generates, agent crops), a short
+    looping video, Unsplash pictures used online (as in Amara), or an
+    animation drawn in code. He asked for the agent's opinion and the
+    prompts. Unsplash and Pexels are blocked from the agent's machine.
+    Waiting for his pictures or his choice.
+
 ### Standing instructions
 
 These never come off the list.

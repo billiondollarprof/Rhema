@@ -49,6 +49,15 @@ import {
 
 type Stage = 'checking' | 'install' | 'installed-elsewhere' | 'allow' | 'ring' | 'done'
 
+// PAUSED, Anthony 2026-10-30: "we should pause the ask for now... before
+// we hand over to the hospital... we can now bring it back." Why: until
+// Resend sends a 6 digit code (6 November), signing in uses the email
+// link, and on an iPhone or iPad the link opens Safari, not the installed
+// app, so nobody can sign in inside the app yet. Set this to false before
+// handover (it is on the handover list in CURRENT.md). The /install/ page
+// and the "Turn on" line in the Call attention list still work meanwhile.
+const CARDS_PAUSED = true
+
 const RING_SET_KEY = 'rhema-loud-ring-set'
 
 function ringAlreadySet(): boolean {
@@ -61,6 +70,7 @@ function ringAlreadySet(): boolean {
 
 // ===== 1. Which card, if any =====
 async function pickStage(client: SupabaseClient, platform: Platform): Promise<Stage> {
+  if (CARDS_PAUSED) return 'done'
   if (typeof navigator !== 'undefined' && navigator.webdriver) return 'done'
   const installed = isInstalled()
   if (!installed && platform !== 'other') {
