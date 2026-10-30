@@ -31,9 +31,27 @@ reset role;
 
 
 -- ===== 1. A stranger cannot sign up ==========================================
-set local role supabase_auth_admin;
+-- Here the test acts as Supabase's sign in service. On the real Supabase in
+-- CI the test runner is not allowed to act as it; there the sign in walk
+-- through (scripts/e2e-signin.mjs) proves the same rule through the real
+-- sign in service, and this test checks the rule is in place.
 do $$
 begin
+  begin
+    perform set_config('role', 'supabase_auth_admin', true);
+  exception when insufficient_privilege then
+    if not exists (
+      select 1 from pg_trigger
+      where tgname = 'rhema_only_invited_sign_ups' and tgrelid = 'auth.users'::regclass
+    ) then
+      raise exception 'FAIL 1: the sign up rule is not on auth.users';
+    end if;
+    if private.has_waiting_invite('stranger@test.rhema') then
+      raise exception 'FAIL 1: a stranger counts as invited';
+    end if;
+    raise notice 'Sign up rule checked by its parts; the e2e walk through tests it whole';
+    return;
+  end;
   insert into auth.users (id, email)
   values ('00000000-0000-0000-0000-0000000000b9', 'stranger@test.rhema');
   raise exception 'FAIL 1: an email with no invitation signed up';
@@ -100,15 +118,29 @@ reset role;
 -- ===== 4. The invited email can sign up; a run out invitation cannot =========
 insert into public.staff_invites (email, full_name, role, created_at, expires_at)
 values ('late@test.rhema', 'Late Person', 'nurse', now() - interval '73 hours', now() - interval '1 hour');
-set local role supabase_auth_admin;
-insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000b1', 'new1@test.rhema');
 do $$
 begin
-  insert into auth.users (id, email)
-  values ('00000000-0000-0000-0000-0000000000b2', 'late@test.rhema');
-  raise exception 'FAIL 4: an invitation that ran out still let somebody sign up';
-exception when insufficient_privilege then
-  null;
+  begin
+    perform set_config('role', 'supabase_auth_admin', true);
+  exception when insufficient_privilege then
+    -- See test 1. Check the rule's answer, then add the account as the owner.
+    if not private.has_waiting_invite('new1@test.rhema') then
+      raise exception 'FAIL 4: an invited email does not count as invited';
+    end if;
+    if private.has_waiting_invite('late@test.rhema') then
+      raise exception 'FAIL 4: an invitation that ran out still counts';
+    end if;
+    insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000b1', 'new1@test.rhema');
+    return;
+  end;
+  insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000b1', 'new1@test.rhema');
+  begin
+    insert into auth.users (id, email)
+    values ('00000000-0000-0000-0000-0000000000b2', 'late@test.rhema');
+    raise exception 'FAIL 4: an invitation that ran out still let somebody sign up';
+  exception when insufficient_privilege then
+    null;
+  end;
 end $$;
 reset role;
 \echo 'PASS 4: invited signs up, run out does not'
