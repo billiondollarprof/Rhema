@@ -95,30 +95,35 @@ export const GUIDES: Record<Device, Step[]> = {
 
 // ===== 2. The drawings =====
 // The ringed spot to tap, with its numbered arrow. The arrow comes in from
-// whichever side has room, so it never runs off the picture.
-function Target({ x, y, step }: { x: number; y: number; step: number }) {
-  const side = x < 100 ? 1 : -1
+// whichever side has room, and from above when the spot is near the
+// bottom, so the arrow and its number never run off the picture or cover
+// the words. `side` forces left (-1) or right (1) where words sit nearby.
+function Target({ x, y, step, side }: { x: number; y: number; step: number; side?: 1 | -1 }) {
+  const across = side ?? (x < 100 ? 1 : -1)
+  const down = y > 150 ? -1 : 1
+  const tipX = x + across * 14
+  const tipY = y + down * 12
   return (
     <g>
       <circle className={styles.pulse} cx={x} cy={y} r="14" />
       <circle cx={x} cy={y} r="14" fill="none" stroke="#e53935" strokeWidth="2.5" />
       <g className={styles.arrow}>
         <path
-          d={`M${x + side * 34} ${y + 30} L${x + side * 14} ${y + 12}`}
+          d={`M${x + across * 34} ${y + down * 30} L${tipX} ${tipY}`}
           stroke="#e53935"
           strokeWidth="3"
           strokeLinecap="round"
         />
         <path
-          d={`M${x + side * 14} ${y + 12} l${side * 9} 1 M${x + side * 14} ${y + 12} l${side} 9`}
+          d={`M${tipX} ${tipY} l${across * 9} ${down} M${tipX} ${tipY} l${across} ${down * 9}`}
           stroke="#e53935"
           strokeWidth="3"
           strokeLinecap="round"
         />
-        <circle cx={x + side * 42} cy={y + 37} r="10" fill="#e53935" />
+        <circle cx={x + across * 42} cy={y + down * 37} r="10" fill="#e53935" />
         <text
-          x={x + side * 42}
-          y={y + 41}
+          x={x + across * 42}
+          y={y + down * 37 + 4}
           textAnchor="middle"
           fontSize="12"
           fontWeight="700"
@@ -206,15 +211,9 @@ function Row({
   return (
     <g>
       <rect x={x} y={y} width={w} height="17" rx="0" fill={on ? '#e8f0fd' : '#fff'} />
-      <text x={x + 7} y={y + 11.5} fontSize="7.5" fontWeight={on ? 700 : 400} fill="#0f2238">
+      <text x={x + 6} y={y + 12} fontSize="9" fontWeight={on ? 700 : 500} fill="#0f2238">
         {label}
       </text>
-      {on ? (
-        <g stroke="#0f2238" strokeWidth="1.2" fill="none">
-          <rect x={x + w - 15} y={y + 4} width="9" height="9" rx="2" />
-          <path d={`M${x + w - 10.5} ${y + 6} v5 M${x + w - 13} ${y + 8.5} h5`} />
-        </g>
-      ) : null}
     </g>
   )
 }
@@ -285,8 +284,16 @@ function Swipe({ x, y }: { x: number; y: number }) {
     >
       <path d={`M${x} ${y} v-34 M${x - 6} ${y - 28} l6 -6 l6 6`} strokeWidth="2.5" />
       <path d={`M${x - 7} ${y + 4} q7 8 14 0`} strokeWidth="2" />
-      <text x={x} y={y + 18} textAnchor="middle" fontSize="7" fill="#64748b" stroke="none">
-        scroll
+      <text
+        x={x}
+        y={y + 18}
+        textAnchor="middle"
+        fontSize="9"
+        fontWeight="700"
+        fill="#64748b"
+        stroke="none"
+      >
+        Scroll
       </text>
     </g>
   )
@@ -330,7 +337,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
   const computer = device === 'mac-safari' || device === 'desktop'
 
   // Phone and tablet scenes share the shapes; only the places differ.
-  const sheet = tablet ? { x: 120, y: 34, w: 120 } : { x: 74, y: 56, w: 112 }
+  const sheet = tablet ? { x: 96, y: 34, w: 120 } : { x: 74, y: 56, w: 112 }
 
   switch (scene) {
     case 'share':
@@ -340,9 +347,15 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           <text x="30" y="35" fontSize="7.5" fill="#64748b">
             rhema-hospital…workers.dev
           </text>
-          <ShareIcon x={200} y={33} />
+          <ShareIcon x={196} y={33} />
+          {/* The real iPad bar: Share, then +, then the tabs button. */}
+          <path d="M212 33 h8 M216 29 v8" stroke="#1f5fd0" strokeWidth="2" strokeLinecap="round" />
+          <g stroke="#1f5fd0" strokeWidth="1.6" fill="none">
+            <rect x="226" y="28" width="8" height="8" rx="1.5" />
+            <rect x="229" y="25.5" width="8" height="8" rx="1.5" />
+          </g>
           <Lines x={30} y={56} rows={10} width={150} />
-          <Target x={200} y={31} step={step} />
+          <Target x={196} y={31} step={step} />
         </PhoneFrame>
       ) : (
         <PhoneFrame tablet={false}>
@@ -351,6 +364,20 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           <text x="130" y="170" textAnchor="middle" fontSize="7" fill="#64748b">
             rhema…workers.dev
           </text>
+          {/* The real iPhone bar: back, forward, Share, bookmarks, tabs. */}
+          <g
+            stroke="#1f5fd0"
+            strokeWidth="2"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M92 188 l-5 5 l5 5" />
+            <path d="M107 188 l5 5 l-5 5" />
+            <path d="M146 188 v10 M146 188 q4 -2 8 0 v10 q-4 -2 -8 0" />
+            <rect x="166" y="188" width="8" height="8" rx="1.5" />
+            <rect x="169" y="185.5" width="8" height="8" rx="1.5" />
+          </g>
           <ShareIcon x={130} y={193} />
           <Target x={130} y={191} step={step} />
         </PhoneFrame>
@@ -368,7 +395,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
         <PhoneFrame tablet={tablet}>
           {tablet ? <Lines x={24} y={40} rows={10} width={80} /> : null}
           <ShareSheet x={sheet.x} y={sheet.y} w={sheet.w} scrolled />
-          <Target x={sheet.x + sheet.w - 30} y={sheet.y + 76} step={step} />
+          <Target x={sheet.x + 48} y={sheet.y + 76} step={step} side={1} />
         </PhoneFrame>
       )
     case 'confirm': {
@@ -419,7 +446,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           <text x={sheet.x + 42} y={sheet.y + 23} fontSize="9" fontWeight="700" fill="#0f2238">
             RHEMA
           </text>
-          <Target x={sheet.x + sheet.w - 18} y={sheet.y - 9} step={step} />
+          <Target x={sheet.x + sheet.w - 18} y={sheet.y - 9} step={step} side={1} />
         </PhoneFrame>
       )
     }
@@ -621,7 +648,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
                   </text>
                 </g>
               ))}
-              <Target x={160} y={115} step={step} />
+              <Target x={132} y={115} step={step} side={1} />
             </g>
           ) : (
             <>
@@ -669,12 +696,21 @@ export default function InstallGuide({
 }) {
   const steps = GUIDES[platform]
   const [at, setAt] = useState(0)
+  const [held, setHeld] = useState(false)
 
-  // Move to the next step every 3.5 seconds, round and round.
+  // Move to the next step every 5 seconds, round and round, until the
+  // person taps a step: then it stays on that step, so they can read it
+  // at their own pace.
   useEffect(() => {
-    const timer = setInterval(() => setAt((now) => (now + 1) % steps.length), 3500)
+    if (held) return
+    const timer = setInterval(() => setAt((now) => (now + 1) % steps.length), 5000)
     return () => clearInterval(timer)
-  }, [steps.length])
+  }, [steps.length, held])
+
+  function show(index: number) {
+    setHeld(true)
+    setAt(index)
+  }
 
   const step = steps[at]
   return (
@@ -695,11 +731,14 @@ export default function InstallGuide({
           </defs>
           <SceneDrawing scene={step.scene} step={at + 1} device={platform} />
         </svg>
-        {withList ? null : (
-          <p className={styles.stepWords} key={`w${at}`}>
-            <b>Step {at + 1}.</b> {step.words}
-          </p>
-        )}
+        {/* The step in words, right under the picture, so the eye never
+            has to leave the animation to know what to do. */}
+        <p className={styles.stepWords} key={`w${at}`}>
+          <b>
+            Step {at + 1} of {steps.length}.
+          </b>{' '}
+          {step.words}
+        </p>
       </div>
       {withList ? (
         <ol className={styles.stepList}>
@@ -708,7 +747,7 @@ export default function InstallGuide({
               <button
                 className={styles.stepItem}
                 aria-current={i === at ? 'step' : undefined}
-                onClick={() => setAt(i)}
+                onClick={() => show(i)}
               >
                 <span className={styles.stepNumber}>{i + 1}</span>
                 <span>{s.words}</span>
@@ -725,7 +764,7 @@ export default function InstallGuide({
               aria-selected={i === at}
               aria-label={`Step ${i + 1}`}
               className={styles.dot}
-              onClick={() => setAt(i)}
+              onClick={() => show(i)}
             />
           ))}
         </div>
