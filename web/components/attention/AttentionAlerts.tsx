@@ -24,7 +24,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Icon from '@/components/shell/Icon'
 import { ringBell } from './bell'
-import { refreshAlerts } from '@/lib/attention/push'
+import { pushSupported, refreshAlerts } from '@/lib/attention/push'
 import styles from './attention.module.css'
 import {
   KIND_LABELS,
@@ -34,6 +34,13 @@ import {
 } from '@/lib/attention/attention'
 
 const CHECK_EVERY_MS = 20_000
+
+// Blocked alerts (request 107): the person tapped Block, so we left them
+// alone. When a call does reach them in the app, the card says how to
+// switch alerts back on. The phone will not ask "Allow?" a second time.
+function alertsBlocked(): boolean {
+  return pushSupported() && Notification.permission === 'denied'
+}
 
 // ===== 1. Calls closed with X, remembered on this device =====
 function closedKey(staffId: string) {
@@ -125,6 +132,12 @@ export default function AttentionAlerts({
                 minute: '2-digit',
               })}
             </small>
+            {alertsBlocked() ? (
+              <small className={styles.blockedHint}>
+                Calls can&apos;t reach you when RHEMA is closed. Allow notifications for RHEMA in
+                your Settings.
+              </small>
+            ) : null}
           </div>
           <button className={styles.close} onClick={() => close(call.id)} aria-label="Close">
             <svg

@@ -193,7 +193,20 @@ Numbers are kept from the full list, so older notes still match.
       built). If they tap Block, "just leave it, let it not be like all
       those annoying ads"; ask again the next time a call comes for them.
     - The /install/ page that opens before sign in: "I like it."
-    Waiting for his yes on the read back.
+    "yes, 107" 2026-10-30, adding: "if a person has already clicked ignore
+    the first time, don't prompt them again", "do not show install more
+    than 3 times", and the skip line "a little bit legible", on its own
+    line, "the same copy... on Android and Mac OS".
+    Built 2026-10-30: skip line ("Already installed RHEMA on this phone?
+    Tap here to skip this.") never asks again; at most 3 showings per
+    browser; Android, Chrome and Edge remember an install and ask again
+    only after it is removed; Install on iPhone, iPad and Mac Safari (or
+    when the browser has not offered one tap install) opens /install/ with
+    the animation and the numbered steps; the iPhone and iPad animation
+    follows his photos (Share, people and apps, scroll down, Add to Home
+    Screen, Add, icon, app open); Block closes the card and the call card
+    later says how to switch alerts on; all card text rewritten through
+    the Humanizer. Walked through: every rule checked, no overflow.
 
 ### Standing instructions
 

@@ -1,41 +1,49 @@
 /*
- * components/onboarding/OnboardingGate.tsx: the cards every staff member
- * goes through once on each phone or computer, in this order:
- *   1. Install RHEMA (requests 102 and 104)
- *   2. Allow call alerts, inside the installed app (request 103)
- *   3. Android only: set a loud ring for RHEMA (request 105, option a)
+ * components/onboarding/OnboardingGate.tsx: the cards a staff member sees
+ * on a phone or computer until RHEMA is installed and alerts are on:
+ *   1. Install RHEMA (requests 102, 104, 107)
+ *   2. Allow call alerts, only inside the installed app (request 103)
+ *   3. Android only: give RHEMA a loud ring (request 105, option a)
  *
- * Why: Anthony, 2026-10-30. Alerts only reach a phone that has RHEMA
- * installed and alerts allowed, so both are required: "it's a mandatory
- * requirement... there is no X, it's only the allow button." The cards
- * float in the middle of the screen, "because it's something that needs to
- * be seen", with a short explanation beside a drawn line.
+ * Why, in Anthony's words (2026-10-30):
+ *   - Install: the eye goes to the Install button first. A separate line
+ *     says "if you have already installed... click here to ignore". "Once
+ *     they click, don't remind them again", and never show the install
+ *     card "more than 3 times" in one browser. On an iPhone, an iPad or
+ *     Mac Safari, Install opens the full install page ("clean and bigger").
+ *     On Android, Chrome and Edge, "just click the install button and it
+ *     installs."
+ *   - Alerts: required, no X, only Allow. If they tap Block, "just leave
+ *     it... let it not be like all those annoying ads." The call card
+ *     reminds them later (AttentionAlerts).
+ *   - All cards float in the middle of the screen, "because it's
+ *     something that needs to be seen."
  *
- * When it shows nothing:
- *   - the device cannot install apps or show alerts (an old browser): it
- *     never asks for the impossible;
- *   - the browser is driven by an automatic test (navigator.webdriver), so
- *     the checks in CI can use the screens. This is not a way round it for
- *     people: a person's browser never says webdriver.
+ * It shows nothing when the device cannot install or show alerts, and when
+ * an automatic test drives the browser (navigator.webdriver), so the
+ * checks in CI can use the screens. A person's browser never says
+ * webdriver.
  *
- * Never: show an X or a "later" button on these cards. Never ask for alerts
- * before the app is installed on a phone that needs it (iPhone, iPad).
+ * Never: ask for alerts on an iPhone or iPad before RHEMA is installed
+ * there; they cannot work. Never show the Allow card again after Block.
  */
 'use client'
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
-import Link from 'next/link'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import InstallGuide from './InstallGuide'
 import styles from './onboarding.module.css'
-import { alertsState, turnOnAlerts, type AlertsState } from '@/lib/attention/push'
+import { alertsState, turnOnAlerts } from '@/lib/attention/push'
 import {
   canInstallNow,
+  countInstallShown,
   detectPlatform,
+  installCardWanted,
   installNow,
   installsByHand,
   isInstalled,
   onInstallChange,
+  skipInstall,
   type Platform,
 } from '@/lib/install/device'
 
@@ -54,15 +62,21 @@ function ringAlreadySet(): boolean {
 // ===== 1. Which card, if any =====
 async function pickStage(client: SupabaseClient, platform: Platform): Promise<Stage> {
   if (typeof navigator !== 'undefined' && navigator.webdriver) return 'done'
-  if (platform !== 'other' && !isInstalled()) return 'install'
+  const installed = isInstalled()
+  if (!installed && platform !== 'other') {
+    // Not installed in this window: ask, unless they skipped or were asked 3 times.
+    return installCardWanted() ? 'install' : 'done'
+  }
+  // Installed (or a browser that cannot install): now the alerts.
   const alerts = await alertsState(client)
-  if (alerts === 'off' || alerts === 'blocked' || alerts === 'not-ready') return 'allow'
+  if (alerts === 'off' || alerts === 'not-ready') return 'allow'
   if (platform === 'android' && alerts === 'on' && !ringAlreadySet()) return 'ring'
+  // 'blocked' lands here on purpose: we leave them alone.
   return 'done'
 }
 
 // ===== 2. The explanation beside a drawn line =====
-function Explain({ lines }: { lines: string[] }) {
+function Explain({ lines, children }: { lines: string[]; children?: React.ReactNode }) {
   return (
     <div className={styles.explain}>
       {lines.map((line, i) => (
@@ -70,6 +84,7 @@ function Explain({ lines }: { lines: string[] }) {
           {line}
         </p>
       ))}
+      {children}
     </div>
   )
 }
@@ -82,25 +97,23 @@ export default function OnboardingGate({
   client: SupabaseClient
   staffId: string
 }) {
+  const router = useRouter()
   const [platform] = useState<Platform>(() => detectPlatform())
   const [stage, setStage] = useState<Stage>('checking')
-  const [guide, setGuide] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [alerts, setAlerts] = useState<AlertsState | null>(null)
-
-  // Look again: used on opening, and by the "Check again" button.
-  const check = useCallback(async () => {
-    setStage(await pickStage(client, platform))
-    setAlerts(await alertsState(client))
-  }, [client, platform])
+  const [problem, setProblem] = useState(false)
+  const counted = useRef(false)
 
   useEffect(() => {
     let current = true
     pickStage(client, platform).then((found) => {
-      if (current) setStage(found)
-    })
-    alertsState(client).then((found) => {
-      if (current) setAlerts(found)
+      if (!current) return
+      setStage(found)
+      // Count one showing of the install card for this visit.
+      if (found === 'install' && !counted.current) {
+        counted.current = true
+        countInstallShown()
+      }
     })
     return () => {
       current = false
@@ -113,9 +126,10 @@ export default function OnboardingGate({
 
   if (stage === 'checking' || stage === 'done') return null
 
+  // ----- What the buttons do -----
   async function install() {
     if (installsByHand(platform) || !oneTap) {
-      setGuide(true)
+      router.push('/install/')
       return
     }
     setBusy(true)
@@ -124,12 +138,20 @@ export default function OnboardingGate({
     if (accepted) setStage('installed-elsewhere')
   }
 
+  function skip() {
+    skipInstall()
+    setStage('done')
+  }
+
   async function allow() {
     setBusy(true)
+    setProblem(false)
     const result = await turnOnAlerts(client, staffId)
     setBusy(false)
-    setAlerts(result)
     if (result === 'on') setStage(platform === 'android' && !ringAlreadySet() ? 'ring' : 'done')
+    else if (result === 'not-ready') setProblem(true)
+    // Blocked or closed: leave them alone. The call card reminds them later.
+    else setStage('done')
   }
 
   function ringDone() {
@@ -141,7 +163,8 @@ export default function OnboardingGate({
     setStage('done')
   }
 
-  const guidePlatform = platform === 'other' ? 'desktop' : platform
+  const phone = platform === 'android' || platform === 'iphone'
+  const device = phone ? 'phone' : platform === 'ipad' ? 'iPad' : 'computer'
 
   return (
     <div className={styles.backdrop}>
@@ -157,35 +180,21 @@ export default function OnboardingGate({
             <div className={styles.badge} aria-hidden="true">
               <span>RH</span>
             </div>
-            <h2 id="onboarding-title">Install the RHEMA app</h2>
-            {guide ? (
-              <>
-                <InstallGuide platform={guidePlatform} />
-                <p className={styles.small}>
-                  Then open RHEMA from{' '}
-                  {platform === 'mac-safari' || platform === 'desktop'
-                    ? 'your apps'
-                    : 'your home screen'}{' '}
-                  and sign in there.
-                </p>
-              </>
-            ) : (
-              <>
-                <Explain
-                  lines={[
-                    'It opens in one tap, fast, like any app on your phone.',
-                    'Calls from other rooms reach you, even when the app is closed.',
-                    'Every staff phone and computer needs it. It takes less than a minute.',
-                  ]}
-                />
-                <button className={styles.primary} onClick={install} disabled={busy}>
-                  {busy ? 'Installing…' : 'Install'}
-                </button>
-              </>
-            )}
-            <Link className={styles.help} href="/install/">
-              Other devices
-            </Link>
+            <h2 id="onboarding-title">Install RHEMA on this {device}</h2>
+            <Explain
+              lines={[
+                `Once it is installed, you open RHEMA from your ${phone || platform === 'ipad' ? 'home screen' : 'apps'} with one tap.`,
+                'Calls from other rooms will reach you even when the app is closed.',
+                'Every staff phone and computer needs it. It takes about a minute.',
+              ]}
+            >
+              <button className={styles.skip} onClick={skip} style={{ animationDelay: '1.1s' }}>
+                Already installed RHEMA on this {device}? Tap here to skip this.
+              </button>
+            </Explain>
+            <button className={styles.primary} onClick={install} disabled={busy}>
+              {busy ? 'Installing…' : 'Install'}
+            </button>
           </>
         ) : null}
 
@@ -197,12 +206,17 @@ export default function OnboardingGate({
             </div>
             <h2 id="onboarding-title">RHEMA is installed</h2>
             <Explain
-              lines={[
+              lines={
                 platform === 'android'
-                  ? 'Open RHEMA from your home screen and sign in there.'
-                  : 'RHEMA opens in its own window. Use it from there.',
-                'You can close this browser tab.',
-              ]}
+                  ? [
+                      'Open RHEMA from your home screen and sign in there.',
+                      'You can close this browser tab now.',
+                    ]
+                  : [
+                      'RHEMA has opened in its own window. Carry on there.',
+                      'You can close this browser tab now.',
+                    ]
+              }
             />
           </>
         ) : null}
@@ -226,42 +240,20 @@ export default function OnboardingGate({
               </svg>
             </div>
             <h2 id="onboarding-title">Turn on call alerts</h2>
-            {alerts === 'blocked' ? (
-              <>
-                <Explain
-                  lines={[
-                    'Alerts are blocked on this device, so calls cannot reach you.',
-                    platform === 'android'
-                      ? 'Open Settings, then Apps, then RHEMA, then Notifications, and switch them on.'
-                      : platform === 'iphone' || platform === 'ipad'
-                        ? 'Open Settings, then Notifications, then RHEMA, and switch on Allow Notifications.'
-                        : 'Click the lock icon beside the address, then allow Notifications.',
-                    'Then come back and tap Check again.',
-                  ]}
-                />
-                <button className={styles.primary} onClick={() => void check()}>
-                  Check again
-                </button>
-              </>
-            ) : (
-              <>
-                <Explain
-                  lines={[
-                    'When a room calls you, this device rings straight away.',
-                    'It works even when the app is closed or the phone is locked.',
-                    'This is required for every staff member. Tap Allow, then Allow again when asked.',
-                  ]}
-                />
-                {alerts === 'not-ready' ? (
-                  <p className={styles.error}>
-                    That did not work. Check the internet and try again.
-                  </p>
-                ) : null}
-                <button className={styles.primary} onClick={allow} disabled={busy}>
-                  {busy ? 'Turning on…' : 'Allow'}
-                </button>
-              </>
-            )}
+            <Explain
+              lines={[
+                `When a room calls you, this ${device} will ring straight away, even when RHEMA is closed.`,
+                'Every staff member needs this on. Tap Allow, then tap Allow again when you are asked.',
+              ]}
+            />
+            {problem ? (
+              <p className={styles.error}>
+                That did not work. Check the internet and tap Allow again.
+              </p>
+            ) : null}
+            <button className={styles.primary} onClick={allow} disabled={busy}>
+              {busy ? 'Turning on…' : 'Allow'}
+            </button>
           </>
         ) : null}
 
@@ -282,16 +274,16 @@ export default function OnboardingGate({
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </div>
-            <h2 id="onboarding-title">Alerts are on. Now make them loud</h2>
+            <h2 id="onboarding-title">Now make RHEMA ring loud</h2>
             <Explain
               lines={[
-                'Your phone uses its quiet message tone for RHEMA. Give RHEMA a loud ring instead.',
+                'Right now your phone uses its quiet message tone for RHEMA calls.',
                 'Open Settings, then Apps, then RHEMA, then Notifications.',
-                'Tap the alert type, then Sound, and pick a loud ringtone.',
+                'Tap Sound and pick a loud ringtone. Then come back here.',
               ]}
             />
             <button className={styles.primary} onClick={ringDone}>
-              I have set the ring
+              Done
             </button>
           </>
         ) : null}

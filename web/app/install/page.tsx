@@ -47,8 +47,8 @@ export default function InstallPage() {
       </div>
       <h1>Get RHEMA on every device</h1>
       <div className={card.explain}>
-        <p>Installed, RHEMA opens in one tap and works like any app.</p>
-        <p>Calls from other rooms reach you at once, even with the app closed.</p>
+        <p>Install RHEMA once, and you open it from your home screen like any other app.</p>
+        <p>Calls from other rooms reach you even when the app is closed.</p>
         <p>Pick your device below and follow the steps.</p>
       </div>
 
@@ -67,7 +67,7 @@ export default function InstallPage() {
       </div>
 
       <section className={styles.panel}>
-        <InstallGuide key={device} platform={device} />
+        <InstallGuide key={device} platform={device} withList />
       </section>
 
       <Link className={card.help} href="/">
