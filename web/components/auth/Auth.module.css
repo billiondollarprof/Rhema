@@ -28,6 +28,12 @@
   box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
 }
 
+/* The sign in card sits above the photo slideshow (request 110). */
+.overPhotos {
+  position: relative;
+  z-index: 1;
+}
+
 .card h2 {
   margin: 0;
   text-align: center;

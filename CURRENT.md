@@ -189,7 +189,10 @@ Numbers are kept from the full list, so older notes still match.
     looping video, Unsplash pictures used online (as in Amara), or an
     animation drawn in code. He asked for the agent's opinion and the
     prompts. Unsplash and Pexels are blocked from the agent's machine.
-    Waiting for his pictures or his choice.
+    He chose ChatGPT and sent both collages. Built 2026-10-30: 5 photos
+    per collage cut into web/public/signin/ (WebP, 24 to 44 KB each), a
+    slideshow behind the sign in card (components/auth/SignInPhotos.tsx),
+    blue wash, slow drift and zoom, 6 seconds each, cross-fade. Going live.
 
 ### Standing instructions
 

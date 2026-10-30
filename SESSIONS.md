@@ -88,3 +88,8 @@ build from the RHEMA demo and the proposal.
   (install card, animated guide per device, must-do Allow card, loud ring
   step on Android, /install/ page). CI moved to newer action versions on
   Node.js 24, ubuntu-24.04 by name, and a 20 minute limit on every job.
+
+- 2026-10-30, later: install and alerts cards paused until handover (109,
+  the sign in link opens Safari, not the app). Sign in screen now has his
+  5 hospital photos sliding behind the card under a blue wash (110). The
+  lock page has its own idle screen, so it is unchanged.
