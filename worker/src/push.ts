@@ -153,12 +153,28 @@ export async function vapidHeader(endpoint: string, keys: VapidKeys): Promise<st
   return `vapid t=${header}.${claims}.${toBase64Url(signature)}, k=${keys.publicKey}`
 }
 
-// ===== 4. Sending to every device =====
+// ===== 4. The tag and the screen a notification may carry =====
+// A tag says which notification this one replaces. Short and plain only.
+export function safeTag(tag: unknown): string | undefined {
+  return typeof tag === 'string' && /^[a-z0-9-]{1,40}$/.test(tag) ? tag : undefined
+}
+
+// The screen a tap opens: a path inside this app only. "//somewhere" would
+// leave the app for another website, so a second slash at the start fails.
+export function safeAppPath(path: unknown): string | undefined {
+  return typeof path === 'string' && /^\/(?!\/)[A-Za-z0-9/?=&_.-]{0,200}$/.test(path)
+    ? path
+    : undefined
+}
+
+// ===== 5. Sending to every device =====
 export type PushResult = { sent: number; gone: number; failed: number }
 
 export async function sendToAll(
   devices: Device[],
-  message: { title: string; body: string; call_id: number },
+  // tag and url (Laboratory, 2026-10-30): which notification this replaces,
+  // and which screen a tap opens. Both are optional.
+  message: { title: string; body: string; call_id: number; tag?: string; url?: string },
   keys: VapidKeys,
   post: typeof fetch = fetch,
 ): Promise<PushResult> {

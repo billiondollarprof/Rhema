@@ -193,8 +193,17 @@ Numbers are kept from the full list, so older notes still match.
     records (NDPA).
 
 115. **Laboratory (build step 5).** (2026-10-30) "do the laboratory."
-    Follows docs/DATABASE.md section 9 and requests 58 to 60. Said back to
-    him, waiting for his yes.
+    Follows docs/DATABASE.md section 9 and requests 58 to 60. His answers
+    to the say back (2026-10-30):
+    - "Front desk usually add amount paid in naira not just tap paid and
+      they also add mode of payment just like during registration."
+    - "We can build the attach result infra now, also make sure that the
+      attached files is usually compressed without affecting the quality
+      of the document. PDF for a few pages is usually a few KBs."
+    - "The results should just be part of the patient's record/med
+      history, you only send a copy when a person requested for it so you
+      send to the person/notify the person while recording it into the
+      patients record simultaneously."
 116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
     "Is it better we use an encrypted Google drive since it's 15gb... Or
     we can use GCP... I think we should just use Cloudflare now. That means

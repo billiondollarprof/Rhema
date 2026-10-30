@@ -387,3 +387,22 @@ textarea.input {
 .consult dd {
   margin: 0;
 }
+
+/* A lab result's text keeps the lab's line breaks (request 115). */
+.resultText {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* A link styled as a small button (Request lab) has no underline. */
+a.small {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Arriving at #lab: stop below the sticky top bar, not under it. */
+.anchor {
+  scroll-margin-top: 80px;
+}

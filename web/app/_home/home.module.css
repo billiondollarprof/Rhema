@@ -287,6 +287,94 @@
   cursor: default;
 }
 
+/* ===== 6b. The Laboratory card (request 115) ===== */
+.count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bl);
+  background: #e3f2fd;
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+.wide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 10px;
+  text-decoration: none;
+}
+
+a.button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.payForm {
+  display: grid;
+  gap: 8px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.payForm .segments {
+  margin-top: 0;
+  display: flex;
+}
+
+.payForm .segments button {
+  flex: 1;
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #fff;
+}
+
+.money:focus-within {
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 4px rgba(31, 95, 208, 0.12);
+}
+
+.money span {
+  font-weight: 700;
+  color: var(--mut);
+}
+
+.money input {
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  border: 0;
+  outline: 0;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  background: none;
+  color: var(--ink);
+}
+
+.error {
+  color: var(--red);
+  margin: 0;
+  font-size: 13px;
+}
+
 /* ===== 7. Wider screens ===== */
 @media (min-width: 760px) {
   .actions {

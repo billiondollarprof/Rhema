@@ -27,6 +27,8 @@ const SCREENS = [
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
   { path: '/install/', waitFor: 'Get RHEMA on every device' },
+  { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
+  { path: '/lab/result/', waitFor: 'Add a lab result' },
   { path: '/admin/', waitFor: 'Tap a name', admin: true },
   { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
   { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },

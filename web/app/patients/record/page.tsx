@@ -27,6 +27,7 @@ import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
 import { DosesSection, MedicationsSection } from './_parts/Medications'
+import LabSection from './_parts/Lab'
 import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
 import styles from './_parts/record.module.css'
 import buttons from '../_parts/patients.module.css'
@@ -145,6 +146,7 @@ function PatientRecord() {
                 <VitalsSection {...props} />
                 <NursingNotesSection {...props} />
                 <ConsultationsSection {...props} />
+                <LabSection client={client} patientId={props.patientId} />
               </div>
               <div className={styles.column}>
                 <AllergiesSection {...props} />
