@@ -215,6 +215,16 @@ Numbers are kept from the full list, so older notes still match.
     performance, you need to download it", because of notifications and
     chat. Also useful when reselling to other hospitals. Not started.
 
+103. **A must-do "Allow alerts" card the first time on each device.**
+    (2026-10-30) "At the first time the person is logging into that new
+    computer, to that new phone, once the system knows it's new... it asks
+    that question... a very good, well-designed card... floats... we have
+    to make it not to be a choice... there is no X, it's only the allow
+    button... write it in a way that they know that it's a mandatory
+    requirement." Not started. Note: the phone's own "Allow?" question
+    still has a Block choice; if Block is picked, the card stays and shows
+    how to allow it in the settings.
+
 ### Standing instructions
 
 These never come off the list.
