@@ -556,3 +556,14 @@ this file.
     later says how to switch alerts on; all card text rewritten through
     the Humanizer. Walked through: every rule checked, no overflow.
     LIVE 2026-10-30. Done.
+108. **Install guide: only ring what they tap, and make it easy for a
+    beginner.** (2026-10-30) "You only circle and highlight what they
+    actually need to click... so nobody gets confused" and "check your
+    animation and understand that at least it's something that can easily
+    guide someone who is not tech savvy." Done 2026-10-30: the scroll step
+    has no ring, only a grey Scroll sign beside the menu; one red ring per
+    step, on the words to tap; bigger menu words; Safari's real bars
+    (iPhone: back, forward, Share, bookmarks, tabs; iPad: Share, +, tabs);
+    "Step 2 of 6" written under the picture; 5 seconds per step, and it
+    stays on a step once tapped; arrows never cover words. Checked every
+    step on iPhone, iPad, Android and Mac at phone width. LIVE. Done.
