@@ -1,0 +1,117 @@
+/*
+ * SignInPhotos.module.css: the photos behind the sign in card, and the blue
+ * wash over them (request 110).
+ *
+ * The photos fill the whole screen behind the card. The wash uses the same
+ * blues as the sign in page before the photos (#0a2a5e, #1565c0, #42a5f5),
+ * see through, so the photos show and the white card still stands out.
+ */
+
+/* ===== 1. The layer behind the card ===== */
+.photos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #0a2a5e;
+  pointer-events: none;
+}
+
+/* ===== 2. One photo: hidden until its turn, then fades in ===== */
+.photo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.6s ease-in-out;
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.showing {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* The photo going out stays fully there underneath, and keeps moving, while
+   the next one fades in on top. So the screen never dips to plain blue. */
+.leaving {
+  opacity: 1;
+}
+
+/* ===== 3. The slow drift and zoom, a different way for each photo ===== */
+.showing img,
+.leaving img {
+  animation: var(--move) 8s ease-out forwards;
+}
+
+.move1 {
+  --move: drift-right;
+}
+.move2 {
+  --move: drift-left;
+}
+.move3 {
+  --move: drift-up;
+}
+.move4 {
+  --move: drift-right;
+}
+.move5 {
+  --move: drift-left;
+}
+
+@keyframes drift-right {
+  from {
+    transform: scale(1.04) translate(-1.5%, 0);
+  }
+  to {
+    transform: scale(1.14) translate(1.5%, -1%);
+  }
+}
+
+@keyframes drift-left {
+  from {
+    transform: scale(1.14) translate(1.5%, 1%);
+  }
+  to {
+    transform: scale(1.04) translate(-1.5%, 0);
+  }
+}
+
+@keyframes drift-up {
+  from {
+    transform: scale(1.06) translate(0, 1.5%);
+  }
+  to {
+    transform: scale(1.14) translate(0, -1.5%);
+  }
+}
+
+/* ===== 4. The blue wash ===== */
+.wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    150deg,
+    rgba(10, 42, 94, 0.86),
+    rgba(21, 101, 192, 0.66) 60%,
+    rgba(66, 165, 245, 0.55)
+  );
+}
+
+/* ===== 5. Less motion: the first photo, still ===== */
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    transition: none;
+  }
+  .showing img,
+  .leaving img {
+    animation: none;
+  }
+}

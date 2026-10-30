@@ -24,6 +24,7 @@
 import { useState } from 'react'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import PersonBadge from '@/components/auth/PersonBadge'
+import SignInPhotos from '@/components/auth/SignInPhotos'
 import styles from '@/components/auth/Auth.module.css'
 import { CODE_LENGTH, PIN_LENGTH } from '@/lib/auth/config'
 import { listAccounts, type DeviceAccount } from '@/lib/auth/device-accounts'
@@ -246,6 +247,7 @@ function ChoosePin() {
 }
 
 // ===== The card and its background, shared by every step =====
+// The background is the photo slideshow under a blue wash (request 110).
 function Shell({
   title,
   lead,
@@ -257,7 +259,8 @@ function Shell({
 }) {
   return (
     <main className={styles.page}>
-      <section className={styles.card}>
+      <SignInPhotos />
+      <section className={`${styles.card} ${styles.overPhotos}`}>
         <div className={styles.mark} aria-hidden="true">
           RH
         </div>
