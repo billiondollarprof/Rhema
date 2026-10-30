@@ -57,9 +57,21 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null)
 
   // Take the email out of the address once it is in the box, so it does
-  // not stay in the browser's history.
+  // not stay in the browser's history. If the link is opened while this
+  // page is already open in the same tab, only the # changes, so listen
+  // for that too.
   useEffect(() => {
-    if (linkEmail) window.history.replaceState(null, '', window.location.pathname)
+    const forget = () => window.history.replaceState(null, '', window.location.pathname)
+    if (linkEmail) forget()
+    function linkOpened() {
+      const found = emailFromLink()
+      if (!found) return
+      setEmail(found)
+      setStep('email')
+      forget()
+    }
+    window.addEventListener('hashchange', linkOpened)
+    return () => window.removeEventListener('hashchange', linkOpened)
   }, [linkEmail])
 
   if (auth.status === 'loading') return <div className={styles.page} />
