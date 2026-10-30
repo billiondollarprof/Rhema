@@ -82,7 +82,13 @@ jobs:
         # Found 2026-10-28, when a bad account ID still showed success.
         run: |
           set -o pipefail
-          npx wrangler deploy --name "$WORKER_NAME" | tee deploy.log
+          # Testing deploys its own copy (--env testing: its own bucket);
+          # live deploys the main one. The site's Supabase address and public
+          # key go in as plain settings, for the lab file checks.
+          if [ "$WORKER_NAME" = "rhema-hospital" ]; then target=""; else target="--env testing"; fi
+          npx wrangler deploy $target \
+            --var "SUPABASE_URL:$NEXT_PUBLIC_SUPABASE_URL" \
+            --var "SUPABASE_KEY:$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" | tee deploy.log
           url=$(grep -o 'https://[a-z0-9.-]*workers\.dev' deploy.log | head -1)
           echo "url=$url" >> "$GITHUB_OUTPUT"
 

@@ -7,6 +7,9 @@
  * it, for every doctor, nurse and matron who opens the record. Request lab
  * opens with this patient already chosen.
  *
+ * A result with an attached printout (slice 2) has an "Open attached file"
+ * button; the Worker asks the database before it hands the file over.
+ *
  * Never: show a result anywhere outside the opened record. Opening the
  * record is what puts the reading in the activity log.
  */
@@ -20,6 +23,7 @@ import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import { STATUS_WORDS, loadPatientLab, type LabRequest, type LabResult } from '@/lib/lab/lab'
 import { when } from '@/lib/record/record'
+import { openFile } from '@/lib/lab/files'
 
 export default function LabSection({
   client,
@@ -98,9 +102,44 @@ export default function LabSection({
             voided={null}
           >
             <p className={styles.resultText}>{result.result}</p>
+            {result.file_key ? (
+              <OpenFile client={client} fileKey={result.file_key} name={result.file_name} />
+            ) : null}
           </Line>
         ))}
       </Section>
+    </div>
+  )
+}
+
+// ===== The attached printout, opened in a new tab =====
+// The database decides, through the Worker, whether this person may see it.
+function OpenFile({
+  client,
+  fileKey,
+  name,
+}: {
+  client: SupabaseClient
+  fileKey: string
+  name: string | null
+}) {
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  async function open() {
+    setBusy(true)
+    setProblem(null)
+    const failed = await openFile(client, fileKey)
+    setBusy(false)
+    setProblem(failed)
+  }
+
+  return (
+    <div className={styles.actions}>
+      <button className={styles.small} onClick={open} disabled={busy}>
+        {busy ? 'Opening…' : `Open attached file${name ? `: ${name}` : ''}`}
+      </button>
+      {problem ? <span className={styles.error}>{problem}</span> : null}
     </div>
   )
 }

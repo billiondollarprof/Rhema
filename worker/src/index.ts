@@ -9,10 +9,11 @@
  * `wrangler secret put` or from GitHub Actions. Never log patient details,
  * push addresses or keys.
  */
+import { downloadLabFile, uploadLabFile, type FilesEnv } from './files'
 import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
-export interface Env {
+export interface Env extends FilesEnv {
   // The built screens (web/out), served as static files.
   ASSETS: Fetcher
   // Call attention push (set by the push-keys workflow). Until they are
@@ -115,6 +116,14 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
       `Call attention push for call ${message.call_id}: ${result.sent} sent, ${result.gone} gone, ${result.failed} failed`,
     )
     return Response.json(result)
+  }
+
+  // Lab result files (request 115, slice 2): see files.ts.
+  if (url.pathname === '/api/files/lab' && request.method === 'POST') {
+    return uploadLabFile(request, env)
+  }
+  if (url.pathname.startsWith('/api/files/lab/') && request.method === 'GET') {
+    return downloadLabFile(request, url.pathname.slice('/api/files/'.length), env)
   }
 
   return Response.json({ error: 'Not found' }, { status: 404 })
