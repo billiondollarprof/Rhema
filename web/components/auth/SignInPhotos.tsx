@@ -1,15 +1,18 @@
 /*
- * components/auth/SignInPhotos.tsx: the photos behind the sign in card.
+ * components/auth/SignInPhotos.tsx: the photos behind the sign in card and
+ * the lock screen.
  *
  * Why: Anthony, 2026-10-30 (request 110): a livelier sign in screen, with
  * pictures of doctors, nurses and patients under a blue wash of the
  * hospital colour, sliding and animated, small WebP files that fit a phone
  * and a desktop. He made the pictures himself (two ChatGPT collages); each
- * collage was cut into 5 photos in web/public/signin/.
+ * collage was cut into 5 photos in web/public/signin/. The same day: the
+ * lock screen gets them too, "because that's where they will also see it
+ * all the time", and it must float, not just switch.
  *
  * How it works:
- *   1. Five photos take turns, about 6 seconds each. The one on show drifts
- *      and zooms slowly, then fades into the next.
+ *   1. Five photos take turns, 7 seconds each. The one on show zooms and
+ *      drifts slowly the whole time, then fades slowly into the next.
  *   2. A tall screen (a phone) gets the tall photos, a wide screen gets the
  *      wide ones. The browser picks, so only one set is downloaded.
  *   3. Only the first photo, and the one after it, load at the start. Each
@@ -28,7 +31,8 @@ import styles from './SignInPhotos.module.css'
 
 // ===== 1. The photos and the timing =====
 const PHOTO_COUNT = 5
-const SHOW_EACH_MS = 6000
+// 7 seconds each; the fade between two photos takes 2.5 of those (CSS).
+const SHOW_EACH_MS = 7000
 
 // ===== 2. The slideshow =====
 export default function SignInPhotos() {

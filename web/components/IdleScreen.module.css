@@ -15,6 +15,13 @@
   color: #fff;
 }
 
+/* The layer behind everything: under the waves, the mark and the name. */
+.behind {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
 /* ===== 2. Waves ===== */
 .waves {
   position: absolute;
