@@ -101,3 +101,8 @@ build from the RHEMA demo and the proposal.
   security check now has a fifth check for that rule. The real sign in
   test in CI caught two faults before testing (link in an open tab, the
   stranger message on a bare 500). Next: 114, logo and red accents.
+
+- 2026-10-30, logo fit (114 follow up): cleaner logo (pure whites, deep
+  blacks, same letters), fills the lock screen ring, a thin divider in the
+  top bar; checked at phone sharpness (3x) and the icons as iPhone,
+  Android and desktop show them. Live after his "go live".
