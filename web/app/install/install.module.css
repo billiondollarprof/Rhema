@@ -3,13 +3,17 @@
  * style as the install card in the app, so both feel like one thing.
  */
 .page {
-  max-width: 520px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 32px 16px 40px;
   display: grid;
   gap: 16px;
   justify-items: center;
   text-align: center;
+}
+
+.page > :global(*) {
+  max-width: 560px;
 }
 
 .page h1 {
@@ -44,6 +48,7 @@
 
 .panel {
   width: 100%;
+  max-width: 860px !important;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 18px;

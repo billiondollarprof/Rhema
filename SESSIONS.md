@@ -80,3 +80,11 @@ build from the RHEMA demo and the proposal.
   requests: 40 open, 6 standing, 62 done). Four skills built and each run
   once: ship, screens (overflow-audit.cjs finally exists), new-migration
   (template with revoke all, local-db.sh, mutate.sh), switch-role.
+
+- 2026-10-30: Call attention step 2 finished: his Android phone got the
+  alert with the app closed and locked; live keys made by him. The
+  security check now fails on a new warning (it only printed them
+  before); pg_net moved out of public. Install and alerts onboarding live
+  (install card, animated guide per device, must-do Allow card, loud ring
+  step on Android, /install/ page). CI moved to newer action versions on
+  Node.js 24, ubuntu-24.04 by name, and a 20 minute limit on every job.

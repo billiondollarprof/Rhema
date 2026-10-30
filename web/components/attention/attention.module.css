@@ -324,6 +324,11 @@
   display: grid;
 }
 
+.alertText .blockedHint {
+  color: #b42318;
+  margin-top: 4px;
+}
+
 .alertText small {
   color: var(--mut);
 }

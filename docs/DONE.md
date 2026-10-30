@@ -459,3 +459,62 @@ this file.
     Live keys: Anthony ran push-keys for live himself 2026-10-30 (run
     40995882870; the Worker check passed: key served, wrong secret
     refused). DONE 2026-10-30.
+102. **Installation guide: install the app on phone and desktop.** (2026-10-29)
+    "We are going to put installation guide on a section... how to install
+    it on phone or on your desktop." On a desktop that has not installed
+    it: an Install button "somewhere... at the corner" (a banner is
+    optional: "or we forget about banner"); once installed it no longer
+    shows, and it comes back if they uninstall. For iOS and Mac Safari: real
+    screenshots of the real browser, with circles and arrows, "step one,
+    this, step two, the other one": tap Share, then Add to Home Screen. Cover
+    iPhone, iPad, macOS and Android/desktop. Heading catchy, for example
+    "Lightning fast download" or a progressive web app line: "for best
+    performance, you need to download it", because of notifications and
+    chat. Also useful when reselling to other hospitals. Not started.
+
+    Built 2026-10-30: /install/ page, "Get RHEMA on every device", animated
+    steps for Android, iPhone, iPad, Windows and Mac. LIVE 2026-10-30.
+103. **A must-do "Allow alerts" card the first time on each device.**
+    (2026-10-30) "At the first time the person is logging into that new
+    computer, to that new phone, once the system knows it's new... it asks
+    that question... a very good, well-designed card... floats... we have
+    to make it not to be a choice... there is no X, it's only the allow
+    button... write it in a way that they know that it's a mandatory
+    requirement." Not started. Note: the phone's own "Allow?" question
+    still has a Block choice; if Block is picked, the card stays and shows
+    how to allow it in the settings.
+
+    Built 2026-10-30: the Allow card, middle of the screen, no X, only
+    Allow; Block shows how to switch it on, and Check again. LIVE 2026-10-30.
+104. **iPhone, iPad and Mac: install first, then the alerts card.**
+    (2026-10-30) "If it is a Mac system, an iPad, the system forces them to
+    download. So what now floats... will be the download instruction to
+    install... You can even animate the process... click on the share
+    button, then click on the home screen... it's only when they have
+    downloaded it and open it will they allow for notification floating."
+    Same for Android: install first, then the Allow card inside the
+    installed app ("just the same way for the iPhone"). No website can
+    install itself on iPhone or Safari, so the animation guides them.
+    Goes with 102 and 103. Not started.
+    Built 2026-10-30: install card first on every device; one tap Install
+    where the browser allows it, the animated guide where it does not;
+    the Allow card only inside the installed app. LIVE 2026-10-30.
+105. **The alert should ring loud, not sound like a message.** (2026-10-30)
+    "It just did tokotom as if one message pops in. So it didn't force
+    serious ring." A web app cannot choose its own notification sound; the
+    phone uses its notification tone. Options given to him 2026-10-30:
+    (a) after install on Android, the app gets its own notification
+    setting, so each phone sets a loud ring tone for RHEMA once (a step in
+    the install guide); (b) later, a small native app wrapper (item 29)
+    can play a real alarm sound. DECIDED 2026-10-30: option (a). Built as
+    part of 102 to 104.
+
+    LIVE 2026-10-30. Done.
+106. **Fix the GitHub notes: Node.js 20 and ubuntu-latest.** (2026-10-30)
+    "Fix the fixes for the notification on the Node.js and the Ubuntu
+    latest, apply them so that nothing takes us by surprise. Use newer
+    version and name the name." Done 2026-10-30: checkout v6, setup-node
+    v6, setup-python v6, upload-artifact v6, supabase/setup-cli v2 (all
+    checked to run on Node.js 24), and every job runs on ubuntu-24.04 by
+    name. Green on testing and live 2026-10-30; the Node.js note is gone
+    from the logs. Done.

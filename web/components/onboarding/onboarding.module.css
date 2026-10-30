@@ -128,6 +128,22 @@
   }
 }
 
+/* "Already installed? Tap here to skip this": its own line, readable, but
+   quieter than the Install button, so the eye goes to Install first. */
+.skip {
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: #475569;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: 0;
+  padding: 2px 0 0;
+  cursor: pointer;
+  animation: slide 0.35s ease-out both;
+}
+
 /* ===== 3. Buttons and small text ===== */
 .primary {
   font: inherit;
@@ -242,7 +258,114 @@
   border-radius: 5px;
 }
 
+/* The Share menu drifts up a little, and a finger swipes up: "scroll". */
+.scrollHint {
+  animation: drift 3.5s ease-in-out infinite;
+}
+
+.swipe {
+  animation: swipe 1.4s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%,
+  30% {
+    transform: translateY(0);
+  }
+  70%,
+  100% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes swipe {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+
+/* On the install page: the picture, with the numbered steps beside it
+   (below it on a phone). */
+.guideScene {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.guideWide {
+  text-align: left;
+}
+
+.stepList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  gap: 6px;
+}
+
+.stepItem {
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #334155;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+}
+
+.stepItem[aria-current='step'] {
+  background: #e8f0fd;
+  border-color: #cfe0fb;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #94a3b8;
+}
+
+.stepItem[aria-current='step'] .stepNumber {
+  background: #e53935;
+}
+
+@media (min-width: 720px) {
+  .guideWide {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 20px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .scrollHint,
+  .swipe,
   .backdrop,
   .card,
   .explain::before,
