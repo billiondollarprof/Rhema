@@ -669,3 +669,18 @@ this file.
     "Go on the slides too" (2026-10-30) read as "go on slice two". Slice 2 next: attached result files, compressed.
     Slice 2 LIVE 2026-10-30: all checks green on testing (one database
     start failure before any test, re-run once) and live.
+94. **Backup to a second Cloudflare account.** "Use a second Cloudflare
+    account for backup of the data they are putting in." Nightly copy of
+    the database export and the files to R2 in a separate account.
+    Done 2026-10-31: the first nightly backup ran on live and passed every
+    step (copy, lock, upload, download, unlock, key tables present).
+116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
+    "Is it better we use an encrypted Google drive since it's 15gb... Or
+    we can use GCP... I think we should just use Cloudflare now. That means
+    I open another... Gmail account... so that I can open Cloudflare. Yeah?"
+    Answered: second Cloudflare, with a new Gmail. Done 2026-10-31: bucket
+    rhema-backup, an R2 key limited to that bucket (Object Read & Write
+    only), and the four GitHub secrets. The nightly backup workflow
+    (.github/workflows/backup.yml) is built.
+    Done 2026-10-31: the first nightly backup ran on live and passed every
+    step (copy, lock, upload, download, unlock, key tables present).

@@ -39,7 +39,19 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
-      - uses: supabase/setup-cli@v2
+      # The install sometimes stalls before any test runs (request 120,
+      # 2026-10-30 and 31): give it 3 minutes, then try once more.
+      - name: Install the Supabase tool
+        id: supabase_cli
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
+        continue-on-error: true
+        with:
+          version: 2.122.0
+      - name: Install the Supabase tool (second try)
+        if: steps.supabase_cli.outcome != 'success'
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
         with:
           version: 2.122.0
       - name: Start a throwaway Supabase database
@@ -60,7 +72,19 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: supabase/setup-cli@v2
+      # The install sometimes stalls before any test runs (request 120,
+      # 2026-10-30 and 31): give it 3 minutes, then try once more.
+      - name: Install the Supabase tool
+        id: supabase_cli
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
+        continue-on-error: true
+        with:
+          version: 2.122.0
+      - name: Install the Supabase tool (second try)
+        if: steps.supabase_cli.outcome != 'success'
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
         with:
           version: 2.122.0
       - run: npm ci
