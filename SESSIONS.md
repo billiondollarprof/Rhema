@@ -137,3 +137,5 @@ build from the RHEMA demo and the proposal.
 - 2026-10-31: on the client's computer the site showed "Not secure": the
   address was typed without https://. Menu button now icon only, and the
   desktop top bar lines up with the page column (124).
+
+- 2026-10-31: lock screen fixed for desktops (125): a click while loading is kept, and any key opens the PIN card.
