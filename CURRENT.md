@@ -311,6 +311,10 @@ These never come off the list.
   when they open the record. Alerts only for what was requested or sent on
   purpose. Full record: doctors, nurses, matron only. Lock screen 10 minutes.
 
+- 2026-10-31: Lock screen after 1 hour without use, not 10 minutes. "We're
+  going to extend the idle lock screen time to 1hr because of network
+  connections, so they don't get locked unnecessarily."
+
 - 2026-10-27: Licence. "The entire back end for this particular project
   belongs to Rhema." StellaXafe keeps its general foundation and can build
   similar systems for other clients, but never reuses this project's code as
