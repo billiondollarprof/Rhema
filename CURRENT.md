@@ -244,6 +244,34 @@ Numbers are kept from the full list, so older notes still match.
     or email from 6 Nov), then messages, notifications, announcements,
     printing.
 
+127. **Attachments on every patient record, auto fill from a scan, and a
+    download choice.** (2026-10-31, from the client meeting) "the doctor
+    was saying that every patient they open profile for, they will be
+    attaching files like the document or scan. So they don't have to write
+    everything by hand... he was saying something about creating profile
+    for all the patients they had before... if they are able to scan it
+    cleanly or use good camera, snap the file, upload it, then the system
+    automatically fetches the data that it recognizes, like name, phone
+    number, the important data, and populates the record, especially
+    biodata information... every patient's record can carry attachments...
+    they can click attach, then it will prompt their computer, they'll be
+    able to upload a document... later, if they want to download the
+    patient's medical history, they can download the entire thing or
+    download only the file. So when they click download, it will now ask
+    them whether to download the full medical history or just the
+    attachment, if there's an attachment." Three parts:
+    a. Attach: any record takes files (photo, scan, PDF) from the computer
+       or the camera, kept on the record (same safe store as lab files).
+    b. Auto fill: upload a scan of an old card or form, the system reads
+       name, phone and the other biodata, fills the registration form, and
+       staff check it before saving. For bringing in the old patients.
+       Needs his decision before building: reading the scan means sending
+       patient data to a reading service, which is a data protection
+       question (NDPA) and may cost money (CLAUDE.md section 2).
+    c. Download: a Download button on the record asks "Full medical
+       history" or "Attachments only" (the second only when there are any).
+    Recorded; not started. Say back to him before building.
+
 ### Standing instructions
 
 These never come off the list.
