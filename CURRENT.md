@@ -205,6 +205,18 @@ Numbers are kept from the full list, so older notes still match.
     (menu), 119 (file backup), 120 (CI stall), the AWS watcher with him,
     then one full review pass of everything built.
 
+122. **Demo data on testing, and the full review.** (2026-10-31) "Let's
+    just go straight to the review. Take it one step at a time, each
+    module, everything. Make sure that all the modules are already built...
+    when I'm going to go and meet the client in the next 1 hour... I'll be
+    asking you to switch to front desk, switch to lab, pharmacy... I think
+    you should put some test data in the testing sites... a few patient
+    test data... of which we know that it's going to expire by its own in
+    7 days." Built: .github/workflows/testing-seed.yml (testing only,
+    once only), waiting for his yes to run it. Note for him: database rows
+    do not expire by themselves; only testing FILES are deleted after 7
+    days.
+
 ### Standing instructions
 
 These never come off the list.
