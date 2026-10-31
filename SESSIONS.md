@@ -120,3 +120,7 @@ build from the RHEMA demo and the proposal.
   only for the Laboratory tick and serves only when the database lets the
   person read the result; testing and live have their own R2 buckets
   (wrangler env "testing"). He is making the backup account's R2 key.
+
+- 2026-10-31: nightly backup live (94, 116 done). First run on live
+  passed every step. Recorded 117 (menu button), 118 (storage charging),
+  119 (back up lab files: needs a read only key), 120 (CI install stall).

@@ -165,9 +165,6 @@ Numbers are kept from the full list, so older notes still match.
     patient files outside Nigeria and outside the database's access rules,
     which the NDPA frame says he must decide on. Planned R2 (10 GB free in
     the hospital's Cloudflare) remains the default until he decides.
-94. **Backup to a second Cloudflare account.** "Use a second Cloudflare
-    account for backup of the data they are putting in." Nightly copy of
-    the database export and the files to R2 in a separate account.
 98. **Weekly digest: email, plus a notification in the app and on the
     phone** (with sound), opening the digest in the app. (2026-10-29)
 
@@ -192,15 +189,6 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
-116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
-    "Is it better we use an encrypted Google drive since it's 15gb... Or
-    we can use GCP... I think we should just use Cloudflare now. That means
-    I open another... Gmail account... so that I can open Cloudflare. Yeah?"
-    Answered: second Cloudflare, with a new Gmail. Done 2026-10-31: bucket
-    rhema-backup, an R2 key limited to that bucket (Object Read & Write
-    only), and the four GitHub secrets. The nightly backup workflow
-    (.github/workflows/backup.yml) is built.
-
 117. **Top bar: only Call attention, then a menu button (three lines).**
     (2026-10-31) "On the home screen there at the top bar, we already have
     three buttons there. So why not only the call attention will be there,
@@ -216,6 +204,15 @@ Numbers are kept from the full list, so older notes still match.
     get 20 GB free (10 GB live, 10 GB backup), alert when they pass it,
     then charge 30 cents per 10 GB against Cloudflare's 15 cents. Answered
     in chat; a usage watcher is to be built when a second client comes.
+
+119. **Back up the lab result files too.** (Found 2026-10-31.) The
+    nightly backup copies the database; the attached lab files in
+    rhema-files are not copied yet. Needs one more key from the MAIN
+    Cloudflare account: R2, Object Read only, bucket rhema-files. Ask him.
+120. **CI: the Supabase tool install stalls now and then** (3 times so
+    far, 2026-10-30 and 31), always before any test runs. Fix the cause:
+    a short time limit and one automatic retry on that step, so a stall
+    fails in minutes, not 20.
 
 ### Standing instructions
 
