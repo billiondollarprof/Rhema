@@ -2,9 +2,11 @@
  * components/shell/AppShell.tsx: the frame around every signed in screen.
  *
  * Why: the RHEMA demo's frame. A blue top bar with the hospital's logo, a
- * thin red line under it (request 114), and the person's badge,
- * name and role, Lock screen and Sign out. Under it, the menu: a bar along
- * the bottom on a phone, a column down the left on a wider screen.
+ * thin red line under it (request 114), the person's badge, Call attention
+ * and the menu button; Lock screen, Notifications, the installation guide
+ * and Sign out sit behind the menu (request 117, 2026-10-31). Under it,
+ * the page menu: a bar along the bottom on a phone, a column down the left
+ * on a wider screen.
  *
  * Menu items whose part of the app is not built yet show "Soon" and cannot
  * be pressed. Each one switches on when its module is built (set `ready`
@@ -26,6 +28,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import Icon from './Icon'
+import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
@@ -41,7 +44,6 @@ const MENU = [
   { href: '/', icon: 'home', label: 'Home', ready: true },
   { href: '/patients/', icon: 'users', label: 'Patients', ready: true },
   { href: '/messages/', icon: 'msg', label: 'Messages', ready: false },
-  { href: '/notifications/', icon: 'bell', label: 'Notifications', ready: false },
 ]
 
 // Only for a person with admin access (request 112). The database checks
@@ -84,14 +86,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             myRoomId={staff.room_id}
             buttonClass={styles.topButton}
           />
-          <button className={styles.topButton} onClick={auth.lock} aria-label="Lock screen">
-            <Icon name="lock" size={16} />
-            <span>Lock screen</span>
-          </button>
-          <button className={styles.topButton} onClick={auth.signOut} aria-label="Sign out">
-            <Icon name="out" size={16} />
-            <span>Sign out</span>
-          </button>
+          {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
+          <MainMenu buttonClass={styles.topButton} />
         </header>
 
         <div className={styles.body}>

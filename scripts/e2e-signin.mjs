@@ -109,6 +109,12 @@ async function expectHome(page, name) {
   await page.getByText(name, { exact: true }).first().waitFor()
 }
 
+// Lock screen and Sign out sit behind the menu button (request 117).
+async function openMenuItem(page, words) {
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('menuitem', { name: words }).click()
+}
+
 async function openLockCard(page) {
   await page.getByText('Tap anywhere to unlock').waitFor()
   await page.getByRole('button', { name: 'Unlock' }).first().click()
@@ -154,7 +160,7 @@ try {
   await choosePin(page, '2580')
   await expectHome(page, 'Test Invited One')
   await shot(page, 'home-invited-one')
-  await page.getByRole('button', { name: 'Sign out' }).click()
+  await openMenuItem(page, 'Sign out')
   await page.getByText('Use the account your administrator created for you.').waitFor()
 
   step('A stranger is still refused after that')
@@ -387,7 +393,7 @@ try {
   await expectHome(page, 'Test Nurse One')
 
   step('Lock screen, a wrong PIN, then the right PIN')
-  await page.getByRole('button', { name: 'Lock screen' }).click()
+  await openMenuItem(page, 'Lock screen')
   await page.getByText('Tap anywhere to unlock').waitFor()
   await shot(page, 'locked-idle')
   await openLockCard(page)
@@ -400,7 +406,7 @@ try {
   await expectHome(page, 'Test Nurse One')
 
   step('A refresh while locked stays locked')
-  await page.getByRole('button', { name: 'Lock screen' }).click()
+  await openMenuItem(page, 'Lock screen')
   await page.getByText('Tap anywhere to unlock').waitFor()
   await page.reload()
   await page.getByText('Tap anywhere to unlock').waitFor()
@@ -416,7 +422,7 @@ try {
   await expectHome(page, 'Test Nurse Two')
 
   step('Nurse One taps her own name at the lock screen and uses her own PIN')
-  await page.getByRole('button', { name: 'Lock screen' }).click()
+  await openMenuItem(page, 'Lock screen')
   await openLockCard(page)
   await page.getByText('Not you? Tap your name.').waitFor()
   await shot(page, 'lock-shared-desk')
@@ -426,7 +432,7 @@ try {
   await expectHome(page, 'Test Nurse One')
 
   step('Nurse One signs out; Nurse Two is still remembered')
-  await page.getByRole('button', { name: 'Sign out' }).click()
+  await openMenuItem(page, 'Sign out')
   await page.getByText('Tap your name, then type your PIN.').waitFor()
   await page.getByRole('button', { name: /Test Nurse Two/ }).waitFor()
   if (await page.getByRole('button', { name: /Test Nurse One/ }).count()) {
