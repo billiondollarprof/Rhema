@@ -213,9 +213,19 @@ Numbers are kept from the full list, so older notes still match.
     you should put some test data in the testing sites... a few patient
     test data... of which we know that it's going to expire by its own in
     7 days." Built: .github/workflows/testing-seed.yml (testing only,
-    once only), waiting for his yes to run it. Note for him: database rows
+    once only). He said yes; it ran on testing 2026-10-31 and passed. Note for him: database rows
     do not expire by themselves; only testing FILES are deleted after 7
     days.
+
+123. **Why are Pharmacy, payments, messages, notifications, announcements
+    and printing not built?** (2026-10-31) "Why did you not build pharmacy?
+    Why did you not put the payments?... notification and the messaging...
+    Printing documents. What does it take to do it?... Do you need another
+    code? Do you need another access code?" Answered: nothing is missing;
+    they are the next steps of the build order; no new key is needed
+    (emails wait for Resend on 6 Nov). Proposed order: Pharmacy with drug
+    payments, then the other payments with receipts, then messages,
+    notifications, announcements, printing. Waiting for his yes.
 
 ### Standing instructions
 
