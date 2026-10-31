@@ -1,0 +1,147 @@
+# backup.yml: the nightly backup of the LIVE hospital database (request 94,
+# Anthony's choice 2026-10-30: a second Cloudflare account, not Google Drive).
+#
+# What it does, in order, every night at 02:17 Nigeria time:
+#   1. Copies the live database: the hospital's own tables (schemas public
+#      and private, with their rules) and the sign in accounts (auth.users,
+#      auth.identities), which the staff rows point at.
+#   2. Locks the copy with Anthony's passphrase (BACKUP_PASSPHRASE, AES-256)
+#      before it leaves GitHub's computer. Cloudflare only ever holds a
+#      scrambled file.
+#   3. Uploads it to the rhema-backup bucket in the separate backup account.
+#   4. Checks it: downloads it again, compares the fingerprint, unlocks it,
+#      and lists what is inside, so a broken backup fails loudly here instead
+#      of being found broken on the day it is needed.
+#   5. Keeps every night for 35 days, and the first of each month for good.
+#
+# A failed run is an outage (CLAUDE.md section 10): GitHub emails the repo
+# owner, and the run shows red.
+#
+# It must never: print a password, the passphrase or any patient detail;
+# upload an unlocked copy; touch the testing database; or delete a monthly
+# copy.
+name: Nightly backup
+on:
+  schedule:
+    # 01:17 UTC is 02:17 in Lagos, when the hospital is quietest.
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+env:
+  LIVE_REF: ntfvckqczpmylskusgft
+  BUCKET: rhema-backup
+
+jobs:
+  backup:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      LIVE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      R2_ACCOUNT: ${{ secrets.BACKUP_R2_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      # ===== 0. Stop at once if a key is missing =====
+      - name: Check every key is set
+        run: |
+          missing=""
+          for name in SUPABASE_ACCESS_TOKEN LIVE_PASSWORD PASSPHRASE R2_ACCOUNT AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then echo "Missing secrets:$missing"; exit 1; fi
+          echo "R2=https://$R2_ACCOUNT.r2.cloudflarestorage.com" >> "$GITHUB_ENV"
+
+      # ===== 1. The live database address (same method as db-live.yml) =====
+      - name: Build the database address
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$LIVE_REF/config/database/pooler")
+          host=$(echo "$pooler" | jq -r '.[0].db_host')
+          user=$(echo "$pooler" | jq -r '.[0].db_user')
+          pass=$(P="$LIVE_PASSWORD" python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["P"],safe=""))')
+          echo "::add-mask::$pass"
+          echo "LIVE_URL=postgresql://$user:$pass@$host:5432/postgres" >> "$GITHUB_ENV"
+
+      # ===== 2. Copy the database =====
+      # pg_dump from the official Postgres 17 image, the same version as the
+      # database, so the copy is exact. Two files, then one bundle.
+      - name: Copy the live database
+        run: |
+          mkdir -p copy
+          stamp=$(date -u +%Y-%m-%d)
+          echo "STAMP=$stamp" >> "$GITHUB_ENV"
+          docker run --rm --network host -e URL="$LIVE_URL" -v "$PWD/copy:/copy" postgres:17 \
+            sh -c 'pg_dump "$URL" --format=custom --schema=public --schema=private --file=/copy/hospital.dump &&
+                   pg_dump "$URL" --format=custom --data-only --table=auth.users --table=auth.identities --file=/copy/accounts.dump'
+          tar -czf "rhema-$stamp.tar.gz" -C copy hospital.dump accounts.dump
+          rm -rf copy
+          echo "Copy made: $(du -h "rhema-$stamp.tar.gz" | cut -f1)"
+
+      # ===== 3. Lock it with the passphrase =====
+      # The passphrase goes in through a pipe, never on the command line.
+      - name: Lock the copy
+        run: |
+          printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback \
+            --passphrase-fd 0 --symmetric --cipher-algo AES256 \
+            --output "rhema-$STAMP.tar.gz.gpg" "rhema-$STAMP.tar.gz"
+          rm -f "rhema-$STAMP.tar.gz"
+          sha256sum "rhema-$STAMP.tar.gz.gpg" | cut -d' ' -f1 > fingerprint.txt
+
+      # ===== 4. Upload to the backup account =====
+      - name: Upload to the backup account
+        run: |
+          aws s3 cp "rhema-$STAMP.tar.gz.gpg" "s3://$BUCKET/daily/rhema-$STAMP.tar.gz.gpg" \
+            --endpoint-url "$R2" --only-show-errors
+          # The first of the month is also kept for good.
+          if [ "$(date -u +%d)" = "01" ]; then
+            aws s3 cp "rhema-$STAMP.tar.gz.gpg" "s3://$BUCKET/monthly/rhema-$STAMP.tar.gz.gpg" \
+              --endpoint-url "$R2" --only-show-errors
+          fi
+
+      # ===== 5. Check it: download, compare, unlock, list =====
+      - name: Check the backup can be opened
+        run: |
+          aws s3 cp "s3://$BUCKET/daily/rhema-$STAMP.tar.gz.gpg" check.gpg --endpoint-url "$R2" --only-show-errors
+          if [ "$(sha256sum check.gpg | cut -d' ' -f1)" != "$(cat fingerprint.txt)" ]; then
+            echo "FAILED: the stored backup is not the one that was sent"; exit 1
+          fi
+          printf '%s' "$PASSPHRASE" | gpg --batch --quiet --pinentry-mode loopback \
+            --passphrase-fd 0 --decrypt --output check.tar.gz check.gpg
+          mkdir check && tar -xzf check.tar.gz -C check
+          docker run --rm -v "$PWD/check:/check" postgres:17 \
+            sh -c 'pg_restore --list /check/hospital.dump > /check/hospital.list && pg_restore --list /check/accounts.dump > /check/accounts.list'
+          # The tables the hospital cannot lose must be in the copy.
+          for table in patients staff medical_profiles lab_results payments activity_log; do
+            grep -q "TABLE DATA public $table " check/hospital.list || { echo "FAILED: $table is missing"; exit 1; }
+          done
+          grep -q "TABLE DATA auth users " check/accounts.list || { echo "FAILED: sign in accounts are missing"; exit 1; }
+          echo "Backup checked: stored, unchanged, opens with the passphrase, all key tables present."
+          rm -rf check check.gpg check.tar.gz
+
+      # ===== 6. Keep 35 days of nightly copies =====
+      - name: Remove nightly copies older than 35 days
+        run: |
+          cutoff=$(date -u -d '35 days ago' +%Y-%m-%d)
+          aws s3 ls "s3://$BUCKET/daily/" --endpoint-url "$R2" | awk '{print $4}' | while read -r name; do
+            day=$(echo "$name" | sed -n 's/^rhema-\([0-9-]*\)\.tar\.gz\.gpg$/\1/p')
+            if [ -n "$day" ] && [ "$day" \< "$cutoff" ]; then
+              aws s3 rm "s3://$BUCKET/daily/$name" --endpoint-url "$R2" --only-show-errors
+              echo "Removed an old nightly copy from $day"
+            fi
+          done
+
+      # ===== 7. Nothing left behind on GitHub's computer =====
+      - name: Clean up
+        if: always()
+        run: rm -rf copy check ./*.gpg ./*.tar.gz fingerprint.txt

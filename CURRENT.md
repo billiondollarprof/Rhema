@@ -192,35 +192,30 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
-115. **Laboratory (build step 5).** (2026-10-30) "do the laboratory."
-    Follows docs/DATABASE.md section 9 and requests 58 to 60. His answers
-    to the say back (2026-10-30):
-    - "Front desk usually add amount paid in naira not just tap paid and
-      they also add mode of payment just like during registration."
-    - "We can build the attach result infra now, also make sure that the
-      attached files is usually compressed without affecting the quality
-      of the document. PDF for a few pages is usually a few KBs."
-    - "The results should just be part of the patient's record/med
-      history, you only send a copy when a person requested for it so you
-      send to the person/notify the person while recording it into the
-      patients record simultaneously."
-    Slice 1 built 2026-10-30 (request, payment, results, alert); all
-    checks green on a throwaway Supabase. "Yes, run the lab SQL"
-    (2026-10-30). Buckets rhema-files and rhema-files-testing made by him,
-    the testing one deletes files after 7 days.
-    Slice 1 LIVE 2026-10-30 (merge 2a5fdaa): testing and live databases
-    took it, 0 warnings, all five checks passed; the real walk through
-    passed on testing. Slice 2 (attached files) built 2026-10-30: photos
-    shrunk in the phone to 2000 px WebP (a 3 MB printout photo became
-    192 KB and stays readable), PDFs as they are, 10 MB at most; the
-    Worker checks the Laboratory tick to store and the database to open.
-    "Go on the slides too" (2026-10-30) read as "go on slice two". Slice 2 next: attached result files, compressed.
 116. **Backup: second Cloudflare or encrypted Google Drive?** (2026-10-30)
     "Is it better we use an encrypted Google drive since it's 15gb... Or
     we can use GCP... I think we should just use Cloudflare now. That means
     I open another... Gmail account... so that I can open Cloudflare. Yeah?"
-    Answered: second Cloudflare, with a new Gmail. He is setting it up and
-    will add the token and the account ID to GitHub.
+    Answered: second Cloudflare, with a new Gmail. Done 2026-10-31: bucket
+    rhema-backup, an R2 key limited to that bucket (Object Read & Write
+    only), and the four GitHub secrets. The nightly backup workflow
+    (.github/workflows/backup.yml) is built.
+
+117. **Top bar: only Call attention, then a menu button (three lines).**
+    (2026-10-31) "On the home screen there at the top bar, we already have
+    three buttons there. So why not only the call attention will be there,
+    then by the right of it, hamburger menu icon." Behind the menu: Lock
+    screen, Notifications, the installation guide ("call it guide or
+    installation guide... later... inside that same installation guide,
+    we'll put a manual... about each of the modules"), Sign out, and later
+    the automations ("those messaging"). "Keeps it clean." Recorded; to be
+    built after the backup. The manual comes when the modules are done.
+118. **Storage use and charging when one card pays for every client.**
+    (2026-10-31) "Is there a way for me to automatically track how much
+    each person uses without opening Cloudflare?" Plan: tell clients they
+    get 20 GB free (10 GB live, 10 GB backup), alert when they pass it,
+    then charge 30 cents per 10 GB against Cloudflare's 15 cents. Answered
+    in chat; a usage watcher is to be built when a second client comes.
 
 ### Standing instructions
 
