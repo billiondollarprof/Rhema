@@ -225,7 +225,13 @@ Numbers are kept from the full list, so older notes still match.
     they are the next steps of the build order; no new key is needed
     (emails wait for Resend on 6 Nov). Proposed order: Pharmacy with drug
     payments, then the other payments with receipts, then messages,
-    notifications, announcements, printing. Waiting for his yes.
+    notifications, announcements, printing. His answer (2026-10-31): "do
+    pharmacy with drug payments now. And then after you're done with it,
+    then you follow it with other payments with printable receipts...
+    the receipts, you can also either print it or send to email as well...
+    Then later we can work on messages, notification, announcements, and
+    printing. So if you can do this too today, no problem." Pharmacy said
+    back to him the same day; waiting for his answers.
 
 ### Standing instructions
 
