@@ -248,6 +248,11 @@ These never come off the list.
 
 ### Decided
 
+- 2026-10-31: One AWS account for the company (StellaXafe), not one per
+  hospital, for the uptime watcher across all clients. "I just wanted to
+  open this one on my own company's account." A hospital gets its own AWS
+  account only if it ever stores data there and pays for it.
+
 - 2026-10-30: Invites use option A: Supabase "allow new users to sign up"
   is on, and a database rule refuses any new email without a waiting
   invitation under 72 hours old. No server key anywhere. He switched the
