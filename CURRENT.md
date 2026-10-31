@@ -231,7 +231,13 @@ Numbers are kept from the full list, so older notes still match.
     the receipts, you can also either print it or send to email as well...
     Then later we can work on messages, notification, announcements, and
     printing. So if you can do this too today, no problem." Pharmacy said
-    back to him the same day; waiting for his answers.
+    back to him the same day. His answers: "let the app always work out
+    the total, the front desk and the lab, they should be able to type in
+    their price. For now, they are typing in manually before later we
+    might now do API." Stock: "You can leave that out... no need." "It's a
+    hospital, so the doctor prescribes." (Doctors only. He did not ask for
+    a dispensed alert, so none: no alert spam, request 58.) So the Front
+    Desk types a price per drug and per lab test, and the app adds them up.
 
 ### Standing instructions
 
