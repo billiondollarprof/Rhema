@@ -215,7 +215,8 @@ Numbers are kept from the full list, so older notes still match.
 120. **CI: the Supabase tool install stalls now and then** (3 times so
     far, 2026-10-30 and 31), always before any test runs. Fix the cause:
     a short time limit and one automatic retry on that step, so a stall
-    fails in minutes, not 20.
+    fails in minutes, not 20. Built 2026-10-31: 3 minutes, then a second
+    try, in ci.yml, db-testing.yml and db-live.yml.
 
 121. **His plan for the rest of today (2026-10-31).** "First of all get
     the backup files [key]... Then I'll set up the budget. After that...

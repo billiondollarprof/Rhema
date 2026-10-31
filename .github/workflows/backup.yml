@@ -13,6 +13,12 @@
 #      and lists what is inside, so a broken backup fails loudly here instead
 #      of being found broken on the day it is needed.
 #   5. Keeps every night for 35 days, and the first of each month for good.
+#   6. Copies the attached lab result files (rhema-files, in the main
+#      Cloudflare account) into files/, each one locked with the same
+#      passphrase. Files never change once saved (each has a random name),
+#      so only files not copied before are copied, and none is ever removed
+#      from the backup. The main account key can only READ rhema-files
+#      (request 119).
 #
 # A failed run is an outage (CLAUDE.md section 10): GitHub emails the repo
 # owner, and the run shows red.
@@ -51,16 +57,21 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: auto
+      # The main account (where the live lab files are), read only.
+      FILES_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      FILES_KEY_ID: ${{ secrets.FILES_R2_ACCESS_KEY_ID }}
+      FILES_SECRET: ${{ secrets.FILES_R2_SECRET_ACCESS_KEY }}
     steps:
       # ===== 0. Stop at once if a key is missing =====
       - name: Check every key is set
         run: |
           missing=""
-          for name in SUPABASE_ACCESS_TOKEN LIVE_PASSWORD PASSPHRASE R2_ACCOUNT AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+          for name in SUPABASE_ACCESS_TOKEN LIVE_PASSWORD PASSPHRASE R2_ACCOUNT AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY FILES_ACCOUNT FILES_KEY_ID FILES_SECRET; do
             if [ -z "${!name}" ]; then missing="$missing $name"; fi
           done
           if [ -n "$missing" ]; then echo "Missing secrets:$missing"; exit 1; fi
           echo "R2=https://$R2_ACCOUNT.r2.cloudflarestorage.com" >> "$GITHUB_ENV"
+          echo "FILES_R2=https://$FILES_ACCOUNT.r2.cloudflarestorage.com" >> "$GITHUB_ENV"
 
       # ===== 1. The live database address (same method as db-live.yml) =====
       - name: Build the database address
@@ -141,7 +152,32 @@ jobs:
             fi
           done
 
-      # ===== 7. Nothing left behind on GitHub's computer =====
+      # ===== 7. The lab result files: copy the new ones, each locked =====
+      - name: Copy new lab result files
+        run: |
+          mkdir -p files
+          # What the backup already holds (names without the .gpg ending).
+          aws s3 ls "s3://$BUCKET/files/lab/" --endpoint-url "$R2" | awk '{print $4}' \
+            | sed 's/\.gpg$//' | sort > have.txt
+          # What the live bucket holds, read with the main account's read only key.
+          AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
+            aws s3 ls "s3://rhema-files/lab/" --endpoint-url "$FILES_R2" | awk '{print $4}' | sort > live.txt
+          copied=0
+          for name in $(comm -13 have.txt live.txt); do
+            # Our own names only (a random id and webp, jpg or pdf).
+            echo "$name" | grep -Eq '^[0-9a-f-]{36}\.(webp|jpg|pdf)$' || continue
+            AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
+              aws s3 cp "s3://rhema-files/lab/$name" "files/$name" --endpoint-url "$FILES_R2" --only-show-errors
+            printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback \
+              --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "files/$name.gpg" "files/$name"
+            aws s3 cp "files/$name.gpg" "s3://$BUCKET/files/lab/$name.gpg" --endpoint-url "$R2" --only-show-errors
+            rm -f "files/$name" "files/$name.gpg"
+            copied=$((copied + 1))
+          done
+          echo "Lab files: $(wc -l < live.txt) live, $copied newly copied, all locked."
+          rm -rf files have.txt live.txt
+
+      # ===== 8. Nothing left behind on GitHub's computer =====
       - name: Clean up
         if: always()
-        run: rm -rf copy check ./*.gpg ./*.tar.gz fingerprint.txt
+        run: rm -rf copy check files ./*.gpg ./*.tar.gz fingerprint.txt have.txt live.txt

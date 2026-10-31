@@ -37,7 +37,19 @@ jobs:
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_TESTING }}
     steps:
       - uses: actions/checkout@v6
-      - uses: supabase/setup-cli@v2
+      # The install sometimes stalls before any test runs (request 120,
+      # 2026-10-30 and 31): give it 3 minutes, then try once more.
+      - name: Install the Supabase tool
+        id: supabase_cli
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
+        continue-on-error: true
+        with:
+          version: 2.122.0
+      - name: Install the Supabase tool (second try)
+        if: steps.supabase_cli.outcome != 'success'
+        uses: supabase/setup-cli@v2
+        timeout-minutes: 3
         with:
           version: 2.122.0
 
