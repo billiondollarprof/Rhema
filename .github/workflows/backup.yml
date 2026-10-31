@@ -156,12 +156,17 @@ jobs:
       - name: Copy new lab result files
         run: |
           mkdir -p files
+          # Each list is read on its own line (not in a pipe), so a wrong key
+          # stops the run here instead of quietly looking like "0 files".
           # What the backup already holds (names without the .gpg ending).
-          aws s3 ls "s3://$BUCKET/files/lab/" --endpoint-url "$R2" | awk '{print $4}' \
-            | sed 's/\.gpg$//' | sort > have.txt
+          aws s3api list-objects-v2 --bucket "$BUCKET" --prefix files/lab/ --endpoint-url "$R2" \
+            --query 'Contents[].Key' --output text > have.raw
+          tr '\t' '\n' < have.raw | grep -v '^None$' | sed 's#^files/lab/##; s/\.gpg$//' | sort > have.txt || true
           # What the live bucket holds, read with the main account's read only key.
           AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
-            aws s3 ls "s3://rhema-files/lab/" --endpoint-url "$FILES_R2" | awk '{print $4}' | sort > live.txt
+            aws s3api list-objects-v2 --bucket rhema-files --prefix lab/ --endpoint-url "$FILES_R2" \
+            --query 'Contents[].Key' --output text > live.raw
+          tr '\t' '\n' < live.raw | grep -v '^None$' | sed 's#^lab/##' | sort > live.txt || true
           copied=0
           for name in $(comm -13 have.txt live.txt); do
             # Our own names only (a random id and webp, jpg or pdf).
@@ -175,9 +180,9 @@ jobs:
             copied=$((copied + 1))
           done
           echo "Lab files: $(wc -l < live.txt) live, $copied newly copied, all locked."
-          rm -rf files have.txt live.txt
+          rm -rf files have.txt live.txt have.raw live.raw
 
       # ===== 8. Nothing left behind on GitHub's computer =====
       - name: Clean up
         if: always()
-        run: rm -rf copy check files ./*.gpg ./*.tar.gz fingerprint.txt have.txt live.txt
+        run: rm -rf copy check files ./*.gpg ./*.tar.gz fingerprint.txt have.txt live.txt have.raw live.raw
