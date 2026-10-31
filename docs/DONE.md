@@ -726,3 +726,11 @@ this file.
     page's own left and right edges; the page column is 1280px wide (was
     1100px), shared through --page-width. The drop down panels open under
     their buttons. Done and live 2026-10-31.
+125. **Lock screen did not respond to a mouse click on a desktop.**
+    (2026-10-31, on the client's computer) "after locking the screen, I
+    tapped on the covered screen so I can enter the PIN but it's not
+    responding... I thought clicking enter solves or just clicking the
+    mouse." Cause: a click while the lock page was still loading was used
+    up and the cover went away with no card. Now the cover stays until the
+    card shows, and any key (Enter, a digit) opens the card too. Done and
+    live 2026-10-31.
