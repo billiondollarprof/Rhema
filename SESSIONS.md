@@ -124,3 +124,7 @@ build from the RHEMA demo and the proposal.
 - 2026-10-31: nightly backup live (94, 116 done). First run on live
   passed every step. Recorded 117 (menu button), 118 (storage charging),
   119 (back up lab files: needs a read only key), 120 (CI install stall).
+
+- 2026-10-31: menu button live (117); backup now copies lab files, each
+  locked (119), and fails loudly on a bad key; CI tool install has a 3
+  minute limit and one retry (120). AWS account: his phone code is late.

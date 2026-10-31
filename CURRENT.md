@@ -189,15 +189,6 @@ Numbers are kept from the full list, so older notes still match.
     plain word with the director, because that account can see patient
     records (NDPA).
 
-117. **Top bar: only Call attention, then a menu button (three lines).**
-    (2026-10-31) "On the home screen there at the top bar, we already have
-    three buttons there. So why not only the call attention will be there,
-    then by the right of it, hamburger menu icon." Behind the menu: Lock
-    screen, Notifications, the installation guide ("call it guide or
-    installation guide... later... inside that same installation guide,
-    we'll put a manual... about each of the modules"), Sign out, and later
-    the automations ("those messaging"). "Keeps it clean." Recorded; to be
-    built after the backup. The manual comes when the modules are done.
 118. **Storage use and charging when one card pays for every client.**
     (2026-10-31) "Is there a way for me to automatically track how much
     each person uses without opening Cloudflare?" Plan: tell clients they

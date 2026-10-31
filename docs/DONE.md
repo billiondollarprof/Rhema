@@ -698,3 +698,14 @@ this file.
     fails in minutes, not 20. Built 2026-10-31: 3 minutes, then a second
     try, in ci.yml, db-testing.yml and db-live.yml.
     Done and live 2026-10-31.
+117. **Top bar: only Call attention, then a menu button (three lines).**
+    (2026-10-31) "On the home screen there at the top bar, we already have
+    three buttons there. So why not only the call attention will be there,
+    then by the right of it, hamburger menu icon." Behind the menu: Lock
+    screen, Notifications, the installation guide ("call it guide or
+    installation guide... later... inside that same installation guide,
+    we'll put a manual... about each of the modules"), Sign out, and later
+    the automations ("those messaging"). "Keeps it clean." Recorded; to be
+    built after the backup. The manual comes when the modules are done.
+    Done and live 2026-10-31. Notifications moved from the bottom bar into
+    the menu. The user manual goes inside the installation guide later.
