@@ -65,7 +65,16 @@ jobs:
                 can_lab      = :'role' in ('laboratory', 'doctor', 'admin'),
                 can_announce = :'role' in ('admin', 'nurse', 'matron'),
                 can_admin    = true,
-                can_logs     = true
+                can_logs     = true,
+                -- The room that goes with the role, so the demo queues show
+                -- (request 122). Admin keeps whatever room it had.
+                room_id      = coalesce((select r.id from public.rooms r where r.name = case :'role'
+                                 when 'doctor'     then 'Consultant Room 1'
+                                 when 'nurse'      then 'Nursing Station 1'
+                                 when 'matron'     then 'Matron''s Office'
+                                 when 'laboratory' then 'Laboratory'
+                                 when 'pharmacy'   then 'Pharmacy'
+                                 when 'front_desk' then 'Front Desk' end), room_id)
             where email = 'rhemamedical7@gmail.com'
             returning 1
           )
