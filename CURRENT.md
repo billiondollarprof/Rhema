@@ -196,8 +196,10 @@ Numbers are kept from the full list, so older notes still match.
     "Is it better we use an encrypted Google drive since it's 15gb... Or
     we can use GCP... I think we should just use Cloudflare now. That means
     I open another... Gmail account... so that I can open Cloudflare. Yeah?"
-    Answered: second Cloudflare, with a new Gmail. He is setting it up and
-    will add the token and the account ID to GitHub.
+    Answered: second Cloudflare, with a new Gmail. Done 2026-10-31: bucket
+    rhema-backup, an R2 key limited to that bucket (Object Read & Write
+    only), and the four GitHub secrets. The nightly backup workflow
+    (.github/workflows/backup.yml) is built.
 
 117. **Top bar: only Call attention, then a menu button (three lines).**
     (2026-10-31) "On the home screen there at the top bar, we already have
