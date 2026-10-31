@@ -7,7 +7,7 @@
 .page {
   display: grid;
   gap: 14px;
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
 }
 

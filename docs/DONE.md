@@ -717,3 +717,12 @@ this file.
     per drug (and per lab test), the app and the database add them up;
     the Pharmacy taps Dispensed and the drugs join current medications.
     No stock counting. Done and live 2026-10-31.
+124. **Menu button without the word "Menu", and a balanced desktop.**
+    (2026-10-31, from the client's computer) "I don't think you really
+    needed to write a menu on the iBurger menu... the interface is not well
+    balanced on the desktop... Balance the interface for desktop properly."
+    The menu button is the three lines only. On a desktop the logo sits
+    above the left menu, and the name and the buttons line up with the
+    page's own left and right edges; the page column is 1280px wide (was
+    1100px), shared through --page-width. The drop down panels open under
+    their buttons. Done and live 2026-10-31.

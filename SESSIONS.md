@@ -133,3 +133,7 @@ build from the RHEMA demo and the proposal.
   per lab test, total worked out by the app and the database. Testing and
   live both took the migration with 0 security warnings. Next: other
   payments with printable receipts.
+
+- 2026-10-31: on the client's computer the site showed "Not secure": the
+  address was typed without https://. Menu button now icon only, and the
+  desktop top bar lines up with the page column (124).
