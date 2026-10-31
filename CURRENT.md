@@ -238,11 +238,11 @@ Numbers are kept from the full list, so older notes still match.
     hospital, so the doctor prescribes." (Doctors only. He did not ask for
     a dispensed alert, so none: no alert spam, request 58.) So the Front
     Desk types a price per drug and per lab test, and the app adds them up.
-    Status 2026-10-31: Pharmacy built and checked locally (walkthrough,
-    screenshots, overflow, verify, 7 database tests, 13 of 13 breaks
-    caught). Commit 2a4b400 on the feature branch. Waiting for his yes on
-    the SQL batch before it goes to testing. Next: other payments with
-    printable receipts (email from 6 Nov).
+    Pharmacy with drug payments: done and live 2026-10-31 (his yes on the
+    SQL batch the same day; testing and live both 0 security warnings).
+    Still open under 123: other payments with printable receipts (print,
+    or email from 6 Nov), then messages, notifications, announcements,
+    printing.
 
 ### Standing instructions
 

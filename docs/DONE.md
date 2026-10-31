@@ -709,3 +709,11 @@ this file.
     built after the backup. The manual comes when the modules are done.
     Done and live 2026-10-31. Notifications moved from the bottom bar into
     the menu. The user manual goes inside the installation guide later.
+123a. **Pharmacy with drug payments.** (2026-10-31) "do pharmacy with drug
+    payments now." "Let the app always work out the total... they should
+    be able to type in their price." "It's a hospital, so the doctor
+    prescribes." A doctor prescribes from the record and sends it to the
+    Front Desk or straight to the Pharmacy; the Front Desk types a price
+    per drug (and per lab test), the app and the database add them up;
+    the Pharmacy taps Dispensed and the drugs join current medications.
+    No stock counting. Done and live 2026-10-31.
