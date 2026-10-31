@@ -71,7 +71,12 @@ const REQUEST_COLUMNS =
 
 // "₦7,500.50", "₦7,500".
 export function naira(amount: number): string {
-  return '₦' + amount.toLocaleString('en-NG', { maximumFractionDigits: 2 })
+  // Whole naira show no kobo (₦7,500); kobo always show two digits (₦4,700.50).
+  const digits = Number.isInteger(amount) ? 0 : 2
+  return (
+    '₦' +
+    amount.toLocaleString('en-NG', { minimumFractionDigits: digits, maximumFractionDigits: 2 })
+  )
 }
 
 // ===== 2. A doctor, nurse or matron requests tests =====
@@ -114,6 +119,25 @@ export async function payLabRequest(
   })
   // "already_paid": somebody else at the desk paid it a moment ago. The
   // list refreshes and it drops off, so there is nothing to say.
+  if (error || (data !== 'paid' && data !== 'already_paid')) {
+    return 'The payment could not be saved. Check the internet and try again.'
+  }
+  return null
+}
+
+// A price per test (2026-10-31: "let the app always work out the total").
+// The database adds the lines up; the screen never sends a total.
+export async function payLabRequestLines(
+  client: SupabaseClient,
+  requestId: number,
+  lines: { label: string; amount: number }[],
+  mode: PaymentMode,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('pay_lab_request_lines', {
+    request: requestId,
+    lines,
+    paid_by: mode,
+  })
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }

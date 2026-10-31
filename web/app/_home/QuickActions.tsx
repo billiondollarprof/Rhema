@@ -22,6 +22,8 @@ type Action = { icon: string; label: string; colour: string; ready: boolean; job
 const QUEUE = 'queue'
 // Scrolls to the Laboratory card (request 115).
 const LAB = 'lab'
+// Scrolls to the Pharmacy card (request 123).
+const PHARMACY_CARD = 'pharmacy'
 const SOON = 'soon'
 // Opens the Call attention list in the top bar, not a page.
 const ATTENTION = 'attention'
@@ -47,7 +49,7 @@ const NURSE: Action[] = [
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const PHARMACY: Action[] = [
-  { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: QUEUE },
+  { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: PHARMACY_CARD },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
   { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: false, job: SOON },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
@@ -90,7 +92,7 @@ export default function QuickActions({ role }: { role: string }) {
   function run(action: Action) {
     if (action.job === ATTENTION) {
       attention.setOpen(true)
-    } else if (action.job === QUEUE || action.job === LAB) {
+    } else if (action.job === QUEUE || action.job === LAB || action.job === PHARMACY_CARD) {
       document.getElementById(action.job)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     } else if (action.job.startsWith('/')) {
       router.push(action.job)

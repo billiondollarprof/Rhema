@@ -364,9 +364,10 @@ try {
   await desk.getByText('Lab tests to pay for').waitFor()
   await desk.getByText('Asked by Test Nurse One').waitFor()
   await desk.getByRole('button', { name: 'Take payment' }).click()
-  await desk.getByLabel('Amount paid').fill('2,000')
+  // One price box per test; the app shows the total on the button.
+  await desk.getByLabel('Malaria test').fill('2,000')
   await desk.getByRole('button', { name: 'POS' }).click()
-  await desk.getByRole('button', { name: 'Record payment' }).click()
+  await desk.getByRole('button', { name: 'Record payment · ₦2,000' }).click()
   await desk.getByText('Nothing waiting for payment.').waitFor()
   await desk.reload()
   await desk.getByText('Nothing waiting for payment.').waitFor()

@@ -330,6 +330,43 @@ a.button {
   padding: 8px 10px;
 }
 
+/* The drugs on a prescription (PharmacyCard). */
+.drugs {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.drugs small {
+  color: var(--mut);
+}
+
+/* One price box per test or drug, with its name above (PriceForm). */
+.priceLine {
+  display: grid;
+  gap: 4px;
+}
+
+.priceLine label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 2px 0;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.total b {
+  font-size: 20px;
+}
+
 .fieldLabel {
   font-size: 12px;
   font-weight: 600;

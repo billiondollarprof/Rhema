@@ -213,9 +213,36 @@ Numbers are kept from the full list, so older notes still match.
     you should put some test data in the testing sites... a few patient
     test data... of which we know that it's going to expire by its own in
     7 days." Built: .github/workflows/testing-seed.yml (testing only,
-    once only), waiting for his yes to run it. Note for him: database rows
+    once only). He said yes; it ran on testing 2026-10-31 and passed. Note for him: database rows
     do not expire by themselves; only testing FILES are deleted after 7
     days.
+
+123. **Why are Pharmacy, payments, messages, notifications, announcements
+    and printing not built?** (2026-10-31) "Why did you not build pharmacy?
+    Why did you not put the payments?... notification and the messaging...
+    Printing documents. What does it take to do it?... Do you need another
+    code? Do you need another access code?" Answered: nothing is missing;
+    they are the next steps of the build order; no new key is needed
+    (emails wait for Resend on 6 Nov). Proposed order: Pharmacy with drug
+    payments, then the other payments with receipts, then messages,
+    notifications, announcements, printing. His answer (2026-10-31): "do
+    pharmacy with drug payments now. And then after you're done with it,
+    then you follow it with other payments with printable receipts...
+    the receipts, you can also either print it or send to email as well...
+    Then later we can work on messages, notification, announcements, and
+    printing. So if you can do this too today, no problem." Pharmacy said
+    back to him the same day. His answers: "let the app always work out
+    the total, the front desk and the lab, they should be able to type in
+    their price. For now, they are typing in manually before later we
+    might now do API." Stock: "You can leave that out... no need." "It's a
+    hospital, so the doctor prescribes." (Doctors only. He did not ask for
+    a dispensed alert, so none: no alert spam, request 58.) So the Front
+    Desk types a price per drug and per lab test, and the app adds them up.
+    Status 2026-10-31: Pharmacy built and checked locally (walkthrough,
+    screenshots, overflow, verify, 7 database tests, 13 of 13 breaks
+    caught). Commit 2a4b400 on the feature branch. Waiting for his yes on
+    the SQL batch before it goes to testing. Next: other payments with
+    printable receipts (email from 6 Nov).
 
 ### Standing instructions
 
