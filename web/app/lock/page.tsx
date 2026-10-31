@@ -11,12 +11,17 @@
  * people signed in on this device. Each one taps their own name and types
  * their own PIN, so whatever they do next carries their name.
  *
+ * A click, a tap, or any key (Enter, a digit) opens the card. If the page
+ * is still loading when somebody clicks, the card opens the moment it is
+ * ready, and the cover keeps listening until then (Anthony, 2026-10-31:
+ * a click on a desktop did nothing).
+ *
  * Never: show anything from a patient record here. Never unlock without the
  * database saying the PIN is right.
  */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import IdleScreen from '@/components/IdleScreen'
 import PersonBadge from '@/components/auth/PersonBadge'
@@ -32,18 +37,34 @@ export default function LockPage() {
   const auth = useAuth()
   useRightPage(auth.status, '/lock/')
   const [open, setOpen] = useState(false)
+  // The card shows only once the account is known to be locked.
+  const showCard = open && auth.status === 'locked' && Boolean(auth.account)
+
+  // ===== 1a. Any key opens the card too, for a desktop with a keyboard =====
+  useEffect(() => {
+    if (showCard) return
+    function onKey(event: KeyboardEvent) {
+      // Leave shortcuts such as Ctrl + R to the browser.
+      if (event.ctrlKey || event.metaKey || event.altKey) return
+      setOpen(true)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showCard])
 
   return (
     <>
       {/* ===== 1. The idle screen, until somebody taps it. The hospital
           photos float behind it (Anthony, 2026-10-30). ===== */}
       <IdleScreen footer={<span>Tap anywhere to unlock</span>} behind={<SignInPhotos />} />
-      {!open ? (
+      {/* The cover stays until the card is really showing, so a click while
+          the page is still loading is never lost. */}
+      {!showCard ? (
         <button className={styles.tapArea} aria-label="Unlock" onClick={() => setOpen(true)} />
       ) : null}
 
       {/* ===== 2. The PIN card. A new key per person starts it empty. ===== */}
-      {open && auth.status === 'locked' && auth.account ? <PinCard key={auth.account.id} /> : null}
+      {showCard && auth.account ? <PinCard key={auth.account.id} /> : null}
     </>
   )
 }
