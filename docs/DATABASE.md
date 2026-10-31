@@ -46,10 +46,11 @@ are used, none of their code.
 
 - **First sign in:** the admin invites the person, and they sign in with a
   code sent to their email. No passwords.
-- **The lock screen:** after **10 minutes** with no use, the app locks and
+- **The lock screen:** after **1 hour** with no use (10 minutes until
+  2026-10-31, changed by Anthony because of slow networks), the app locks and
   asks for the 4 digit PIN. The lock screen uses the RHEMA idle design
   (waves, ring, shimmer) with the PIN pad on it, so there is no separate
-  idle screen. The admin can change the 10 minutes.
+  idle screen. The admin can change the 1 hour.
 - **PIN safety (security):** the PIN is stored scrambled (hashed), never as
   the digits. 5 wrong tries signs the person out completely.
 - **Long absence:** if an account has not been used for **24 hours**, the

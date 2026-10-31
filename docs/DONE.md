@@ -734,3 +734,7 @@ this file.
     up and the cover went away with no card. Now the cover stays until the
     card shows, and any key (Enter, a digit) opens the card too. Done and
     live 2026-10-31.
+126. **Idle lock after 1 hour, not 10 minutes.** (2026-10-31) "extend the
+    idle lock screen time to 1hr because of network connections, so they
+    don't get locked unnecessarily when network is loading slowly." Done
+    and live 2026-10-31. Lock screen from the menu still locks at once.

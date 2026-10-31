@@ -1,7 +1,7 @@
 /*
  * app/lock/page.tsx: the lock screen.
  *
- * Why: after 10 minutes without use, or when somebody taps "Lock screen",
+ * Why: after 1 hour without use, or when somebody taps "Lock screen",
  * the RHEMA idle screen covers the app (Anthony, 2026-10-28: the lock
  * screen uses the idle design). Tapping it opens the PIN card from the
  * demo: "Welcome back", 4 digits, Unlock. Since 2026-10-30 the hospital

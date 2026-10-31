@@ -14,7 +14,7 @@
  *   locked          signed in, but the PIN must be typed to carry on
  *   ready           signed in and unlocked
  *
- * Rules from Anthony (2026-10-28 and 29): lock after 10 minutes without use;
+ * Rules from Anthony (2026-10-28 and 29): lock after 1 hour without use (10 minutes until 2026-10-31);
  * signed out of the device after 24 hours without use; 5 wrong PINs means
  * sign in again with an email code. The PIN is checked by the database.
  *
@@ -254,7 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     start()
   }, [activate, finishSignIn, signOutHere])
 
-  // ----- 3e. Lock after 10 minutes without use -----
+  // ----- 3e. Lock after 1 hour without use (LOCK_AFTER_MS) -----
   const lastTouch = useRef(0)
   useEffect(() => {
     if (status !== 'ready' || !account) return
