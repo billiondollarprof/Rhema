@@ -1,8 +1,9 @@
 /*
  * app/_home/LabCard.tsx: the Laboratory card on Home. It shows a different
  * list to each person (request 115):
- *   Front Desk, Admin     tests waiting for payment: amount in naira, the
- *                         mode (Cash, POS, Transfer), Record payment.
+ *   Front Desk, Admin     tests waiting for payment: a price for each test
+ *                         (the app adds them up), the mode (Cash, POS,
+ *                         Transfer), Record payment (PriceForm.tsx).
  *   Laboratory            tests to do: Enter results; and a way to add a
  *                         result for a walk in.
  *   Doctor, Nurse, Matron results ready for the tests they asked for. A
@@ -21,18 +22,17 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import PriceForm from './PriceForm'
 import styles from './home.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { waitedSince } from '@/lib/patients/age'
 import {
-  PAYMENT_MODES,
   listAwaitingPayment,
   listAwaitingTest,
   listMyReadyResults,
   markSeen,
-  payLabRequest,
+  payLabRequestLines,
   type LabRequest,
-  type PaymentMode,
 } from '@/lib/lab/lab'
 
 type View = 'pay' | 'lab' | 'mine'
@@ -165,84 +165,15 @@ function LabEntry({
       </div>
 
       {paying ? (
-        <PaymentForm
-          client={client}
-          request={request}
+        // A price for each test; the app adds them up (2026-10-31).
+        <PriceForm
+          formId={`lab-${request.id}`}
+          labels={request.tests}
+          save={(lines, mode) => payLabRequestLines(client, request.id, lines, mode)}
           onCancel={() => setPaying(false)}
           onDone={onDone}
         />
       ) : null}
-    </div>
-  )
-}
-
-// ===== 4. The payment: amount in naira and the mode =====
-function PaymentForm({
-  client,
-  request,
-  onCancel,
-  onDone,
-}: {
-  client: SupabaseClient
-  request: LabRequest
-  onCancel: () => void
-  onDone: () => void
-}) {
-  const [typed, setTyped] = useState('')
-  const [mode, setMode] = useState<PaymentMode>('cash')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  // Commas and spaces are fine to type ("7,500"); only digits and one dot count.
-  const amount = Number(typed.replace(/[,\s]/g, ''))
-  const ready = Number.isFinite(amount) && amount > 0 && amount < 100000000
-
-  async function save() {
-    setBusy(true)
-    setError(null)
-    const problem = await payLabRequest(client, request.id, Math.round(amount * 100) / 100, mode)
-    setBusy(false)
-    if (problem) setError(problem)
-    else onDone()
-  }
-
-  return (
-    <div className={styles.payForm}>
-      <label className={styles.fieldLabel} htmlFor={`amount-${request.id}`}>
-        Amount paid
-      </label>
-      <div className={styles.money}>
-        <span aria-hidden="true">₦</span>
-        <input
-          id={`amount-${request.id}`}
-          inputMode="decimal"
-          placeholder="0"
-          value={typed}
-          autoFocus
-          onChange={(event) => setTyped(event.target.value.replace(/[^\d.,\s]/g, ''))}
-        />
-      </div>
-      <span className={styles.fieldLabel}>Paid by</span>
-      <div className={styles.segments} role="group" aria-label="Paid by">
-        {PAYMENT_MODES.map(([value, words]) => (
-          <button key={value} aria-pressed={mode === value} onClick={() => setMode(value)}>
-            {words}
-          </button>
-        ))}
-      </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
-      <div className={styles.entryButtons}>
-        <button className={styles.button} onClick={onCancel} disabled={busy}>
-          Cancel
-        </button>
-        <button
-          className={`${styles.button} ${styles.primary}`}
-          onClick={save}
-          disabled={!ready || busy}
-        >
-          {busy ? 'Saving…' : 'Record payment'}
-        </button>
-      </div>
     </div>
   )
 }

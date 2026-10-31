@@ -54,7 +54,7 @@ function pick(staff: StaffMember, entries: QueueEntry[]) {
   }
   if (staff.role === 'pharmacy') {
     return {
-      title: 'Prescriptions to dispense',
+      title: 'Patients at the pharmacy',
       list: entries.filter((entry) => entry.room?.kind === 'pharmacy'),
       empty: 'Nobody is waiting at the pharmacy.',
     }

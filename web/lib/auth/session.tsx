@@ -58,6 +58,8 @@ export type StaffMember = {
   can_medical: boolean
   // The Laboratory tick: may enter lab results (request 115).
   can_lab: boolean
+  // The Pharmacy tick: may dispense (request 123).
+  can_pharmacy: boolean
   room_id: number | null
   // The room the admin gave them, e.g. "Consultant Room 1". Null if none.
   room: { name: string; kind: string } | null
@@ -94,7 +96,9 @@ export function useAuth(): AuthState {
 async function loadStaff(client: SupabaseClient, id: string): Promise<StaffMember | null> {
   const { data } = await client
     .from('staff')
-    .select('id, full_name, role, can_admin, can_medical, can_lab, room_id, room:rooms(name, kind)')
+    .select(
+      'id, full_name, role, can_admin, can_medical, can_lab, can_pharmacy, room_id, room:rooms(name, kind)',
+    )
     .eq('id', id)
     .maybeSingle()
   return (data as StaffMember | null) ?? null
