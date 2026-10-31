@@ -52,7 +52,6 @@ export default function MainMenu({ buttonClass }: { buttonClass: string }) {
         aria-label="Menu"
       >
         <Icon name="menu" size={18} />
-        <span>Menu</span>
       </button>
 
       {open ? (

@@ -128,3 +128,12 @@ build from the RHEMA demo and the proposal.
 - 2026-10-31: menu button live (117); backup now copies lab files, each
   locked (119), and fails loudly on a bad key; CI tool install has a 3
   minute limit and one retry (120). AWS account: his phone code is late.
+
+- 2026-10-31: Pharmacy with drug payments live (123a). Price per drug and
+  per lab test, total worked out by the app and the database. Testing and
+  live both took the migration with 0 security warnings. Next: other
+  payments with printable receipts.
+
+- 2026-10-31: on the client's computer the site showed "Not secure": the
+  address was typed without https://. Menu button now icon only, and the
+  desktop top bar lines up with the page column (124).

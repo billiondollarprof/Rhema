@@ -72,22 +72,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className={styles.app}>
         {/* ===== 2. Top bar ===== */}
         <header className={styles.top}>
-          <Logo size={34} className={styles.topLogo} />
-          {/* A thin line keeps the hospital's logo apart from the person. */}
-          <span className={styles.topDivider} aria-hidden="true" />
-          <PersonBadge name={staff.full_name} />
-          <div className={styles.who}>
-            <b>{staff.full_name}</b>
-            <small>{roleWords}</small>
+          {/* On a desktop the logo sits above the menu down the left. */}
+          <div className={styles.topBrand}>
+            <Logo size={34} className={styles.topLogo} />
           </div>
-          <AttentionMenu
-            client={client}
-            staffId={staff.id}
-            myRoomId={staff.room_id}
-            buttonClass={styles.topButton}
-          />
-          {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
-          <MainMenu buttonClass={styles.topButton} />
+          {/* On a desktop this part lines up with the page below it. */}
+          <div className={styles.topInner}>
+            {/* A thin line keeps the hospital's logo apart from the person. */}
+            <span className={styles.topDivider} aria-hidden="true" />
+            <PersonBadge name={staff.full_name} />
+            <div className={styles.who}>
+              <b>{staff.full_name}</b>
+              <small>{roleWords}</small>
+            </div>
+            <AttentionMenu
+              client={client}
+              staffId={staff.id}
+              myRoomId={staff.room_id}
+              buttonClass={styles.topButton}
+            />
+            {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
+            <MainMenu buttonClass={styles.topButton} />
+          </div>
         </header>
 
         <div className={styles.body}>

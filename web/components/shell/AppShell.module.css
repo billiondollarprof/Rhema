@@ -27,6 +27,19 @@
   border-bottom: 3px solid var(--brand-red);
 }
 
+.topBrand {
+  flex-shrink: 0;
+  display: flex;
+}
+
+.topInner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .topLogo {
   flex-shrink: 0;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
@@ -92,7 +105,7 @@
 .menuPanel {
   position: fixed;
   top: calc(62px + env(safe-area-inset-top, 0px));
-  right: 12px;
+  right: var(--panel-right);
   width: min(260px, calc(100vw - 24px));
   z-index: 40;
   background: #fff;
@@ -252,5 +265,32 @@
 
   .main {
     padding: 20px 24px;
+  }
+
+  /* The top bar on a desktop: the logo centred above the 96px menu, then
+     the name and the buttons lined up with the page column below, so the
+     bar and the page share the same edges (Anthony, 2026-10-31: "balance
+     the interface for desktop properly"). */
+  .top {
+    padding-left: 0;
+    padding-right: 0;
+    /* No gap after the logo's 96px, so the edges match the page exactly. */
+    gap: 0;
+  }
+
+  .topBrand {
+    flex: 0 0 96px;
+    justify-content: center;
+  }
+
+  .topInner {
+    max-width: calc(var(--page-width) + 48px);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* The space above the left menu already keeps the logo apart. */
+  .topDivider {
+    display: none;
   }
 }
