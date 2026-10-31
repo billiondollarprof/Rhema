@@ -684,3 +684,17 @@ this file.
     (.github/workflows/backup.yml) is built.
     Done 2026-10-31: the first nightly backup ran on live and passed every
     step (copy, lock, upload, download, unlock, key tables present).
+119. **Back up the lab result files too.** (Found 2026-10-31.) The
+    nightly backup copies the database; the attached lab files in
+    rhema-files are not copied yet. Needs one more key from the MAIN
+    Cloudflare account: R2, Object Read only, bucket rhema-files. He is
+    making it (2026-10-31). Only two secrets: FILES_R2_ACCESS_KEY_ID and
+    FILES_R2_SECRET_ACCESS_KEY; the account ID is CLOUDFLARE_ACCOUNT_ID,
+    already in GitHub (his point: "why do I have to submit it again").
+    Done and live 2026-10-31.
+120. **CI: the Supabase tool install stalls now and then** (3 times so
+    far, 2026-10-30 and 31), always before any test runs. Fix the cause:
+    a short time limit and one automatic retry on that step, so a stall
+    fails in minutes, not 20. Built 2026-10-31: 3 minutes, then a second
+    try, in ci.yml, db-testing.yml and db-live.yml.
+    Done and live 2026-10-31.
