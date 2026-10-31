@@ -208,11 +208,23 @@ Numbers are kept from the full list, so older notes still match.
 119. **Back up the lab result files too.** (Found 2026-10-31.) The
     nightly backup copies the database; the attached lab files in
     rhema-files are not copied yet. Needs one more key from the MAIN
-    Cloudflare account: R2, Object Read only, bucket rhema-files. Ask him.
+    Cloudflare account: R2, Object Read only, bucket rhema-files. He is
+    making it (2026-10-31). Only two secrets: FILES_R2_ACCESS_KEY_ID and
+    FILES_R2_SECRET_ACCESS_KEY; the account ID is CLOUDFLARE_ACCOUNT_ID,
+    already in GitHub (his point: "why do I have to submit it again").
 120. **CI: the Supabase tool install stalls now and then** (3 times so
     far, 2026-10-30 and 31), always before any test runs. Fix the cause:
     a short time limit and one automatic retry on that step, so a stall
     fails in minutes, not 20.
+
+121. **His plan for the rest of today (2026-10-31).** "First of all get
+    the backup files [key]... Then I'll set up the budget. After that...
+    open the AWS account and you walk me through that one... whatever
+    that is left that you can do today, you will do it before the
+    November 6th. Then after you do it, you go through what you did
+    again. Make sure everything is fine. Then we wait." So: build 117
+    (menu), 119 (file backup), 120 (CI stall), the AWS watcher with him,
+    then one full review pass of everything built.
 
 ### Standing instructions
 
