@@ -439,7 +439,8 @@ Numbers are kept from the full list, so older notes still match.
     database. Not yet guarded (a double tap saves twice): registering a
     patient (and from old file), and the medical record writes (allergies, vital signs, notes,
     consultations, medicines, doses, conditions). Built 2026-11-02 as one
-    shared guard (double_tap_guards); waiting for his yes on the SQL.
+    shared guard (double_tap_guards); his yes 2026-11-02; live, 0
+    security warnings on testing and live.
 
 132. **Unread count on the menu button.** (2026-11-02) "If notification
     is... behind hamburger menu... the hamburger menu will be showing a

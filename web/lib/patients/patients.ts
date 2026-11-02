@@ -43,6 +43,9 @@ export type PatientCard = {
   next_of_kin_phone: string | null
   // Registered with only a name, a phone and the old paper file.
   from_old_file: boolean
+  // The family this patient belongs to, and its card number (FAM-000012).
+  family_id: number | null
+  family: { family_number: string } | null
   created_at: string
 }
 
@@ -51,7 +54,7 @@ export type PatientCard = {
 // date of birth and sex.
 export type PatientDetails = Omit<
   PatientCard,
-  'id' | 'patient_number' | 'created_at' | 'from_old_file' | 'date_of_birth' | 'sex'
+  'id' | 'patient_number' | 'created_at' | 'from_old_file' | 'date_of_birth' | 'sex' | 'family'
 > & { date_of_birth: string; sex: Sex }
 
 // A search result also says when the patient was last seen (their last
@@ -62,7 +65,7 @@ export type PatientResult = PatientCard & {
 }
 
 const CARD_COLUMNS =
-  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, created_at'
+  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, family_id, family:families(family_number), created_at'
 
 // "Female", "Male", or that it is not recorded yet (an old file).
 export function sexWords(sex: Sex | null): string {
@@ -98,6 +101,25 @@ export async function searchPatients(
     .order('created_at', { ascending: false })
     .limit(30)
 
+  // A family card number (FAM-000012, or just FAM-12): every member.
+  const familyNumber = words.toUpperCase().match(/^FAM-?0*(\d{1,6})$/)
+  if (familyNumber) {
+    const wanted = 'FAM-' + familyNumber[1].padStart(6, '0')
+    const { data: family } = await client
+      .from('families')
+      .select('id')
+      .eq('family_number', wanted)
+      .maybeSingle()
+    if (!family) return []
+    const { data } = await client
+      .from('patients')
+      .select(CARD_COLUMNS)
+      .is('voided_at', null)
+      .eq('family_id', (family as { id: number }).id)
+      .order('created_at')
+    return withVisits(client, (data as unknown as PatientCard[] | null) ?? [])
+  }
+
   if (words) {
     const phone = cleanPhone(words)
     const number = words.toUpperCase()
@@ -114,7 +136,7 @@ export async function searchPatients(
 
   const { data, error } = await query
   if (error || !data) return []
-  return withVisits(client, data as PatientCard[])
+  return withVisits(client, data as unknown as PatientCard[])
 }
 
 // Add "last seen" and "in the hospital now" to a list of patients.
@@ -156,7 +178,7 @@ export async function getPatient(
 ): Promise<PatientResult | null> {
   const { data } = await client.from('patients').select(CARD_COLUMNS).eq('id', id).maybeSingle()
   if (!data) return null
-  const [withVisit] = await withVisits(client, [data as PatientCard])
+  const [withVisit] = await withVisits(client, [data as unknown as PatientCard])
   return withVisit ?? null
 }
 
@@ -177,7 +199,7 @@ export async function findPossibleDuplicates(
     .eq('date_of_birth', dateOfBirth)
     .ilike('full_name', cleanName.replace(/[%_]/g, ''))
     .limit(5)
-  return withVisits(client, (data as PatientCard[] | null) ?? [])
+  return withVisits(client, (data as unknown as PatientCard[] | null) ?? [])
 }
 
 // ===== 5. Registering and updating =====
@@ -202,7 +224,7 @@ async function justRegistered(
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
-  return (data as PatientCard | null) ?? null
+  return (data as unknown as PatientCard | null) ?? null
 }
 
 export async function registerPatient(
@@ -226,7 +248,7 @@ export async function registerPatient(
       problem: 'The patient could not be saved. Check the details and try again.',
     }
   }
-  return { patient: data as PatientCard, problem: null }
+  return { patient: data as unknown as PatientCard, problem: null }
 }
 
 // Register from old file (request 128): the name and the phone, and the
@@ -265,7 +287,7 @@ export async function registerFromOldFile(
       problem: 'The patient could not be saved. Check the internet and try again.',
     }
   }
-  return { patient: data as PatientCard, problem: null }
+  return { patient: data as unknown as PatientCard, problem: null }
 }
 
 // Patients already registered with this phone number, so the Front Desk
@@ -281,7 +303,45 @@ export async function findSamePhone(
     .is('voided_at', null)
     .eq('phone', phone)
     .limit(5)
-  return withVisits(client, (data as PatientCard[] | null) ?? [])
+  return withVisits(client, (data as unknown as PatientCard[] | null) ?? [])
+}
+
+// ===== 6. Families (request 128, step 2) =====
+// Start a family from a registered patient; answers the family's id. Tapped
+// twice, the database answers the same family.
+export async function startFamily(
+  client: SupabaseClient,
+  patientId: number,
+): Promise<number | null> {
+  const { data, error } = await client.rpc('start_family', { patient: patientId })
+  if (error || typeof data !== 'number') return null
+  return data
+}
+
+// Everybody in a family, oldest registration first.
+export async function familyMembers(
+  client: SupabaseClient,
+  familyId: number,
+): Promise<PatientCard[]> {
+  const { data } = await client
+    .from('patients')
+    .select(CARD_COLUMNS)
+    .is('voided_at', null)
+    .eq('family_id', familyId)
+    .order('created_at')
+  return (data as unknown as PatientCard[] | null) ?? []
+}
+
+export async function familyNumber(
+  client: SupabaseClient,
+  familyId: number,
+): Promise<string | null> {
+  const { data } = await client
+    .from('families')
+    .select('family_number')
+    .eq('id', familyId)
+    .maybeSingle()
+  return (data as { family_number: string } | null)?.family_number ?? null
 }
 
 export async function updatePatient(

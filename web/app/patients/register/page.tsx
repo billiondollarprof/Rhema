@@ -10,14 +10,18 @@
  *      a new patient anyway when it really is somebody else;
  *   3. once saved, the new RMC number shows, with Send to room.
  *
+ * Family (request 128, step 2): after saving a patient with Family chosen,
+ * "Add family member" starts the family (it gets a FAM number) and opens
+ * this form again with the family already set (?family=12). No surname.
+ *
  * Never: register silently over a possible duplicate. Two numbers for one
  * person splits their history.
  */
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
@@ -26,8 +30,10 @@ import styles from '../_parts/patients.module.css'
 import { lastSeenWords } from '../_parts/PatientDetail'
 import { ageFrom } from '@/lib/patients/age'
 import {
+  familyNumber,
   findPossibleDuplicates,
   registerPatient,
+  startFamily,
   type PatientCard,
   type PatientDetails,
   type PatientResult,
@@ -35,11 +41,15 @@ import {
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
-export default function RegisterPatientPage() {
+function RegisterPatient() {
   const auth = useAuth()
   useRightPage(auth.status, '/patients/register/')
   const router = useRouter()
   const { client, staff } = auth
+  // Adding a member to a family: the family comes from the address.
+  const familyId = Number(useSearchParams().get('family')) || null
+  const [familyCard, setFamilyCard] = useState<string | null>(null)
+  const [joining, setJoining] = useState(false)
 
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
@@ -50,7 +60,35 @@ export default function RegisterPatientPage() {
   const [sentTo, setSentTo] = useState<string | null>(null)
   const [formKey, setFormKey] = useState(0)
 
+  // The family's card number, to show while adding members.
+  useEffect(() => {
+    if (!client || !familyId) return
+    let current = true
+    familyNumber(client, familyId).then((found) => {
+      if (current) setFamilyCard(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, familyId])
+
   if (auth.status !== 'ready' || !client || !staff) return null
+
+  // ===== 0. Add family member: start the family (once), then a fresh form =====
+  async function addMember(patientId: number) {
+    if (!client) return
+    setJoining(true)
+    const family = await startFamily(client, patientId)
+    setJoining(false)
+    if (!family) {
+      setProblem('The family could not be started. Check the network and try again.')
+      return
+    }
+    setSaved(null)
+    setSentTo(null)
+    setFormKey((key) => key + 1)
+    router.push(`/patients/register/?family=${family}`)
+  }
 
   // ===== 1. Save, but look for the same patient first =====
   async function save(details: PatientDetails, skipCheck = false) {
@@ -92,7 +130,9 @@ export default function RegisterPatientPage() {
           </div>
           <p className={styles.muted}>
             {saved.full_name} · {ageFrom(saved.date_of_birth)}
+            {familyCard && saved.family_id ? ` · Family ${familyCard}` : ''}
           </p>
+          {problem ? <p className={styles.error}>{problem}</p> : null}
           {sentTo ? (
             <div className={styles.ok}>
               <b>Sent to {sentTo}</b>
@@ -120,12 +160,22 @@ export default function RegisterPatientPage() {
                   <Icon name="door" size={16} /> Send to room
                 </button>
               ) : null}
+              {saved.category === 'family' ? (
+                <button
+                  className={`${styles.button} ${styles.familyButton}`}
+                  disabled={joining}
+                  onClick={() => addMember(saved.id)}
+                >
+                  <Icon name="users" size={16} /> {joining ? 'Starting…' : 'Add family member'}
+                </button>
+              ) : null}
               <button
                 className={styles.button}
                 onClick={() => {
                   setSaved(null)
                   setSentTo(null)
                   setFormKey((key) => key + 1)
+                  if (familyId) router.push('/patients/register/')
                 }}
               >
                 Register another patient
@@ -193,9 +243,20 @@ export default function RegisterPatientPage() {
           </div>
         ) : null}
 
+        {familyId ? (
+          <div className={styles.familyBanner}>
+            <Icon name="users" size={18} />
+            <span>
+              Adding to family <b>{familyCard ?? '…'}</b>
+            </span>
+          </div>
+        ) : null}
+
         <PatientForm
-          key={formKey}
-          initial={EMPTY_DETAILS}
+          key={`${formKey}-${familyId ?? 'none'}`}
+          initial={
+            familyId ? { ...EMPTY_DETAILS, category: 'family', family_id: familyId } : EMPTY_DETAILS
+          }
           saveLabel="Save patient"
           busy={busy}
           problem={problem}
@@ -203,5 +264,14 @@ export default function RegisterPatientPage() {
         />
       </div>
     </AppShell>
+  )
+}
+
+// The address (?family=) is read in the browser, so the page waits for it.
+export default function RegisterPatientPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterPatient />
+    </Suspense>
   )
 }

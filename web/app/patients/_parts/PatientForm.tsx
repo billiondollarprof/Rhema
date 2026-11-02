@@ -43,6 +43,7 @@ export const EMPTY_DETAILS: PatientDetails = {
   next_of_kin_name: null,
   next_of_kin_relationship: null,
   next_of_kin_phone: null,
+  family_id: null,
 }
 
 type FormProps = {

@@ -756,3 +756,7 @@ this file.
     card with a chime at every Front Desk, "Adaeze Okafor to Consultant
     Room 1", closes with X; the phone alert names the patient too; each
     kind of call has its own duplicate guard. Live 2026-11-02.
+131. **Duplicate guard on every action.** (2026-11-02) One shared database
+    guard: registration and every medical record entry, tapped twice, save
+    once; a refused double registration shows the first patient. Live
+    2026-11-02.
