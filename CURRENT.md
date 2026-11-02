@@ -360,9 +360,12 @@ Numbers are kept from the full list, so older notes still match.
       setup and training).
     - Button words (2026-11-02): "Add scan or photo" and "Add PDF file";
       PDF only, so a Word document is saved as PDF first.
-    Status 2026-11-02: step 1 (attachments, Register from old file,
-    Download) built and checked locally and in CI on the feature branch.
-    Waiting for his yes on the files SQL batch before testing.
+    - "make sex and age optional, they can add or skip it" (old file):
+      optional date of birth and sex; skipped shows "not recorded".
+    - Keep every screen clean, no more words than needed (CLAUDE.md 7).
+    Step 1 (attachments, Register from old file, Download) live
+    2026-11-02, his yes on the SQL; testing and live 0 security warnings.
+    NEXT: step 2, family profile (one card number for the family).
 
 ### Standing instructions
 

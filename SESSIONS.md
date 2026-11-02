@@ -141,3 +141,10 @@ build from the RHEMA demo and the proposal.
 - 2026-10-31: lock screen fixed for desktops (125): a click while loading is kept, and any key opens the PIN card.
 
 - 2026-10-31: idle lock now 1 hour (126). Live CI database job stalled on the tool install before any test; one re-run passed.
+
+- 2026-11-02: request 128 mapped with him (OCR and migration later;
+  messages with ticks stay in this build). Step 1 live: files on the
+  record, Register from old file, Download. Slip: one push to testing went
+  out while my local verify was red (a formatting line), because the
+  command joined steps with ";". Testing CI caught it; fixed in minutes,
+  live never touched. Join ship steps with "&&" only.

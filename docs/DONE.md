@@ -738,3 +738,9 @@ this file.
     idle lock screen time to 1hr because of network connections, so they
     don't get locked unnecessarily when network is loading slowly." Done
     and live 2026-10-31. Lock screen from the menu still locks at once.
+128a. **Files on the record, Register from old file, Download.**
+    (2026-11-02) Scans, ultrasound results and documents on every record
+    (Add scan or photo, Add PDF file; photos shrunk to WebP); Register from
+    old file with name, phone, optional date of birth and sex, and the old
+    file; Download asks Full medical history (print or Save as PDF) or
+    Attachments only. Done and live 2026-11-02.
