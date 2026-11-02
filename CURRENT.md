@@ -272,6 +272,56 @@ Numbers are kept from the full list, so older notes still match.
        history" or "Attachments only" (the second only when there are any).
     Recorded; not started. Say back to him before building.
 
+128. **Old patients, attachments, family profile, poor network; migration
+    later.** (2026-11-02) Replaces part b of 127: "Let's ignore the OCR
+    for now... Let's forget about API and OCR for now."
+    NOW, for this hospital:
+    a. Attachments: "we can attach a document like scanned a patient scan,
+       ABI ultrasound scan results and other stuff. And you can also attach
+       normal written documents." "yes we can attach and download files."
+    b. Register by document, for the patients they already have: "There
+       should be another button there that should say register patient by
+       attachment... or register patient by raw document... they will just
+       put the patient name, the full name and the phone number. Then they
+       will now upload the patient's documents there." Old card numbers are
+       not used. "let it be one by one because if I allow them to upload
+       back then papers, they'll just fill up the storage fast."
+    c. Find by name or phone: "in case you have two people with the same
+       name, they will not have the same phone number."
+    d. Family profile: "You register the mother, and then since you have
+       toggled family... it will show you add family, add member... you
+       don't have to first of all save the person detail before adding
+       family members... Anybody from the family can make the family
+       profile pop up." No family last name needed. (Today "family" is only
+       a category label; there is no family group yet.)
+    e. Download (from 127): full medical history or attachments only.
+    f. Poor network: "front desk should be able to click register a
+       patient... click save, and if the network is poor, the system should
+       say so, that patient is registering, and that they can continue
+       doing other things... saves whatever it is as a draft. Then when the
+       network is back, the system just automatically push it to server."
+       Search and open records with poor network: "those texts for each
+       patient... preloaded... since it's text... I don't think there's any
+       need to leave anyone out. So I need you to evaluate that." Attached
+       files load over the network; shrink them on upload "while
+       maintaining the quality" (as in Amara) so they open on little
+       network. "we are designing for the worst-case scenario of network.
+       And we are also designing to manage space."
+    LATER, not this hospital (record only):
+    g. Messages ticks like WhatsApp: one tick sent, two ticks read; for a
+       group, two ticks when everyone has read. Comes with messaging.
+    h. Migration for hospitals leaving other software: import their CSV or
+       Excel export (typed, so no OCR), map biodata and the important
+       medical records to our layout; keep their own ID pattern; where only
+       an age is given, store the age and the date it was taken so it grows
+       each year; or pull through the old system's API or webhook. "in less
+       than a day with few clicks of a button." "if there is a better way
+       they used to do it, you can do a research and then recommend."
+       Selling point: own the system, stop paying per patient.
+    i. Batch upload of scanned papers: not now (storage).
+    j. OCR auto fill: not now (mostly handwriting).
+    Mapped back to him 2026-11-02; waiting for his yes and his answers.
+
 ### Standing instructions
 
 These never come off the list.
