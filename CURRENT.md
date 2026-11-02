@@ -400,6 +400,13 @@ Numbers are kept from the full list, so older notes still match.
     they can quickly call the patient." Today Call in only changes the
     patient's status; the Front Desk is not told. "If that's not it, then
     you have to note it down for when you are going to do that."
+    His answer 2026-11-02: either order is fine; "it has to float in front
+    of the screen... they can just click the X to remove it... different
+    headline, different coloration... call patient, then the name of the
+    patient to room 1". Built the same day: a green card with a door icon
+    and a chime, "Call patient · Adaeze Okafor to Consultant Room 1", for
+    every Front Desk; phone alerts say the room only. Waiting for his yes
+    on the SQL.
 
 130. **Lab, prescription and download fixes.** (2026-11-02)
     a. Request lab: "doesn't populate the patients that are there... I

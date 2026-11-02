@@ -54,7 +54,30 @@ function strike(at: number) {
   }
 }
 
-// ===== 3. Kring: two quick strikes =====
+// ===== 3. Ding dong: Call patient's own sound (request 129) =====
+// Two softer tones, high then low, like a waiting room chime, so the Front
+// Desk hears at once that it is a patient being called, not Call attention.
+export function ringChime() {
+  if (!context || context.state !== 'running') return
+  const now = context.currentTime
+  for (const [frequency, at] of [
+    [880, 0],
+    [659, 0.45],
+  ]) {
+    const tone = context.createOscillator()
+    const volume = context.createGain()
+    tone.type = 'sine'
+    tone.frequency.value = frequency
+    volume.gain.setValueAtTime(0.0001, now + at)
+    volume.gain.exponentialRampToValueAtTime(0.32, now + at + 0.02)
+    volume.gain.exponentialRampToValueAtTime(0.0001, now + at + 1.2)
+    tone.connect(volume).connect(context.destination)
+    tone.start(now + at)
+    tone.stop(now + at + 1.2)
+  }
+}
+
+// ===== 4. Kring: two quick strikes =====
 export function ringBell() {
   if (!context || context.state !== 'running') return
   const now = context.currentTime
