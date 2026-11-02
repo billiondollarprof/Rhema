@@ -33,7 +33,9 @@
 .head h2 {
   margin: 0;
   font-size: 22px;
-  flex: 1;
+  /* The title keeps 220 pixels; a button beside it drops below on a small
+     phone instead of squeezing it onto three lines. */
+  flex: 1 1 220px;
   min-width: 0;
 }
 

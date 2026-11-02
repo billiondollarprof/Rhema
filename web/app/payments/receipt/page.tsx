@@ -23,8 +23,9 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import styles from './receipt.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Logo from '@/components/brand/Logo'
@@ -52,7 +53,6 @@ const when = (iso: string) =>
 function Receipt() {
   const auth = useAuth()
   useRightPage(auth.status, '/payments/receipt/')
-  const router = useRouter()
   const params = useSearchParams()
   const { client, staff } = auth
   const [payments, setPayments] = useState<Payment[] | null>(null)
@@ -105,9 +105,12 @@ function Receipt() {
           <button className={`${styles.button} ${styles.primary}`} onClick={print}>
             Print receipt
           </button>
-          <button className={styles.button} onClick={() => router.back()}>
-            Back
-          </button>
+          {/* Back to the patient, so it works however the receipt was opened. */}
+          {patient ? (
+            <Link className={styles.button} href={`/patients/?p=${patient.id}`}>
+              Back to patient
+            </Link>
+          ) : null}
         </div>
 
         {payments === null ? <p className={styles.muted}>Loading…</p> : null}

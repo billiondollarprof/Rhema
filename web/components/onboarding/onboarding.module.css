@@ -175,6 +175,13 @@
   color: var(--mut);
 }
 
+/* As a link (Open RHEMA): tall enough for a finger (layout check, 2026-11-02). */
+a.help {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+
 .small {
   margin: 0;
   font-size: 13px;

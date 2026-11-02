@@ -171,6 +171,8 @@
   border: 0;
   background: none;
   border-radius: 9px;
+  /* At least 32 pixels high, for a finger (layout check, 2026-11-02). */
+  min-height: 32px;
   padding: 6px 10px;
   color: var(--mut);
   cursor: pointer;

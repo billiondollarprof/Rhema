@@ -28,7 +28,9 @@
 }
 
 .header > div {
-  flex: 1;
+  /* The name keeps at least 200 pixels; on a small phone the buttons drop
+     under it instead of running over it (layout check, 2026-11-02). */
+  flex: 1 1 200px;
   min-width: 0;
 }
 

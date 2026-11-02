@@ -501,6 +501,22 @@ These never come off the list.
     says what happened and what to do. Fixed the same day: the sign out
     warning, the waiting pill, "Not saved yet", the file messages.
 
+134. **Anticipate the steps a flow needs.** (2026-11-02) "There are
+    certain things that I might not remember to include. That little steps
+    or... some buttons that may be missing. You should know that, oh, we'll
+    probably need this thing... for easy flow. Without clutter, without
+    having too many buttons." Standing rule, in the screens skill (2c).
+
+135. **A thorough screen check, and a click-through check.** (2026-11-02)
+    "improve the skill that checks... A skill that clicks through buttons."
+    Done the same day: the layout check now covers phone, tablet portrait,
+    tablet landscape and desktop and catches cut off text, squeezed
+    headings, overlapping text and small buttons; scripts/screens/
+    clickthrough.cjs presses every button. They found and fixed: the
+    record header running into its buttons at 320, the Register from old
+    file title on 3 lines, the chart period buttons and Open RHEMA too
+    small to tap, and Back on the receipt (now Back to patient).
+
 ### Decided
 
 - 2026-11-02 evening: "Anything that doesn't involve me... you just do

@@ -166,6 +166,109 @@ async function overflow(page, label, widths = [320, 360, 375, 390]) {
   return problems
 }
 
+// ===== 4b. The thorough layout check (Anthony, 2026-11-02: "I don't know
+// how you missed that receipt... improve the skill... to do thorough job") =====
+// At every width it looks for:
+//   spill     anything past the right edge, or a page that scrolls sideways
+//   clipped   text cut off inside its box (an intended "..." does not count)
+//   cramped   a heading squeezed onto more than 2 lines
+//   overlap   two pieces of text on top of each other (fixed bars excluded)
+//   tiny      a button or link under 32 pixels high, too small for a finger
+const WIDTHS = [
+  [320, 700, 'phone 320'],
+  [360, 760, 'phone 360'],
+  [390, 844, 'phone 390'],
+  [820, 1180, 'tablet portrait'],
+  [1180, 820, 'tablet landscape'],
+  [1440, 900, 'desktop'],
+]
+
+async function layout(page, label, widths = WIDTHS) {
+  const size = page.viewportSize()
+  const problems = []
+  for (const [width, height, name] of widths) {
+    await page.setViewportSize({ width, height })
+    await page.waitForTimeout(200)
+    const found = await page.evaluate(() => {
+      const out = []
+      const vw = window.innerWidth
+      const fixed = (el) => {
+        for (let e = el; e && e !== document.body; e = e.parentElement) {
+          const pos = getComputedStyle(e).position
+          if (pos === 'fixed' || pos === 'sticky') return true
+        }
+        return false
+      }
+      const shown = (el) => {
+        const r = el.getBoundingClientRect()
+        const st = getComputedStyle(el)
+        return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none'
+      }
+      const name = (el) =>
+        (el.innerText || el.getAttribute('aria-label') || el.tagName).trim().slice(0, 40)
+      if (document.documentElement.scrollWidth > vw + 1)
+        out.push(`spill: the page scrolls sideways (${document.documentElement.scrollWidth}px)`)
+      for (const el of document.querySelectorAll('body *')) {
+        if (!shown(el)) continue
+        const r = el.getBoundingClientRect()
+        if (r.right > vw + 1 && !fixed(el))
+          out.push(`spill: "${name(el)}" ends at ${Math.round(r.right)}px`)
+        const st = getComputedStyle(el)
+        // A box 2 pixels wide or less is text kept for screen readers only.
+        if (
+          r.width > 2 &&
+          (st.overflowX === 'hidden' || st.overflow === 'hidden') &&
+          st.textOverflow !== 'ellipsis' &&
+          el.scrollWidth > el.clientWidth + 2 &&
+          el.innerText &&
+          el.innerText.trim() &&
+          !['IMG', 'SVG', 'svg', 'CANVAS', 'VIDEO', 'IFRAME'].includes(el.tagName)
+        )
+          out.push(`clipped: "${name(el)}" is cut off`)
+      }
+      for (const h of document.querySelectorAll('h1, h2, h3')) {
+        if (!shown(h)) continue
+        const lh =
+          parseFloat(getComputedStyle(h).lineHeight) ||
+          parseFloat(getComputedStyle(h).fontSize) * 1.2
+        const lines = Math.round(h.getBoundingClientRect().height / lh)
+        if (lines > 2) out.push(`cramped: heading "${name(h)}" takes ${lines} lines`)
+      }
+      for (const el of document.querySelectorAll('button, a')) {
+        if (!shown(el) || fixed(el)) continue
+        const r = el.getBoundingClientRect()
+        if (r.height < 32 && (el.innerText || '').trim())
+          out.push(`tiny: "${name(el)}" is ${Math.round(r.height)}px high`)
+      }
+      // Text pieces: the smallest elements that hold text directly.
+      const leaves = [...document.querySelectorAll('body *')].filter(
+        // Only text a person can see: not inside a folded section.
+        (el) =>
+          shown(el) &&
+          !fixed(el) &&
+          (el.innerText || '').trim() &&
+          !el.closest('details:not([open]) > :not(summary)') &&
+          [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()),
+      )
+      const boxes = leaves.map((el) => [el, el.getBoundingClientRect()])
+      for (let i = 0; i < boxes.length; i++) {
+        for (let j = i + 1; j < boxes.length; j++) {
+          const [a, ra] = boxes[i]
+          const [b, rb] = boxes[j]
+          if (a.contains(b) || b.contains(a)) continue
+          const w = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left)
+          const hgt = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top)
+          if (w > 4 && hgt > 4) out.push(`overlap: "${name(a)}" sits on "${name(b)}"`)
+        }
+      }
+      return [...new Set(out)].slice(0, 12)
+    })
+    for (const problem of found) problems.push(`${label} at ${name}: ${problem}`)
+  }
+  await page.setViewportSize(size)
+  return problems
+}
+
 // ===== 5. Screenshots at a phone width and a desktop width =====
 async function shoot(page, folder, name) {
   const size = page.viewportSize()
@@ -178,4 +281,4 @@ async function shoot(page, folder, name) {
   await page.setViewportSize(size)
 }
 
-module.exports = { STAFF_ID, ROOMS, PATIENT, signIn, mockSupabase, overflow, shoot }
+module.exports = { STAFF_ID, ROOMS, PATIENT, signIn, mockSupabase, overflow, layout, shoot }
