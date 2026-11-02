@@ -105,6 +105,7 @@ async function signIn(
     can_medical: medical,
     can_lab: role === 'laboratory' || role === 'doctor' || role === 'admin',
     can_pharmacy: role === 'pharmacy' || role === 'doctor' || role === 'admin',
+    can_announce: role === 'nurse' || role === 'admin',
     room_id: room?.id ?? null,
     room: room ? { name: room.name, kind: room.kind } : null,
   }

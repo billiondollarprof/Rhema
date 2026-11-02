@@ -40,6 +40,8 @@ const TIME_COLUMN: Record<string, string> = { vital_signs: 'recorded_at' }
 // ===== 1. Is it already saved? (a reply that got lost on the way) =====
 async function alreadySaved(client: SupabaseClient, task: OutboxTask): Promise<boolean> {
   const since = new Date(task.created - 60_000).toISOString()
+  // A message is checked by its key in the database itself.
+  if (task.kind === 'message') return false
   if (task.kind === 'register') {
     const { data } = await client
       .from('patients')
@@ -65,6 +67,19 @@ async function alreadySaved(client: SupabaseClient, task: OutboxTask): Promise<b
 
 // ===== 2. Send one; answers false when the network is still down =====
 async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask) {
+  // A message carries its own key: sending it again is the same message.
+  if (task.kind === 'message') {
+    const { error } = await client.rpc('send_message', {
+      to_kind: task.toKind,
+      to_room: task.toRoom,
+      body: task.body,
+      client_key: task.clientKey,
+    })
+    if (isNetworkFailure(error)) return false
+    if (error) markFailed(staffId, task.id, 'Could not be sent. Open Messages and send it again.')
+    else removeFromOutbox(staffId, task.id)
+    return true
+  }
   try {
     if (await alreadySaved(client, task)) {
       removeFromOutbox(staffId, task.id)

@@ -26,6 +26,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import AppShell from '@/components/shell/AppShell'
+import AnnouncementsCard from './_home/AnnouncementsCard'
 import CountTiles from './_home/CountTiles'
 import LabCard from './_home/LabCard'
 import PharmacyCard from './_home/PharmacyCard'
@@ -115,6 +116,8 @@ export default function HomePage() {
         ) : null}
 
         {/* ===== 3 to 6 ===== */}
+        {/* Announcements first, until each person taps Got it. */}
+        <AnnouncementsCard client={client} staffId={staff.id} />
         <QuickActions role={staff.role} />
         <CountTiles counts={counts} />
         <SeenChart client={client} />

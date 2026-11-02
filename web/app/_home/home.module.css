@@ -437,3 +437,31 @@ a.button {
   color: #1f6b4a;
   font-weight: 600;
 }
+
+/* ===== Announcements (request 123) ===== */
+.announce {
+  border-left: 4px solid #fb8c00;
+}
+
+.announceItem {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  justify-items: start;
+}
+
+.announceItem:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.announceItem p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.announceItem small {
+  color: var(--mut);
+}

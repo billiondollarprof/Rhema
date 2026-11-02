@@ -19,6 +19,9 @@ module.exports.SCREENS = [
   { path: '/lab/result/', waitFor: 'Add a lab result' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },
+  { path: '/messages/', waitFor: 'From Front Desk' },
+  { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },
+  { path: '/announce/', waitFor: 'Show on Home until', medical: true },
   {
     path: '/payments/receipt/?id=1',
     waitFor: 'RHEMA MEDICAL CENTRE',

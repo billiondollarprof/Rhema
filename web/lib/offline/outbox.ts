@@ -12,6 +12,7 @@
  * What waits here, as plain text only (never a file or a picture):
  *   register   a new patient from Register patient
  *   record     one medical record entry (a note, a reading, an allergy...)
+ *   message    a message to a room (its key makes a resend the same one)
  * The sender (components/offline/OutboxSender) sends them when it can.
  * The database's double tap guard and a check before each resend make sure
  * nothing is saved twice.
@@ -39,6 +40,17 @@ export type OutboxTask =
       patientId: number
       table: string
       values: Record<string, unknown>
+      failed?: string
+    }
+  | {
+      id: string
+      kind: 'message'
+      created: number
+      label: string
+      toKind: string
+      toRoom: number | null
+      body: string
+      clientKey: string
       failed?: string
     }
 
@@ -76,6 +88,14 @@ type NewTask =
       patientId: number
       table: string
       values: Record<string, unknown>
+    }
+  | {
+      kind: 'message'
+      label: string
+      toKind: string
+      toRoom: number | null
+      body: string
+      clientKey: string
     }
 
 export function addToOutbox(staffId: string, task: NewTask) {

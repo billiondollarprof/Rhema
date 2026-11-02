@@ -26,11 +26,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from './Icon'
 import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import OutboxSender from '@/components/offline/OutboxSender'
+import { unreadCount } from '@/lib/messages/messages'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
@@ -44,7 +45,7 @@ import { useAuth } from '@/lib/auth/session'
 const MENU = [
   { href: '/', icon: 'home', label: 'Home', ready: true },
   { href: '/patients/', icon: 'users', label: 'Patients', ready: true },
-  { href: '/messages/', icon: 'msg', label: 'Messages', ready: false },
+  { href: '/messages/', icon: 'msg', label: 'Messages', ready: true },
 ]
 
 // Only for a person with admin access (request 112). The database checks
@@ -63,6 +64,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [attentionOpen, setAttentionOpen] = useState(false)
   const staff = auth.staff
   const client = auth.client
+  // Unread messages for the red bubble on Messages, checked every 30 seconds.
+  const [unread, setUnread] = useState(0)
+  const staffId = staff?.id
+  const roomId = staff?.room_id
+  useEffect(() => {
+    if (!client || !staffId || !roomId) return
+    let current = true
+    const check = () =>
+      void unreadCount(client, staffId, roomId).then((count) => {
+        if (current) setUnread(count)
+      })
+    const first = window.setTimeout(check, 1500)
+    const timer = window.setInterval(check, 30_000)
+    return () => {
+      current = false
+      window.clearTimeout(first)
+      window.clearInterval(timer)
+    }
+  }, [client, staffId, roomId, path])
   if (!staff || !client) return null
 
   const roleWords =
@@ -110,6 +130,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 >
                   <Icon name={item.icon} size={22} />
                   {item.label}
+                  {/* Unread messages: a red bubble with the number. */}
+                  {item.href === '/messages/' && unread > 0 ? (
+                    <em className={styles.bubble} aria-label={`${unread} unread`}>
+                      {unread > 99 ? '99+' : unread}
+                    </em>
+                  ) : null}
                 </Link>
               ) : (
                 <span

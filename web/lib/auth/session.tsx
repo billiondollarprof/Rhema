@@ -62,6 +62,8 @@ export type StaffMember = {
   can_lab: boolean
   // The Pharmacy tick: may dispense (request 123).
   can_pharmacy: boolean
+  // May send announcements to everybody (nurses and admins by default).
+  can_announce: boolean
   room_id: number | null
   // The room the admin gave them, e.g. "Consultant Room 1". Null if none.
   room: { name: string; kind: string } | null
@@ -99,7 +101,7 @@ async function loadStaff(client: SupabaseClient, id: string): Promise<StaffMembe
   const { data } = await client
     .from('staff')
     .select(
-      'id, full_name, role, can_admin, can_medical, can_lab, can_pharmacy, room_id, room:rooms(name, kind)',
+      'id, full_name, role, can_admin, can_medical, can_lab, can_pharmacy, can_announce, room_id, room:rooms(name, kind)',
     )
     .eq('id', id)
     .maybeSingle()
