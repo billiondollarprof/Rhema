@@ -145,6 +145,8 @@ function FindPatient() {
                 client={client}
                 staffId={staff.id}
                 canMedical={staff.can_medical}
+                // Payments: the Front Desk and admins (request 123, part 2).
+                canPay={staff.role === 'front_desk' || staff.can_admin}
                 patient={chosen}
                 onChanged={() => {
                   loadChosen()

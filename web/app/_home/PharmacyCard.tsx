@@ -16,6 +16,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
@@ -56,6 +57,8 @@ export default function PharmacyCard({
   const view = viewFor(staff)
   const [list, setList] = useState<Prescription[] | null>(null)
 
+  // The patient just paid for, to offer their receipt.
+  const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
     if (view === 'pay') setList(await listAwaitingPayment(client))
     else if (view === 'dispense') setList(await listAwaitingDispense(client))
@@ -88,6 +91,15 @@ export default function PharmacyCard({
       </h3>
       {list === null ? <p className={styles.muted}>Loading…</p> : null}
       {list && list.length === 0 ? <p className={styles.muted}>{empty}</p> : null}
+      {/* Straight after a payment: its receipt, one tap away (request 123). */}
+      {paidFor ? (
+        <div className={styles.paidBar}>
+          <span>Payment saved.</span>
+          <Link className={styles.button} href={`/payments/receipt/?latest=${paidFor}`}>
+            Print receipt
+          </Link>
+        </div>
+      ) : null}
       <div className={styles.queue}>
         {(list ?? []).map((prescription) => (
           <Entry
@@ -96,6 +108,10 @@ export default function PharmacyCard({
             view={view}
             prescription={prescription}
             onDone={load}
+            onPaid={(patientId) => {
+              setPaidFor(patientId)
+              void load()
+            }}
           />
         ))}
       </div>
@@ -109,11 +125,13 @@ function Entry({
   view,
   prescription,
   onDone,
+  onPaid,
 }: {
   client: SupabaseClient
   view: View
   prescription: Prescription
   onDone: () => void
+  onPaid: (patientId: number) => void
 }) {
   const [paying, setPaying] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -180,7 +198,7 @@ function Entry({
           labels={labels}
           save={(lines, mode) => payPrescription(client, prescription.id, lines, mode)}
           onCancel={() => setPaying(false)}
-          onDone={onDone}
+          onDone={() => onPaid(prescription.patient_id)}
         />
       ) : null}
     </div>

@@ -717,3 +717,78 @@
 .waitingCard small {
   color: #8a6d2b;
 }
+
+/* ===== 14. Payments on the profile (request 123, part 2) ===== */
+.payBox {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.payLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 120px) 32px;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Remove a line: a small x at its end, not a row of its own. */
+.lineRemove {
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--mut);
+  cursor: pointer;
+}
+
+.money {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.money > span {
+  color: var(--mut);
+  font-weight: 700;
+}
+
+.payTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 18px;
+}
+
+.payList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.payList li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.payList span {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.payList small {
+  color: var(--mut);
+}
