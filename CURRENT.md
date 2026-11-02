@@ -399,8 +399,9 @@ Numbers are kept from the full list, so older notes still match.
     every opening must be logged). Wiped at sign out.
     Step 4, receipts, built 2026-11-02 (receipt numbers, Take payment on
     the profile, printable receipt, today's receipt, Print receipt after
-    paying on Home). Waiting for his yes on the SQL. Email on receipts
-    comes with Resend (6 Nov); no button shows before then.
+    paying on Home). Live 2026-11-02 (his yes; 0 security warnings on
+    testing and live). Email on receipts comes with Resend (6 Nov); no
+    button shows before then.
     NEXT: messages with ticks (and 132, the unread bubble).
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
