@@ -169,3 +169,10 @@ build from the RHEMA demo and the proposal.
   mattered: a run where verify failed still reached the push line (the
   commit had not happened, so testing only got the old version again).
   The ship command now runs the push only after a successful commit.
+
+- 2026-11-02 evening: 133 (full sentences) and receipts (123 part 2)
+  live, on his standing yes for the rest of the day. Review pass, first
+  round: every screen as every role (front desk, doctor, nurse, lab,
+  pharmacy, admin) at 390 and 1280 wide, with made up data: no browser
+  errors, no overflow at 320 and 375. Next: messages with ticks (needs his
+  say-back yes), then 132.

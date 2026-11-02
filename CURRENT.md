@@ -402,7 +402,8 @@ Numbers are kept from the full list, so older notes still match.
     paying on Home). Live 2026-11-02 (his yes; 0 security warnings on
     testing and live). Email on receipts comes with Resend (6 Nov); no
     button shows before then.
-    NEXT: messages with ticks (and 132, the unread bubble).
+    NEXT: messages with ticks (and 132, the unread bubble). Say-back sent
+    2026-11-02 evening; waiting for his answers.
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
     a consultant in room one calls in patient, that means the front desk
