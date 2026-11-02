@@ -183,3 +183,39 @@ export async function downloadFiles(
   }
   return failed
 }
+
+// ===== 6. Fetch a stored file for the preview window =====
+// Answers the file, or the words to show. Nothing is saved on the device.
+export async function fetchFile(client: SupabaseClient, key: string): Promise<Blob | string> {
+  const token = await tokenOf(client)
+  if (!token) return 'Please sign in again.'
+  try {
+    const response = await fetch(`/api/files/${key}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) return 'This file could not be opened.'
+    return await response.blob()
+  } catch {
+    return 'No network. Try again.'
+  }
+}
+
+// ===== 7. Delete a record file attached by mistake =====
+// Only the person who attached it, on a patient from an old file; the
+// database decides (request 128, 2026-11-02).
+export async function deleteFile(client: SupabaseClient, key: string): Promise<string | null> {
+  const token = await tokenOf(client)
+  if (!token) return 'Please sign in again.'
+  try {
+    const response = await fetch(`/api/files/${key}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.ok) return null
+    return response.status === 403
+      ? 'Only the person who attached it can delete it.'
+      : 'The file could not be deleted. Try again.'
+  } catch {
+    return 'No network. Try again.'
+  }
+}

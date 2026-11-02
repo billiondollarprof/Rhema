@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   downloadFile,
+  deleteRecordFile,
   downloadLabFile,
   kindOf,
   realType,
@@ -148,12 +149,12 @@ describe('downloadLabFile', () => {
 })
 
 // ===== 5. Files on the record itself (request 128) =====
-// A Supabase stand-in that also notes what it was asked.
-const asking = (rows: unknown[]) => {
+// A stand-in for a database function: answers `value`, notes the address.
+const askingAnswer = (value: unknown) => {
   const asked: string[] = []
   const post = (async (url: string) => {
     asked.push(url)
-    return Response.json(rows)
+    return Response.json(value)
   }) as unknown as typeof fetch
   return { post, asked }
 }
@@ -181,18 +182,19 @@ describe('record files', () => {
     expect(response.status).toBe(403)
     expect(stored.size).toBe(0)
   })
-  it('asks the record files table, not the lab, and skips removed files', async () => {
+  it('asks the database to open (and log) a record file, not the lab', async () => {
     const KEY = 'record/12345678-1234-1234-1234-123456789abc.pdf'
     const { bucket, stored } = fakeBucket()
     stored.set(KEY, PDF)
-    const { post, asked } = asking([{ id: 1 }])
+    const { post, asked } = askingAnswer(true)
     const request = new Request(`https://x/api/files/${KEY}`, {
       headers: { Authorization: `Bearer ${TOKEN}` },
     })
     const response = await downloadFile(request, KEY, env(bucket), post)
     expect(response.status).toBe(200)
-    expect(asked[0]).toContain('patient_files?')
-    expect(asked[0]).toContain('removed_at=is.null')
+    expect(asked[0]).toContain('rpc/open_patient_file')
+    const refused = await downloadFile(request, KEY, env(bucket), askingAnswer(false).post)
+    expect(refused.status).toBe(404)
   })
   it('knows our two kinds of name and nothing else', () => {
     expect(kindOf('lab/12345678-1234-1234-1234-123456789abc.webp')).toBe('lab')
@@ -200,5 +202,50 @@ describe('record files', () => {
     expect(kindOf('record/../secret.pdf')).toBeNull()
     expect(kindOf('other/12345678-1234-1234-1234-123456789abc.pdf')).toBeNull()
     expect(kindOf('record/12345678-1234-1234-1234-123456789abcXpdf')).toBeNull()
+  })
+})
+
+describe('deleteRecordFile', () => {
+  const KEY = 'record/12345678-1234-1234-1234-123456789abc.pdf'
+  const del = (token: string | null = TOKEN) =>
+    new Request(`https://x/api/files/${KEY}`, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+  const bucketWith = () => {
+    const stored = new Map<string, Uint8Array>([[KEY, PDF]])
+    const bucket = {
+      delete: async (key: string) => {
+        stored.delete(key)
+      },
+    } as unknown as R2Bucket
+    return { bucket, stored }
+  }
+
+  it('deletes the stored file only after the database says deleted', async () => {
+    const { bucket, stored } = bucketWith()
+    const { post, asked } = askingAnswer('deleted')
+    const response = await deleteRecordFile(del(), KEY, env(bucket), post)
+    expect(response.status).toBe(200)
+    expect(asked[0]).toContain('rpc/delete_patient_file')
+    expect(stored.has(KEY)).toBe(false)
+  })
+  it('keeps the file when the database refuses', async () => {
+    const { bucket, stored } = bucketWith()
+    const refused = (async () => new Response('{}', { status: 403 })) as unknown as typeof fetch
+    const response = await deleteRecordFile(del(), KEY, env(bucket), refused)
+    expect(response.status).toBe(403)
+    expect(stored.has(KEY)).toBe(true)
+  })
+  it('refuses somebody not signed in, and lab files', async () => {
+    const { bucket, stored } = bucketWith()
+    expect(
+      (await deleteRecordFile(del(null), KEY, env(bucket), askingAnswer('deleted').post)).status,
+    ).toBe(401)
+    const lab = 'lab/12345678-1234-1234-1234-123456789abc.pdf'
+    expect(
+      (await deleteRecordFile(del(), lab, env(bucket), askingAnswer('deleted').post)).status,
+    ).toBe(404)
+    expect(stored.has(KEY)).toBe(true)
   })
 })

@@ -92,29 +92,22 @@ reset role;
 \echo 'PASS 2: the Front Desk attaches, once; others without the right cannot'
 
 
--- ===== 3. The Front Desk can never read the files =====
-select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1"}', true);
+-- ===== 3. Somebody without the patients tick or the record reads nothing =====
+-- (Since 20261102 patient_files_preview, the Front Desk may see the files;
+-- that is tested in 012. The Laboratory, with neither, still may not.)
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3"}', true);
 set local role authenticated;
 do $$
 begin
   if (select count(*) from public.patient_files) <> 0 then
-    raise exception 'FAIL 3: the Front Desk could read a patient''s files';
+    raise exception 'FAIL 3: somebody without the patients tick read a patient''s files';
   end if;
 end $$;
 reset role;
-\echo 'PASS 3: the Front Desk cannot read files'
+\echo 'PASS 3: nobody without the patients tick or the record reads files'
 
 
--- ===== 4. A nurse reads only after opening the record =====
-select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2"}', true);
-set local role authenticated;
-do $$
-begin
-  if (select count(*) from public.patient_files) <> 0 then
-    raise exception 'FAIL 4: a nurse read files without opening the record';
-  end if;
-end $$;
-reset role;
+-- ===== 4. A nurse with the record open reads the file =====
 insert into public.record_openings (patient_id, staff_id)
 values ((select patient from t), '00000000-0000-0000-0000-0000000000a2');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2"}', true);
@@ -126,19 +119,19 @@ begin
   end if;
 end $$;
 reset role;
-\echo 'PASS 4: a nurse reads files only with the record opened'
--- Note the file's number as the test runner, so the Front Desk below asks
+\echo 'PASS 4: a nurse with the record open reads the file'
+-- Note the file's number as the test runner, so somebody without the record below asks
 -- for a real file it cannot see, not for nothing.
 update t set file = (select min(id) from public.patient_files);
 
 
 -- ===== 5. Removing needs the record open and a reason; nothing is deleted =====
-select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1"}', true);
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3"}', true);
 set local role authenticated;
 do $$
 begin
   perform public.remove_patient_file((select file from t), 'Wrong patient');
-  raise exception 'FAIL 5: the Front Desk removed a file';
+  raise exception 'FAIL 5: somebody without the record removed a file';
 exception when insufficient_privilege then null;
 end $$;
 reset role;

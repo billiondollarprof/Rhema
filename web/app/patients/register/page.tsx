@@ -146,7 +146,7 @@ export default function RegisterPatientPage() {
         <div className={styles.head}>
           <h2>Register patient</h2>
           <div className={styles.buttons}>
-            <Link className={`${styles.button} ${styles.quiet}`} href="/patients/old-file/">
+            <Link className={`${styles.button} ${styles.oldFile}`} href="/patients/old-file/">
               <Icon name="file" size={16} /> Register from old file
             </Link>
             <Link className={styles.button} href="/patients/">

@@ -7,13 +7,17 @@
  * be saved as PDF first; the screen says so. Up to 5 files at once, 10 MB
  * each. A photo is shrunk to WebP here, before it is sent, and stays clear.
  *
+ * Tapping a chosen file shows it (FilePreview), straight from the device,
+ * so staff can check it is the right document before sending it.
+ *
  * Used by Register from old file and by the Files section of the record.
  *
  * Never: send anything. This only gets files ready; the page sends them.
  */
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import FilePreview from './FilePreview'
 import styles from './patients.module.css'
 import Icon from '@/components/shell/Icon'
 import { MOST_AT_ONCE, prepareFile, sizeWords, type ReadyFile } from '@/lib/files/files'
@@ -31,6 +35,12 @@ export default function FilePicker({
   const pdfInput = useRef<HTMLInputElement>(null)
   const [working, setWorking] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  const [shown, setShown] = useState<number | null>(null)
+
+  // A local address for each chosen file, for the small picture and the
+  // preview. Let go of them when the list changes, so nothing piles up.
+  const addresses = useMemo(() => files.map((file) => URL.createObjectURL(file.blob)), [files])
+  useEffect(() => () => addresses.forEach((address) => URL.revokeObjectURL(address)), [addresses])
 
   const full = files.length >= MOST_AT_ONCE
 
@@ -104,11 +114,21 @@ export default function FilePicker({
         <ul className={styles.fileList}>
           {files.map((file, at) => (
             <li key={`${file.name}-${at}`}>
-              <Icon name={file.type === 'application/pdf' ? 'file' : 'camera'} size={16} />
-              <span>
+              {file.type !== 'application/pdf' && addresses[at] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className={styles.thumb} src={addresses[at]} alt="" />
+              ) : (
+                <Icon name="file" size={16} />
+              )}
+              <button
+                type="button"
+                className={styles.fileOpen}
+                onClick={() => setShown(at)}
+                aria-label={`Preview ${file.name}`}
+              >
                 <b>{file.name}</b>
                 <small>{sizeWords(file.size)}</small>
-              </span>
+              </button>
               <button
                 type="button"
                 className={styles.button}
@@ -120,6 +140,14 @@ export default function FilePicker({
             </li>
           ))}
         </ul>
+      ) : null}
+      {shown !== null && files[shown] && addresses[shown] ? (
+        <FilePreview
+          address={addresses[shown]}
+          type={files[shown].type}
+          name={files[shown].name}
+          onClose={() => setShown(null)}
+        />
       ) : null}
     </div>
   )

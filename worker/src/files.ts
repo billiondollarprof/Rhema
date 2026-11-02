@@ -86,9 +86,9 @@ type KindRules = {
   // Whether that answer allows storing.
   mayStore: (row: Record<string, unknown> | undefined) => boolean
   refused: string
-  // What to ask Supabase (as the person) before serving a stored file. A
-  // row back means the database lets this person read it.
-  readAsk: (key: string) => string
+  // Asks Supabase (as the person) before serving a stored file: true means
+  // the database lets this person read it.
+  mayRead: (key: string, token: string, env: FilesEnv, post: typeof fetch) => Promise<boolean>
   // For the log: counts only, never names.
   label: string
 }
@@ -99,7 +99,13 @@ const KINDS: Record<FileKind, KindRules> = {
     whoAsk: (person) => `staff?select=can_lab&id=eq.${person}&is_active=eq.true`,
     mayStore: (row) => row?.can_lab === true,
     refused: 'Only the Laboratory can attach result files',
-    readAsk: (key) => `lab_results?select=id&file_key=eq.${encodeURIComponent(key)}&limit=1`,
+    mayRead: async (key, token, env, post) => {
+      const rows = await supabaseAsker(env, post)(
+        `lab_results?select=id&file_key=eq.${encodeURIComponent(key)}&limit=1`,
+        token,
+      )
+      return Boolean(rows && rows.length > 0)
+    },
     label: 'Lab file',
   },
   record: {
@@ -107,9 +113,10 @@ const KINDS: Record<FileKind, KindRules> = {
     whoAsk: (person) => `staff?select=can_patients,can_medical&id=eq.${person}&is_active=eq.true`,
     mayStore: (row) => row?.can_patients === true || row?.can_medical === true,
     refused: 'You cannot attach files to patients',
-    // A removed file is not served any more.
-    readAsk: (key) =>
-      `patient_files?select=id&file_key=eq.${encodeURIComponent(key)}&removed_at=is.null&limit=1`,
+    // The database checks, refuses a crossed out file, and writes the
+    // opening in the activity log (open_patient_file, 2026-11-02).
+    mayRead: async (key, token, env, post) =>
+      (await callFunction(env, post, 'open_patient_file', { key }, token)) === true,
     label: 'Record file',
   },
 }
@@ -133,6 +140,28 @@ function supabaseAsker(env: FilesEnv, post: typeof fetch): Ask {
     const rows = (await response.json()) as unknown
     return Array.isArray(rows) ? rows : null
   }
+}
+
+// Call a database function as the person. Answers what it returned, or
+// null when Supabase refused.
+async function callFunction(
+  env: FilesEnv,
+  post: typeof fetch,
+  name: string,
+  body: Record<string, unknown>,
+  token: string,
+): Promise<unknown> {
+  const response = await post(`${env.SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_KEY ?? '',
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) return null
+  return (await response.json()) as unknown
 }
 
 function tokenFrom(request: Request): string | null {
@@ -215,8 +244,7 @@ export async function downloadFile(
   if (!token || !personFrom(token)) return no(401, 'Please sign in again')
 
   // Only if the database lets this person read the row holding the file.
-  const rows = await supabaseAsker(env, post)(KINDS[kind].readAsk(key), token)
-  if (!rows || rows.length === 0) return no(404, 'Not found')
+  if (!(await KINDS[kind].mayRead(key, token, env, post))) return no(404, 'Not found')
 
   const stored = await env.FILES.get(key)
   if (!stored) return no(404, 'Not found')
@@ -233,3 +261,27 @@ export async function downloadFile(
 }
 
 export const downloadLabFile = downloadFile
+
+// ===== 6. Delete a record file attached by mistake =====
+// Only the person who attached it, on a patient registered from an old
+// file (Anthony, 2026-11-02). The database decides and forgets the row
+// first; only then is the stored file deleted, so storage is freed.
+export async function deleteRecordFile(
+  request: Request,
+  key: string,
+  env: FilesEnv,
+  post: typeof fetch = fetch,
+): Promise<Response> {
+  if (!env.FILES || !env.SUPABASE_URL || !env.SUPABASE_KEY)
+    return no(503, 'Files are not set up yet')
+  if (kindOf(key) !== 'record') return no(404, 'Not found')
+  const token = tokenFrom(request)
+  if (!token || !personFrom(token)) return no(401, 'Please sign in again')
+
+  const answer = await callFunction(env, post, 'delete_patient_file', { key }, token)
+  if (answer === 'not_found') return no(404, 'Not found')
+  if (answer !== 'deleted') return no(403, 'Only the person who attached it can delete it')
+  await env.FILES.delete(key)
+  console.log('Record file deleted')
+  return Response.json({ deleted: true })
+}

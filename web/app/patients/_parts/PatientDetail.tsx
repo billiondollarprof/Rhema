@@ -20,6 +20,7 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
+import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
 import { sexWords, type PatientResult } from '@/lib/patients/patients'
@@ -100,7 +101,14 @@ export default function PatientDetail({
     <section className={styles.card} aria-label="Patient">
       <div className={styles.head}>
         <PersonBadge name={patient.full_name} />
-        <h2>{patient.full_name}</h2>
+        <div className={styles.headName}>
+          <h2>{patient.full_name}</h2>
+          {patient.from_old_file ? (
+            <span className={styles.oldFileMark}>
+              <Icon name="file" size={13} /> From old file
+            </span>
+          ) : null}
+        </div>
         {where ? <span className={`${styles.tag} ${styles.tagBusy}`}>{where}</span> : null}
       </div>
 

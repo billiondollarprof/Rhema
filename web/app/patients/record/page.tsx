@@ -30,6 +30,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
+import Icon from '@/components/shell/Icon'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
 import { DosesSection, MedicationsSection } from './_parts/Medications'
 import FilesSection from './_parts/Files'
@@ -189,6 +190,11 @@ function PatientRecord() {
                 {sexWords(patient.sex)}
               </small>
             ) : null}
+            {patient?.from_old_file ? (
+              <span className={buttons.oldFileMark}>
+                <Icon name="file" size={13} /> From old file
+              </span>
+            ) : null}
           </div>
           {back}
         </div>
@@ -249,6 +255,7 @@ function PatientRecord() {
                 <PrescriptionsSection client={client} patientId={props.patientId} />
                 <FilesSection
                   client={client}
+                  staffId={staff.id}
                   patientId={props.patientId}
                   fromOldFile={patient.from_old_file}
                   onLoaded={setFiles}
