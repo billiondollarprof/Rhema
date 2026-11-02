@@ -31,7 +31,7 @@ const SKIP = /^(Sign out|Lock screen)$/
 async function openScreen(browser, screen) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   await signIn(context, {
-    role: screen.medical ? 'nurse' : 'front_desk',
+    role: screen.role ?? (screen.medical ? 'nurse' : 'front_desk'),
     medical: Boolean(screen.medical),
     admin: Boolean(screen.admin),
   })

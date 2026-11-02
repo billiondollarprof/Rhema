@@ -5,8 +5,8 @@
  * Why: Anthony, 2026-10-31 (request 117): "only the call attention will be
  * there, then by the right of it, hamburger menu icon... Every other thing
  * is now behind hamburger menu... Keeps it clean." Behind it: Lock screen,
- * Notifications, the installation guide (later with the user manual inside
- * it), and Sign out. The automations go here too, when they are built.
+ * Notifications (with a red bubble of how many wait, request 132), the
+ * installation guide (later with the user manual inside it), and Sign out. The automations go here too, when they are built.
  *
  * Never: put Call attention behind this menu. It stays in the top bar,
  * one tap away, because it is urgent.
@@ -20,7 +20,14 @@ import styles from './AppShell.module.css'
 import { useAuth } from '@/lib/auth/session'
 import { readOutbox } from '@/lib/offline/outbox'
 
-export default function MainMenu({ buttonClass }: { buttonClass: string }) {
+export default function MainMenu({
+  buttonClass,
+  waiting = 0,
+}: {
+  buttonClass: string
+  // How many notifications wait (request 132): a red bubble on the button.
+  waiting?: number
+}) {
   const auth = useAuth()
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement | null>(null)
@@ -50,9 +57,14 @@ export default function MainMenu({ buttonClass }: { buttonClass: string }) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls="main-menu"
-        aria-label="Menu"
+        aria-label={waiting > 0 ? `Menu, ${waiting} notifications` : 'Menu'}
       >
         <Icon name="menu" size={18} />
+        {waiting > 0 ? (
+          <em className={styles.menuBubble} aria-hidden="true">
+            {waiting > 99 ? '99+' : waiting}
+          </em>
+        ) : null}
       </button>
 
       {open ? (
@@ -68,12 +80,18 @@ export default function MainMenu({ buttonClass }: { buttonClass: string }) {
             <Icon name="lock" size={18} />
             Lock screen
           </button>
-          {/* The notifications part is not built yet: shown, but not pressable. */}
-          <span className={`${styles.menuItem} ${styles.menuSoon}`} aria-disabled="true">
+          <Link
+            className={styles.menuItem}
+            role="menuitem"
+            href="/notifications/"
+            onClick={() => setOpen(false)}
+          >
             <Icon name="bell" size={18} />
             Notifications
-            <em>Soon</em>
-          </span>
+            {waiting > 0 ? (
+              <em className={styles.menuCount}>{waiting > 99 ? '99+' : waiting}</em>
+            ) : null}
+          </Link>
           <Link
             className={styles.menuItem}
             role="menuitem"

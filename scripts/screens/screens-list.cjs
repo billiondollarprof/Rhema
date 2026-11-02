@@ -9,6 +9,12 @@
 // ===== 1. Every screen, and the text that shows it has loaded =====
 module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today' },
+  // Home is different for every role (review pass, 2026-11-02).
+  { path: '/', waitFor: 'Registered today', role: 'doctor', medical: true },
+  { path: '/', waitFor: 'Registered today', role: 'laboratory' },
+  { path: '/', waitFor: 'Registered today', role: 'pharmacy' },
+  { path: '/', waitFor: 'Registered today', role: 'matron', medical: true },
+  { path: '/', waitFor: 'Registered today', role: 'admin', admin: true, medical: true },
   { path: '/patients/', waitFor: 'Find patient' },
   { path: '/patients/?p=1', waitFor: 'Adaeze Okafor' },
   { path: '/patients/register/', waitFor: 'Register patient' },
@@ -22,6 +28,7 @@ module.exports.SCREENS = [
   { path: '/messages/', waitFor: 'From Front Desk' },
   { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },
   { path: '/announce/', waitFor: 'Show on Home until', medical: true },
+  { path: '/notifications/', waitFor: 'Notifications' },
   {
     path: '/payments/receipt/?id=1',
     waitFor: 'RHEMA MEDICAL CENTRE',

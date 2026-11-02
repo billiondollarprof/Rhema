@@ -113,8 +113,9 @@ So the agents can work fast without guessing.
 2. Look at it: screenshots at a phone width and a desktop width (skill
    `screens`). The app has one look today. If a dark look is ever added,
    check both.
-3. Run the overflow check at 320, 360, 375 and 390 for anything that
-   changes layout (`screens` does it).
+3. Run the layout check at phone (320, 360, 390), tablet portrait, tablet
+   landscape and desktop widths, and press every button with the
+   click-through check (skills `screens` and `clickthrough`).
 4. Judge it as somebody who was never told how it works. If a control
    needs explaining, the control is wrong.
 5. Run `npm run verify`. Then say what you actually checked.
@@ -268,7 +269,8 @@ Skills live in `.claude/skills/`, with sources and licences in
 `.claude/skills/SOURCES.md`. A skill from outside is read whole before it
 is added.
 
-**Our own skills:** `ship`, `screens`, `new-migration`, `switch-role`.
+**Our own skills:** `ship`, `screens`, `clickthrough`, `new-migration`,
+`switch-role`.
 
 **Anything an agent does more than twice becomes a skill**, so the next
 agent runs it instead of working it out again.
