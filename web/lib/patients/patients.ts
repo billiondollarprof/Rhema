@@ -181,6 +181,30 @@ export async function findPossibleDuplicates(
 }
 
 // ===== 5. Registering and updating =====
+// A double tap (or a slow network sending twice) is refused by the database
+// with "already registered" (request 131). The first tap saved the patient,
+// so this finds that patient, by this person, with this name, just now.
+function isDoubleTap(error: { code?: string; message?: string }): boolean {
+  return error.code === '23505' && (error.message ?? '').includes('already registered')
+}
+
+async function justRegistered(
+  client: SupabaseClient,
+  staffId: string,
+  fullName: string,
+): Promise<PatientCard | null> {
+  const { data } = await client
+    .from('patients')
+    .select(CARD_COLUMNS)
+    .eq('created_by', staffId)
+    .eq('full_name', fullName)
+    .gte('created_at', new Date(Date.now() - 2 * 60 * 1000).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (data as PatientCard | null) ?? null
+}
+
 export async function registerPatient(
   client: SupabaseClient,
   details: PatientDetails,
@@ -191,6 +215,10 @@ export async function registerPatient(
     .insert({ ...details, created_by: staffId })
     .select(CARD_COLUMNS)
     .single()
+  if (error && isDoubleTap(error)) {
+    const first = await justRegistered(client, staffId, details.full_name)
+    if (first) return { patient: first, problem: null }
+  }
   if (error) {
     console.warn(`Patient could not be registered: ${error.code}`)
     return {
@@ -213,10 +241,11 @@ export async function registerFromOldFile(
   dateOfBirth: string | null = null,
   sex: Sex | null = null,
 ): Promise<{ patient: PatientCard | null; problem: string | null }> {
+  const cleanName = fullName.trim().replace(/\s+/g, ' ')
   const { data, error } = await client
     .from('patients')
     .insert({
-      full_name: fullName.trim().replace(/\s+/g, ' '),
+      full_name: cleanName,
       phone,
       date_of_birth: dateOfBirth,
       sex,
@@ -225,6 +254,10 @@ export async function registerFromOldFile(
     })
     .select(CARD_COLUMNS)
     .single()
+  if (error && isDoubleTap(error)) {
+    const first = await justRegistered(client, staffId, cleanName)
+    if (first) return { patient: first, problem: null }
+  }
   if (error) {
     console.warn(`Old file patient could not be registered: ${error.code}`)
     return {

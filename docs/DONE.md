@@ -752,3 +752,7 @@ this file.
     2026-11-02.
 130. **Lab picker, Send also, attachment chooser, named downloads, exact
     status tags.** (2026-11-02) Live 2026-11-02.
+129. **Call in tells the Front Desk.** (2026-11-02) A green Call patient
+    card with a chime at every Front Desk, "Adaeze Okafor to Consultant
+    Room 1", closes with X; the phone alert names the patient too; each
+    kind of call has its own duplicate guard. Live 2026-11-02.

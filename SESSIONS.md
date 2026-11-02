@@ -154,3 +154,8 @@ build from the RHEMA demo and the proposal.
   lab picker fixed (the initials circle stretched on iPad), Send also,
   attachment chooser with zip, history and zip named after the patient,
   exact status tags on Find patient. Recorded 129 (call in alert).
+
+- 2026-11-02: 129 live (Call patient card, chime, name on the phone
+  alert; the CI walkthrough caught the Call attention guard counting the
+  Call patient card, fixed before testing). 131 built: one shared double
+  tap guard for registration and every record entry; waiting for his yes.
