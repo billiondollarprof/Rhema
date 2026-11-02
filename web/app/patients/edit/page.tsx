@@ -8,6 +8,10 @@
  *
  * The patient comes from the address: /patients/edit/?p=12.
  *
+ * Below the form: the patient's files (PatientFilesCard), to preview, to
+ * attach more, and for the person who attached them to an old file
+ * patient, to delete a wrong one (request 128, 2026-11-02).
+ *
  * Never: delete a patient from here. A wrong registration is voided with a
  * reason, by the admin, in a later step.
  */
@@ -17,6 +21,7 @@ import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
+import PatientFilesCard from '../_parts/PatientFilesCard'
 import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
 import styles from '../_parts/patients.module.css'
 import {
@@ -33,7 +38,7 @@ function EditPatient() {
   useRightPage(auth.status, '/patients/edit/')
   const router = useRouter()
   const id = Number(useSearchParams().get('p')) || null
-  const { client } = auth
+  const { client, staff } = auth
 
   const [patient, setPatient] = useState<PatientResult | null | undefined>(undefined)
   const [busy, setBusy] = useState(false)
@@ -105,6 +110,14 @@ function EditPatient() {
               problem={problem}
               onSave={save}
             />
+            {staff ? (
+              <PatientFilesCard
+                client={client}
+                staffId={staff.id}
+                patientId={patient.id}
+                fromOldFile={patient.from_old_file}
+              />
+            ) : null}
           </>
         ) : null}
       </div>

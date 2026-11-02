@@ -24,7 +24,7 @@ import { ageFrom } from '@/lib/patients/age'
 import { getPatient, searchPatients, type PatientResult } from '@/lib/patients/patients'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
-import { CATEGORY_LABELS } from '@/lib/queue/queue'
+import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
 
 function FindPatient() {
   const auth = useAuth()
@@ -73,7 +73,7 @@ function FindPatient() {
         <div className={styles.head}>
           <h2>Find patient</h2>
           <div className={styles.buttons}>
-            <Link className={`${styles.button} ${styles.quiet}`} href="/patients/old-file/">
+            <Link className={`${styles.button} ${styles.oldFile}`} href="/patients/old-file/">
               <Icon name="file" size={16} /> Register from old file
             </Link>
             <Link className={`${styles.button} ${styles.primary}`} href="/patients/register/">
@@ -118,8 +118,15 @@ function FindPatient() {
                   </small>
                   <small>Last seen: {lastSeenWords(patient.last_seen)}</small>
                 </div>
+                {/* Where the patient is right now, e.g. "Waiting · Consultant Room 1"
+                    (Anthony, 2026-11-02: "remove in hospital and then put the
+                    actual tags"). */}
                 {patient.open_visit ? (
-                  <span className={`${styles.tag} ${styles.tagBusy}`}>In hospital</span>
+                  <span className={`${styles.tag} ${styles.tagBusy}`}>
+                    {STATUS_LABELS[patient.open_visit.status as QueueStatus] ??
+                      patient.open_visit.status}
+                    {patient.open_visit.room ? ` · ${patient.open_visit.room}` : ''}
+                  </span>
                 ) : (
                   <span className={styles.tag}>
                     {CATEGORY_LABELS[patient.category] ?? patient.category}

@@ -242,3 +242,10 @@ textarea.input {
   padding: 5px 10px;
   font-size: 13px;
 }
+
+/* "Also send to": a softer grey button beside Back to the record. */
+.soft {
+  background: #eef2f7;
+  border-color: #dfe5ee;
+  color: #3b4a5e;
+}

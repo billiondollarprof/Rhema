@@ -236,7 +236,9 @@ textarea.input {
   background: #f4f8ff;
 }
 
-.person > span {
+/* Only the name grows; the initials circle keeps its size (it is a span
+   too, and stretched into an oval on an iPad, 2026-11-02). */
+.personText {
   flex: 1;
   min-width: 0;
 }

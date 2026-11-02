@@ -1,6 +1,8 @@
 /*
  * record/_parts/Files.tsx: the Files part of the patient's record: scans,
  * ultrasound results, old paper files and documents (request 128).
+ * Preview shows a file inside the app; the person who attached it to an
+ * old file patient may delete it (2026-11-02).
  *
  * Why: Anthony, 2026-11-02: "every patient's record can carry attachments
  * ... they can click attach, then it will prompt their computer, they'll
@@ -18,11 +20,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import FilePicker from '../../_parts/FilePicker'
+import StoredFile from '../../_parts/StoredFile'
 import Line from './Line'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
-import { openFile, sizeWords, type ReadyFile } from '@/lib/files/files'
+import { sizeWords, type ReadyFile } from '@/lib/files/files'
 import {
   attachFiles,
   listPatientFiles,
@@ -35,11 +38,13 @@ const REMOVE_REASONS = ['Wrong patient', 'Wrong file', 'Not clear, added again']
 
 export default function FilesSection({
   client,
+  staffId,
   patientId,
   fromOldFile,
   onLoaded,
 }: {
   client: SupabaseClient
+  staffId: string
   patientId: number
   // A patient registered from an old file: the section opens by itself.
   fromOldFile: boolean
@@ -143,34 +148,36 @@ export default function FilesSection({
 
         {/* ----- The files, newest first ----- */}
         {(files ?? []).map((file) => (
-          <FileLine key={file.id} client={client} file={file} onDone={load} />
+          <FileLine
+            key={file.id}
+            client={client}
+            staffId={staffId}
+            file={file}
+            fromOldFile={fromOldFile}
+            onDone={load}
+          />
         ))}
       </Section>
     </div>
   )
 }
 
-// ===== 3. One file: open it, or remove it with a reason =====
+// ===== 3. One file: preview it, delete it (the uploader, old files only),
+// or remove it with a reason =====
 function FileLine({
   client,
+  staffId,
   file,
+  fromOldFile,
   onDone,
 }: {
   client: SupabaseClient
+  staffId: string
   file: PatientFile
+  fromOldFile: boolean
   onDone: () => void
 }) {
-  const [busy, setBusy] = useState(false)
   const [removing, setRemoving] = useState(false)
-  const [problem, setProblem] = useState<string | null>(null)
-
-  async function open() {
-    setBusy(true)
-    setProblem(null)
-    setProblem(await openFile(client, file.file_key))
-    setBusy(false)
-  }
-
   const kind = file.file_type === 'application/pdf' ? 'PDF' : 'Scan or photo'
 
   return (
@@ -199,13 +206,17 @@ function FileLine({
       }
       actions={
         <>
-          <button className={styles.small} onClick={open} disabled={busy}>
-            {busy ? 'Opening…' : 'Open'}
-          </button>
+          <StoredFile
+            client={client}
+            staffId={staffId}
+            file={file}
+            fromOldFile={fromOldFile}
+            buttonClass={styles.small}
+            onDeleted={onDone}
+          />
           <button className={`${styles.small} ${styles.link}`} onClick={() => setRemoving(true)}>
             Remove
           </button>
-          {problem ? <small className={styles.error}>{problem}</small> : null}
         </>
       }
     />

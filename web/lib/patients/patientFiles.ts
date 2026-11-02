@@ -31,11 +31,12 @@ export type PatientFile = {
   uploaded_at: string
   removed_at: string | null
   remove_reason: string | null
+  uploaded_by: string
   uploader: { full_name: string } | null
 }
 
 const COLUMNS =
-  'id, file_key, file_name, file_type, file_size, uploaded_at, removed_at, remove_reason, ' +
+  'id, file_key, file_name, file_type, file_size, uploaded_at, removed_at, remove_reason, uploaded_by, ' +
   'uploader:staff!patient_files_uploaded_by_fkey(full_name)'
 
 // ===== 2. List, newest first =====

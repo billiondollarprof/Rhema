@@ -27,6 +27,7 @@
  * chose Download), or send a file anywhere but our own Worker.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { makeZip } from './zip'
 
 // ===== 1. Limits =====
 export const MOST_BYTES = 10 * 1024 * 1024
@@ -148,38 +149,77 @@ export async function openFile(client: SupabaseClient, key: string): Promise<str
   }
 }
 
-// ===== 5. Download files to the device, one after another =====
-// For "Attachments only". The browser may ask once to allow several
-// downloads. Answers how many could not be fetched.
-export async function downloadFiles(
+// ===== 5. Download the chosen files =====
+// One file: saved as it is. Several: fetched, put in one .zip named
+// zipName, then saved (Anthony, 2026-11-02: "select all... download
+// everything once as a zip folder, or... choose one and download as a
+// single file"). Answers null, or the words to show.
+function save(blob: Blob, name: string) {
+  const address = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = address
+  link.download = name
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.setTimeout(() => URL.revokeObjectURL(address), 60000)
+}
+
+export async function downloadChosen(
   client: SupabaseClient,
   files: { key: string; name: string }[],
-): Promise<number> {
-  const token = await tokenOf(client)
-  if (!token) return files.length
-  let failed = 0
+  zipName: string,
+): Promise<string | null> {
+  const fetched: { name: string; blob: Blob }[] = []
   for (const file of files) {
-    try {
-      const response = await fetch(`/api/files/${file.key}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!response.ok) {
-        failed += 1
-        continue
-      }
-      const address = URL.createObjectURL(await response.blob())
-      const link = document.createElement('a')
-      link.href = address
-      link.download = file.name
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.setTimeout(() => URL.revokeObjectURL(address), 60000)
-      // A short pause, so the browser takes each one as its own download.
-      await new Promise((done) => window.setTimeout(done, 400))
-    } catch {
-      failed += 1
-    }
+    const blob = await fetchFile(client, file.key)
+    if (typeof blob === 'string') return 'Some files did not download. Try again.'
+    fetched.push({ name: file.name, blob })
   }
-  return failed
+  if (fetched.length === 1) {
+    save(fetched[0].blob, fetched[0].name)
+    return null
+  }
+  const parts = []
+  for (const file of fetched) {
+    parts.push({ name: file.name, bytes: new Uint8Array(await file.blob.arrayBuffer()) })
+  }
+  save(makeZip(parts), zipName)
+  return null
+}
+
+// ===== 6. Fetch a stored file for the preview window =====
+// Answers the file, or the words to show. Nothing is saved on the device.
+export async function fetchFile(client: SupabaseClient, key: string): Promise<Blob | string> {
+  const token = await tokenOf(client)
+  if (!token) return 'Please sign in again.'
+  try {
+    const response = await fetch(`/api/files/${key}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) return 'This file could not be opened.'
+    return await response.blob()
+  } catch {
+    return 'No network. Try again.'
+  }
+}
+
+// ===== 7. Delete a record file attached by mistake =====
+// Only the person who attached it, on a patient from an old file; the
+// database decides (request 128, 2026-11-02).
+export async function deleteFile(client: SupabaseClient, key: string): Promise<string | null> {
+  const token = await tokenOf(client)
+  if (!token) return 'Please sign in again.'
+  try {
+    const response = await fetch(`/api/files/${key}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.ok) return null
+    return response.status === 403
+      ? 'Only the person who attached it can delete it.'
+      : 'The file could not be deleted. Try again.'
+  } catch {
+    return 'No network. Try again.'
+  }
 }

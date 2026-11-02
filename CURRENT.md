@@ -360,9 +360,62 @@ Numbers are kept from the full list, so older notes still match.
       setup and training).
     - Button words (2026-11-02): "Add scan or photo" and "Add PDF file";
       PDF only, so a Word document is saved as PDF first.
-    Status 2026-11-02: step 1 (attachments, Register from old file,
-    Download) built and checked locally and in CI on the feature branch.
-    Waiting for his yes on the files SQL batch before testing.
+    - "make sex and age optional, they can add or skip it" (old file):
+      optional date of birth and sex; skipped shows "not recorded".
+    - Keep every screen clean, no more words than needed (CLAUDE.md 7).
+    Step 1 (attachments, Register from old file, Download) live
+    2026-11-02, his yes on the SQL; testing and live 0 security warnings.
+    Adjustments asked 2026-11-02 (after step 1 went live):
+    - "The register from old file button doesn't look like a button...
+      let it look like maybe another kind of protruding 3D button, just
+      like you did the buttons in the home screen."
+    - "a file that I upload, I can't click on it to preview it... it
+      should have a little preview... to check whether what you uploaded
+      is the correct document." (PDF text reading: "don't worry, just the
+      preview will be okay.")
+    - Old file patients get a faint mark: "something that just says from
+      old file, a little bit faint, like a watermark... when you open their
+      profile."
+    - Category on Register from old file: "pointless selecting family or
+      individual in this case. During edit, they can decide." Name and
+      phone only (date of birth and sex stay optional).
+    - On Edit patient, "anybody should be able to see the files that were
+      attached to that patient... They can preview it, but they can't
+      delete it" and cannot download. "Only allow the person who uploaded
+      to delete the file", a real delete (frees storage), with a red
+      warning first, and "this is just for only the register from old
+      file... because they have a backup". Not even the admin may delete.
+      Every other file is still only crossed out with a reason.
+    - "make me a doctor": done 2026-11-02.
+    NEXT after these: step 2, family profile (one card number for the
+    family).
+
+129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
+    a consultant in room one calls in patient, that means the front desk
+    gets the notification, right?... the notification will float on the
+    screen, even if the front desk is doing something... it should also
+    carry the call attention ringing infrastructure the same way... so
+    they can quickly call the patient." Today Call in only changes the
+    patient's status; the Front Desk is not told. "If that's not it, then
+    you have to note it down for when you are going to do that."
+
+130. **Lab, prescription and download fixes.** (2026-11-02)
+    a. Request lab: "doesn't populate the patients that are there... I
+       don't understand this type of way that the thing is looking" (the
+       initials circle stretched into a long oval on the iPad; nobody is
+       listed until you type).
+    b. Prescribe: optional parts must never block Send prescription; make
+       sure Send works to the Front Desk and straight to the Pharmacy.
+    c. After sending: "a gray, as in a softer button... by the side of back
+       to the record... send also to front desk" (or "also to pharmacy"),
+       not a "send to both" button.
+    d. Attachments only: "show the names of the attachment... select or
+       toggle one button that says select all... download everything once
+       as a zip folder, or they can just choose one and download as a
+       single file." Full medical history stays as it is, on its own,
+       without attachments.
+    e. "When they are downloading a medical report... let it come with the
+       name of the patient with their patient ID."
 
 ### Standing instructions
 

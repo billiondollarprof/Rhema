@@ -18,7 +18,7 @@ import styles from '../_parts/pharmacy.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import { getPatient, type PatientResult } from '@/lib/patients/patients'
-import { HOW_OFTEN, prescribe, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
+import { HOW_OFTEN, prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -63,6 +63,10 @@ function Prescribe() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  // "Send also to" the other place, after sending (request 130c).
+  const [alsoBusy, setAlsoBusy] = useState(false)
+  const [alsoSent, setAlsoSent] = useState(false)
+  const [alsoProblem, setAlsoProblem] = useState<string | null>(null)
 
   // ===== 1. The patient, from the address =====
   useEffect(() => {
@@ -129,6 +133,14 @@ function Prescribe() {
             <p className={styles.muted}>
               Once dispensed, the drugs join {patient.full_name}&apos;s current medications.
             </p>
+            {alsoSent ? (
+              <p className={styles.good}>
+                {sendTo === 'front_desk'
+                  ? 'Also sent to the Pharmacy.'
+                  : 'Also sent to the Front Desk.'}
+              </p>
+            ) : null}
+            {alsoProblem ? <p className={styles.error}>{alsoProblem}</p> : null}
             <div className={styles.buttons}>
               <Link
                 className={`${styles.button} ${styles.primary}`}
@@ -136,6 +148,22 @@ function Prescribe() {
               >
                 Back to the record
               </Link>
+              {!alsoSent ? (
+                <button
+                  className={`${styles.button} ${styles.soft}`}
+                  disabled={alsoBusy}
+                  onClick={async () => {
+                    setAlsoBusy(true)
+                    setAlsoProblem(null)
+                    const problem = await sendAlso(client, patient.id, staff.id)
+                    setAlsoBusy(false)
+                    if (problem) setAlsoProblem(problem)
+                    else setAlsoSent(true)
+                  }}
+                >
+                  {sendTo === 'front_desk' ? 'Also send to Pharmacy' : 'Also send to Front Desk'}
+                </button>
+              ) : null}
             </div>
           </div>
         ) : (

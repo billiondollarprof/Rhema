@@ -240,8 +240,18 @@
 }
 
 .result > div {
-  flex: 1;
+  flex: 1 1 140px;
   min-width: 0;
+}
+
+/* A long status ("In consultation · Consultant Room 1") drops under the
+   name on a small phone instead of running over it. */
+.result {
+  flex-wrap: wrap;
+}
+
+.result > .tag {
+  margin-left: auto;
 }
 
 .result small {
@@ -424,9 +434,28 @@
   color: var(--mut);
 }
 
-/* The quiet second button beside Register patient. */
-.quiet {
-  background: #eef2f8;
+/* Register from old file: a raised button of its own, the same 3D look
+   as the Home buttons, in slate so it sits apart from the blue Register
+   patient (Anthony, 2026-11-02: "let it look like... a protruding 3D
+   button"). */
+.oldFile {
+  --c: #546e7a;
+  color: #fff;
+  border: 0;
+  border-bottom: 4px solid color-mix(in srgb, var(--c), #000 40%);
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--c), #fff 8%),
+    color-mix(in srgb, var(--c), #000 22%)
+  );
+  box-shadow:
+    0 10px 18px -10px color-mix(in srgb, var(--c), #000 20%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.oldFile:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }
 
 /* A heading over a group that is not a single input, like the old file. */
@@ -449,4 +478,169 @@
   .fields2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* ===== 10. The preview window (request 128) ===== */
+.preview {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(10, 25, 50, 0.6);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.previewBox {
+  background: #fff;
+  border-radius: 18px;
+  width: min(900px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+}
+
+.previewTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 16px;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+
+.previewTop b {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewClose {
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.previewImage {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 110px);
+  margin: 0 auto;
+  object-fit: contain;
+  background: #f6f8fb;
+}
+
+.previewPdf {
+  width: 100%;
+  height: calc(100dvh - 110px);
+  border: 0;
+}
+
+/* A small picture of a chosen or stored scan, tapped to preview. */
+.thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+/* The name of a file is the button that previews it. */
+.fileOpen {
+  font: inherit;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.fileOpen:hover b {
+  color: var(--bl);
+}
+
+/* ===== 11. Delete warning (old file only) ===== */
+.danger {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fdecea;
+  border: 1px solid #f5c2bd;
+  color: #8a1c13;
+}
+
+.dangerButton {
+  background: #d32f2f;
+  border-color: #d32f2f;
+  color: #fff;
+}
+
+/* The faint mark on a patient registered from an old file. */
+.oldFileMark {
+  display: flex;
+  margin-top: 2px;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--mut);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+/* A name with the faint old file mark under it. */
+.headName {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* A stored file: on a phone the buttons drop under the name. */
+.storedFile {
+  flex-wrap: wrap;
+}
+
+.storedFile > span {
+  flex: 1 1 160px;
+}
+
+.storedFile > .buttons {
+  margin-left: auto;
+}
+
+.storedFile > .danger {
+  flex: 1 1 100%;
+}
+
+/* While the delete warning shows, it takes the whole width of the row. */
+.storedFile > .buttons:has(> .danger) {
+  flex: 1 1 100%;
+  margin-left: 0;
+}
+
+.storedFile .danger {
+  flex: 1 1 100%;
 }
