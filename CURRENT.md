@@ -365,7 +365,30 @@ Numbers are kept from the full list, so older notes still match.
     - Keep every screen clean, no more words than needed (CLAUDE.md 7).
     Step 1 (attachments, Register from old file, Download) live
     2026-11-02, his yes on the SQL; testing and live 0 security warnings.
-    NEXT: step 2, family profile (one card number for the family).
+    Adjustments asked 2026-11-02 (after step 1 went live):
+    - "The register from old file button doesn't look like a button...
+      let it look like maybe another kind of protruding 3D button, just
+      like you did the buttons in the home screen."
+    - "a file that I upload, I can't click on it to preview it... it
+      should have a little preview... to check whether what you uploaded
+      is the correct document." (PDF text reading: "don't worry, just the
+      preview will be okay.")
+    - Old file patients get a faint mark: "something that just says from
+      old file, a little bit faint, like a watermark... when you open their
+      profile."
+    - Category on Register from old file: "pointless selecting family or
+      individual in this case. During edit, they can decide." Name and
+      phone only (date of birth and sex stay optional).
+    - On Edit patient, "anybody should be able to see the files that were
+      attached to that patient... They can preview it, but they can't
+      delete it" and cannot download. "Only allow the person who uploaded
+      to delete the file", a real delete (frees storage), with a red
+      warning first, and "this is just for only the register from old
+      file... because they have a backup". Not even the admin may delete.
+      Every other file is still only crossed out with a reason.
+    - "make me a doctor": done 2026-11-02.
+    NEXT after these: step 2, family profile (one card number for the
+    family).
 
 ### Standing instructions
 
