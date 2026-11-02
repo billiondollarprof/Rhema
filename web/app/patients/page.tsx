@@ -130,6 +130,7 @@ function FindPatient() {
                 ) : (
                   <span className={styles.tag}>
                     {CATEGORY_LABELS[patient.category] ?? patient.category}
+                    {patient.family ? ` · ${patient.family.family_number}` : ''}
                   </span>
                 )}
               </button>

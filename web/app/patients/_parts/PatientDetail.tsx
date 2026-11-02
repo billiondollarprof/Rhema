@@ -18,6 +18,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import FamilyCard from './FamilyCard'
 import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
@@ -131,6 +132,9 @@ export default function PatientDetail({
           </dl>
         </div>
       ))}
+
+      {/* The family: its number, the other members, Add family member. */}
+      <FamilyCard client={client} patient={patient} />
 
       {/* ===== 2. What can be done from here ===== */}
       {sending ? (

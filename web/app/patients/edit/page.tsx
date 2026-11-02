@@ -104,6 +104,7 @@ function EditPatient() {
                 next_of_kin_name: patient.next_of_kin_name,
                 next_of_kin_relationship: patient.next_of_kin_relationship,
                 next_of_kin_phone: patient.next_of_kin_phone,
+                family_id: patient.family_id,
               }}
               saveLabel="Save changes"
               busy={busy}
