@@ -338,7 +338,13 @@ try {
 
   step('The front desk screen gets the card live, without a refresh')
   await desk.getByText('Consultant Room 1 needs Front Desk').waitFor({ timeout: 15000 })
-  await desk.getByText(/Test Nurse One · \d\d:\d\d/).waitFor()
+  const attentionCard = desk.getByRole('status').filter({ hasText: 'needs Front Desk' })
+  await attentionCard.getByText(/Test Nurse One · \d\d:\d\d/).waitFor()
+
+  // Request 129: her Call in earlier raised a green Call patient card here.
+  step('The front desk also has the Call patient card from her Call in')
+  const patientCard = desk.getByRole('status').filter({ hasText: 'Call patient' })
+  await patientCard.getByText(/ to Consultant Room 1$/).waitFor()
   await shot(desk, 'attention-card')
 
   step('A second tap at once sends nothing new')
@@ -347,13 +353,17 @@ try {
   await page.getByText('Already sent').waitFor()
   await page.keyboard.press('Escape')
 
-  step('The front desk closes the card with X, and it stays closed')
-  await desk.getByRole('button', { name: 'Close' }).click()
+  step('The front desk closes both cards with X, and they stay closed')
+  await attentionCard.getByRole('button', { name: 'Close' }).click()
+  await patientCard.getByRole('button', { name: 'Close' }).click()
   await desk.reload()
   await expectHome(desk, 'Test Desk One')
   await desk.waitForTimeout(1500)
   if (await desk.getByText('Consultant Room 1 needs Front Desk').count()) {
     throw new Error('A closed call came back after a refresh')
+  }
+  if (await desk.getByText('Call patient', { exact: true }).count()) {
+    throw new Error('A closed Call patient card came back after a refresh')
   }
 
   step('Lab: Nurse One requests a malaria test from the record, for payment')
