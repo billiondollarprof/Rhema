@@ -26,8 +26,10 @@ export type PatientCard = {
   id: number
   patient_number: string
   full_name: string
-  date_of_birth: string
-  sex: Sex
+  // Empty only for a patient registered from an old file (request 128),
+  // until somebody fills them in.
+  date_of_birth: string | null
+  sex: Sex | null
   category: Category
   phone: string | null
   email: string | null
@@ -39,12 +41,18 @@ export type PatientCard = {
   next_of_kin_name: string | null
   next_of_kin_relationship: string | null
   next_of_kin_phone: string | null
+  // Registered with only a name, a phone and the old paper file.
+  from_old_file: boolean
   created_at: string
 }
 
-// What the form fills in. The number, the author and the times are never
-// typed: the database sets them.
-export type PatientDetails = Omit<PatientCard, 'id' | 'patient_number' | 'created_at'>
+// What the full form fills in. The number, the author and the times are
+// never typed: the database sets them. The full form always asks for the
+// date of birth and sex.
+export type PatientDetails = Omit<
+  PatientCard,
+  'id' | 'patient_number' | 'created_at' | 'from_old_file' | 'date_of_birth' | 'sex'
+> & { date_of_birth: string; sex: Sex }
 
 // A search result also says when the patient was last seen (their last
 // visit in the queue), and whether they are in the hospital now.
@@ -54,7 +62,14 @@ export type PatientResult = PatientCard & {
 }
 
 const CARD_COLUMNS =
-  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, created_at'
+  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, created_at'
+
+// "Female", "Male", or that it is not recorded yet (an old file).
+export function sexWords(sex: Sex | null): string {
+  if (sex === 'female') return 'Female'
+  if (sex === 'male') return 'Male'
+  return 'Sex not recorded'
+}
 
 // ===== 2. Phone numbers: one way of writing them =====
 // The database keeps 11 digits starting with 0, like 08035550126. People
@@ -184,6 +199,56 @@ export async function registerPatient(
     }
   }
   return { patient: data as PatientCard, problem: null }
+}
+
+// Register from old file (request 128): the name and the phone, and the
+// date of birth and sex if the old file has them (Anthony, 2026-11-02:
+// "they can add or skip it"). The database still gives the patient their
+// own RMC number.
+export async function registerFromOldFile(
+  client: SupabaseClient,
+  fullName: string,
+  phone: string,
+  staffId: string,
+  dateOfBirth: string | null = null,
+  sex: Sex | null = null,
+): Promise<{ patient: PatientCard | null; problem: string | null }> {
+  const { data, error } = await client
+    .from('patients')
+    .insert({
+      full_name: fullName.trim().replace(/\s+/g, ' '),
+      phone,
+      date_of_birth: dateOfBirth,
+      sex,
+      from_old_file: true,
+      created_by: staffId,
+    })
+    .select(CARD_COLUMNS)
+    .single()
+  if (error) {
+    console.warn(`Old file patient could not be registered: ${error.code}`)
+    return {
+      patient: null,
+      problem: 'The patient could not be saved. Check the internet and try again.',
+    }
+  }
+  return { patient: data as PatientCard, problem: null }
+}
+
+// Patients already registered with this phone number, so the Front Desk
+// does not register the same person twice from an old file.
+export async function findSamePhone(
+  client: SupabaseClient,
+  phone: string,
+): Promise<PatientResult[]> {
+  if (!phoneLooksRight(phone)) return []
+  const { data } = await client
+    .from('patients')
+    .select(CARD_COLUMNS)
+    .is('voided_at', null)
+    .eq('phone', phone)
+    .limit(5)
+  return withVisits(client, (data as PatientCard[] | null) ?? [])
 }
 
 export async function updatePatient(

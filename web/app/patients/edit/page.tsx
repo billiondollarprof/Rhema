@@ -17,7 +17,7 @@ import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
-import PatientForm from '../_parts/PatientForm'
+import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
 import styles from '../_parts/patients.module.css'
 import {
   getPatient,
@@ -84,8 +84,10 @@ function EditPatient() {
             <PatientForm
               initial={{
                 full_name: patient.full_name,
-                date_of_birth: patient.date_of_birth,
-                sex: patient.sex,
+                // An old file patient has neither yet; the form asks for
+                // both, with the same starting choice as a new patient.
+                date_of_birth: patient.date_of_birth ?? '',
+                sex: patient.sex ?? EMPTY_DETAILS.sex,
                 category: patient.category,
                 phone: patient.phone,
                 email: patient.email,

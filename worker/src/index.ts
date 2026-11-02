@@ -9,7 +9,7 @@
  * `wrangler secret put` or from GitHub Actions. Never log patient details,
  * push addresses or keys.
  */
-import { downloadLabFile, uploadLabFile, type FilesEnv } from './files'
+import { downloadFile, uploadLabFile, uploadRecordFile, type FilesEnv } from './files'
 import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
@@ -122,8 +122,15 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
   if (url.pathname === '/api/files/lab' && request.method === 'POST') {
     return uploadLabFile(request, env)
   }
-  if (url.pathname.startsWith('/api/files/lab/') && request.method === 'GET') {
-    return downloadLabFile(request, url.pathname.slice('/api/files/'.length), env)
+  // Files on the record itself (request 128): scans, photos and PDFs.
+  if (url.pathname === '/api/files/record' && request.method === 'POST') {
+    return uploadRecordFile(request, env)
+  }
+  if (
+    (url.pathname.startsWith('/api/files/lab/') || url.pathname.startsWith('/api/files/record/')) &&
+    request.method === 'GET'
+  ) {
+    return downloadFile(request, url.pathname.slice('/api/files/'.length), env)
   }
 
   return Response.json({ error: 'Not found' }, { status: 404 })

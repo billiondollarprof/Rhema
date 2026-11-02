@@ -30,6 +30,7 @@ const SCREENS = [
   { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
   { path: '/lab/result/', waitFor: 'Add a lab result' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
+  { path: '/patients/old-file/', waitFor: 'Register from old file' },
   { path: '/admin/', waitFor: 'Tap a name', admin: true },
   { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
   { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },

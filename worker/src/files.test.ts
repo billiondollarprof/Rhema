@@ -2,7 +2,15 @@
 // `npm run check:tests`. Supabase and R2 are stand-ins, so nothing real is
 // touched.
 import { describe, expect, it } from 'vitest'
-import { downloadLabFile, realType, uploadLabFile, type FilesEnv } from './files'
+import {
+  downloadFile,
+  downloadLabFile,
+  kindOf,
+  realType,
+  uploadLabFile,
+  uploadRecordFile,
+  type FilesEnv,
+} from './files'
 
 // ===== 1. Stand-ins =====
 const PERSON = '00000000-0000-0000-0000-0000000000c4'
@@ -136,5 +144,61 @@ describe('downloadLabFile', () => {
       supabase([{ id: 1 }]),
     )
     expect(response.status).toBe(404)
+  })
+})
+
+// ===== 5. Files on the record itself (request 128) =====
+// A Supabase stand-in that also notes what it was asked.
+const asking = (rows: unknown[]) => {
+  const asked: string[] = []
+  const post = (async (url: string) => {
+    asked.push(url)
+    return Response.json(rows)
+  }) as unknown as typeof fetch
+  return { post, asked }
+}
+
+describe('record files', () => {
+  it('lets somebody who may register patients store a scan', async () => {
+    const { bucket, stored } = fakeBucket()
+    const response = await uploadRecordFile(
+      upload(JPEG),
+      env(bucket),
+      supabase([{ can_patients: true, can_medical: false }]),
+    )
+    expect(response.status).toBe(200)
+    const answer = (await response.json()) as { key: string }
+    expect(answer.key).toMatch(/^record\/[0-9a-f-]{36}\.jpg$/)
+    expect(stored.has(answer.key)).toBe(true)
+  })
+  it('refuses somebody with neither tick', async () => {
+    const { bucket, stored } = fakeBucket()
+    const response = await uploadRecordFile(
+      upload(PDF),
+      env(bucket),
+      supabase([{ can_patients: false, can_medical: false }]),
+    )
+    expect(response.status).toBe(403)
+    expect(stored.size).toBe(0)
+  })
+  it('asks the record files table, not the lab, and skips removed files', async () => {
+    const KEY = 'record/12345678-1234-1234-1234-123456789abc.pdf'
+    const { bucket, stored } = fakeBucket()
+    stored.set(KEY, PDF)
+    const { post, asked } = asking([{ id: 1 }])
+    const request = new Request(`https://x/api/files/${KEY}`, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    })
+    const response = await downloadFile(request, KEY, env(bucket), post)
+    expect(response.status).toBe(200)
+    expect(asked[0]).toContain('patient_files?')
+    expect(asked[0]).toContain('removed_at=is.null')
+  })
+  it('knows our two kinds of name and nothing else', () => {
+    expect(kindOf('lab/12345678-1234-1234-1234-123456789abc.webp')).toBe('lab')
+    expect(kindOf('record/12345678-1234-1234-1234-123456789abc.pdf')).toBe('record')
+    expect(kindOf('record/../secret.pdf')).toBeNull()
+    expect(kindOf('other/12345678-1234-1234-1234-123456789abc.pdf')).toBeNull()
+    expect(kindOf('record/12345678-1234-1234-1234-123456789abcXpdf')).toBeNull()
   })
 })

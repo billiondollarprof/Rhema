@@ -6,7 +6,9 @@
  *
  * Never: store the age. It changes every day; the date of birth does not.
  */
-export function ageFrom(dateOfBirth: string, today: Date = new Date()): string {
+export function ageFrom(dateOfBirth: string | null, today: Date = new Date()): string {
+  // A patient from an old file may have no date of birth yet.
+  if (!dateOfBirth) return 'Age not recorded'
   const born = new Date(`${dateOfBirth}T00:00:00`)
   if (Number.isNaN(born.getTime()) || born > today) return ''
 

@@ -244,6 +244,126 @@ Numbers are kept from the full list, so older notes still match.
     or email from 6 Nov), then messages, notifications, announcements,
     printing.
 
+127. **Attachments on every patient record, auto fill from a scan, and a
+    download choice.** (2026-10-31, from the client meeting) "the doctor
+    was saying that every patient they open profile for, they will be
+    attaching files like the document or scan. So they don't have to write
+    everything by hand... he was saying something about creating profile
+    for all the patients they had before... if they are able to scan it
+    cleanly or use good camera, snap the file, upload it, then the system
+    automatically fetches the data that it recognizes, like name, phone
+    number, the important data, and populates the record, especially
+    biodata information... every patient's record can carry attachments...
+    they can click attach, then it will prompt their computer, they'll be
+    able to upload a document... later, if they want to download the
+    patient's medical history, they can download the entire thing or
+    download only the file. So when they click download, it will now ask
+    them whether to download the full medical history or just the
+    attachment, if there's an attachment." Three parts:
+    a. Attach: any record takes files (photo, scan, PDF) from the computer
+       or the camera, kept on the record (same safe store as lab files).
+    b. Auto fill: upload a scan of an old card or form, the system reads
+       name, phone and the other biodata, fills the registration form, and
+       staff check it before saving. For bringing in the old patients.
+       Needs his decision before building: reading the scan means sending
+       patient data to a reading service, which is a data protection
+       question (NDPA) and may cost money (CLAUDE.md section 2).
+    c. Download: a Download button on the record asks "Full medical
+       history" or "Attachments only" (the second only when there are any).
+    Recorded; not started. Say back to him before building.
+
+128. **Old patients, attachments, family profile, poor network; migration
+    later.** (2026-11-02) Replaces part b of 127: "Let's ignore the OCR
+    for now... Let's forget about API and OCR for now."
+    NOW, for this hospital:
+    a. Attachments: "we can attach a document like scanned a patient scan,
+       ABI ultrasound scan results and other stuff. And you can also attach
+       normal written documents." "yes we can attach and download files."
+    b. Register by document, for the patients they already have: "There
+       should be another button there that should say register patient by
+       attachment... or register patient by raw document... they will just
+       put the patient name, the full name and the phone number. Then they
+       will now upload the patient's documents there." Old card numbers are
+       not used. "let it be one by one because if I allow them to upload
+       back then papers, they'll just fill up the storage fast."
+    c. Find by name or phone: "in case you have two people with the same
+       name, they will not have the same phone number."
+    d. Family profile: "You register the mother, and then since you have
+       toggled family... it will show you add family, add member... you
+       don't have to first of all save the person detail before adding
+       family members... Anybody from the family can make the family
+       profile pop up." No family last name needed. (Today "family" is only
+       a category label; there is no family group yet.)
+    e. Download (from 127): full medical history or attachments only.
+    f. Poor network: "front desk should be able to click register a
+       patient... click save, and if the network is poor, the system should
+       say so, that patient is registering, and that they can continue
+       doing other things... saves whatever it is as a draft. Then when the
+       network is back, the system just automatically push it to server."
+       Search and open records with poor network: "those texts for each
+       patient... preloaded... since it's text... I don't think there's any
+       need to leave anyone out. So I need you to evaluate that." Attached
+       files load over the network; shrink them on upload "while
+       maintaining the quality" (as in Amara) so they open on little
+       network. "we are designing for the worst-case scenario of network.
+       And we are also designing to manage space."
+    LATER, not this hospital (record only):
+    g. Messages ticks like WhatsApp: one tick sent, two ticks read; for a
+       group, two ticks when everyone has read. Part of THIS build, with
+       messaging (his correction, 2026-11-02).
+    h. Migration for hospitals leaving other software: import their CSV or
+       Excel export (typed, so no OCR), map biodata and the important
+       medical records to our layout; keep their own ID pattern; where only
+       an age is given, store the age and the date it was taken so it grows
+       each year; or pull through the old system's API or webhook. "in less
+       than a day with few clicks of a button." "if there is a better way
+       they used to do it, you can do a research and then recommend."
+       Selling point: own the system, stop paying per patient.
+    i. Batch upload of scanned papers: not now (storage).
+    j. OCR auto fill: not now (mostly handwriting).
+    Mapped back to him 2026-11-02. His answers the same day:
+    - Order yes: (1) attachments, Register from old file, download;
+      (2) family profile; (3) poor network; (4) receipts; then messages.
+    - Button name: "Register from old file" ("So they know it's their old
+      file").
+    - Files: shrink what can be shrunk, keep quality; "just allow them to
+      upload. If they finish the space, they will pay for more space."
+      No personal photos are wanted in the system ("use their Google
+      Drive"). Limits proposed: 10 MB a file, 5 files at a time.
+    - Family: "one family will have one card number for all of them...
+      they can use one card number to even search for the family". A
+      family member who later opens a personal profile gets their own
+      number. Needs a database change (patient_number is unique today).
+    - Network: "anything... that is going to slow the system down, keep it
+      in the server... we don't want a complex system to manage." Keep on
+      the device only patients whose details changed in the last 30 days.
+      Registration drafts are fine. Device copy is allowed (his yes).
+    - Messages are part of THIS client's build (with ticks), only the
+      migration (h) is later.
+    - He asked for a quick search on how other platforms migrate data.
+    His answers 2026-11-02 (second message), "yes to both, go ahead":
+    - Limits yes: 10 MB a file, 5 at a time. Pictures and PDFs are picked
+      with separate buttons. Pictures shrunk to WebP (same method as in
+      Amara). PDFs open in the app to read where the browser can, without
+      downloading first.
+    - Every patient gets their own RMC number, old file ones too.
+    - Device copy: text only, never files or pictures; only patients with
+      any change in the last 30 days.
+    - Notes and vital signs with no network: "The thing should show that it
+      has not saved. But let it save." So they wait on the device, marked
+      not sent, and send when the network is back. (Two people do not
+      update one patient at the same time.)
+    - Receipts summary right; a receipt can be printed or sent again any
+      number of times, and updates when the patient pays more.
+    - Import templates: later, when ready.
+    - He asked for Helium Health's public pricing (per year, per patient,
+      setup and training).
+    - Button words (2026-11-02): "Add scan or photo" and "Add PDF file";
+      PDF only, so a Word document is saved as PDF first.
+    Status 2026-11-02: step 1 (attachments, Register from old file,
+    Download) built and checked locally and in CI on the feature branch.
+    Waiting for his yes on the files SQL batch before testing.
+
 ### Standing instructions
 
 These never come off the list.

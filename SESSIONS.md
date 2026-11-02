@@ -139,3 +139,5 @@ build from the RHEMA demo and the proposal.
   desktop top bar lines up with the page column (124).
 
 - 2026-10-31: lock screen fixed for desktops (125): a click while loading is kept, and any key opens the PIN card.
+
+- 2026-10-31: idle lock now 1 hour (126). Live CI database job stalled on the tool install before any test; one re-run passed.
