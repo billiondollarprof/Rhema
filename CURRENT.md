@@ -441,6 +441,15 @@ Numbers are kept from the full list, so older notes still match.
     consultations, medicines, doses, conditions). Built 2026-11-02 as one
     shared guard (double_tap_guards); waiting for his yes on the SQL.
 
+132. **Unread count on the menu button.** (2026-11-02) "If notification
+    is... behind hamburger menu... the hamburger menu will be showing a
+    bubble, red, with... the number of notifications that are unread...
+    But if we already have it at the sidebar, then there's no point behind
+    the hamburger menu." Today Notifications sits only in the menu (since
+    117), marked Soon. So when notifications are built: a red bubble with
+    the unread count on the menu button, and the same count beside
+    Notifications inside the menu. Comes with the notifications build.
+
 ### Standing instructions
 
 These never come off the list.
