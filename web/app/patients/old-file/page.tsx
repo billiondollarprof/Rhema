@@ -160,9 +160,7 @@ export default function OldFilePage() {
           {!progress ? (
             <p className={failed.length ? styles.error : styles.muted}>
               {sentCount === 1 ? '1 file attached.' : `${sentCount} files attached.`}
-              {failed.length
-                ? ` ${failed.length} not sent. Check the network and try again.`
-                : ''}
+              {failed.length ? ` ${failed.length} not sent. Check the network and try again.` : ''}
             </p>
           ) : null}
           <div className={styles.buttons}>
