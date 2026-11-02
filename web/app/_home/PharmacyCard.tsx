@@ -164,7 +164,10 @@ function Entry({
             Take payment
           </button>
         ) : null}
-        {view === 'dispense' ? (
+        {view === 'dispense' && prescription.status === 'awaiting_payment' ? (
+          <span className={styles.muted}>Waiting for payment</span>
+        ) : null}
+        {view === 'dispense' && prescription.status !== 'awaiting_payment' ? (
           <button className={`${styles.button} ${styles.primary}`} onClick={done} disabled={busy}>
             {busy ? 'Saving…' : 'Dispensed'}
           </button>

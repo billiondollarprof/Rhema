@@ -33,13 +33,13 @@ import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
 import { DosesSection, MedicationsSection } from './_parts/Medications'
+import AttachmentPicker from './_parts/AttachmentPicker'
 import FilesSection from './_parts/Files'
 import LabSection from './_parts/Lab'
 import PrescriptionsSection from './_parts/Prescriptions'
 import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
 import styles from './_parts/record.module.css'
 import buttons from '../_parts/patients.module.css'
-import { downloadFiles } from '@/lib/files/files'
 import { ageFrom } from '@/lib/patients/age'
 import type { PatientFile } from '@/lib/patients/patientFiles'
 import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patients'
@@ -83,8 +83,7 @@ function PatientRecord() {
   // The files on the record, for Download (Files section tells us).
   const [files, setFiles] = useState<PatientFile[]>([])
   const [choosing, setChoosing] = useState(false)
-  const [downloading, setDownloading] = useState(false)
-  const [downloadProblem, setDownloadProblem] = useState<string | null>(null)
+  const [picking, setPicking] = useState(false)
 
   // ===== 2. Open, then read =====
   useEffect(() => {
@@ -119,27 +118,25 @@ function PatientRecord() {
   // ===== 2b. Download =====
   const liveFiles = files.filter((file) => !file.removed_at)
 
+  // The name a saved file starts with, so files sort by patient
+  // (Anthony, 2026-11-02): "Ngozi Okafor RMC-000077".
+  const fileStem = patient ? `${patient.full_name} ${patient.patient_number}` : 'Patient'
+
   function printHistory() {
     setChoosing(false)
     // Every part of the record open on paper, then the print window, where
-    // "Save as PDF" makes a file of it.
+    // "Save as PDF" makes a file of it. The browser names that file after
+    // the page title, so the title is the patient's name and number while
+    // the window is open.
     document.querySelectorAll('details').forEach((part) => {
       part.open = true
     })
+    const title = document.title
+    document.title = `${fileStem} medical history`
+    // Put the title back once the print window closes (some browsers do
+    // not wait at print(), so this listens for the close instead).
+    window.addEventListener('afterprint', () => (document.title = title), { once: true })
     window.setTimeout(() => window.print(), 100)
-  }
-
-  async function saveAttachments() {
-    if (!client) return
-    setDownloading(true)
-    setDownloadProblem(null)
-    const failed = await downloadFiles(
-      client,
-      liveFiles.map((file) => ({ key: file.file_key, name: file.file_name })),
-    )
-    setDownloading(false)
-    setChoosing(false)
-    if (failed) setDownloadProblem('Some files did not download. Try again.')
   }
 
   const back = id ? (
@@ -159,7 +156,13 @@ function PatientRecord() {
         </Link>
       ) : null}
       {allowed && record ? (
-        <button className={buttons.button} onClick={() => setChoosing(!choosing)}>
+        <button
+          className={buttons.button}
+          onClick={() => {
+            setPicking(false)
+            setChoosing(!choosing)
+          }}
+        >
           Download
         </button>
       ) : null}
@@ -204,30 +207,35 @@ function PatientRecord() {
           <div className={`${styles.choice} ${styles.noPrint}`}>
             <b>What do you want to download?</b>
             <div className={buttons.buttons}>
-              <button
-                className={`${buttons.button} ${buttons.primary}`}
-                onClick={printHistory}
-                disabled={downloading}
-              >
+              <button className={`${buttons.button} ${buttons.primary}`} onClick={printHistory}>
                 Full medical history
               </button>
               {liveFiles.length > 0 ? (
-                <button className={buttons.button} onClick={saveAttachments} disabled={downloading}>
-                  {downloading ? 'Downloading…' : `Attachments only (${liveFiles.length})`}
+                <button
+                  className={buttons.button}
+                  onClick={() => {
+                    setChoosing(false)
+                    setPicking(true)
+                  }}
+                >
+                  Attachments ({liveFiles.length})
                 </button>
               ) : null}
-              <button
-                className={buttons.button}
-                onClick={() => setChoosing(false)}
-                disabled={downloading}
-              >
+              <button className={buttons.button} onClick={() => setChoosing(false)}>
                 Cancel
               </button>
             </div>
             <small className={styles.muted}>To keep a file, choose Save as PDF.</small>
           </div>
         ) : null}
-        {downloadProblem ? <p className={styles.error}>{downloadProblem}</p> : null}
+        {picking ? (
+          <AttachmentPicker
+            client={client}
+            files={liveFiles}
+            zipName={`${fileStem} attachments.zip`}
+            onClose={() => setPicking(false)}
+          />
+        ) : null}
 
         {/* On paper, the patient's name and number head the history. */}
         {patient ? (

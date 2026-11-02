@@ -35,6 +35,9 @@ export type Prescription = {
   status: PrescriptionStatus
   prescribed_at: string
   dispensed_at: string | null
+  // Sent also to the other place (request 130c), and whether it is paid.
+  also_sent: boolean
+  payment_id: number | null
   patient: { full_name: string; patient_number: string } | null
   prescriber: { full_name: string } | null
   items: PrescriptionItem[]
@@ -71,7 +74,7 @@ export function itemWords(item: PrescriptionItem): string {
 }
 
 const COLUMNS =
-  'id, patient_id, note, status, prescribed_at, dispensed_at, ' +
+  'id, patient_id, note, status, prescribed_at, dispensed_at, also_sent, payment_id, ' +
   'patient:patients(full_name, patient_number), ' +
   'prescriber:staff!prescriptions_prescribed_by_fkey(full_name), ' +
   'items:prescription_items(id, drug, strength, dose, how_often, days, quantity, note)'
@@ -94,19 +97,52 @@ export async function prescribe(
 }
 
 // ===== 3. Lists =====
-async function listByStatus(client: SupabaseClient, status: PrescriptionStatus) {
+async function listWhere(client: SupabaseClient, filter: string) {
   const { data } = await client
     .from('prescriptions')
     .select(COLUMNS)
-    .eq('status', status)
+    .or(filter)
     .order('prescribed_at')
   return (data as unknown as Prescription[] | null) ?? []
 }
 
+// The Front Desk: waiting for payment, or sent straight to the Pharmacy and
+// also to the Front Desk, not paid yet.
 export const listAwaitingPayment = (client: SupabaseClient) =>
-  listByStatus(client, 'awaiting_payment')
+  listWhere(
+    client,
+    'status.eq.awaiting_payment,and(also_sent.is.true,payment_id.is.null,status.in.(awaiting_dispense,dispensed))',
+  )
+
+// The Pharmacy: ready to dispense, or sent to the Front Desk and also to
+// the Pharmacy (shown as waiting for payment until it is paid).
 export const listAwaitingDispense = (client: SupabaseClient) =>
-  listByStatus(client, 'awaiting_dispense')
+  listWhere(client, 'status.eq.awaiting_dispense,and(also_sent.is.true,status.eq.awaiting_payment)')
+
+// ===== 3b. Send also to the other place (request 130c) =====
+// The doctor's newest prescription for this patient, the one just sent.
+export async function sendAlso(
+  client: SupabaseClient,
+  patientId: number,
+  doctorId: string,
+): Promise<string | null> {
+  const { data: found } = await client
+    .from('prescriptions')
+    .select('id')
+    .eq('patient_id', patientId)
+    .eq('prescribed_by', doctorId)
+    .order('prescribed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!found) return 'It could not be sent. Check the network and try again.'
+  const { data, error } = await client.rpc('send_prescription_also', {
+    prescription: (found as { id: number }).id,
+  })
+  if (error || (data !== 'sent' && data !== 'already_sent')) {
+    return 'It could not be sent. Check the network and try again.'
+  }
+  return null
+}
 
 export async function loadPatientPrescriptions(
   client: SupabaseClient,
