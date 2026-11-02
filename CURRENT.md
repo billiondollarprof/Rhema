@@ -479,6 +479,69 @@ Numbers are kept from the full list, so older notes still match.
     the unread count on the menu button, and the same count beside
     Notifications inside the menu. Comes with the notifications build.
 
+## 6 November handover (the one checklist, 2026-11-02)
+
+He asked (2026-11-02): "save the November 6 while you check in case we are
+forgetting anything". Everything for the move, in order. Items marked NEW
+were not on any list before this check.
+
+A. He does (the domain opens for moving on 6 November):
+  1. Move rhemamedical.app from his Cloudflare account to the hospital's
+     (DNSSEC already off; the zone waits in the new account). Never delete
+     the domain.
+  2. Resend: add rhemamedical.app, put its DNS records (SPF, DKIM, DMARC)
+     in the hospital's zone, wait for "Verified".
+  3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
+  4. The $0.01 budget alerts on both Cloudflare accounts.
+
+B. I do, in the app, once A1 is done:
+  5. NEW: wrangler.jsonc: the real address for live (rhemamedical.app) and
+     testing (testing.rhemamedical.app); keep workers.dev until both work.
+  6. NEW: deploy.yml smoke test reads the workers.dev address: point it at
+     the real address.
+  7. NEW: push-keys.yml and the database's saved push address
+     (rhema_push_url) use workers.dev: move them, or phone alerts stop.
+  8. NEW: ops/supabase_check.py SITE_URLS, and Supabase Auth "Site URL"
+     and redirect list: the real address, or sign in links break.
+  9. NEW: the install guide pictures show "rhema-hospital…workers.dev":
+     show rhemamedical.app.
+  10. NEW: scripts/e2e-signin.mjs refuses live addresses by name: add the
+      real address so a test can never touch live.
+  11. Supabase email through Resend (no-reply@rhemamedical.app); the sign
+      in code wording in BOTH hosted templates, Magic link and Confirm
+      signup (109).
+  12. CARDS_PAUSED back to false, then walk the cards (109).
+  13. Invitation and "account back on" emails through Resend (112).
+  14. Receipts: the Send by email button (123).
+
+C. NEW: what the staff will notice (tell them before):
+  15. The real address is a new app to each phone and computer: install
+      it again from rhemamedical.app, sign in with the email code, set the
+      PIN again, allow notifications again. The old workers.dev address
+      should send people to the new one (I add a redirect).
+  16. Anything "waiting for the network" on the old address must be sent
+      first: everybody opens the old app once with network before the
+      switch.
+
+D. Accounts and keys:
+  17. Delete the test accounts, keep his master account, after a word with
+      the director (113, NDPA).
+  18. Hand over fresh keys: delete the github-ci Supabase token and the
+      Cloudflare API token, make new ones owned by the hospital.
+  19. NEW: rename the Supabase project ("rhemamedical7@gmail.com's
+      Project") to rhema-hospital.
+  20. NEW: check live has no demo rows (the demo data was testing only).
+
+E. Watching after the move:
+  21. NEW: the first nightly backup after the move passes, including the
+      new "messages older than a year" step.
+  22. The AWS uptime watcher on the real address (74), when his AWS
+      account is ready.
+
+F. NEW: for the hospital to own (NDPA 2023), not code:
+  23. A privacy notice for patients and staff, a record of what is kept
+      and why, and who answers for data protection at the hospital.
+
 ### Standing instructions
 
 These never come off the list.
