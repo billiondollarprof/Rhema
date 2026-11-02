@@ -767,3 +767,7 @@ this file.
 128d. **Poor network.** (2026-11-02) Registration drafts, record entries
     that wait and send by themselves, a waiting-to-send pill, and a device
     copy of recent patients for Find patient. Live 2026-11-02.
+123b. **Other payments with printable receipts.** (2026-11-02) Receipt
+    numbers on every payment; Take payment on the profile; a printable
+    receipt with the letterhead; today's receipt that grows; Print receipt
+    after paying on Home. Live 2026-11-02. Email waits for Resend.

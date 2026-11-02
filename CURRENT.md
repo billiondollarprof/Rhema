@@ -399,9 +399,20 @@ Numbers are kept from the full list, so older notes still match.
     every opening must be logged). Wiped at sign out.
     Step 4, receipts, built 2026-11-02 (receipt numbers, Take payment on
     the profile, printable receipt, today's receipt, Print receipt after
-    paying on Home). Waiting for his yes on the SQL. Email on receipts
-    comes with Resend (6 Nov); no button shows before then.
-    NEXT: messages with ticks (and 132, the unread bubble).
+    paying on Home). Live 2026-11-02 (his yes; 0 security warnings on
+    testing and live). Email on receipts comes with Resend (6 Nov); no
+    button shows before then.
+    NEXT: messages with ticks (and 132, the unread bubble). His answers
+    2026-11-02 evening: "messages should most likely send from... a room
+    to a room... from front desk to lab, from lab to pharmacy, you know,
+    just the way you also call attention... matron one, matron two... by
+    office or by room"; groups too. Patient names: "they can type the
+    patient name, but they don't have to tag the patient... just a normal
+    message." Text only. He asked whether messages need SQL (yes, new
+    tables) and whether messages and announcements should expire (90 days
+    or forever); recommendation sent; waiting for his choice.
+    Also: "Always remember to ensure that your text, nothing overflows out
+    of the screen" on phone, tablet (portrait and landscape) and desktop.
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
     a consultant in room one calls in patient, that means the front desk
