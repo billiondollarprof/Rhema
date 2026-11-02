@@ -387,8 +387,10 @@ Numbers are kept from the full list, so older notes still match.
       file... because they have a backup". Not even the admin may delete.
       Every other file is still only crossed out with a reason.
     - "make me a doctor": done 2026-11-02.
-    NEXT after these: step 2, family profile (one card number for the
-    family).
+    Adjustments live 2026-11-02 (his yes on the SQL; 0 security warnings
+    on testing and live).
+    NEXT: step 2, family profile (one card number for the family). He has
+    not yet said whether 129 (call in alert) comes before or after it.
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
     a consultant in room one calls in patient, that means the front desk
@@ -416,6 +418,8 @@ Numbers are kept from the full list, so older notes still match.
        without attachments.
     e. "When they are downloading a medical report... let it come with the
        name of the patient with their patient ID."
+    f. "remove in hospital and then put the actual tags" on Find patient.
+    All of 130 live 2026-11-02.
 
 ### Standing instructions
 
