@@ -309,7 +309,8 @@ Numbers are kept from the full list, so older notes still match.
        And we are also designing to manage space."
     LATER, not this hospital (record only):
     g. Messages ticks like WhatsApp: one tick sent, two ticks read; for a
-       group, two ticks when everyone has read. Comes with messaging.
+       group, two ticks when everyone has read. Part of THIS build, with
+       messaging (his correction, 2026-11-02).
     h. Migration for hospitals leaving other software: import their CSV or
        Excel export (typed, so no OCR), map biodata and the important
        medical records to our layout; keep their own ID pattern; where only
@@ -320,7 +321,26 @@ Numbers are kept from the full list, so older notes still match.
        Selling point: own the system, stop paying per patient.
     i. Batch upload of scanned papers: not now (storage).
     j. OCR auto fill: not now (mostly handwriting).
-    Mapped back to him 2026-11-02; waiting for his yes and his answers.
+    Mapped back to him 2026-11-02. His answers the same day:
+    - Order yes: (1) attachments, Register from old file, download;
+      (2) family profile; (3) poor network; (4) receipts; then messages.
+    - Button name: "Register from old file" ("So they know it's their old
+      file").
+    - Files: shrink what can be shrunk, keep quality; "just allow them to
+      upload. If they finish the space, they will pay for more space."
+      No personal photos are wanted in the system ("use their Google
+      Drive"). Limits proposed: 10 MB a file, 5 files at a time.
+    - Family: "one family will have one card number for all of them...
+      they can use one card number to even search for the family". A
+      family member who later opens a personal profile gets their own
+      number. Needs a database change (patient_number is unique today).
+    - Network: "anything... that is going to slow the system down, keep it
+      in the server... we don't want a complex system to manage." Keep on
+      the device only patients whose details changed in the last 30 days.
+      Registration drafts are fine. Device copy is allowed (his yes).
+    - Messages are part of THIS client's build (with ticks), only the
+      migration (h) is later.
+    - He asked for a quick search on how other platforms migrate data.
 
 ### Standing instructions
 
