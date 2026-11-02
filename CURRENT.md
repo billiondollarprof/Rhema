@@ -479,6 +479,14 @@ These never come off the list.
     me so I can still know it... I really liked that one." Standing rule,
     already in CLAUDE.md; he asked for it to continue.
 
+133. **Screen text in full sentences.** (2026-11-02) "Better make a
+    complete sentence... The fact that I said you should not write too many
+    texts doesn't mean you should write in a way that somebody will not
+    understand... don't unnecessarily explain, don't unnecessarily add
+    extra text." Standing rule: short, but always a whole sentence that
+    says what happened and what to do. Fixed the same day: the sign out
+    warning, the waiting pill, "Not saved yet", the file messages.
+
 ### Decided
 
 - 2026-10-31: One AWS account for the company (StellaXafe), not one per

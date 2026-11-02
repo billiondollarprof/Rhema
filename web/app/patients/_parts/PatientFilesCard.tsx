@@ -60,7 +60,10 @@ export default function PatientFilesCard({
     const failed = await attachFiles(client, patientId, chosen)
     setBusy(false)
     setChosen(failed)
-    if (failed.length) setProblem(`${failed.length} not sent. Check the network and try again.`)
+    if (failed.length)
+      setProblem(
+        `${failed.length === 1 ? '1 file was' : `${failed.length} files were`} not sent. Check the network and try again.`,
+      )
     await load()
   }
 

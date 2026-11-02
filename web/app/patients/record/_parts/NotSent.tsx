@@ -32,8 +32,8 @@ export default function NotSent({ staffId, patientId }: { staffId: string; patie
   if (waiting.length === 0) return null
   return (
     <div className={`${styles.banner} ${styles.bannerAmber} ${styles.noPrint}`} role="status">
-      Not sent yet: {waiting.map((task) => task.label).join(', ')}. It sends when the network is
-      back.
+      Not saved yet: {waiting.map((task) => task.label).join(', ')}. It will save by itself when the
+      network is back.
     </div>
   )
 }
