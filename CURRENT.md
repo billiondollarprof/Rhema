@@ -405,8 +405,11 @@ Numbers are kept from the full list, so older notes still match.
     headline, different coloration... call patient, then the name of the
     patient to room 1". Built the same day: a green card with a door icon
     and a chime, "Call patient · Adaeze Okafor to Consultant Room 1", for
-    every Front Desk; phone alerts say the room only. Waiting for his yes
-    on the SQL.
+    every Front Desk. His yes on the SQL 2026-11-02, with: "the name
+    should still show when the app is locked" (the phone alert names the
+    patient: his decision on patient data, NDPA), and "they should count
+    differently... and each should prevent duplicate" (each kind has its
+    own 30 second guard).
 
 130. **Lab, prescription and download fixes.** (2026-11-02)
     a. Request lab: "doesn't populate the patients that are there... I
@@ -427,6 +430,15 @@ Numbers are kept from the full list, so older notes still match.
        name of the patient with their patient ID."
     f. "remove in hospital and then put the actual tags" on Find patient.
     All of 130 live 2026-11-02.
+
+131. **Duplicate guard on every action.** (2026-11-02) "Remember
+    Idempotency checks in all actions that might cause a duplicate of
+    exact results." Audit 2026-11-02: payments, lab requests, results,
+    prescriptions, Send also, files, invites, Call attention and Call
+    patient, Send to room (one open visit per patient) are guarded in the
+    database. Not yet guarded (a double tap saves twice): registering a
+    patient (and from old file), and the medical record writes (allergies, vital signs, notes,
+    consultations, medicines, doses, conditions). Next SQL batch.
 
 ### Standing instructions
 

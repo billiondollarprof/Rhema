@@ -20,9 +20,15 @@
 --   - Who can read it is the same as Call attention: the caller and the
 --     people called. The patient's name is read from the patients table,
 --     which the Front Desk may already see.
---   - Phone alerts carry rooms only, never the patient's name.
+--   - The phone alert names the patient too, even on a locked phone
+--     (Anthony, 2026-11-02: "the name should still show when the app is
+--     locked"). Call attention alerts still carry rooms only.
+--   - Each kind stops its own duplicates (Anthony, 2026-11-02: "they should
+--     count differently... and each should prevent duplicate"): Call in for
+--     the same patient from the same room within 30 seconds makes one card,
+--     and Call attention's own guard counts Call attention only.
 --
--- Never: put a patient's name in a phone alert or in the log.
+-- Never: put a patient's name in the activity log.
 -- =============================================================================
 
 
@@ -50,8 +56,20 @@ set search_path = ''
 as $$
 begin
   if old.status = 'waiting' and new.status = 'in_consultation' and auth.uid() is not null then
-    insert into public.attention_calls (called_by, from_room_id, to_kind, to_room_id, kind, patient_id)
-    values (auth.uid(), new.room_id, 'front_desk', null, 'call_patient', new.patient_id);
+    -- Two taps at the same moment wait here for each other.
+    perform pg_advisory_xact_lock(hashtext('call_patient:' || new.patient_id || ':' || new.room_id));
+    -- The same patient called from the same room in the last 30 seconds
+    -- already has a card: one card, never two.
+    if not exists (
+      select 1 from public.attention_calls
+      where kind = 'call_patient'
+        and patient_id = new.patient_id
+        and from_room_id = new.room_id
+        and created_at > now() - interval '30 seconds'
+    ) then
+      insert into public.attention_calls (called_by, from_room_id, to_kind, to_room_id, kind, patient_id)
+      values (auth.uid(), new.room_id, 'front_desk', null, 'call_patient', new.patient_id);
+    end if;
   end if;
   return new;
 end;
@@ -64,7 +82,7 @@ create trigger queue_entries_call_patient
   for each row execute function private.call_patient_alert();
 
 
--- ===== 3. The phone alert: its own title, still no names =====
+-- ===== 3. The phone alert: its own title, with the patient's name =====
 
 create or replace function private.push_attention_call()
 returns trigger
@@ -123,11 +141,12 @@ begin
       url := worker_url || '/api/push/attention',
       body := jsonb_build_object(
         'call_id', new.id,
-        -- Call patient (request 129) has its own words. Still rooms only:
-        -- a phone's lock screen never shows a patient's name.
+        -- Call patient (request 129) has its own words, with the patient's
+        -- name, shown even on a locked phone (Anthony, 2026-11-02).
         'title', case when new.kind = 'call_patient' then 'Call patient' else 'Call attention' end,
         'body', case when new.kind = 'call_patient'
-                     then from_words || ' is calling the next patient'
+                     then coalesce((select full_name from public.patients where id = new.patient_id), 'The next patient')
+                          || ' to ' || from_words
                      else from_words || ' is calling ' || to_words end,
         'targets', targets
       ),

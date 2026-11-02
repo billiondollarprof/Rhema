@@ -78,6 +78,22 @@ end $$;
 reset role;
 \echo 'PASS 1b: Call attention right after Call in still rings'
 
+-- Call in again at once (back to waiting, then called again): one card.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c2"}', true);
+set local role authenticated;
+update public.queue_entries set status = 'waiting'
+where patient_id = (select id from public.patients where full_name = 'Cp Made Up');
+update public.queue_entries set status = 'in_consultation', called_at = now()
+where patient_id = (select id from public.patients where full_name = 'Cp Made Up');
+reset role;
+do $$
+begin
+  if (select count(*) from public.attention_calls where kind = 'call_patient') <> 1 then
+    raise exception 'FAIL 1c: calling the same patient in twice at once made two cards';
+  end if;
+end $$;
+\echo 'PASS 1c: Call in twice at once makes one card'
+
 
 -- ===== 2. The Front Desk reads it with the name; a nurse elsewhere does not =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1"}', true);
