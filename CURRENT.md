@@ -438,7 +438,8 @@ Numbers are kept from the full list, so older notes still match.
     patient, Send to room (one open visit per patient) are guarded in the
     database. Not yet guarded (a double tap saves twice): registering a
     patient (and from old file), and the medical record writes (allergies, vital signs, notes,
-    consultations, medicines, doses, conditions). Next SQL batch.
+    consultations, medicines, doses, conditions). Built 2026-11-02 as one
+    shared guard (double_tap_guards); waiting for his yes on the SQL.
 
 ### Standing instructions
 
