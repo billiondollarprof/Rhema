@@ -15,6 +15,10 @@
  *   3. On opening the app, calls from the last 5 minutes still show.
  * A call closed with X stays closed on this device.
  *
+ * Call patient (request 129, 2026-11-02): when a room taps Call in, the
+ * Front Desk gets its own card, green, with a door icon and a chime
+ * instead of the bell: "Call patient · Adaeze Okafor to Consultant Room 1".
+ *
  * Never: take the cursor or the keyboard. The card is not focused, and
  * nothing behind it moves.
  */
@@ -23,7 +27,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Icon from '@/components/shell/Icon'
-import { ringBell } from './bell'
+import { ringBell, ringChime } from './bell'
 import { pushSupported, refreshAlerts } from '@/lib/attention/push'
 import styles from './attention.module.css'
 import {
@@ -80,7 +84,11 @@ export default function AttentionAlerts({
       if (!fresh.length) return
       for (const call of fresh) known.current.add(call.id)
       setCalls((shown) => [...shown, ...fresh])
-      if (ring) ringBell()
+      if (ring) {
+        // A patient being called chimes; Call attention rings the bell.
+        if (incoming.some((call) => call.kind === 'call_patient')) ringChime()
+        if (incoming.some((call) => call.kind !== 'call_patient')) ringBell()
+      }
     },
     [staffId],
   )
@@ -116,15 +124,29 @@ export default function AttentionAlerts({
   return (
     <div className={styles.alerts} aria-live="assertive">
       {calls.map((call) => (
-        <div key={call.id} className={styles.alert} role="status">
+        <div
+          key={call.id}
+          className={`${styles.alert} ${call.kind === 'call_patient' ? styles.alertPatient : ''}`}
+          role="status"
+        >
           <span className={`${styles.alertBell} ${styles.shake}`} aria-hidden="true">
-            <Icon name="call" size={20} />
+            <Icon name={call.kind === 'call_patient' ? 'door' : 'call'} size={20} />
           </span>
           <div className={styles.alertText}>
-            <b>
-              {call.from_room?.name ?? call.caller?.full_name ?? 'Someone'} needs{' '}
-              {call.to_room?.name ?? KIND_LABELS[call.to_kind]}
-            </b>
+            {call.kind === 'call_patient' ? (
+              <>
+                <span className={styles.alertKind}>Call patient</span>
+                <b>
+                  {call.patient?.full_name ?? 'The next patient'} to{' '}
+                  {call.from_room?.name ?? 'the room'}
+                </b>
+              </>
+            ) : (
+              <b>
+                {call.from_room?.name ?? call.caller?.full_name ?? 'Someone'} needs{' '}
+                {call.to_room?.name ?? KIND_LABELS[call.to_kind]}
+              </b>
+            )}
             <small>
               {call.caller?.full_name ?? 'Staff'} ·{' '}
               {new Date(call.created_at).toLocaleTimeString('en-GB', {

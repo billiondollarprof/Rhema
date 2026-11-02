@@ -31,6 +31,9 @@ export type AttentionCall = {
   created_at: string
   called_by: string
   to_kind: RoomKind
+  // 'call_patient': raised by Call in, for the Front Desk (request 129).
+  kind: 'attention' | 'call_patient'
+  patient: { full_name: string } | null
   caller: { full_name: string } | null
   from_room: { name: string } | null
   to_room: { name: string } | null
@@ -144,7 +147,7 @@ export async function callAttention(client: SupabaseClient, target: Target): Pro
 
 // ===== 4. Hearing calls =====
 const CALL_COLUMNS =
-  'id, created_at, called_by, to_kind, caller:staff!called_by(full_name), from_room:rooms!from_room_id(name), to_room:rooms!to_room_id(name)'
+  'id, created_at, called_by, to_kind, kind, patient:patients(full_name), caller:staff!called_by(full_name), from_room:rooms!from_room_id(name), to_room:rooms!to_room_id(name)'
 
 // Calls made to me in the last few minutes. The database only returns the
 // calls I am allowed to read; my own calls are left out here.

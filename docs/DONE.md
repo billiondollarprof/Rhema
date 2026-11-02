@@ -744,3 +744,11 @@ this file.
     old file with name, phone, optional date of birth and sex, and the old
     file; Download asks Full medical history (print or Save as PDF) or
     Attachments only. Done and live 2026-11-02.
+128b. **File preview, uploader delete, old file mark, raised button.**
+    (2026-11-02) Preview inside the app; files on Edit patient for everybody
+    who may see the patient; Delete only for the person who attached it, on
+    old file patients, after a red warning; every opening logged; "From old
+    file" mark; Register from old file as a raised 3D button. Live
+    2026-11-02.
+130. **Lab picker, Send also, attachment chooser, named downloads, exact
+    status tags.** (2026-11-02) Live 2026-11-02.

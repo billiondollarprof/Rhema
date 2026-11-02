@@ -148,3 +148,9 @@ build from the RHEMA demo and the proposal.
   out while my local verify was red (a formatting line), because the
   command joined steps with ";". Testing CI caught it; fixed in minutes,
   live never touched. Join ship steps with "&&" only.
+
+- 2026-11-02: 128 adjustments and 130 live (two SQL batches, his yes):
+  file preview and uploader delete, old file mark, raised old file button,
+  lab picker fixed (the initials circle stretched on iPad), Send also,
+  attachment chooser with zip, history and zip named after the patient,
+  exact status tags on Find patient. Recorded 129 (call in alert).

@@ -354,3 +354,21 @@
     animation: none;
   }
 }
+
+/* ===== Call patient (request 129): green, a door, its own headline ===== */
+.alertPatient {
+  border-color: #b9e2cf;
+  border-left-color: #2e7d5b;
+}
+
+.alertPatient .alertBell {
+  background: #2e7d5b;
+}
+
+.alertKind {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #2e7d5b;
+}
