@@ -421,3 +421,17 @@ a.button {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* After a payment on Home: Payment saved, Print receipt (request 123). */
+.paidBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #e8f5ee;
+  border: 1px solid #bfe3cf;
+  color: #1f6b4a;
+  font-weight: 600;
+}

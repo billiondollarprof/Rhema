@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import FamilyCard from './FamilyCard'
+import PaymentsCard from './PaymentsCard'
 import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
@@ -31,6 +32,7 @@ type DetailProps = {
   client: SupabaseClient
   staffId: string
   canMedical: boolean
+  canPay: boolean
   patient: PatientResult
   onChanged: () => void
 }
@@ -48,6 +50,7 @@ export default function PatientDetail({
   client,
   staffId,
   canMedical,
+  canPay,
   patient,
   onChanged,
 }: DetailProps) {
@@ -135,6 +138,9 @@ export default function PatientDetail({
 
       {/* The family: its number, the other members, Add family member. */}
       <FamilyCard client={client} patient={patient} />
+
+      {/* Payments and receipts, for the Front Desk and admins. */}
+      {canPay ? <PaymentsCard client={client} patientId={patient.id} /> : null}
 
       {/* ===== 2. What can be done from here ===== */}
       {sending ? (

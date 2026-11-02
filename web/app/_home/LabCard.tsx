@@ -56,6 +56,8 @@ export default function LabCard({ client, staff }: { client: SupabaseClient; sta
   const view = viewFor(staff)
   const [requests, setRequests] = useState<LabRequest[] | null>(null)
 
+  // The patient just paid for, to offer their receipt.
+  const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
     if (view === 'pay') setRequests(await listAwaitingPayment(client))
     else if (view === 'lab') setRequests(await listAwaitingTest(client))
@@ -98,9 +100,28 @@ export default function LabCard({ client, staff }: { client: SupabaseClient; sta
       ) : null}
       {requests === null ? <p className={styles.muted}>Loading…</p> : null}
       {requests && requests.length === 0 ? <p className={styles.muted}>{empty}</p> : null}
+      {/* Straight after a payment: its receipt, one tap away (request 123). */}
+      {paidFor ? (
+        <div className={styles.paidBar}>
+          <span>Payment saved.</span>
+          <Link className={styles.button} href={`/payments/receipt/?latest=${paidFor}`}>
+            Print receipt
+          </Link>
+        </div>
+      ) : null}
       <div className={styles.queue}>
         {(requests ?? []).map((request) => (
-          <LabEntry key={request.id} client={client} view={view} request={request} onDone={load} />
+          <LabEntry
+            key={request.id}
+            client={client}
+            view={view}
+            request={request}
+            onDone={load}
+            onPaid={(patientId) => {
+              setPaidFor(patientId)
+              void load()
+            }}
+          />
         ))}
       </div>
     </div>
@@ -113,11 +134,13 @@ function LabEntry({
   view,
   request,
   onDone,
+  onPaid,
 }: {
   client: SupabaseClient
   view: View
   request: LabRequest
   onDone: () => void
+  onPaid: (patientId: number) => void
 }) {
   const [paying, setPaying] = useState(false)
 
@@ -171,7 +194,7 @@ function LabEntry({
           labels={request.tests}
           save={(lines, mode) => payLabRequestLines(client, request.id, lines, mode)}
           onCancel={() => setPaying(false)}
-          onDone={onDone}
+          onDone={() => onPaid(request.patient_id)}
         />
       ) : null}
     </div>
