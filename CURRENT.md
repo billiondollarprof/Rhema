@@ -392,9 +392,13 @@ Numbers are kept from the full list, so older notes still match.
     Step 2, family profile, live 2026-11-02: he chose the family number
     (FAM-000012; each member keeps their own RMC number). His yes on the
     SQL; 0 security warnings on testing and live.
-    NEXT: step 3, poor network (registration drafts; device copy of
-    patients changed in the last 30 days, text only; notes and vital
-    signs wait on the device marked not sent).
+    Step 3, poor network, live 2026-11-02: registration drafts, record
+    entries that wait ("Not sent yet"), a "waiting to send" pill, and a
+    device copy of patients changed or seen in the last 30 days
+    (registration text only; the medical record is not copied because
+    every opening must be logged). Wiped at sign out.
+    NEXT: step 4, receipts (other payments with printable receipts), then
+    messages with ticks (and 132, the unread bubble).
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
     a consultant in room one calls in patient, that means the front desk
