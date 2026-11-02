@@ -341,6 +341,23 @@ Numbers are kept from the full list, so older notes still match.
     - Messages are part of THIS client's build (with ticks), only the
       migration (h) is later.
     - He asked for a quick search on how other platforms migrate data.
+    His answers 2026-11-02 (second message), "yes to both, go ahead":
+    - Limits yes: 10 MB a file, 5 at a time. Pictures and PDFs are picked
+      with separate buttons. Pictures shrunk to WebP (same method as in
+      Amara). PDFs open in the app to read where the browser can, without
+      downloading first.
+    - Every patient gets their own RMC number, old file ones too.
+    - Device copy: text only, never files or pictures; only patients with
+      any change in the last 30 days.
+    - Notes and vital signs with no network: "The thing should show that it
+      has not saved. But let it save." So they wait on the device, marked
+      not sent, and send when the network is back. (Two people do not
+      update one patient at the same time.)
+    - Receipts summary right; a receipt can be printed or sent again any
+      number of times, and updates when the patient pays more.
+    - Import templates: later, when ready.
+    - He asked for Helium Health's public pricing (per year, per patient,
+      setup and training).
 
 ### Standing instructions
 
