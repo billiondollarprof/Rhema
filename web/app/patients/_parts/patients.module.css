@@ -240,8 +240,18 @@
 }
 
 .result > div {
-  flex: 1;
+  flex: 1 1 140px;
   min-width: 0;
+}
+
+/* A long status ("In consultation · Consultant Room 1") drops under the
+   name on a small phone instead of running over it. */
+.result {
+  flex-wrap: wrap;
+}
+
+.result > .tag {
+  margin-left: auto;
 }
 
 .result small {
