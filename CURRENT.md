@@ -390,6 +390,33 @@ Numbers are kept from the full list, so older notes still match.
     NEXT after these: step 2, family profile (one card number for the
     family).
 
+129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
+    a consultant in room one calls in patient, that means the front desk
+    gets the notification, right?... the notification will float on the
+    screen, even if the front desk is doing something... it should also
+    carry the call attention ringing infrastructure the same way... so
+    they can quickly call the patient." Today Call in only changes the
+    patient's status; the Front Desk is not told. "If that's not it, then
+    you have to note it down for when you are going to do that."
+
+130. **Lab, prescription and download fixes.** (2026-11-02)
+    a. Request lab: "doesn't populate the patients that are there... I
+       don't understand this type of way that the thing is looking" (the
+       initials circle stretched into a long oval on the iPad; nobody is
+       listed until you type).
+    b. Prescribe: optional parts must never block Send prescription; make
+       sure Send works to the Front Desk and straight to the Pharmacy.
+    c. After sending: "a gray, as in a softer button... by the side of back
+       to the record... send also to front desk" (or "also to pharmacy"),
+       not a "send to both" button.
+    d. Attachments only: "show the names of the attachment... select or
+       toggle one button that says select all... download everything once
+       as a zip folder, or they can just choose one and download as a
+       single file." Full medical history stays as it is, on its own,
+       without attachments.
+    e. "When they are downloading a medical report... let it come with the
+       name of the patient with their patient ID."
+
 ### Standing instructions
 
 These never come off the list.
