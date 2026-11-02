@@ -252,10 +252,14 @@ try {
   await page.getByRole('heading', { name: 'Made Up Patient C' }).waitFor()
   await page.getByText(number).first().waitFor()
 
-  step('Find shows her by number, in hospital, with last seen')
+  step('Find shows her by number, with where she is now, and last seen')
   await page.getByLabel('Search by name, patient number or phone').fill(number)
   await page.getByRole('button', { name: /Made Up Patient C/ }).waitFor()
-  await page.getByText('In hospital').first().waitFor()
+  // The exact status and room, not just "In hospital" (2026-11-02).
+  await page
+    .getByRole('button', { name: /Made Up Patient C/ })
+    .getByText(/^Waiting · /)
+    .waitFor()
   await shot(page, 'find-patient')
 
   step('Medical record: she opens it, and nobody has asked about allergies yet')
