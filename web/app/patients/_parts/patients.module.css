@@ -437,3 +437,16 @@
   color: #475569;
   margin: 0 0 5px;
 }
+
+/* Two optional fields side by side on wider screens (Register from old file). */
+.fields2 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 560px) {
+  .fields2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

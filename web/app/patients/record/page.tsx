@@ -138,7 +138,7 @@ function PatientRecord() {
     )
     setDownloading(false)
     setChoosing(false)
-    if (failed) setDownloadProblem(`${failed} file(s) could not be downloaded. Try again.`)
+    if (failed) setDownloadProblem('Some files did not download. Try again.')
   }
 
   const back = id ? (
@@ -218,9 +218,7 @@ function PatientRecord() {
                 Cancel
               </button>
             </div>
-            <small className={styles.muted}>
-              Full medical history opens the print window. Choose Save as PDF there to keep a file.
-            </small>
+            <small className={styles.muted}>To keep a file, choose Save as PDF.</small>
           </div>
         ) : null}
         {downloadProblem ? <p className={styles.error}>{downloadProblem}</p> : null}

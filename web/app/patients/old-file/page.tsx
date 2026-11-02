@@ -8,8 +8,9 @@
  * number like everybody else. One patient at a time, never in batches.
  *
  * In order:
- *   1. the Front Desk types the full name and the phone number, and picks
- *      the scans and PDFs of the old file;
+ *   1. the Front Desk types the full name and the phone number, adds the
+ *      date of birth and sex if the old file has them (optional, 2026-11-02),
+ *      and picks the scans and PDFs of the old file;
  *   2. if a patient with this phone number is already registered, they see
  *      them first and can use that patient instead (a family may share a
  *      phone, so "register a new patient" stays possible);
@@ -39,7 +40,9 @@ import {
   registerFromOldFile,
   type PatientCard,
   type PatientResult,
+  type Sex,
 } from '@/lib/patients/patients'
+import { ageFrom } from '@/lib/patients/age'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -51,6 +54,9 @@ export default function OldFilePage() {
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  // Optional: only if the old file has them.
+  const [born, setBorn] = useState('')
+  const [sex, setSex] = useState<Sex | null>(null)
   const [files, setFiles] = useState<ReadyFile[]>([])
   const [tried, setTried] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -69,7 +75,9 @@ export default function OldFilePage() {
   const phoneWrong = !phoneLooksRight(cleanedPhone)
     ? 'Type an 11 digit phone number, like 08031234567.'
     : null
-  const filesWrong = files.length === 0 ? 'Add the old file: a scan, a photo or a PDF.' : null
+  const filesWrong = files.length === 0 ? 'Add the old file.' : null
+  const bornWrong =
+    born && new Date(born) > new Date() ? 'The date of birth cannot be in the future.' : null
 
   // ===== 2. Send the files for a saved patient =====
   async function sendFiles(patient: PatientCard, list: ReadyFile[]) {
@@ -86,7 +94,7 @@ export default function OldFilePage() {
   // ===== 3. Save: look for the same phone first =====
   async function save(skipCheck = false) {
     setTried(true)
-    if (!client || !staff || nameWrong || phoneWrong || filesWrong) return
+    if (!client || !staff || nameWrong || phoneWrong || filesWrong || bornWrong) return
     setBusy(true)
     setProblem(null)
     if (!skipCheck) {
@@ -98,7 +106,14 @@ export default function OldFilePage() {
       }
     }
     setMatches([])
-    const result = await registerFromOldFile(client, name, cleanedPhone, staff.id)
+    const result = await registerFromOldFile(
+      client,
+      name,
+      cleanedPhone,
+      staff.id,
+      born || null,
+      sex,
+    )
     if (result.problem || !result.patient) {
       setBusy(false)
       setProblem(result.problem)
@@ -112,6 +127,8 @@ export default function OldFilePage() {
   function startAgain() {
     setName('')
     setPhone('')
+    setBorn('')
+    setSex(null)
     setFiles([])
     setTried(false)
     setSaved(null)
@@ -144,7 +161,7 @@ export default function OldFilePage() {
             <p className={failed.length ? styles.error : styles.muted}>
               {sentCount === 1 ? '1 file attached.' : `${sentCount} files attached.`}
               {failed.length
-                ? ` ${failed.length} could not be sent. Check the internet and try again.`
+                ? ` ${failed.length} not sent. Check the network and try again.`
                 : ''}
             </p>
           ) : null}
@@ -189,8 +206,7 @@ export default function OldFilePage() {
           <div className={styles.warn} role="alert">
             <b>This phone number is already registered</b>
             <p className={styles.muted}>
-              Open the existing patient to keep one record, unless this really is somebody else,
-              like a family member on the same phone.
+              Use this patient, unless it is someone else on the same phone.
             </p>
             {matches.map((match) => (
               <div
@@ -223,10 +239,6 @@ export default function OldFilePage() {
 
         {/* ===== 6. Name, phone, and the old file ===== */}
         <div className={styles.card}>
-          <p className={styles.muted}>
-            For patients already on paper. Type the name and phone number, then add their old file.
-            They get a new RMC number.
-          </p>
           <div className={styles.field}>
             <label htmlFor="old-name">Full name</label>
             <input
@@ -253,6 +265,39 @@ export default function OldFilePage() {
               onChange={(event) => setPhone(event.target.value)}
             />
             {tried && phoneWrong ? <small className={styles.error}>{phoneWrong}</small> : null}
+          </div>
+          <div className={styles.fields2}>
+            <div className={styles.field}>
+              <label htmlFor="old-born">Date of birth (optional)</label>
+              <input
+                id="old-born"
+                type="date"
+                className={styles.input}
+                max={new Date().toISOString().slice(0, 10)}
+                value={born}
+                aria-invalid={bornWrong ? 'true' : undefined}
+                onChange={(event) => setBorn(event.target.value)}
+              />
+              {bornWrong ? <small className={styles.error}>{bornWrong}</small> : null}
+              {born && !bornWrong ? (
+                <small className={styles.hint}>Age: {ageFrom(born)}</small>
+              ) : null}
+            </div>
+            <div className={styles.field}>
+              <label>Sex (optional)</label>
+              <div className={styles.segments} role="group" aria-label="Sex">
+                {(['female', 'male'] as Sex[]).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={sex === value}
+                    onClick={() => setSex(sex === value ? null : value)}
+                  >
+                    {value === 'female' ? 'Female' : 'Male'}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div className={styles.field}>
             <span className={styles.fieldTitle}>Old file</span>

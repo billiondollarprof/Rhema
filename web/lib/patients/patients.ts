@@ -201,19 +201,25 @@ export async function registerPatient(
   return { patient: data as PatientCard, problem: null }
 }
 
-// Register from old file (request 128): only the name and the phone. The
-// database still gives the patient their own RMC number.
+// Register from old file (request 128): the name and the phone, and the
+// date of birth and sex if the old file has them (Anthony, 2026-11-02:
+// "they can add or skip it"). The database still gives the patient their
+// own RMC number.
 export async function registerFromOldFile(
   client: SupabaseClient,
   fullName: string,
   phone: string,
   staffId: string,
+  dateOfBirth: string | null = null,
+  sex: Sex | null = null,
 ): Promise<{ patient: PatientCard | null; problem: string | null }> {
   const { data, error } = await client
     .from('patients')
     .insert({
       full_name: fullName.trim().replace(/\s+/g, ' '),
       phone,
+      date_of_birth: dateOfBirth,
+      sex,
       from_old_file: true,
       created_by: staffId,
     })

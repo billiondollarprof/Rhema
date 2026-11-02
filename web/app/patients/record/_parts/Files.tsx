@@ -85,7 +85,7 @@ export default function FilesSection({
     setBusy(false)
     setChosen(failed)
     if (failed.length) {
-      setProblem(`${failed.length} could not be sent. Check the internet and try again.`)
+      setProblem(`${failed.length} not sent. Check the network and try again.`)
     } else {
       setAdding(false)
     }
