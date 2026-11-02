@@ -65,6 +65,19 @@ begin
 end $$;
 \echo 'PASS 1: Call in raises one Call patient card for every Front Desk'
 
+-- Straight after Call in, the same doctor can still ring the Front Desk:
+-- the Call patient card is not a double tap.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c2"}', true);
+set local role authenticated;
+do $$
+begin
+  if public.call_attention('front_desk', null) <> 'sent' then
+    raise exception 'FAIL 1b: Call attention right after Call in was taken for a double tap';
+  end if;
+end $$;
+reset role;
+\echo 'PASS 1b: Call attention right after Call in still rings'
+
 
 -- ===== 2. The Front Desk reads it with the name; a nurse elsewhere does not =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1"}', true);

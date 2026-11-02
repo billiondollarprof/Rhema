@@ -78,6 +78,60 @@ begin
 end;
 $$;
 
+create or replace function private.call_attention(called_kind public.room_kind, called_room bigint)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  caller_room bigint;
+begin
+  if not (select private.is_active_staff()) then
+    raise exception 'Only active staff can call attention' using errcode = '42501';
+  end if;
+
+  select room_id into caller_room from public.staff where id = (select auth.uid());
+
+  if called_room is not null then
+    if not exists (
+      select 1 from public.rooms
+      where id = called_room and kind = called_kind and is_active
+    ) then
+      raise exception 'That room cannot be called' using errcode = '22023';
+    end if;
+    if called_room = caller_room then
+      raise exception 'You cannot call your own room' using errcode = '22023';
+    end if;
+  elsif exists (select 1 from public.rooms where id = caller_room and kind = called_kind) then
+    -- A group call to your own group, e.g. Nursing Station 1 calling
+    -- "Nursing Station", would ring your own screen.
+    raise exception 'You cannot call your own room' using errcode = '22023';
+  end if;
+
+  -- Two taps at the same moment wait here for each other. The lock is
+  -- per caller and per place called, and lets go when the call is saved.
+  perform pg_advisory_xact_lock(
+    hashtext('attention:' || (select auth.uid())::text || ':' || called_kind::text || ':' || coalesce(called_room::text, 'all'))
+  );
+
+  -- A double tap: the same caller, the same place, in the last 30 seconds.
+  if exists (
+    select 1 from public.attention_calls
+    where called_by = (select auth.uid())
+      and to_kind = called_kind
+      and to_room_id is not distinct from called_room
+      and created_at > now() - interval '30 seconds'
+  ) then
+    return 'already_sent';
+  end if;
+
+  insert into public.attention_calls (called_by, from_room_id, to_kind, to_room_id)
+  values ((select auth.uid()), caller_room, called_kind, called_room);
+  return 'sent';
+end;
+$$;
+
 delete from public.attention_calls where kind = 'call_patient';
 alter table public.attention_calls drop constraint if exists attention_calls_patient_kind;
 drop index if exists public.attention_calls_patient_idx;
