@@ -184,3 +184,9 @@ build from the RHEMA demo and the proposal.
   they found and fixed 6 faults. Messages and announcements live (his
   evening yes, SQL shown in the chat before it ran). Next: notifications
   (132), the review pass, the 6 November handover.
+
+- 2026-11-02 late: clickthrough is its own skill; notifications (132)
+  live; review pass round two (Home for every role, 25 screens at 6 sizes,
+  clean); one 6 November checklist written, with 12 items that were on no
+  list before (the address in the deploy, push, sign in links, install
+  pictures; staff reinstalling; keys; the project name; NDPA papers).

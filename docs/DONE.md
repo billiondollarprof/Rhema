@@ -777,3 +777,7 @@ this file.
     year, deleted nightly after the backup. Live 2026-11-02.
 134-135. **Thorough layout check and click-through check.** (2026-11-02)
     In the screens skill; live fixes for what they found.
+132. **Notifications with an unread bubble on the menu button.**
+    (2026-11-02) Messages, announcements, lab results ready, and work
+    waiting for each role, in whole sentences that open their place; a red
+    bubble with the total on the menu button. Live 2026-11-02.
