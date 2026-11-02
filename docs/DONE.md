@@ -771,3 +771,9 @@ this file.
     numbers on every payment; Take payment on the profile; a printable
     receipt with the letterhead; today's receipt that grows; Print receipt
     after paying on Home. Live 2026-11-02. Email waits for Resend.
+123c. **Messages and announcements.** (2026-11-02) Room to room and to
+    groups, ticks like WhatsApp, a clock while waiting for the network, an
+    unread bubble on Messages; announcements on Home until Got it; kept 1
+    year, deleted nightly after the backup. Live 2026-11-02.
+134-135. **Thorough layout check and click-through check.** (2026-11-02)
+    In the screens skill; live fixes for what they found.

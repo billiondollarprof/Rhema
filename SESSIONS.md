@@ -176,3 +176,11 @@ build from the RHEMA demo and the proposal.
   pharmacy, admin) at 390 and 1280 wide, with made up data: no browser
   errors, no overflow at 320 and 375. Next: messages with ticks (needs his
   say-back yes), then 132.
+
+- 2026-11-02 night: receipt fit checked at every size and tightened at
+  320; the screens skill now runs a thorough layout check (phone, tablet
+  portrait and landscape, desktop: spill, cut off, squeezed headings,
+  overlapping text, small buttons) and a click-through of every button;
+  they found and fixed 6 faults. Messages and announcements live (his
+  evening yes, SQL shown in the chat before it ran). Next: notifications
+  (132), the review pass, the 6 November handover.

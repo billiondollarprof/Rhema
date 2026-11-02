@@ -412,7 +412,9 @@ Numbers are kept from the full list, so older notes still match.
     backup (his choice, 2026-11-02). Built 2026-11-02: Messages (rooms and
     groups, ticks, clock while waiting for the network, unread bubble on
     Messages), Announce (nurses and admins), announcements on Home until
-    Got it.
+    Got it. Live 2026-11-02 (0 security warnings on testing and live).
+    NEXT: 132 (notifications, and the unread bubble on the menu button),
+    the rest of the review pass (122), and the 6 November handover.
     Also: "Always remember to ensure that your text, nothing overflows out
     of the screen" on phone, tablet (portrait and landscape) and desktop.
 
