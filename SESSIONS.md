@@ -159,3 +159,6 @@ build from the RHEMA demo and the proposal.
   alert; the CI walkthrough caught the Call attention guard counting the
   Call patient card, fixed before testing). 131 built: one shared double
   tap guard for registration and every record entry; waiting for his yes.
+
+- 2026-11-02: 131 live (shared double tap guard). Recorded 132 (unread
+  bubble on the menu button, with notifications). Next: family profile.
