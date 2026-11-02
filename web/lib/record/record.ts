@@ -15,6 +15,7 @@
  * Never: log a value from the record. Errors are reported by table and id.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { addToOutbox, isNetworkFailure } from '@/lib/offline/outbox'
 
 // ===== 1. Shapes =====
 type Voidable = {
@@ -215,6 +216,17 @@ export async function loadRecord(
   }
 }
 
+// What each kind of entry is called, for "Not sent yet" lines.
+const ENTRY_WORDS: Record<string, string> = {
+  allergies: 'Allergy',
+  conditions: 'Condition',
+  patient_medications: 'Medicine',
+  medications_given: 'Dose given',
+  vital_signs: 'Vital signs',
+  nursing_notes: 'Nursing note',
+  consultation_notes: 'Consultation note',
+}
+
 // ===== 3. Adding a line =====
 // Each add sends the signed in person as the writer; the database refuses
 // any other name.
@@ -224,6 +236,23 @@ export async function addLine(
   values: Record<string, unknown>,
 ): Promise<string | null> {
   const { error } = await client.from(table).insert(values)
+  // No network: the entry waits on this device, marked not sent, and goes
+  // when the network is back (request 128, step 3: "show that it has not
+  // saved. But let it save").
+  if (isNetworkFailure(error) && table !== 'medical_profiles') {
+    const { data } = await client.auth.getSession()
+    const staffId = data.session?.user.id
+    if (staffId) {
+      addToOutbox(staffId, {
+        kind: 'record',
+        label: ENTRY_WORDS[table] ?? 'Entry',
+        patientId: Number(values.patient_id),
+        table,
+        values,
+      })
+      return null
+    }
+  }
   if (error) {
     console.warn(`A line could not be added to ${table}: ${error.code}`)
     return error.code === '23514'

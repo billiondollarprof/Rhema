@@ -32,6 +32,8 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
+import { wipeOutbox } from '@/lib/offline/outbox'
+import { wipeCopy } from '@/lib/offline/patientCopy'
 import { adoptSession, clientFor, dropClient, pendingClient } from './clients'
 import { forgetThisDevice } from '@/lib/attention/push'
 import {
@@ -155,6 +157,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Offline or already gone: still forget them on this device.
     }
     dropClient(id)
+    // Nothing of this person's stays on the device: the waiting list and
+    // the copy of recent patients go too (request 128, step 3).
+    wipeOutbox(id)
+    wipeCopy(id)
     removeAccount(id)
     setAccount(null)
     setStaff(null)

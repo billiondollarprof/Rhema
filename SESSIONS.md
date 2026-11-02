@@ -162,3 +162,5 @@ build from the RHEMA demo and the proposal.
 
 - 2026-11-02: 131 live (shared double tap guard). Recorded 132 (unread
   bubble on the menu button, with notifications). Next: family profile.
+
+- 2026-11-02: family profile live (128 step 2). Next: poor network.

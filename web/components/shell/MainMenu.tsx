@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon'
 import styles from './AppShell.module.css'
 import { useAuth } from '@/lib/auth/session'
+import { readOutbox } from '@/lib/offline/outbox'
 
 export default function MainMenu({ buttonClass }: { buttonClass: string }) {
   const auth = useAuth()
@@ -87,6 +88,16 @@ export default function MainMenu({ buttonClass }: { buttonClass: string }) {
             className={`${styles.menuItem} ${styles.menuRed}`}
             role="menuitem"
             onClick={() => {
+              // Things still waiting to send would be lost: ask first.
+              const waiting = auth.staff ? readOutbox(auth.staff.id).length : 0
+              if (
+                waiting > 0 &&
+                !window.confirm(
+                  `${waiting} not sent yet. Signing out deletes them from this device. Sign out anyway?`,
+                )
+              ) {
+                return
+              }
               setOpen(false)
               void auth.signOut()
             }}

@@ -30,6 +30,7 @@ import { useState } from 'react'
 import Icon from './Icon'
 import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
+import OutboxSender from '@/components/offline/OutboxSender'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
@@ -130,6 +131,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* ===== 5. Call attention cards, over every screen ===== */}
         <AttentionAlerts client={client} staffId={staff.id} />
+        {/* Sends what waited while the network was down (request 128, step 3). */}
+        <OutboxSender client={client} staffId={staff.id} />
 
         {/* ===== 6. Install and alerts, once per device (must-do cards) ===== */}
         <OnboardingGate client={client} staffId={staff.id} />

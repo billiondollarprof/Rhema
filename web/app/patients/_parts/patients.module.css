@@ -695,3 +695,25 @@
 .familyList small {
   color: var(--mut);
 }
+
+/* ===== 13. Waiting for the network (request 128, step 3) ===== */
+.waitingCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #fff8e6;
+  border: 1px solid #f3dca4;
+  color: #7a4f00;
+}
+
+.waitingCard > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.waitingCard small {
+  color: #8a6d2b;
+}

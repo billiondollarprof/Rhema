@@ -36,6 +36,7 @@ import { DosesSection, MedicationsSection } from './_parts/Medications'
 import AttachmentPicker from './_parts/AttachmentPicker'
 import FilesSection from './_parts/Files'
 import LabSection from './_parts/Lab'
+import NotSent from './_parts/NotSent'
 import PrescriptionsSection from './_parts/Prescriptions'
 import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
 import styles from './_parts/record.module.css'
@@ -251,6 +252,7 @@ function PatientRecord() {
         {/* ===== 4. The record ===== */}
         {!stop && props && patient ? (
           <>
+            <NotSent staffId={staff.id} patientId={props.patientId} />
             <AllergyBanner record={props.record} />
             <div className={styles.columns}>
               <div className={styles.column}>

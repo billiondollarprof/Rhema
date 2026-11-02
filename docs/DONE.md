@@ -760,3 +760,7 @@ this file.
     guard: registration and every medical record entry, tapped twice, save
     once; a refused double registration shows the first patient. Live
     2026-11-02.
+128c. **Family profile.** (2026-11-02) Family number (FAM-000012) given by
+    the database; Add family member after saving a Family patient; find
+    by FAM number; the profile shows the family and its members. Live
+    2026-11-02.
