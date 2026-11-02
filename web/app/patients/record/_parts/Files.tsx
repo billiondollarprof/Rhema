@@ -90,7 +90,9 @@ export default function FilesSection({
     setBusy(false)
     setChosen(failed)
     if (failed.length) {
-      setProblem(`${failed.length} not sent. Check the network and try again.`)
+      setProblem(
+        `${failed.length === 1 ? '1 file was' : `${failed.length} files were`} not sent. Check the network and try again.`,
+      )
     } else {
       setAdding(false)
     }

@@ -106,7 +106,7 @@ export default function FilePicker({
       <small className={styles.muted}>
         Up to {MOST_AT_ONCE} files, 10 MB each. Word files: save as PDF first.
       </small>
-      {working ? <small className={styles.muted}>Preparing…</small> : null}
+      {working ? <small className={styles.muted}>Getting the files ready…</small> : null}
       {problem ? <small className={styles.error}>{problem}</small> : null}
 
       {/* ===== 3. What is chosen so far ===== */}

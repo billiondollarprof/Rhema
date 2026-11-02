@@ -12,7 +12,7 @@
  * again it checks the database does not already have it, so a reply lost
  * on the way never makes a double.
  *
- * What shows: a small pill, "2 waiting to send", only while something
+ * What shows: a small pill, "2 entries are waiting for the network", only while something
  * waits. Tap it to see what. Anything the database refused (not a network
  * problem) says so, with Discard.
  *
@@ -171,7 +171,9 @@ export default function OutboxSender({
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        {failed ? `${failed} not sent` : `${tasks.length} waiting to send`}
+        {failed
+          ? `${failed === 1 ? '1 entry' : `${failed} entries`} could not be sent`
+          : `${tasks.length === 1 ? '1 entry is' : `${tasks.length} entries are`} waiting for the network`}
       </button>
     </div>
   )

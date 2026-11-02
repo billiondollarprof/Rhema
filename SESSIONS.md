@@ -164,3 +164,8 @@ build from the RHEMA demo and the proposal.
   bubble on the menu button, with notifications). Next: family profile.
 
 - 2026-11-02: family profile live (128 step 2). Next: poor network.
+
+- 2026-11-02: poor network live (128 step 3). Slip caught before it
+  mattered: a run where verify failed still reached the push line (the
+  commit had not happened, so testing only got the old version again).
+  The ship command now runs the push only after a successful commit.

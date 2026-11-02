@@ -173,7 +173,8 @@ export async function downloadChosen(
   const fetched: { name: string; blob: Blob }[] = []
   for (const file of files) {
     const blob = await fetchFile(client, file.key)
-    if (typeof blob === 'string') return 'Some files did not download. Try again.'
+    if (typeof blob === 'string')
+      return 'Some files did not download. Check the network and try again.'
     fetched.push({ name: file.name, blob })
   }
   if (fetched.length === 1) {

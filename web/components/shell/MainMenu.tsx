@@ -93,7 +93,7 @@ export default function MainMenu({ buttonClass }: { buttonClass: string }) {
               if (
                 waiting > 0 &&
                 !window.confirm(
-                  `${waiting} not sent yet. Signing out deletes them from this device. Sign out anyway?`,
+                  `You have ${waiting === 1 ? '1 entry' : `${waiting} entries`} not saved yet. Wait a little longer for the network to come back. If you sign out now, ${waiting === 1 ? 'it' : 'they'} will be deleted from this device. Sign out anyway?`,
                 )
               ) {
                 return
