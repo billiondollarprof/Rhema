@@ -33,7 +33,7 @@ const { SCREENS } = require('./screens/screens-list.cjs')
   for (const screen of SCREENS) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
     await signIn(context, {
-      role: screen.medical ? 'nurse' : 'front_desk',
+      role: screen.role ?? (screen.medical ? 'nurse' : 'front_desk'),
       medical: Boolean(screen.medical),
       admin: Boolean(screen.admin),
     })

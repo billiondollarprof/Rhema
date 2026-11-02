@@ -31,7 +31,7 @@ import Icon from './Icon'
 import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import OutboxSender from '@/components/offline/OutboxSender'
-import { unreadCount } from '@/lib/messages/messages'
+import { loadNotices, totalOf } from '@/lib/notifications/notifications'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
@@ -64,16 +64,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [attentionOpen, setAttentionOpen] = useState(false)
   const staff = auth.staff
   const client = auth.client
-  // Unread messages for the red bubble on Messages, checked every 30 seconds.
+  // Everything waiting, checked every 30 seconds: the red bubble on the
+  // menu button (all of it, request 132) and on Messages (messages only).
   const [unread, setUnread] = useState(0)
-  const staffId = staff?.id
-  const roomId = staff?.room_id
+  const [waitingTotal, setWaitingTotal] = useState(0)
   useEffect(() => {
-    if (!client || !staffId || !roomId) return
+    if (!client || !staff) return
     let current = true
     const check = () =>
-      void unreadCount(client, staffId, roomId).then((count) => {
-        if (current) setUnread(count)
+      void loadNotices(client, staff).then((notices) => {
+        if (!current) return
+        setWaitingTotal(totalOf(notices))
+        setUnread(totalOf(notices.filter((notice) => notice.key.startsWith('messages-'))))
       })
     const first = window.setTimeout(check, 1500)
     const timer = window.setInterval(check, 30_000)
@@ -82,7 +84,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       window.clearTimeout(first)
       window.clearInterval(timer)
     }
-  }, [client, staffId, roomId, path])
+  }, [client, staff, path])
   if (!staff || !client) return null
 
   const roleWords =
@@ -113,7 +115,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               buttonClass={styles.topButton}
             />
             {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
-            <MainMenu buttonClass={styles.topButton} />
+            <MainMenu buttonClass={styles.topButton} waiting={waitingTotal} />
           </div>
         </header>
 

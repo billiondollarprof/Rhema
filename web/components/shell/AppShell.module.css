@@ -328,3 +328,42 @@
   display: grid;
   place-items: center;
 }
+
+/* ===== 6. Notifications (request 132): the bubble on the menu button and
+   the count beside Notifications inside the menu ===== */
+.menuWrap > button {
+  position: relative;
+}
+
+.menuBubble {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--brand-red);
+  color: #fff;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 2px #0f3d8a;
+}
+
+.menuCount {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--brand-red);
+  color: #fff;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}

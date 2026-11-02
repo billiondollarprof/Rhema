@@ -125,30 +125,6 @@ export async function sendMessage(
   return null
 }
 
-// How many messages to this person's room are not read yet (the red bubble
-// on Messages in the menu).
-export async function unreadCount(
-  client: SupabaseClient,
-  staffId: string,
-  myRoom: number,
-): Promise<number> {
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-  const { data } = await client
-    .from('messages')
-    .select('id')
-    .neq('from_room_id', myRoom)
-    .gte('created_at', since)
-    .limit(500)
-  const ids = ((data as { id: number }[] | null) ?? []).map((row) => row.id)
-  if (ids.length === 0) return 0
-  const { data: mine } = await client
-    .from('message_reads')
-    .select('message_id')
-    .eq('staff_id', staffId)
-    .in('message_id', ids)
-  return ids.length - ((mine as unknown[] | null) ?? []).length
-}
-
 export async function markRead(client: SupabaseClient, ids: number[]) {
   if (ids.length) await client.rpc('mark_messages_read', { ids })
 }
