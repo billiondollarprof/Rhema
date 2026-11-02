@@ -406,3 +406,49 @@ a.small {
 .anchor {
   scroll-margin-top: 80px;
 }
+
+/* ===== Files on the record (request 128) ===== */
+.blue {
+  background: #e3f2fd;
+  color: var(--bl);
+}
+
+/* A long file name breaks rather than pushing the line off a phone. */
+.fileName {
+  overflow-wrap: anywhere;
+}
+
+/* ===== Download: the choice, and printing the full history ===== */
+.choice {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+/* Shown only on paper: the patient's name over the printed history. */
+.printOnly {
+  display: none;
+}
+
+/* Printing the full medical history: only the record, every part open. */
+@media print {
+  .printOnly {
+    display: block;
+    font-size: 16px;
+  }
+  .noPrint,
+  .actions,
+  .chevron {
+    display: none !important;
+  }
+  .section {
+    break-inside: avoid;
+  }
+  .page {
+    max-width: none !important;
+  }
+}

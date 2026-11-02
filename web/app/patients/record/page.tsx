@@ -16,6 +16,11 @@
  * doses, readings, notes) and the background facts on the right
  * (allergies, profile, conditions).
  *
+ * Files (request 128): scans, results and old paper files sit in their own
+ * section. Download asks "Full medical history" (printed, or saved as a
+ * PDF from the print window) or "Attachments only" (each file to the
+ * device).
+ *
  * Never: show any part of the record before openRecord succeeds.
  */
 'use client'
@@ -27,13 +32,16 @@ import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
 import { DosesSection, MedicationsSection } from './_parts/Medications'
+import FilesSection from './_parts/Files'
 import LabSection from './_parts/Lab'
 import PrescriptionsSection from './_parts/Prescriptions'
 import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
 import styles from './_parts/record.module.css'
 import buttons from '../_parts/patients.module.css'
+import { downloadFiles } from '@/lib/files/files'
 import { ageFrom } from '@/lib/patients/age'
-import { getPatient, type PatientResult } from '@/lib/patients/patients'
+import type { PatientFile } from '@/lib/patients/patientFiles'
+import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patients'
 import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
@@ -71,6 +79,11 @@ function PatientRecord() {
   const [patient, setPatient] = useState<PatientResult | null | undefined>(undefined)
   const [record, setRecord] = useState<MedicalRecord | null>(null)
   const [refused, setRefused] = useState(false)
+  // The files on the record, for Download (Files section tells us).
+  const [files, setFiles] = useState<PatientFile[]>([])
+  const [choosing, setChoosing] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadProblem, setDownloadProblem] = useState<string | null>(null)
 
   // ===== 2. Open, then read =====
   useEffect(() => {
@@ -102,6 +115,32 @@ function PatientRecord() {
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
+  // ===== 2b. Download =====
+  const liveFiles = files.filter((file) => !file.removed_at)
+
+  function printHistory() {
+    setChoosing(false)
+    // Every part of the record open on paper, then the print window, where
+    // "Save as PDF" makes a file of it.
+    document.querySelectorAll('details').forEach((part) => {
+      part.open = true
+    })
+    window.setTimeout(() => window.print(), 100)
+  }
+
+  async function saveAttachments() {
+    if (!client) return
+    setDownloading(true)
+    setDownloadProblem(null)
+    const failed = await downloadFiles(
+      client,
+      liveFiles.map((file) => ({ key: file.file_key, name: file.file_name })),
+    )
+    setDownloading(false)
+    setChoosing(false)
+    if (failed) setDownloadProblem(`${failed} file(s) could not be downloaded. Try again.`)
+  }
+
   const back = id ? (
     <>
       {/* Always in view, so a lab request never hides in a folded section. */}
@@ -117,6 +156,11 @@ function PatientRecord() {
         <Link className={`${buttons.button} ${buttons.primary}`} href={`/lab/request/?p=${id}`}>
           Request lab
         </Link>
+      ) : null}
+      {allowed && record ? (
+        <button className={buttons.button} onClick={() => setChoosing(!choosing)}>
+          Download
+        </button>
       ) : null}
       <Link className={buttons.button} href={`/patients/?p=${id}`}>
         Back to patient
@@ -135,19 +179,59 @@ function PatientRecord() {
   return (
     <AppShell>
       <div className={styles.page}>
-        <div className={styles.header}>
+        <div className={`${styles.header} ${styles.noPrint}`}>
           {patient ? <PersonBadge name={patient.full_name} /> : null}
           <div>
             <h2>{patient ? patient.full_name : 'Medical record'}</h2>
             {patient ? (
               <small>
                 {patient.patient_number} · {ageFrom(patient.date_of_birth)} ·{' '}
-                {patient.sex === 'female' ? 'Female' : 'Male'}
+                {sexWords(patient.sex)}
               </small>
             ) : null}
           </div>
           {back}
         </div>
+
+        {/* ----- Download: which part ----- */}
+        {choosing ? (
+          <div className={`${styles.choice} ${styles.noPrint}`}>
+            <b>What do you want to download?</b>
+            <div className={buttons.buttons}>
+              <button
+                className={`${buttons.button} ${buttons.primary}`}
+                onClick={printHistory}
+                disabled={downloading}
+              >
+                Full medical history
+              </button>
+              {liveFiles.length > 0 ? (
+                <button className={buttons.button} onClick={saveAttachments} disabled={downloading}>
+                  {downloading ? 'Downloading…' : `Attachments only (${liveFiles.length})`}
+                </button>
+              ) : null}
+              <button
+                className={buttons.button}
+                onClick={() => setChoosing(false)}
+                disabled={downloading}
+              >
+                Cancel
+              </button>
+            </div>
+            <small className={styles.muted}>
+              Full medical history opens the print window. Choose Save as PDF there to keep a file.
+            </small>
+          </div>
+        ) : null}
+        {downloadProblem ? <p className={styles.error}>{downloadProblem}</p> : null}
+
+        {/* On paper, the patient's name and number head the history. */}
+        {patient ? (
+          <p className={styles.printOnly}>
+            <b>{patient.full_name}</b> · {patient.patient_number} · {ageFrom(patient.date_of_birth)}{' '}
+            · {sexWords(patient.sex)}
+          </p>
+        ) : null}
 
         {stop ? <p className={styles.muted}>{stop}</p> : null}
         {!stop && !props ? <p className={styles.muted}>Opening the record…</p> : null}
@@ -165,6 +249,12 @@ function PatientRecord() {
                 <ConsultationsSection {...props} />
                 <LabSection client={client} patientId={props.patientId} />
                 <PrescriptionsSection client={client} patientId={props.patientId} />
+                <FilesSection
+                  client={client}
+                  patientId={props.patientId}
+                  fromOldFile={patient.from_old_file}
+                  onLoaded={setFiles}
+                />
               </div>
               <div className={styles.column}>
                 <AllergiesSection {...props} />

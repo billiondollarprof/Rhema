@@ -22,7 +22,7 @@ import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
-import type { PatientResult } from '@/lib/patients/patients'
+import { sexWords, type PatientResult } from '@/lib/patients/patients'
 import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
 
 type DetailProps = {
@@ -61,9 +61,11 @@ export default function PatientDetail({
         ['Age', ageFrom(patient.date_of_birth)],
         [
           'Date of birth',
-          new Date(`${patient.date_of_birth}T00:00:00`).toLocaleDateString('en-GB'),
+          patient.date_of_birth
+            ? new Date(`${patient.date_of_birth}T00:00:00`).toLocaleDateString('en-GB')
+            : 'Not recorded',
         ],
-        ['Sex', patient.sex === 'female' ? 'Female' : 'Male'],
+        ['Sex', sexWords(patient.sex)],
         ['Category', CATEGORY_LABELS[patient.category] ?? patient.category],
         ['Last seen', lastSeenWords(patient.last_seen)],
       ],

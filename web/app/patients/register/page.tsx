@@ -145,9 +145,14 @@ export default function RegisterPatientPage() {
       <div className={styles.page}>
         <div className={styles.head}>
           <h2>Register patient</h2>
-          <Link className={styles.button} href="/patients/">
-            <Icon name="find" size={16} /> Find patient
-          </Link>
+          <div className={styles.buttons}>
+            <Link className={`${styles.button} ${styles.quiet}`} href="/patients/old-file/">
+              <Icon name="file" size={16} /> Register from old file
+            </Link>
+            <Link className={styles.button} href="/patients/">
+              <Icon name="find" size={16} /> Find patient
+            </Link>
+          </div>
         </div>
 
         {/* ===== 3. A patient with the same name and date of birth ===== */}

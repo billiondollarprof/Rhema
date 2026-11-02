@@ -13,6 +13,8 @@ describe('ageFrom', () => {
   it('gives months for babies', () => expect(ageFrom('2026-06-10', today)).toBe('4 months'))
   it('gives days for the newborn', () => expect(ageFrom('2026-10-25', today)).toBe('4 days'))
   it('gives a year and months', () => expect(ageFrom('2025-07-01', today)).toBe('1 year 3 months'))
+  it('says so when there is no date of birth yet', () =>
+    expect(ageFrom(null, today)).toBe('Age not recorded'))
   it('says nothing for a date in the future', () => expect(ageFrom('2027-01-01', today)).toBe(''))
 })
 

@@ -294,3 +294,19 @@
     display: none;
   }
 }
+
+/* ===== 4. Printing (the full medical history, request 128) =====
+   Only the page itself goes on paper: no top bar, no menu. */
+@media print {
+  .top,
+  .nav,
+  .menuPanel {
+    display: none !important;
+  }
+  .app {
+    background: #fff;
+  }
+  .main {
+    padding: 0;
+  }
+}

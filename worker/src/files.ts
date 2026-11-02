@@ -1,7 +1,11 @@
 /*
- * worker/src/files.ts: lab result files (request 115, slice 2). The lab
- * attaches a photo or PDF of the machine printout; doctors, nurses and the
- * matron open it from the patient's record.
+ * worker/src/files.ts: files on the patient's record. Two kinds:
+ *   lab      a photo or PDF of the lab printout (request 115, slice 2),
+ *            attached by the Laboratory.
+ *   record   scans, photos and PDFs on the record itself (request 128,
+ *            2026-11-02), attached by anybody who may register patients
+ *            (the Front Desk brings in old files) or use the record.
+ * Doctors, nurses and the matron open both from the patient's record.
  *
  * Why: Anthony, 2026-10-30: "We can build the attach result infra now...
  * make sure that the attached files is usually compressed without
@@ -68,8 +72,54 @@ export function realType(bytes: Uint8Array): string | null {
   return null
 }
 
-// A stored file's name: lab/<random uuid>.<webp|jpg|pdf>. Nothing else.
-const NAME = /^lab\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(webp|jpg|pdf)$/
+// A stored file's name: <kind>/<random uuid>.<webp|jpg|pdf>. Nothing else.
+const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+// ===== 2b. The two kinds of file, and who may do what with each =====
+export type FileKind = 'lab' | 'record'
+
+type KindRules = {
+  // Stored names look like this, and nothing else is served.
+  name: RegExp
+  // What to ask Supabase about the person (as them) before storing.
+  whoAsk: (person: string) => string
+  // Whether that answer allows storing.
+  mayStore: (row: Record<string, unknown> | undefined) => boolean
+  refused: string
+  // What to ask Supabase (as the person) before serving a stored file. A
+  // row back means the database lets this person read it.
+  readAsk: (key: string) => string
+  // For the log: counts only, never names.
+  label: string
+}
+
+const KINDS: Record<FileKind, KindRules> = {
+  lab: {
+    name: new RegExp(`^lab/${UUID}\\.(webp|jpg|pdf)$`),
+    whoAsk: (person) => `staff?select=can_lab&id=eq.${person}&is_active=eq.true`,
+    mayStore: (row) => row?.can_lab === true,
+    refused: 'Only the Laboratory can attach result files',
+    readAsk: (key) => `lab_results?select=id&file_key=eq.${encodeURIComponent(key)}&limit=1`,
+    label: 'Lab file',
+  },
+  record: {
+    name: new RegExp(`^record/${UUID}\\.(webp|jpg|pdf)$`),
+    whoAsk: (person) => `staff?select=can_patients,can_medical&id=eq.${person}&is_active=eq.true`,
+    mayStore: (row) => row?.can_patients === true || row?.can_medical === true,
+    refused: 'You cannot attach files to patients',
+    // A removed file is not served any more.
+    readAsk: (key) =>
+      `patient_files?select=id&file_key=eq.${encodeURIComponent(key)}&removed_at=is.null&limit=1`,
+    label: 'Record file',
+  },
+}
+
+// Which kind a stored name belongs to, or null if it is not one of ours.
+export function kindOf(key: string): FileKind | null {
+  if (KINDS.lab.name.test(key)) return 'lab'
+  if (KINDS.record.name.test(key)) return 'record'
+  return null
+}
 
 // ===== 3. Asking Supabase, as the person =====
 type Ask = (path: string, token: string) => Promise<unknown[] | null>
@@ -106,24 +156,23 @@ function personFrom(token: string): string | null {
 const no = (status: number, error: string) => Response.json({ error }, { status })
 
 // ===== 4. Upload =====
-export async function uploadLabFile(
+export async function uploadFile(
   request: Request,
   env: FilesEnv,
+  kind: FileKind,
   post: typeof fetch = fetch,
 ): Promise<Response> {
+  const rules = KINDS[kind]
   if (!env.FILES || !env.SUPABASE_URL || !env.SUPABASE_KEY)
     return no(503, 'Files are not set up yet')
   const token = tokenFrom(request)
   const person = token ? personFrom(token) : null
   if (!token || !person) return no(401, 'Please sign in again')
 
-  // The Laboratory tick, as the database sees it for this person.
-  const rows = await supabaseAsker(env, post)(
-    `staff?select=can_lab&id=eq.${person}&is_active=eq.true`,
-    token,
-  )
-  const row = rows?.[0] as { can_lab?: boolean } | undefined
-  if (!row?.can_lab) return no(403, 'Only the Laboratory can attach result files')
+  // The person's ticks, as the database sees them for this person.
+  const rows = await supabaseAsker(env, post)(rules.whoAsk(person), token)
+  if (!rules.mayStore(rows?.[0] as Record<string, unknown> | undefined))
+    return no(403, rules.refused)
 
   const declared = Number(request.headers.get('Content-Length') ?? '0')
   if (declared > MOST_BYTES) return no(413, 'The file is bigger than 10 MB')
@@ -134,18 +183,25 @@ export async function uploadLabFile(
   const type = realType(bytes)
   if (!type) return no(415, 'Attach a photo or a PDF')
 
-  const key = `lab/${crypto.randomUUID()}.${EXTENSIONS[type]}`
+  const key = `${kind}/${crypto.randomUUID()}.${EXTENSIONS[type]}`
   await env.FILES.put(key, bytes, {
     httpMetadata: { contentType: type },
     customMetadata: { uploadedBy: person },
   })
   // Counts only, never names.
-  console.log(`Lab file stored: ${type}, ${bytes.length} bytes`)
+  console.log(`${rules.label} stored: ${type}, ${bytes.length} bytes`)
   return Response.json({ key, type, size: bytes.length })
 }
 
+// The lab's own names, kept so the lab screens and tests read as before.
+export const uploadLabFile = (request: Request, env: FilesEnv, post: typeof fetch = fetch) =>
+  uploadFile(request, env, 'lab', post)
+export const uploadRecordFile = (request: Request, env: FilesEnv, post: typeof fetch = fetch) =>
+  uploadFile(request, env, 'record', post)
+
 // ===== 5. Download =====
-export async function downloadLabFile(
+// Serves lab/... and record/... names alike; each asks its own table.
+export async function downloadFile(
   request: Request,
   key: string,
   env: FilesEnv,
@@ -153,15 +209,13 @@ export async function downloadLabFile(
 ): Promise<Response> {
   if (!env.FILES || !env.SUPABASE_URL || !env.SUPABASE_KEY)
     return no(503, 'Files are not set up yet')
-  if (!NAME.test(key)) return no(404, 'Not found')
+  const kind = kindOf(key)
+  if (!kind) return no(404, 'Not found')
   const token = tokenFrom(request)
   if (!token || !personFrom(token)) return no(401, 'Please sign in again')
 
-  // Only if the database lets this person read the result holding the file.
-  const rows = await supabaseAsker(env, post)(
-    `lab_results?select=id&file_key=eq.${encodeURIComponent(key)}&limit=1`,
-    token,
-  )
+  // Only if the database lets this person read the row holding the file.
+  const rows = await supabaseAsker(env, post)(KINDS[kind].readAsk(key), token)
   if (!rows || rows.length === 0) return no(404, 'Not found')
 
   const stored = await env.FILES.get(key)
@@ -177,3 +231,5 @@ export async function downloadLabFile(
     },
   })
 }
+
+export const downloadLabFile = downloadFile

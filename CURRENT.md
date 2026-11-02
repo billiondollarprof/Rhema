@@ -358,6 +358,11 @@ Numbers are kept from the full list, so older notes still match.
     - Import templates: later, when ready.
     - He asked for Helium Health's public pricing (per year, per patient,
       setup and training).
+    - Button words (2026-11-02): "Add scan or photo" and "Add PDF file";
+      PDF only, so a Word document is saved as PDF first.
+    Status 2026-11-02: step 1 (attachments, Register from old file,
+    Download) built and checked locally and in CI on the feature branch.
+    Waiting for his yes on the files SQL batch before testing.
 
 ### Standing instructions
 
