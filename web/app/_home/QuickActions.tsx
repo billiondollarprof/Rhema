@@ -45,19 +45,19 @@ const DOCTOR: Action[] = [
 const NURSE: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#00838f', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
-  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
+  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const PHARMACY: Action[] = [
   { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: PHARMACY_CARD },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
-  { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: false, job: SOON },
+  { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: true, job: '/messages/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const LABORATORY: Action[] = [
   { icon: 'lab', label: 'Lab requests', colour: '#7e57c2', ready: true, job: LAB },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
-  { icon: 'msg', label: 'Messages', colour: '#00897b', ready: false, job: SOON },
+  { icon: 'msg', label: 'Messages', colour: '#00897b', ready: true, job: '/messages/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const ADMIN: Action[] = [
@@ -68,7 +68,7 @@ const ADMIN: Action[] = [
     ready: true,
     job: '/admin/?tab=invite',
   },
-  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: false, job: SOON },
+  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]

@@ -408,9 +408,11 @@ Numbers are kept from the full list, so older notes still match.
     just the way you also call attention... matron one, matron two... by
     office or by room"; groups too. Patient names: "they can type the
     patient name, but they don't have to tag the patient... just a normal
-    message." Text only. He asked whether messages need SQL (yes, new
-    tables) and whether messages and announcements should expire (90 days
-    or forever); recommendation sent; waiting for his choice.
+    message." Text only. Kept 1 year, then deleted nightly after the
+    backup (his choice, 2026-11-02). Built 2026-11-02: Messages (rooms and
+    groups, ticks, clock while waiting for the network, unread bubble on
+    Messages), Announce (nurses and admins), announcements on Home until
+    Got it.
     Also: "Always remember to ensure that your text, nothing overflows out
     of the screen" on phone, tablet (portrait and landscape) and desktop.
 
@@ -500,6 +502,22 @@ These never come off the list.
     extra text." Standing rule: short, but always a whole sentence that
     says what happened and what to do. Fixed the same day: the sign out
     warning, the waiting pill, "Not saved yet", the file messages.
+
+134. **Anticipate the steps a flow needs.** (2026-11-02) "There are
+    certain things that I might not remember to include. That little steps
+    or... some buttons that may be missing. You should know that, oh, we'll
+    probably need this thing... for easy flow. Without clutter, without
+    having too many buttons." Standing rule, in the screens skill (2c).
+
+135. **A thorough screen check, and a click-through check.** (2026-11-02)
+    "improve the skill that checks... A skill that clicks through buttons."
+    Done the same day: the layout check now covers phone, tablet portrait,
+    tablet landscape and desktop and catches cut off text, squeezed
+    headings, overlapping text and small buttons; scripts/screens/
+    clickthrough.cjs presses every button. They found and fixed: the
+    record header running into its buttons at 320, the Register from old
+    file title on 3 lines, the chart period buttons and Open RHEMA too
+    small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
 

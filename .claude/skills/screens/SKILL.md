@@ -1,6 +1,6 @@
 ---
 name: screens
-description: Screenshot a screen with made up data at a phone and a desktop width, click through its controls, and run the overflow check at 320, 360, 375 and 390. Use after building or changing any screen, before saying it is done (CLAUDE.md section 5).
+description: Screenshot a screen with made up data, run the thorough layout check at phone, tablet (portrait and landscape) and desktop widths, and press every button with the click-through check. Use after building or changing any screen, before saying it is done (CLAUDE.md section 5).
 ---
 
 # screens
@@ -14,11 +14,30 @@ looking without a real database, so no patient data can reach a picture.
    ```
    scripts/screens/serve.sh
    ```
-2. **Run the overflow check on every screen:**
+2. **Run the layout check on every screen:**
    ```
    node scripts/overflow-audit.cjs
    ```
-   When a new screen is built, add it to `SCREENS` in that file first.
+   At 320, 360, 390, tablet portrait (820), tablet landscape (1180) and
+   desktop (1440) it fails on: anything past the edge, text cut off, a
+   heading on more than 2 lines, text on top of other text, a button under
+   32 pixels high. When a new screen is built, add it to
+   `scripts/screens/screens-list.cjs` first (with `extra` rows if it needs
+   data to show). Since 2026-11-02, after the receipt's letterhead was
+   squeezed at 320 and the old check could not see it.
+2b. **Press every button with the click-through check:**
+   ```
+   node scripts/screens/clickthrough.cjs
+   ```
+   It presses each visible button on a fresh page. It fails if a button
+   breaks the page. It lists buttons that changed nothing: read every one;
+   only an option that was already chosen is fine.
+2c. **Ask what is missing.** Anthony, 2026-11-02: "There are certain
+   things that I might not remember to include... you should know that,
+   oh, we'll probably need this thing... for easy flow. Without clutter."
+   Walk the screen as the person who uses it: is there a way back, a next
+   step, a way to undo a mistake, a confirmation that it saved? Add what is
+   needed, nothing more.
 3. **Walk the new screen through.** Write a short script in the scratchpad
    that uses `scripts/screens/mock.cjs`:
    ```js

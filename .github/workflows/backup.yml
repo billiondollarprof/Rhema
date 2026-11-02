@@ -152,6 +152,16 @@ jobs:
             fi
           done
 
+      # ===== 6b. Messages older than a year are deleted =====
+      # Anthony, 2026-11-02: messages and announcements are kept 1 year.
+      # Runs only after the backup above is saved and checked, so tonight's
+      # copy still holds them for its 35 days.
+      - name: Delete messages older than a year
+        run: |
+          gone=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
+            psql "$URL" -tA -c "select private.forget_old_messages()")
+          echo "Messages and announcements older than a year deleted: $gone"
+
       # ===== 7. The lab result files: copy the new ones, each locked =====
       - name: Copy new lab result files
         run: |

@@ -171,6 +171,8 @@
   border: 0;
   background: none;
   border-radius: 9px;
+  /* At least 32 pixels high, for a finger (layout check, 2026-11-02). */
+  min-height: 32px;
   padding: 6px 10px;
   color: var(--mut);
   cursor: pointer;
@@ -434,4 +436,32 @@ a.button {
   border: 1px solid #bfe3cf;
   color: #1f6b4a;
   font-weight: 600;
+}
+
+/* ===== Announcements (request 123) ===== */
+.announce {
+  border-left: 4px solid #fb8c00;
+}
+
+.announceItem {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  justify-items: start;
+}
+
+.announceItem:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.announceItem p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.announceItem small {
+  color: var(--mut);
 }

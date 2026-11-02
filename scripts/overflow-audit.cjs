@@ -1,9 +1,14 @@
 /*
- * scripts/overflow-audit.cjs: checks that nothing on any screen is wider
- * than a phone, at 320, 360, 375 and 390 pixels.
+ * scripts/overflow-audit.cjs: the layout check for every screen, at phone
+ * (320, 360, 390), tablet portrait, tablet landscape and desktop widths.
  *
- * Why: a screenshot cannot see content cut off the right edge. This
- * measures every element's real edges instead. CLAUDE.md section 5.
+ * Why: a screenshot cannot see content cut off the right edge, and a
+ * quick look misses a squeezed heading. Since 2026-11-02 (Anthony: "I
+ * don't know how you missed that receipt... improve the skill... to do
+ * thorough job") it checks, at every width: anything spilling past the
+ * edge, text cut off, headings on more than 2 lines, text on top of other
+ * text, and buttons too small to tap (scripts/screens/mock.cjs, layout).
+ * CLAUDE.md section 5.
  *
  * Usage:
  *   scripts/screens/serve.sh          (once, to build and serve)
@@ -14,28 +19,12 @@
  * Never: point it at the live or testing site. It uses made up data.
  */
 const { chromium } = require('playwright')
-const { signIn, mockSupabase, overflow } = require('./screens/mock.cjs')
+const { signIn, mockSupabase, layout } = require('./screens/mock.cjs')
 
 const APP = process.env.APP_URL || 'http://127.0.0.1:3100'
 
-// ===== 1. Every screen, and the text that shows it has loaded =====
-const SCREENS = [
-  { path: '/', waitFor: 'Registered today' },
-  { path: '/patients/', waitFor: 'Find patient' },
-  { path: '/patients/?p=1', waitFor: 'Adaeze Okafor' },
-  { path: '/patients/register/', waitFor: 'Register patient' },
-  { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
-  { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
-  { path: '/install/', waitFor: 'Get RHEMA on every device' },
-  { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
-  { path: '/lab/result/', waitFor: 'Add a lab result' },
-  { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
-  { path: '/patients/old-file/', waitFor: 'Register from old file' },
-  { path: '/admin/', waitFor: 'Tap a name', admin: true },
-  { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
-  { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },
-  { path: '/admin/?tab=activity', waitFor: 'activities today', admin: true },
-]
+// ===== 1. Every screen (scripts/screens/screens-list.cjs) =====
+const { SCREENS } = require('./screens/screens-list.cjs')
 
 // ===== 2. Walk them all =====
 ;(async () => {
@@ -49,7 +38,7 @@ const SCREENS = [
       admin: Boolean(screen.admin),
     })
     const page = await context.newPage()
-    await mockSupabase(page)
+    await mockSupabase(page, screen.extra ?? {})
     await page.goto(APP + screen.path)
     try {
       await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
@@ -58,14 +47,16 @@ const SCREENS = [
       await context.close()
       continue
     }
-    problems.push(...(await overflow(page, screen.path)))
+    problems.push(...(await layout(page, screen.path)))
     await context.close()
   }
   await browser.close()
   if (problems.length) {
-    console.log('OVERFLOW AUDIT FAILED')
+    console.log('LAYOUT AUDIT FAILED')
     for (const problem of problems) console.log('  ' + problem)
     process.exit(1)
   }
-  console.log(`Overflow audit passed: ${SCREENS.length} screens, 4 phone widths, nothing spills.`)
+  console.log(
+    `Layout audit passed: ${SCREENS.length} screens at phone, tablet and desktop widths: nothing spills, nothing is cut off, squeezed, on top of other text or too small to tap.`,
+  )
 })()
