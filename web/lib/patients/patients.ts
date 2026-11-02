@@ -17,6 +17,8 @@
  * patient number or error code only.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { addToOutbox, isNetworkFailure } from '../offline/outbox'
+import { readCopy, searchCopy } from '../offline/patientCopy'
 
 // ===== 1. Shapes =====
 export type Sex = 'female' | 'male'
@@ -64,7 +66,8 @@ export type PatientResult = PatientCard & {
   open_visit: { status: string; room: string } | null
 }
 
-const CARD_COLUMNS =
+// Also used for the device copy (lib/offline/patientCopy).
+export const CARD_COLUMNS =
   'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, family_id, family:families(family_number), created_at'
 
 // "Female", "Male", or that it is not recorded yet (an old file).
@@ -73,6 +76,19 @@ export function sexWords(sex: Sex | null): string {
   if (sex === 'male') return 'Male'
   return 'Sex not recorded'
 }
+
+// The signed in person, read from this device (works with no network).
+async function myId(client: SupabaseClient): Promise<string | null> {
+  const { data } = await client.auth.getSession()
+  return data.session?.user.id ?? null
+}
+
+// A copied patient, shaped like a search result (no visit details offline).
+const offline = (patient: PatientCard): PatientResult => ({
+  ...patient,
+  last_seen: null,
+  open_visit: null,
+})
 
 // ===== 2. Phone numbers: one way of writing them =====
 // The database keeps 11 digits starting with 0, like 08035550126. People
@@ -135,6 +151,11 @@ export async function searchPatients(
   }
 
   const { data, error } = await query
+  // No network: search the copy on this device (request 128, step 3).
+  if (isNetworkFailure(error)) {
+    const me = await myId(client)
+    return me ? searchCopy(me, typed).map(offline) : []
+  }
   if (error || !data) return []
   return withVisits(client, data as unknown as PatientCard[])
 }
@@ -176,7 +197,17 @@ export async function getPatient(
   client: SupabaseClient,
   id: number,
 ): Promise<PatientResult | null> {
-  const { data } = await client.from('patients').select(CARD_COLUMNS).eq('id', id).maybeSingle()
+  const { data, error } = await client
+    .from('patients')
+    .select(CARD_COLUMNS)
+    .eq('id', id)
+    .maybeSingle()
+  // No network: the copy on this device, if this patient is in it.
+  if (isNetworkFailure(error)) {
+    const me = await myId(client)
+    const copied = me ? readCopy(me).find((patient) => patient.id === id) : undefined
+    return copied ? offline(copied) : null
+  }
   if (!data) return null
   const [withVisit] = await withVisits(client, [data as unknown as PatientCard])
   return withVisit ?? null
@@ -231,7 +262,7 @@ export async function registerPatient(
   client: SupabaseClient,
   details: PatientDetails,
   staffId: string,
-): Promise<{ patient: PatientCard | null; problem: string | null }> {
+): Promise<{ patient: PatientCard | null; problem: string | null; queued?: boolean }> {
   const { data, error } = await client
     .from('patients')
     .insert({ ...details, created_by: staffId })
@@ -240,6 +271,16 @@ export async function registerPatient(
   if (error && isDoubleTap(error)) {
     const first = await justRegistered(client, staffId, details.full_name)
     if (first) return { patient: first, problem: null }
+  }
+  // No network: keep it on this device; it registers when the network is
+  // back (request 128, step 3).
+  if (isNetworkFailure(error)) {
+    addToOutbox(staffId, {
+      kind: 'register',
+      label: details.full_name,
+      values: { ...details, created_by: staffId },
+    })
+    return { patient: null, problem: null, queued: true }
   }
   if (error) {
     console.warn(`Patient could not be registered: ${error.code}`)

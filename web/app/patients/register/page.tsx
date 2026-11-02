@@ -50,6 +50,8 @@ function RegisterPatient() {
   const familyId = Number(useSearchParams().get('family')) || null
   const [familyCard, setFamilyCard] = useState<string | null>(null)
   const [joining, setJoining] = useState(false)
+  // The name of a patient saved on this device while the network was down.
+  const [queued, setQueued] = useState<string | null>(null)
 
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
@@ -108,8 +110,45 @@ function RegisterPatient() {
     setBusy(false)
     setWaiting(null)
     setMatches([])
-    if (result.problem) setProblem(result.problem)
+    if (result.queued) setQueued(details.full_name)
+    else if (result.problem) setProblem(result.problem)
     else setSaved(result.patient)
+  }
+
+  // ===== 1b. No network: saved on this device, sent later =====
+  if (queued) {
+    return (
+      <AppShell>
+        <div className={styles.page}>
+          <div className={styles.head}>
+            <h2>Registering…</h2>
+          </div>
+          <div className={styles.waitingCard}>
+            <Icon name="reg" size={22} />
+            <div>
+              <b>{queued}</b>
+              <small>
+                No network. Saved on this device. It registers by itself when the network is back.
+              </small>
+            </div>
+          </div>
+          <div className={styles.buttons}>
+            <button
+              className={`${styles.button} ${styles.primary}`}
+              onClick={() => {
+                setQueued(null)
+                setFormKey((key) => key + 1)
+              }}
+            >
+              Register another patient
+            </button>
+            <Link className={styles.button} href="/">
+              Home
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    )
   }
 
   // ===== 2. After saving: the number, then Send to room =====
