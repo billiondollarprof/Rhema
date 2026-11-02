@@ -389,8 +389,12 @@ Numbers are kept from the full list, so older notes still match.
     - "make me a doctor": done 2026-11-02.
     Adjustments live 2026-11-02 (his yes on the SQL; 0 security warnings
     on testing and live).
-    NEXT: step 2, family profile (one card number for the family). He has
-    not yet said whether 129 (call in alert) comes before or after it.
+    Step 2, family profile, live 2026-11-02: he chose the family number
+    (FAM-000012; each member keeps their own RMC number). His yes on the
+    SQL; 0 security warnings on testing and live.
+    NEXT: step 3, poor network (registration drafts; device copy of
+    patients changed in the last 30 days, text only; notes and vital
+    signs wait on the device marked not sent).
 
 129. **Call in tells the Front Desk, with the ringing.** (2026-11-02) "If
     a consultant in room one calls in patient, that means the front desk
