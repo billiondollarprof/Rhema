@@ -492,6 +492,11 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-02 evening: "Anything that doesn't involve me... you just do
+  them. If you are going to run SQL, just show me the bash. Run them.
+  Because it's already dark, so I can go and rest." So for the rest of
+  2026-11-02 SQL batches are shown in the chat and run without waiting.
+
 - 2026-10-31: One AWS account for the company (StellaXafe), not one per
   hospital, for the uptime watcher across all clients. "I just wanted to
   open this one on my own company's account." A hospital gets its own AWS
