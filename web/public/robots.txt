@@ -1,0 +1,5 @@
+# RHEMA Hospital Operations System: a private tool for hospital staff.
+# Anthony, 2026-11-03: "It's not something that you just discover online...
+# Crawlers are not supposed to be able to discover it." Every crawler: stay out.
+User-agent: *
+Disallow: /

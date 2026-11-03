@@ -526,8 +526,7 @@ C. NEW: what the staff will notice (tell them before):
 D. Accounts and keys:
   17. Delete the test accounts, keep his master account, after a word with
       the director (113, NDPA).
-  18. Hand over fresh keys: delete the github-ci Supabase token and the
-      Cloudflare API token, make new ones owned by the hospital.
+  18. (Dropped 2026-11-03, his decision: the keys stay as they are.)
   19. NEW: rename the Supabase project ("rhemamedical7@gmail.com's
       Project") to rhema-hospital.
   20. NEW: check live has no demo rows (the demo data was testing only).
@@ -535,12 +534,22 @@ D. Accounts and keys:
 E. Watching after the move:
   21. NEW: the first nightly backup after the move passes, including the
       new "messages older than a year" step.
-  22. The AWS uptime watcher on the real address (74), when his AWS
-      account is ready.
+  22. The AWS uptime watcher (74): set up 2026-11-03 if his phone code
+      arrives; on the 6th it is pointed at the real address.
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
       and why, and who answers for data protection at the hospital.
+
+136. **Not findable online.** (2026-11-03) "this is an internal tool...
+    It's not supposed to be a public internet... it's not something that
+    you just discover online. Google doesn't need to discover it online.
+    Crawlers are not supposed to be able to discover it." Done 2026-11-03:
+    robots.txt says Disallow for every crawler, and every page and answer
+    carries "X-Robots-Tag: noindex, nofollow, noarchive, nosnippet".
+    Keys (2026-11-03): no need to change the Supabase key at handover;
+    "Is it not the same key you have been using? Why change it?" (Decided.)
+    AWS uptime watcher: today, if his phone code arrives.
 
 ### Standing instructions
 

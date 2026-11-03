@@ -149,9 +149,13 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
-    if (url.pathname.startsWith('/api/')) {
-      return handleApi(request, env)
-    }
-    return env.ASSETS.fetch(request)
+    // A private hospital tool: nothing it answers may be indexed
+    // (request 136). The screens get the same header from web/public/_headers.
+    const response = url.pathname.startsWith('/api/')
+      ? await handleApi(request, env)
+      : await env.ASSETS.fetch(request)
+    const answered = new Response(response.body, response)
+    answered.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+    return answered
   },
 }

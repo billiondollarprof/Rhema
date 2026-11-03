@@ -102,7 +102,14 @@ jobs:
           test -n "$url" || { echo "No workers.dev address found in the deploy output"; exit 1; }
           for i in 1 2 3 4 5 6; do
             if curl -fsS "$url/api/health" | grep -q '"ok":true' && curl -fsS -o /dev/null "$url/" && curl -fsS -o /dev/null "$url/sign-in/"; then
-              echo "Smoke test passed: $url"; exit 0
+              echo "Smoke test passed: $url"
+              # Request 136: a private tool, never indexed. Proved on every deploy.
+              curl -fsS "$url/robots.txt" | grep -q "^Disallow: /$" \
+                || { echo "robots.txt does not keep crawlers out"; exit 1; }
+              curl -fsS -D - -o /dev/null "$url/sign-in/" | grep -qi "^x-robots-tag: noindex" \
+                || { echo "The no-index header is missing"; exit 1; }
+              echo "Crawlers are kept out: robots.txt and the no-index header are in place."
+              exit 0
             fi
             sleep 10
           done
