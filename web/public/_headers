@@ -1,0 +1,5 @@
+# Cloudflare sends these headers with every screen (request 136).
+# A private hospital tool: never indexed, never shown in search results,
+# never kept in a search engine's copy.
+/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
