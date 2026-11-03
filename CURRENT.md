@@ -541,16 +541,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
       and why, and who answers for data protection at the hospital.
 
-136. **Not findable online.** (2026-11-03) "this is an internal tool...
-    It's not supposed to be a public internet... it's not something that
-    you just discover online. Google doesn't need to discover it online.
-    Crawlers are not supposed to be able to discover it." Done 2026-11-03:
-    robots.txt says Disallow for every crawler, and every page and answer
-    carries "X-Robots-Tag: noindex, nofollow, noarchive, nosnippet".
-    Keys (2026-11-03): no need to change the Supabase key at handover;
-    "Is it not the same key you have been using? Why change it?" (Decided.)
-    AWS uptime watcher: today, if his phone code arrives.
-
 ### Standing instructions
 
 These never come off the list.
@@ -596,6 +586,14 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-03: the Supabase keys stay as they are at handover. "Is it not
+  the same key you have been using? Why change it?" He may rename the
+  project on the 6th.
+
+- 2026-11-03: the order on 6 November morning is: move the domain to the
+  hospital's Cloudflare account, then Resend, then Email Routing, then
+  the agent's part (the handover checklist above).
 
 - 2026-11-02 evening: "Anything that doesn't involve me... you just do
   them. If you are going to run SQL, just show me the bash. Run them.

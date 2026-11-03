@@ -781,3 +781,13 @@ this file.
     (2026-11-02) Messages, announcements, lab results ready, and work
     waiting for each role, in whole sentences that open their place; a red
     bubble with the total on the menu button. Live 2026-11-02.
+
+136. **Not findable online.** (2026-11-03) "this is an internal tool...
+    It's not supposed to be a public internet... it's not something that
+    you just discover online. Google doesn't need to discover it online.
+    Crawlers are not supposed to be able to discover it." Live and checked 2026-11-03:
+    robots.txt says Disallow for every crawler, and every page and answer
+    carries "X-Robots-Tag: noindex, nofollow, noarchive, nosnippet".
+    Keys (2026-11-03): no need to change the Supabase key at handover;
+    "Is it not the same key you have been using? Why change it?" (Decided.)
+    AWS uptime watcher: today, if his phone code arrives.
