@@ -544,10 +544,20 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
 137. **His own walk through all 13 modules.** (2026-11-04) "I want to go
     through all 13 modules and go through the entire system myself... I'll
     go from front desk to the last and test every single section of it
-    myself. And I hope you populated them with dummy data." The demo data
-    from 2026-10-31 covers patients, queue, lab and payments only. A top
-    up for the newer modules (pharmacy, messages, announcements, families,
-    files, record notes) is offered, waiting for his yes and the SQL.
+    myself. And I hope you populated them with dummy data." Then: "yes, top
+    up, and make me front desk... look into the SQL properly and then run
+    it. I'll give you my yes in advance." Top up: ops/testing-topup.sql,
+    run by .github/workflows/testing-topup.yml on testing only. Checked on
+    the local database first (twice, and a second run changes nothing).
+    He is Front Desk on testing from 2026-11-04.
+
+138. **FAULT, found 2026-11-04 by the top up: saving blood group,
+    genotype or the antenatal details (Profile, in the record) fails, on
+    testing and on live.** The activity log needs an id column, and
+    medical_profiles has none (its key is patient_id), so every save is
+    refused. No test ever saved a profile. Fix: one migration that makes
+    private.write_activity() use patient_id when there is no id, plus a
+    test. Waiting for his yes, because it is SQL on live.
 
 ### Standing instructions
 
