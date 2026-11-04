@@ -791,3 +791,10 @@ this file.
     Keys (2026-11-03): no need to change the Supabase key at handover;
     "Is it not the same key you have been using? Why change it?" (Decided.)
     AWS uptime watcher: today, if his phone code arrives.
+
+139. **Find patient on Register did not look like a button.** (2026-11-04)
+    "It's almost not looking like a button. Somebody can mistake it and not
+    know that that's a button." Live and checked 2026-11-04: now the same
+    raised button as Register from old file, in the app's blue. Screenshots
+    at 390, 820 and 1440; it opens Find patient; layout check passed on 25
+    screens.

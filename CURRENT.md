@@ -549,7 +549,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     it. I'll give you my yes in advance." Top up: ops/testing-topup.sql,
     run by .github/workflows/testing-topup.yml on testing only. Checked on
     the local database first (twice, and a second run changes nothing).
-    He is Front Desk on testing from 2026-11-04.
+    Ran on testing 2026-11-04: "Top up added: 3 staff, 1 family of 3,
+    records for 3 patients, 3 prescriptions, 5 messages, 1 announcement."
+    He is Front Desk on testing from 2026-11-04. Open until his walk is done.
 
 138. **FAULT, found 2026-11-04 by the top up: saving blood group,
     genotype or the antenatal details (Profile, in the record) fails, on
@@ -558,6 +560,74 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     refused. No test ever saved a profile. Fix: one migration that makes
     private.write_activity() use patient_id when there is no id, plus a
     test. Waiting for his yes, because it is SQL on live.
+
+140. **Moving a patient who is already in a room, and marking that they
+    left.** (2026-11-04) "When a patient is also already in a room, you
+    can't send the patient data to another room... a patient is in a
+    laboratory, but doctor calls... there's no way for somebody to know
+    that the patient left a particular room. Is there a way, like, okay,
+    person has left, it marks the time the patient left? Or a patient who
+    have been sent to consultant room 1 since 48 hours ago, it will still
+    be showing consultant room 1. There has to be a way." He also settled:
+    a doctor does not need the record sent; a doctor finds any registered
+    patient and sees the updated record. Proposal sent 2026-11-04, waiting
+    for his yes and his pick on old visits.
+    Also 2026-11-04: show the SQL and wait before running it (the profile
+    fix, 138).
+
+141. **Payment at registration.** (2026-11-04) "Why is it that during
+    registration there's no place where payment was mentioned? In the demo
+    I gave you, I had payment... registration is like they are buying
+    card... they used to pay some amount of money... even if they can still
+    add payment later for something, but there's payments during
+    registration."
+
+142. **Chats scoped to departments, plus one general chat.** (2026-11-04)
+    "people should see chats that is in their own department... it did not
+    even put front desk... there should be a general chat that everybody in
+    the hospital sees... if Matron started chatting nursing station, then
+    the particular matron that was chatting nursing station is the only
+    matron that sees that chat, apart from the nurses in the nursing
+    stations... If it's all nursing station, then it's all. If it's nursing
+    station one, then it's nursing station one... if you are not in that
+    department, but you started a chat for that department... only you see
+    what you are sending to that department with the department... If I
+    click all consultants rooms, I will not see the chat [sent to
+    Consultant Room 1]. I can only start a new chat."
+
+143. **A message appears at once when sent, and keeps trying without
+    network.** (2026-11-04) "When you type message and you send, you should
+    send immediately... Let it just at least appear in the chat before...
+    it is being sent."
+
+144. **Edit a sent message.** (2026-11-04) "When you send a message and you
+    want to edit it... in case you made a mistake... You hold on to the
+    message and edit it."
+
+145. **Switching pages is slow to show data.** (2026-11-04) "switching from
+    one of those page to another page, sometimes it's like there's a little
+    bit of delay in loading data." Notifications took a few seconds to open.
+
+146. **Patients seen chart on Home shows nothing.** (2026-11-04) "check it
+    that it's working, because even now that we have demo data, the demo
+    data does not even make it work."
+
+147. **How a visit ends, at every room.** (2026-11-04) "can the consultant
+    check the person out?... how do you know that consultant is done with a
+    particular person? Is it when he calls the second person in?... Then
+    what about pharmacy? What about laboratory?... Also check how others do
+    it." Goes with 140.
+
+148. **FAULT: opening a notification goes to Home.** (2026-11-04) "I saw a
+    notification, I clicked open. It took me back to the home page... you're
+    not even supposed to be clicking open... just be clicking a maybe a drop
+    down to review all the notification... fold it back, open the next
+    one."
+
+149. **Test every button properly, and look for oversights.** (2026-11-04)
+    "take your time to check not just the fixes you did, but also each and
+    every button in this place... Anything that doesn't look right, take
+    your time." And: "now run your SQL" (the profile fix, 138).
 
 ### Standing instructions
 
