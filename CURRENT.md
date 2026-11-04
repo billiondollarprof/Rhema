@@ -536,6 +536,12 @@ E. Watching after the move:
       new "messages older than a year" step.
   22. The AWS uptime watcher (74): set up 2026-11-03 if his phone code
       arrives; on the 6th it is pointed at the real address.
+      2026-11-04: the new AWS account offered no $200 credit (AWS says it
+      is linked to an older account of his) and asks for a card first. He
+      may use the older account. Advised: either works, the watcher stays
+      inside the always-free allowance; use the company account, choose
+      the Paid plan (the Free plan closes after 6 months), MFA and the $1
+      budget, then "AWS done".
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
