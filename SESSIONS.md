@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-04: he began his own walk (137), as Front Desk. Testing top up
+  ran (pharmacy, messages, a family, records, an announcement), checked on
+  the local database first. The top up found a real fault (138): saving a
+  Profile (blood group, genotype) fails on testing and live. Fix waits for
+  his yes. Find patient on Register made a real button (139), live.
+
 - 2026-11-03: 136 live (robots.txt Disallow and a no-index header on
   every answer; the live smoke test now checks both). Keys stay, order
   for the 6th recorded. Next: the AWS uptime watcher today, once his

@@ -549,7 +549,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     it. I'll give you my yes in advance." Top up: ops/testing-topup.sql,
     run by .github/workflows/testing-topup.yml on testing only. Checked on
     the local database first (twice, and a second run changes nothing).
-    He is Front Desk on testing from 2026-11-04.
+    Ran on testing 2026-11-04: "Top up added: 3 staff, 1 family of 3,
+    records for 3 patients, 3 prescriptions, 5 messages, 1 announcement."
+    He is Front Desk on testing from 2026-11-04. Open until his walk is done.
 
 138. **FAULT, found 2026-11-04 by the top up: saving blood group,
     genotype or the antenatal details (Profile, in the record) fails, on
