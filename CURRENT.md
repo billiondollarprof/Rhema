@@ -554,6 +554,16 @@ E. Watching after the move:
       State 2026-11-04 (his screenshot): the StellaXafe account is open,
       $100 credit, spend limit $20, a card saved. Next for him: MFA (via
       "Manage security and sign-in"), then the $1 budget alarm.
+      2026-11-04 later: MFA done ("MFA1, TOTP"). Watcher BUILT in aws/
+      (uptime_watcher.py, 35 tests, 18 deliberate breaks caught,
+      template.yaml passes cfn-lint, aws-watcher.yml, README with his
+      steps). Waiting for him: upload template.yaml in CloudFormation
+      (Ireland), confirm the SNS email, give me DeployRoleArn. Then: put it
+      in aws/target.json, merge to main, the workflow deploys and runs it
+      once in test mode. On the 6th: change the address in aws/sites.json.
+      Least access: watcher = one table + one topic; deploy role = one
+      function, main branch of this repo only, no keys anywhere.
+      Not yet checked: the $1 budget alarm (the $20 spend limit is set).
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept

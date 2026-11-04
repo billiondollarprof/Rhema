@@ -1,0 +1,202 @@
+# template.yaml: everything the uptime watcher needs in AWS, in one file.
+#
+# Why: Anthony uploads this one file in the AWS console (CloudFormation, the
+# AWS tool that builds things from a file). No clicking through ten screens,
+# and no access keys anywhere. AWS builds all of this:
+#   - a Lambda function (code that AWS runs for us) that checks the hospitals;
+#   - a clock (EventBridge) that runs it every 5 minutes;
+#   - a small table (DynamoDB) that remembers which hospitals are down;
+#   - an SNS topic (AWS's email sender) that emails the alerts;
+#   - an alarm that emails when the watcher itself breaks;
+#   - a deploy role, so GitHub can put new watcher code in AFTER this, with
+#     no password or key (GitHub proves who it is to AWS each time).
+#
+# The watcher's own code is not in this file. It starts as a placeholder,
+# and .github/workflows/aws-watcher.yml puts aws/uptime_watcher.py in.
+#
+# Least access, each with its reason (CLAUDE.md section 10):
+#   - the watcher can read and write ONE table and publish to ONE topic;
+#   - the deploy role can change, run and read ONE function, and only when
+#     the request comes from the main branch of Anthony's repository.
+#
+# Never: put a key or a password in this file.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: StellaXafe uptime watcher, checks every hospital from outside Cloudflare
+
+Parameters:
+  AlertEmail:
+    Type: String
+    Description: The email that gets DOWN and BACK UP alerts
+    AllowedPattern: '[^@\s]+@[^@\s]+\.[^@\s]+'
+    ConstraintDescription: Type an email address, like name@example.com
+  GitHubRepo:
+    Type: String
+    Default: billiondollarprof/Rhema
+    Description: The repository allowed to deploy the watcher code
+
+Resources:
+  # ===== 1. The email sender =====
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: stellaxafe-uptime-alerts
+
+  AlertSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref AlertTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  # ===== 2. What the watcher remembers =====
+  # One row per hospital. Provisioned at 1 read and 1 write a second, which
+  # is inside the always free allowance of DynamoDB.
+  StateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: stellaxafe-uptime-state
+      AttributeDefinitions:
+        - AttributeName: site
+          AttributeType: S
+      KeySchema:
+        - AttributeName: site
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  # ===== 3. The watcher =====
+  WatcherRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        # Lets the function write its own log lines, nothing else.
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: watcher-own-table-and-topic
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                Resource: !GetAtt StateTable.Arn
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref AlertTopic
+
+  # The placeholder code only says it has not been deployed yet. The GitHub
+  # workflow replaces it with aws/uptime_watcher.py and sets the handler.
+  WatcherFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: stellaxafe-uptime-watcher
+      Runtime: python3.13
+      Architectures: [arm64]
+      Handler: index.handler
+      Timeout: 120
+      MemorySize: 128
+      Role: !GetAtt WatcherRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref StateTable
+          TOPIC_ARN: !Ref AlertTopic
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {"deployed": False}
+
+  # ===== 4. The clock: every 5 minutes =====
+  WatcherClock:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: stellaxafe-uptime-every-5-minutes
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets:
+        - Id: watcher
+          Arn: !GetAtt WatcherFunction.Arn
+
+  ClockMayRunWatcher:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref WatcherFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt WatcherClock.Arn
+
+  # ===== 5. An alarm for the watcher itself =====
+  # If the watcher breaks, it cannot email about it. This alarm can: one
+  # error in 5 minutes emails the same address.
+  WatcherBrokenAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: stellaxafe-uptime-watcher-broken
+      AlarmDescription: The uptime watcher itself failed to run. Hospitals are NOT being watched.
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref WatcherFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertTopic
+
+  # ===== 6. GitHub may deploy the watcher code, and nothing else =====
+  GitHubProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: stellaxafe-uptime-deploy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                # Only the main branch of this repository, never another
+                # repository and never another branch.
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepo}:ref:refs/heads/main
+      Policies:
+        - PolicyName: deploy-and-test-the-one-function
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:UpdateFunctionCode
+                  - lambda:UpdateFunctionConfiguration
+                  - lambda:GetFunction
+                  - lambda:InvokeFunction
+                Resource: !GetAtt WatcherFunction.Arn
+
+Outputs:
+  DeployRoleArn:
+    Description: Give this to Claude, so GitHub can deploy the watcher code
+    Value: !GetAtt DeployRole.Arn
+  FunctionName:
+    Value: !Ref WatcherFunction

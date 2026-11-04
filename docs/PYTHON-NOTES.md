@@ -32,3 +32,12 @@ the file where you can see it working. Read this to revise.
 | `.items()` on a dictionary | Give each pair (the name and its value) one at a time, for a loop. | `ops/supabase_check.py` |
 | `str(x)` | Turn a number or `True`/`False` into text, so it can join other text. | `ops/supabase_check.py` |
 | `if ... else` | Do one set of steps when something is true, and the other set when it is not. | `ops/supabase_check.py` |
+| `try` ... `except` | Try some steps. If one fails, run the `except` steps instead of stopping. | `aws/uptime_watcher.py` |
+| `try` ... `else` | Steps that run only when the `try` did not fail. | `aws/uptime_watcher.py` |
+| default value in a function, `name=value` | If nobody gives this value, use the one written here. | `aws/uptime_watcher.py` |
+| a function as a value | A function can be handed to another function, like a tool passed along. The tests hand in a pretend one. | `aws/uptime_watcher.py` |
+| `lambda site: ...` | A tiny function written in one line, with no name. | `aws/uptime_watcher.py` |
+| `class` | A bundle of functions and values that belong together. `self` means this bundle. | `aws/uptime_watcher.py` |
+| `isinstance(x, dict)` | Ask: is this a dictionary? | `aws/uptime_watcher.py` |
+| `ThreadPoolExecutor` and `.map` | Do the same job for many items at the same time, then collect the answers in order. | `aws/uptime_watcher.py` |
+| `unittest` | Python's own tool for tests: each test is a function that checks one thing. | `aws/test_uptime_watcher.py` |

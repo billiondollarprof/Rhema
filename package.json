@@ -13,7 +13,7 @@
     "check:lint": "npm run lint --workspace web",
     "check:types": "npm run typecheck --workspace web && npm run typecheck --workspace worker",
     "check:tests": "npm run test --workspace web && npm run test --workspace worker",
-    "check:python": "python3 checks/copy_check.py",
+    "check:python": "python3 checks/copy_check.py && python3 -B -m unittest discover -s aws -p \"test_*.py\"",
     "build": "npm run build --workspace web",
     "verify": "npm run check:format && npm run check:lint && npm run check:types && npm run check:tests && npm run check:python && npm run build",
     "deploy": "npm run build && wrangler deploy"
