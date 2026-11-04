@@ -567,13 +567,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Also 2026-11-04: show the SQL and wait before running it (the profile
     fix, 138).
 
-141. **Payment at registration.** (2026-11-04) "Why is it that during
-    registration there's no place where payment was mentioned? In the demo
-    I gave you, I had payment... registration is like they are buying
-    card... they used to pay some amount of money... even if they can still
-    add payment later for something, but there's payments during
-    registration."
-
 142. **Chats scoped to departments, plus one general chat.** (2026-11-04)
     "people should see chats that is in their own department... it did not
     even put front desk... there should be a general chat that everybody in
@@ -591,13 +584,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     want to edit it... in case you made a mistake... You hold on to the
     message and edit it."
 
-146. **Patients seen chart on Home shows nothing.** (2026-11-04) "check it
-    that it's working, because even now that we have demo data, the demo
-    data does not even make it work." Checked 2026-11-04: the chart works;
-    it counts finished visits, and the demo data has none. ops/testing-
-    visits.sql adds a year of made up finished visits (tested locally:
-    27 this week, 121 this month). Waiting for his yes to run it.
-
 147. **How a visit ends, at every room.** (2026-11-04) "can the consultant
     check the person out?... how do you know that consultant is done with a
     particular person? Is it when he calls the second person in?... Then
@@ -608,6 +594,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     "take your time to check not just the fixes you did, but also each and
     every button in this place... Anything that doesn't look right, take
     your time." And: "now run your SQL" (the profile fix, 138).
+
+**Built 2026-11-04, waiting for his yes on the SQL** (140, 142, 144, 147):
+migrations 20261104061628_messages_general_tags_edits and
+20261104061952_visit_endings, tests 020 and 021, every deliberate break
+caught (8 and 9). Screens built and walked through with made up data:
+General, Reply, @ tags, Edit for 15 minutes; Move to another room, Has
+left, Today on the patient, calling in the next patient ends the one
+before; the nightly job ends open visits (backup.yml step 6c). On the
+working branch only: pushing to testing runs the SQL, so it waits.
 
 ### Standing instructions
 

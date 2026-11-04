@@ -9,6 +9,11 @@
  * The facts are in three small groups (the patient, how to reach them,
  * next of kin), so on a wide screen they line up in tidy rows.
  *
+ * Visits (requests 140 and 147, 2026-11-04): a patient already in a room
+ * can be moved to another one; the Front Desk and admins can mark that
+ * the patient has left; and Today lists where the patient has been, from
+ * when to when, and how each visit ended.
+ *
  * Never: show the medical record here. It gets its own page, open only to
  * doctors, nurses and the matron, and every opening is logged. This card
  * only shows the "Medical record" button to staff with that access.
@@ -26,7 +31,13 @@ import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
 import { sexWords, type PatientResult } from '@/lib/patients/patients'
-import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
+import {
+  CATEGORY_LABELS,
+  FINISH_WORDS,
+  STATUS_LABELS,
+  markLeft,
+  type QueueStatus,
+} from '@/lib/queue/queue'
 
 type DetailProps = {
   client: SupabaseClient
@@ -46,6 +57,11 @@ export function lastSeenWords(isoTime: string | null): string {
   })
 }
 
+// "10:42", for the Today list.
+function clock(isoTime: string): string {
+  return new Date(isoTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
+
 export default function PatientDetail({
   client,
   staffId,
@@ -56,6 +72,22 @@ export default function PatientDetail({
 }: DetailProps) {
   const [sending, setSending] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
+  const [leaving, setLeaving] = useState(false)
+  const [leaveProblem, setLeaveProblem] = useState<string | null>(null)
+
+  // Has left: ends the visit the patient is in now, with the time.
+  async function hasLeft() {
+    if (!patient.open_visit) return
+    setLeaving(true)
+    setLeaveProblem(null)
+    const problem = await markLeft(client, patient.open_visit.id)
+    setLeaving(false)
+    if (problem) setLeaveProblem(problem)
+    else {
+      setSentTo(null)
+      onChanged()
+    }
+  }
 
   // ===== 1. The facts, in the order the front desk asks for them =====
   const groups: { title: string; facts: [string, string][] }[] = [
@@ -136,6 +168,25 @@ export default function PatientDetail({
         </div>
       ))}
 
+      {/* ===== Today: where the patient has been ===== */}
+      {patient.today.length ? (
+        <div className={styles.factGroup}>
+          <h3>Today</h3>
+          <ol className={styles.trail}>
+            {patient.today.map((visit) => (
+              <li key={visit.from}>
+                <b>{visit.room}</b>
+                <span>
+                  {clock(visit.from)}
+                  {visit.to ? ` to ${clock(visit.to)}` : ' · here now'}
+                  {visit.reason ? ` · ${FINISH_WORDS[visit.reason] ?? ''}` : ''}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+
       {/* The family: its number, the other members, Add family member. */}
       <FamilyCard client={client} patient={patient} />
 
@@ -149,6 +200,7 @@ export default function PatientDetail({
           staffId={staffId}
           patientId={patient.id}
           patientName={patient.full_name}
+          openVisit={patient.open_visit}
           onCancel={() => setSending(false)}
           onSent={(room) => {
             setSending(false)
@@ -160,14 +212,18 @@ export default function PatientDetail({
         <div className={styles.buttons}>
           <button
             className={`${styles.button} ${styles.primary}`}
-            disabled={Boolean(patient.open_visit)}
             onClick={() => {
               setSentTo(null)
               setSending(true)
             }}
           >
-            Send to room
+            {patient.open_visit ? 'Move to another room' : 'Send to room'}
           </button>
+          {patient.open_visit && canPay ? (
+            <button className={styles.button} disabled={leaving} onClick={hasLeft}>
+              {leaving ? 'Saving…' : 'Has left'}
+            </button>
+          ) : null}
           {canMedical ? (
             <Link className={styles.button} href={`/patients/record/?p=${patient.id}`}>
               Medical record
@@ -178,11 +234,7 @@ export default function PatientDetail({
           </Link>
         </div>
       )}
-      {patient.open_visit && !sending ? (
-        <p className={styles.muted}>
-          This patient is already in a room. They can be sent again once that visit is finished.
-        </p>
-      ) : null}
+      {leaveProblem ? <p className={styles.error}>{leaveProblem}</p> : null}
     </section>
   )
 }

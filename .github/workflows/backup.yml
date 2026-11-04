@@ -162,6 +162,16 @@ jobs:
             psql "$URL" -tA -c "select private.forget_old_messages()")
           echo "Messages and announcements older than a year deleted: $gone"
 
+      # ===== 6c. The end of the day: visits still open are ended =====
+      # Anthony, 2026-11-04 (requests 140 and 147): a patient sent to a room
+      # yesterday and never finished should not still show in that room.
+      # Each one is ended with the reason "end_of_day", never deleted.
+      - name: End yesterday's open visits
+        run: |
+          ended=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
+            psql "$URL" -tA -c "select private.close_old_visits()")
+          echo "Visits still open from before today, now ended: $ended"
+
       # ===== 7. The lab result files: copy the new ones, each locked =====
       - name: Copy new lab result files
         run: |

@@ -69,12 +69,24 @@ async function alreadySaved(client: SupabaseClient, task: OutboxTask): Promise<b
 async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask) {
   // A message carries its own key: sending it again is the same message.
   if (task.kind === 'message') {
-    const { error } = await client.rpc('send_message', {
-      to_kind: task.toKind,
-      to_room: task.toRoom,
-      body: task.body,
-      client_key: task.clientKey,
-    })
+    // Tasks saved before General and tags (2026-11-04) use the old door.
+    const newer = task.toEveryone !== undefined
+    const { error } = newer
+      ? await client.rpc('send_message_to', {
+          to_kind: task.toKind,
+          to_room: task.toRoom,
+          to_everyone: task.toEveryone,
+          body: task.body,
+          client_key: task.clientKey,
+          reply_to: task.replyTo ?? null,
+          mention: task.mention ?? null,
+        })
+      : await client.rpc('send_message', {
+          to_kind: task.toKind,
+          to_room: task.toRoom,
+          body: task.body,
+          client_key: task.clientKey,
+        })
     if (isNetworkFailure(error)) return false
     if (error) markFailed(staffId, task.id, 'Could not be sent. Open Messages and send it again.')
     else removeFromOutbox(staffId, task.id)
