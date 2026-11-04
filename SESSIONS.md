@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-04 night: testing back to Rhema; the brand switch stays (one
+  line in ops/pitch.json, skill pitch-client). Automations is in the menu
+  on every build, live included, by his word. Layout check now covers 26
+  screens.
+
 - 2026-11-04 evening: chat and visit SQL live (his yes); the security
   check found 1 warning on testing (message_edits had no written rule),
   fixed with a small follow-up migration before live; 0 warnings live.
