@@ -559,20 +559,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
-150. **Pitch a new client on the testing site: MASCAP.** (2026-11-04) "I
-    want to use the same remote testing platform to pitch the client...
-    the name of the hospital... is MASCAP... we hide the logo of Rema and
-    the name, and just change it to MASCAP Medical Center... hide the logo
-    and just put MA as the logo, just like we had ROH or Rema before...
-    at the back of the hamburger menu, put automations there... the
-    WhatsApp messaging stuff that we are going to automate, the birthday,
-    happy birthday... put them as coming soon... it's just on the testing
-    branch, so we can hide it later... anytime we want to pitch a new
-    client, you hide the Rema stuff and put the name of the client."
-    He will confirm "Medical Center" when he gets there.
-    Later the same day: "Change name to LANA Medical Center. I have left
-    mascap." So testing shows LANA Medical Centre, letters LA.
-
 ### Standing instructions
 
 These never come off the list.
@@ -618,6 +604,12 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-04: pitches keep the brand switch: "next time switching it
+  becomes just one switch" (skill pitch-client, ops/pitch.json). Testing
+  is back to Rhema. Automations stays in the menu on every build, live
+  included: "the automation section, don't remove it... Keep it at the
+  menu icon there... they will see that that's the next thing on the line."
 
 - 2026-11-04, his answers to the say backs:
   - 141 "fee can be left empty"; Register from old file "not necessarily
