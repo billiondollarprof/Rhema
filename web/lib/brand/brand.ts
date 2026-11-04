@@ -13,8 +13,10 @@
  *     {"brand": "mascap"} shows MASCAP. A new client is a new entry below
  *     plus its icons in web/brands/<key>/ (scripts/pitch-brand.mjs).
  *
- * pitch: true also shows Automations in the menu, the list of what is
- * coming next, for the meeting.
+ * Automations is in the menu on every build, Rhema included (Anthony,
+ * 2026-11-04: "the automation section, don't remove it... Keep it at the
+ * menu icon there... they will see that that's the next thing on the
+ * line"), so it does not depend on the brand.
  *
  * Never: let a pitch brand reach the live site, or put a real patient's
  * detail into a brand.
@@ -31,8 +33,6 @@ export type Brand = {
   initials: string | null
   // The receipt's address line; empty leaves it out.
   address: string
-  // Shows Automations in the menu (pitch only).
-  pitch: boolean
 }
 
 // ===== 2. The hospitals =====
@@ -43,7 +43,6 @@ const BRANDS: Record<string, Brand> = {
     short: 'RHEMA',
     initials: null,
     address: 'Former License Office by Ojolu Junction, Sapele, Delta State, Nigeria',
-    pitch: false,
   },
   lana: {
     key: 'lana',
@@ -51,7 +50,6 @@ const BRANDS: Record<string, Brand> = {
     short: 'LANA',
     initials: 'LA',
     address: '',
-    pitch: true,
   },
   mascap: {
     key: 'mascap',
@@ -59,7 +57,6 @@ const BRANDS: Record<string, Brand> = {
     short: 'MASCAP',
     initials: 'MA',
     address: '',
-    pitch: true,
   },
 }
 

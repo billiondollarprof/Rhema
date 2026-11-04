@@ -879,3 +879,22 @@ this file.
     what about pharmacy? What about laboratory?... Also check how others do
     it." Goes with 140.
     140, 142, 144, 147: Live and checked 2026-11-04: migrations 20261104061628_messages_general_tags_edits, 20261104061952_visit_endings and 20261104110430_message_edits_closed on testing and live, 0 security warnings, tests 020 to 022, 18 deliberate breaks all caught. Walked through at 390 and 1280: General first, Reply with its quote, @ offers the people of that room, Edit only on your own message, For you; Move to another room, Has left, Today on the patient. The nightly job ends open visits (backup.yml step 6c).
+
+150. **Pitch a new client on the testing site: MASCAP.** (2026-11-04) "I
+    want to use the same remote testing platform to pitch the client...
+    the name of the hospital... is MASCAP... we hide the logo of Rema and
+    the name, and just change it to MASCAP Medical Center... hide the logo
+    and just put MA as the logo, just like we had ROH or Rema before...
+    at the back of the hamburger menu, put automations there... the
+    WhatsApp messaging stuff that we are going to automate, the birthday,
+    happy birthday... put them as coming soon... it's just on the testing
+    branch, so we can hide it later... anytime we want to pitch a new
+    client, you hide the Rema stuff and put the name of the client."
+    He will confirm "Medical Center" when he gets there.
+    Later the same day: "Change name to LANA Medical Center. I have left
+    mascap." So testing shows LANA Medical Centre, letters LA.
+    Live and checked 2026-11-04: lib/brand/brand.ts holds the name and mark,
+    ops/pitch.json picks the hospital shown on testing (live is always
+    Rhema), scripts/brand-icons.cjs and pitch-brand.mjs make and place the
+    icons, skill pitch-client. Shown as MASCAP, then LANA, then back to
+    Rhema. Automations (11 coming soon) is in the menu on every build.

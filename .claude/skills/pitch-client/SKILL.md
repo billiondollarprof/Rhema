@@ -1,6 +1,6 @@
 ---
 name: pitch-client
-description: Show the TESTING site as another hospital for a pitch - its name, its letters as the mark, its app icons, and the Automations (coming soon) page - or put Rhema back. Use when Anthony says "we are pitching <hospital>", "change testing to <name>", or "put Rhema back on testing".
+description: Show the TESTING site as another hospital for a pitch - its name, its letters as the mark and its app icons - or put Rhema back. Automations (coming soon) is in the menu on every build. Use when Anthony says "we are pitching <hospital>", "change testing to <name>", or "put Rhema back on testing".
 ---
 
 # pitch-client
@@ -18,7 +18,7 @@ the made up patients stay (their numbers still start RMC).
 
 1. **Add the client** to `BRANDS` in `web/lib/brand/brand.ts`: key (lower
    case, no spaces), name ("MASCAP Medical Centre"), short ("MASCAP"),
-   initials ("MA"), address (empty if unknown), `pitch: true`.
+   initials ("MA"), address (empty if unknown).
 2. **Make its icons:**
    ```
    node scripts/brand-icons.cjs <key> <LETTERS>

@@ -8,19 +8,17 @@
  * happy birthday... put them as coming soon. So when I open it, it's
  * looking like I already have a demo for them."
  *
- * It shows only on a pitch build (lib/brand/brand.ts, pitch: true); on any
- * other build the page sends the person Home and the menu hides it.
+ * Then, when testing went back to Rhema: "the automation section, don't
+ * remove it... Keep it at the menu icon there... they will see that that's
+ * the next thing on the line." So it is in the menu on every build.
  *
  * Never: send anything from here. Nothing on this page is switched on yet.
  */
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import styles from './automations.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
-import { BRAND } from '@/lib/brand/brand'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -113,14 +111,8 @@ const FOR_THE_HOSPITAL: Automation[] = [
 export default function AutomationsPage() {
   const auth = useAuth()
   useRightPage(auth.status, '/automations/')
-  const router = useRouter()
 
-  // ===== 2. Only on a pitch build =====
-  useEffect(() => {
-    if (!BRAND.pitch) router.replace('/')
-  }, [router])
-
-  if (auth.status !== 'ready' || !BRAND.pitch) return null
+  if (auth.status !== 'ready') return null
 
   return (
     <AppShell>

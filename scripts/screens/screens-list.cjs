@@ -29,6 +29,7 @@ module.exports.SCREENS = [
   { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },
   { path: '/announce/', waitFor: 'Show on Home until', medical: true },
   { path: '/notifications/', waitFor: 'Notifications' },
+  { path: '/automations/', waitFor: 'Happy birthday' },
   {
     path: '/payments/receipt/?id=1',
     waitFor: 'RHEMA MEDICAL CENTRE',
