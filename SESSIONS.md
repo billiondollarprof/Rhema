@@ -4,6 +4,14 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-04 evening: chat and visit SQL live (his yes); the security
+  check found 1 warning on testing (message_edits had no written rule),
+  fixed with a small follow-up migration before live; 0 warnings live.
+  150: the hospital's name and mark now come from lib/brand/brand.ts;
+  testing shows LANA Medical Centre (he left MASCAP), letters LA, with
+  Automations (coming soon) in the menu. Live stays Rhema (checked in the
+  deploy log). New skill: pitch-client.
+
 - 2026-11-04 afternoon: his answers recorded. 141 (card fee) live, 146
   visit history ran on testing. 140, 142, 144 and 147 built and tested
   locally (two migrations, 17 deliberate breaks all caught), waiting for
