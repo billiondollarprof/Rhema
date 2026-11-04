@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-03: 136 live (robots.txt Disallow and a no-index header on
+  every answer; the live smoke test now checks both). Keys stay, order
+  for the 6th recorded. Next: the AWS uptime watcher today, once his
+  phone code arrives.
+
 ## Session 2: 2026-10-27, the foundation
 
 - LICENSE written to his rule: the hospital owns this project, StellaXafe

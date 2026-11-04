@@ -1,0 +1,47 @@
+# testing-topup.yml: more made up data on the TESTING site, for the parts
+# built after the first demo data (request 137, 2026-11-04: "I want to go
+# through all 13 modules... I hope you populated them with dummy data").
+#
+# What it adds is listed at the top of ops/testing-topup.sql: 3 more staff
+# who can never sign in, 1 family of 3, records for 3 patients, 3
+# prescriptions, 5 messages and 1 announcement. Once only: a second run
+# changes nothing.
+#
+# Why a separate workflow: testing-seed.yml has already run, and it stops
+# at once when its patients are there, so it cannot add anything new.
+#
+# Never: point this at the live project. The testing project is fixed below,
+# and the job refuses to run if the connection is the live one.
+
+name: Testing demo data (top up)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  topup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      REF: nfrvwvqmfxudaarfuwxg
+      PGPASSWORD: ${{ secrets.SUPABASE_TESTING }}
+    steps:
+      # 1. Get ops/testing-topup.sql.
+      - uses: actions/checkout@v6
+
+      - name: Make sure psql is installed
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      # 2. Connect to the testing database only, then run the top up.
+      - name: Add the top up
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$REF/config/database/pooler")
+          export PGHOST=$(echo "$pooler" | jq -r '.[0].db_host')
+          export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
+          export PGPORT=5432 PGDATABASE=postgres
+          case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: that is the live project"; exit 1 ;; esac
+          psql -v ON_ERROR_STOP=1 -q -f ops/testing-topup.sql

@@ -460,6 +460,12 @@
   border-bottom-width: 2px;
 }
 
+/* Find patient beside it, the same raised button in the app's blue, so it
+   reads as a button and not as text (Anthony, 2026-11-04). */
+.findPatient {
+  --c: #1f62d6;
+}
+
 /* A heading over a group that is not a single input, like the old file. */
 .fieldTitle {
   display: block;

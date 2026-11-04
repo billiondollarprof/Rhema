@@ -238,7 +238,10 @@ function RegisterPatient() {
             <Link className={`${styles.button} ${styles.oldFile}`} href="/patients/old-file/">
               <Icon name="file" size={16} /> Register from old file
             </Link>
-            <Link className={styles.button} href="/patients/">
+            <Link
+              className={`${styles.button} ${styles.oldFile} ${styles.findPatient}`}
+              href="/patients/"
+            >
               <Icon name="find" size={16} /> Find patient
             </Link>
           </div>

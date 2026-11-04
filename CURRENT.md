@@ -541,15 +541,23 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
       and why, and who answers for data protection at the hospital.
 
-136. **Not findable online.** (2026-11-03) "this is an internal tool...
-    It's not supposed to be a public internet... it's not something that
-    you just discover online. Google doesn't need to discover it online.
-    Crawlers are not supposed to be able to discover it." Done 2026-11-03:
-    robots.txt says Disallow for every crawler, and every page and answer
-    carries "X-Robots-Tag: noindex, nofollow, noarchive, nosnippet".
-    Keys (2026-11-03): no need to change the Supabase key at handover;
-    "Is it not the same key you have been using? Why change it?" (Decided.)
-    AWS uptime watcher: today, if his phone code arrives.
+137. **His own walk through all 13 modules.** (2026-11-04) "I want to go
+    through all 13 modules and go through the entire system myself... I'll
+    go from front desk to the last and test every single section of it
+    myself. And I hope you populated them with dummy data." Then: "yes, top
+    up, and make me front desk... look into the SQL properly and then run
+    it. I'll give you my yes in advance." Top up: ops/testing-topup.sql,
+    run by .github/workflows/testing-topup.yml on testing only. Checked on
+    the local database first (twice, and a second run changes nothing).
+    He is Front Desk on testing from 2026-11-04.
+
+138. **FAULT, found 2026-11-04 by the top up: saving blood group,
+    genotype or the antenatal details (Profile, in the record) fails, on
+    testing and on live.** The activity log needs an id column, and
+    medical_profiles has none (its key is patient_id), so every save is
+    refused. No test ever saved a profile. Fix: one migration that makes
+    private.write_activity() use patient_id when there is no id, plus a
+    test. Waiting for his yes, because it is SQL on live.
 
 ### Standing instructions
 
@@ -596,6 +604,14 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-03: the Supabase keys stay as they are at handover. "Is it not
+  the same key you have been using? Why change it?" He may rename the
+  project on the 6th.
+
+- 2026-11-03: the order on 6 November morning is: move the domain to the
+  hospital's Cloudflare account, then Resend, then Email Routing, then
+  the agent's part (the handover checklist above).
 
 - 2026-11-02 evening: "Anything that doesn't involve me... you just do
   them. If you are going to run SQL, just show me the bash. Run them.
