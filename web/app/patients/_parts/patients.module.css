@@ -800,3 +800,18 @@
 .payList small {
   color: var(--mut);
 }
+
+/* After registering with a card fee: the fee, and its receipt (request 141). */
+.paidBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #e8f5ee;
+  border: 1px solid #bfe3cf;
+  color: #1f6b4a;
+  font-weight: 600;
+}

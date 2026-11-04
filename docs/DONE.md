@@ -798,3 +798,30 @@ this file.
     raised button as Register from old file, in the app's blue. Screenshots
     at 390, 820 and 1440; it opens Find patient; layout check passed on 25
     screens.
+
+138. **FAULT, found 2026-11-04 by the top up: saving blood group,
+    genotype or the antenatal details (Profile, in the record) fails, on
+    testing and on live.** The activity log needs an id column, and
+    medical_profiles has none (its key is patient_id), so every save is
+    refused. No test ever saved a profile. Fix: one migration that makes
+    private.write_activity() use patient_id when there is no id, plus a
+    test. Waiting for his yes, because it is SQL on live.
+    Live and checked 2026-11-04: migration 20261104043601_profile_activity_log on testing and live, 0 security warnings, test 019, 5 deliberate breaks all caught.
+
+143. **A message appears at once when sent, and keeps trying without
+    network.** (2026-11-04) "When you type message and you send, you should
+    send immediately... Let it just at least appear in the chat before...
+    it is being sent."
+    Live and checked 2026-11-04: a sent message shows in about 160 ms with "Sending", the box empties at once, it gets its tick when saved; with no network it stays with the clock and sends by itself.
+
+145. **Switching pages is slow to show data.** (2026-11-04) "switching from
+    one of those page to another page, sometimes it's like there's a little
+    bit of delay in loading data." Notifications took a few seconds to open.
+    Live and checked 2026-11-04: Home, Messages, the Lab and Pharmacy cards, the chart and Notifications keep their last data in memory (lib/cache/memory.ts, emptied at sign out). With a 1.5 second network, a second visit showed in about 70 ms instead of about 1.9 seconds.
+
+148. **FAULT: opening a notification goes to Home.** (2026-11-04) "I saw a
+    notification, I clicked open. It took me back to the home page... you're
+    not even supposed to be clicking open... just be clicking a maybe a drop
+    down to review all the notification... fold it back, open the next
+    one."
+    Live and checked 2026-11-04: each notice is a fold; messages show with Reply, announcements with Got it, and the Lab and Pharmacy cards open inside the notice, so payment and dispensing happen there. Checked at 390 and 1280: nothing goes to Home.

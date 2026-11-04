@@ -553,14 +553,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     records for 3 patients, 3 prescriptions, 5 messages, 1 announcement."
     He is Front Desk on testing from 2026-11-04. Open until his walk is done.
 
-138. **FAULT, found 2026-11-04 by the top up: saving blood group,
-    genotype or the antenatal details (Profile, in the record) fails, on
-    testing and on live.** The activity log needs an id column, and
-    medical_profiles has none (its key is patient_id), so every save is
-    refused. No test ever saved a profile. Fix: one migration that makes
-    private.write_activity() use patient_id when there is no id, plus a
-    test. Waiting for his yes, because it is SQL on live.
-
 140. **Moving a patient who is already in a room, and marking that they
     left.** (2026-11-04) "When a patient is also already in a room, you
     can't send the patient data to another room... a patient is in a
@@ -595,34 +587,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     click all consultants rooms, I will not see the chat [sent to
     Consultant Room 1]. I can only start a new chat."
 
-143. **A message appears at once when sent, and keeps trying without
-    network.** (2026-11-04) "When you type message and you send, you should
-    send immediately... Let it just at least appear in the chat before...
-    it is being sent."
-
 144. **Edit a sent message.** (2026-11-04) "When you send a message and you
     want to edit it... in case you made a mistake... You hold on to the
     message and edit it."
 
-145. **Switching pages is slow to show data.** (2026-11-04) "switching from
-    one of those page to another page, sometimes it's like there's a little
-    bit of delay in loading data." Notifications took a few seconds to open.
-
 146. **Patients seen chart on Home shows nothing.** (2026-11-04) "check it
     that it's working, because even now that we have demo data, the demo
-    data does not even make it work."
+    data does not even make it work." Checked 2026-11-04: the chart works;
+    it counts finished visits, and the demo data has none. ops/testing-
+    visits.sql adds a year of made up finished visits (tested locally:
+    27 this week, 121 this month). Waiting for his yes to run it.
 
 147. **How a visit ends, at every room.** (2026-11-04) "can the consultant
     check the person out?... how do you know that consultant is done with a
     particular person? Is it when he calls the second person in?... Then
     what about pharmacy? What about laboratory?... Also check how others do
     it." Goes with 140.
-
-148. **FAULT: opening a notification goes to Home.** (2026-11-04) "I saw a
-    notification, I clicked open. It took me back to the home page... you're
-    not even supposed to be clicking open... just be clicking a maybe a drop
-    down to review all the notification... fold it back, open the next
-    one."
 
 149. **Test every button properly, and look for oversights.** (2026-11-04)
     "take your time to check not just the fixes you did, but also each and
@@ -674,6 +654,28 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-04, his answers to the say backs:
+  - 141 "fee can be left empty"; Register from old file "not necessarily
+    but during edit it can be found in case they're paying for something
+    new/else".
+  - 142 "if the sender's colleagues are also front desk they should also
+    see it, except they are not in the same department or role level but
+    each person's message must carry their name on it so everyone knows
+    who said what." "reply goes to the office, so any matron in that
+    office during that shift sees it but if you want to be specific, a
+    person can be tagged by mentioning their name or clicking and holding
+    their own previous chat so they know the message is for them even if
+    another person in their role level can still see it (by role level I
+    mean a colleague in the same room or office." Plus a General chat for
+    everyone.
+  - 144 "editing, yes go with your plan" (own messages, 15 minutes,
+    "edited" shown, old wording kept in the activity log).
+  - 140 and 147 "your recommendation for ended visit is okay": Move to
+    another room, Has left (Front Desk and admin), calling the next
+    patient finishes the one before, and open visits close by themselves
+    at the end of the day.
+  - 146 "you can run the SQL above". "check everything well."
 
 - 2026-11-03: the Supabase keys stay as they are at handover. "Is it not
   the same key you have been using? Why change it?" He may rename the

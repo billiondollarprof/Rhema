@@ -10,7 +10,10 @@
  *
  * Below the form: the patient's files (PatientFilesCard), to preview, to
  * attach more, and for the person who attached them to an old file
- * patient, to delete a wrong one (request 128, 2026-11-02).
+ * patient, to delete a wrong one (request 128, 2026-11-02). Then, for the
+ * Front Desk and admins, Payments, so a payment for something new can be
+ * taken while editing (request 141, Anthony, 2026-11-04: "during edit it
+ * can be found in case they're paying for something new/else").
  *
  * Never: delete a patient from here. A wrong registration is voided with a
  * reason, by the admin, in a later step.
@@ -22,6 +25,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import PatientFilesCard from '../_parts/PatientFilesCard'
+import PaymentsCard from '../_parts/PaymentsCard'
 import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
 import styles from '../_parts/patients.module.css'
 import {
@@ -118,6 +122,9 @@ function EditPatient() {
                 patientId={patient.id}
                 fromOldFile={patient.from_old_file}
               />
+            ) : null}
+            {staff && (staff.role === 'front_desk' || staff.can_admin) ? (
+              <PaymentsCard client={client} patientId={patient.id} />
             ) : null}
           </>
         ) : null}
