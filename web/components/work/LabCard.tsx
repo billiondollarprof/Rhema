@@ -26,6 +26,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
 import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
+import { recall, remember } from '@/lib/cache/memory'
 import { waitedSince } from '@/lib/patients/age'
 import {
   listAwaitingPayment,
@@ -64,14 +65,18 @@ export default function LabCard({
   bare?: boolean
 }) {
   const view = viewFor(staff)
-  const [requests, setRequests] = useState<LabRequest[] | null>(null)
+  // The last list shown, at once, while a fresh one loads (request 145).
+  const [requests, setRequests] = useState<LabRequest[] | null>(() =>
+    recall(staff.id, `lab-${view}`),
+  )
 
   // The patient just paid for, to offer their receipt.
   const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
-    if (view === 'pay') setRequests(await listAwaitingPayment(client))
-    else if (view === 'lab') setRequests(await listAwaitingTest(client))
-    else if (view === 'mine') setRequests(await listMyReadyResults(client, staff.id))
+    const keep = (found: LabRequest[]) => setRequests(remember(staff.id, `lab-${view}`, found))
+    if (view === 'pay') keep(await listAwaitingPayment(client))
+    else if (view === 'lab') keep(await listAwaitingTest(client))
+    else if (view === 'mine') keep(await listMyReadyResults(client, staff.id))
   }, [client, staff.id, view])
 
   // Load now, then every 30 seconds, like the rest of Home.

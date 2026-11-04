@@ -37,6 +37,7 @@ import styles from './_home/home.module.css'
 import { roleLabel } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { recall, remember } from '@/lib/cache/memory'
 import {
   loadOpenQueue,
   loadTodayCounts,
@@ -54,19 +55,20 @@ export default function HomePage() {
   useRightPage(auth.status, '/')
   const { client, staff } = auth
 
-  const [counts, setCounts] = useState<TodayCounts | null>(null)
-  const [entries, setEntries] = useState<QueueEntry[] | null>(null)
+  // The last numbers shown, at once, while fresh ones load (request 145).
+  const [counts, setCounts] = useState<TodayCounts | null>(() => recall(staff?.id, 'home-counts'))
+  const [entries, setEntries] = useState<QueueEntry[] | null>(() => recall(staff?.id, 'home-queue'))
 
   // ===== Data: today's counts and the open queue =====
   const refresh = useCallback(async () => {
-    if (!client) return
+    if (!client || !staff) return
     const [newCounts, newEntries] = await Promise.all([
       loadTodayCounts(client),
       loadOpenQueue(client),
     ])
-    setCounts(newCounts)
-    setEntries(newEntries)
-  }, [client])
+    setCounts(remember(staff.id, 'home-counts', newCounts))
+    setEntries(remember(staff.id, 'home-queue', newEntries))
+  }, [client, staff])
 
   useEffect(() => {
     if (auth.status !== 'ready') return
@@ -120,7 +122,7 @@ export default function HomePage() {
         <AnnouncementsCard client={client} staffId={staff.id} />
         <QuickActions role={staff.role} />
         <CountTiles counts={counts} />
-        <SeenChart client={client} />
+        <SeenChart client={client} staffId={staff.id} />
         <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
         <LabCard client={client} staff={staff} />
         <PharmacyCard client={client} staff={staff} />

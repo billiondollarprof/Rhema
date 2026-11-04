@@ -8,7 +8,8 @@
  * The screen: on the left (on a phone, first) the rooms and groups, each
  * with its last message and how many are unread; then the conversation,
  * with a box to type in. Your own messages show their ticks:
- *   clock   waiting for the network (sends by itself)
+ *   clock   sending, or waiting for the network (sends by itself); a
+ *           message shows the moment Send is tapped (request 143)
  *   one     sent
  *   two     read (for a group: read by everyone in it)
  * Opening a conversation marks its messages read.
@@ -22,6 +23,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './messages.module.css'
 import AppShell from '@/components/shell/AppShell'
 import { OUTBOX_CHANGED, readOutbox } from '@/lib/offline/outbox'
+import { recall, remember } from '@/lib/cache/memory'
 import {
   GROUP_WORDS,
   loadMessages,
@@ -64,34 +66,47 @@ function Messages() {
   const { client, staff } = auth
   const myRoom = staff?.room_id ?? null
 
-  const [rooms, setRooms] = useState<Room[]>([])
-  const [roomStaff, setRoomStaff] = useState<{ id: string; room_id: number }[]>([])
-  const [messages, setMessages] = useState<Message[] | null>(null)
-  const [reads, setReads] = useState<Read[]>([])
+  // The last copy shown, at once, while a fresh one loads (request 145).
+  const me = staff?.id
+  const [rooms, setRooms] = useState<Room[]>(() => recall(me, 'rooms') ?? [])
+  const [roomStaff, setRoomStaff] = useState<{ id: string; room_id: number }[]>(
+    () => recall(me, 'room-staff') ?? [],
+  )
+  const [messages, setMessages] = useState<Message[] | null>(() => recall(me, 'messages'))
+  const [reads, setReads] = useState<Read[]>(() => recall(me, 'message-reads') ?? [])
   const [waiting, setWaiting] = useState<{ key: string; body: string; target: string }[]>([])
   const [typed, setTyped] = useState('')
-  const [busy, setBusy] = useState(false)
+  // Messages shown at once while they go out (request 143), by conversation.
+  const [sending, setSending] = useState<{ key: string; body: string; target: string }[]>([])
   const [problem, setProblem] = useState<string | null>(null)
   const bottom = useRef<HTMLDivElement>(null)
 
   // ===== 2. Load, then every 15 seconds =====
   const load = useCallback(async () => {
-    if (!client) return
+    if (!client || !me) return
     const found = await loadMessages(client)
-    setMessages(found)
+    setMessages(remember(me, 'messages', found))
     setReads(
-      await loadReads(
-        client,
-        found.map((message) => message.id),
+      remember(
+        me,
+        'message-reads',
+        await loadReads(
+          client,
+          found.map((message) => message.id),
+        ),
       ),
     )
-  }, [client])
+  }, [client, me])
 
   useEffect(() => {
     if (!client || auth.status !== 'ready') return
     let current = true
     Promise.all([loadRooms(client), loadRoomStaff(client)]).then(([foundRooms, people]) => {
       if (!current) return
+      if (me) {
+        remember(me, 'rooms', foundRooms)
+        remember(me, 'room-staff', people)
+      }
       setRooms(foundRooms)
       setRoomStaff(people)
     })
@@ -102,7 +117,7 @@ function Messages() {
       window.clearTimeout(first)
       window.clearInterval(timer)
     }
-  }, [client, auth.status, load])
+  }, [client, auth.status, load, me])
 
   // Messages waiting on this device for the network (the clock).
   useEffect(() => {
@@ -190,6 +205,11 @@ function Messages() {
     bottom.current?.scrollIntoView({ block: 'end' })
   }, [client, staff, myRoom, thread, reads, load])
 
+  // A message just sent shows at the bottom straight away.
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ block: 'end' })
+  }, [sending.length])
+
   if (auth.status !== 'ready' || !client || !staff) return null
 
   // ===== 5. Ticks for my own messages =====
@@ -207,18 +227,24 @@ function Messages() {
       : 1
   }
 
+  // Shown in the conversation at once, then sent behind. Anthony,
+  // 2026-11-04: "when I click send, the message goes and then continues
+  // trying to send there, even if there's no network."
   async function send() {
     if (!client || !staff || !open || !typed.trim()) return
-    setBusy(true)
+    const body = typed
+    const shown = { key: crypto.randomUUID(), body: body.trim(), target: open.key }
+    setTyped('')
     setProblem(null)
-    const answer = await sendMessage(client, staff.id, open.target, typed)
-    setBusy(false)
+    setSending((now) => [...now, shown])
+    const answer = await sendMessage(client, staff.id, open.target, body)
+    if (answer === null) await load()
+    // Sent, or kept on the device for the network (it shows with the clock).
+    setSending((now) => now.filter((item) => item.key !== shown.key))
     if (answer && answer !== 'waiting') {
       setProblem(answer)
-      return
+      setTyped((now) => now || body)
     }
-    setTyped('')
-    await load()
   }
 
   if (!myRoom) {
@@ -236,6 +262,7 @@ function Messages() {
   }
 
   const shownWaiting = open ? waiting.filter((item) => item.target === open.key) : []
+  const shownSending = open ? sending.filter((item) => item.target === open.key) : []
 
   return (
     <AppShell>
@@ -277,7 +304,7 @@ function Messages() {
                 <b>{open.name}</b>
               </div>
               <div className={styles.bubbles}>
-                {thread.length === 0 && shownWaiting.length === 0 ? (
+                {thread.length === 0 && shownWaiting.length === 0 && shownSending.length === 0 ? (
                   <p className={styles.muted}>No messages yet. Write the first one below.</p>
                 ) : null}
                 {thread.map((message) => {
@@ -303,6 +330,17 @@ function Messages() {
                     </div>
                   )
                 })}
+                {shownSending.map((item) => (
+                  <div
+                    key={item.key}
+                    className={`${styles.bubble} ${styles.mine} ${styles.pending}`}
+                  >
+                    <p>{item.body}</p>
+                    <small>
+                      Sending <span aria-label="Sending">🕓</span>
+                    </small>
+                  </div>
+                ))}
                 {shownWaiting.map((item) => (
                   <div
                     key={item.key}
@@ -332,8 +370,8 @@ function Messages() {
                     }
                   }}
                 />
-                <button className={styles.send} onClick={send} disabled={busy || !typed.trim()}>
-                  {busy ? 'Sending…' : 'Send'}
+                <button className={styles.send} onClick={send} disabled={!typed.trim()}>
+                  Send
                 </button>
               </div>
             </>
