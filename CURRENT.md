@@ -542,6 +542,10 @@ E. Watching after the move:
       inside the always-free allowance; use the company account, choose
       the Paid plan (the Free plan closes after 6 months), MFA and the $1
       budget, then "AWS done".
+      Decided 2026-11-04: he uses the NEW account, which is registered to
+      StellaXafe. One watcher checks every hospital in one run every 5
+      minutes (about 8,640 runs a month, under 1% of the free 1 million).
+      Alerts by email, not SMS (SMS is charged per message).
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
