@@ -26,7 +26,12 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { StaffMember } from '../auth/session'
-import { listAwaitingPayment, listAwaitingTest, listMyReadyResults, type LabRequest } from '../lab/lab'
+import {
+  listAwaitingPayment,
+  listAwaitingTest,
+  listMyReadyResults,
+  type LabRequest,
+} from '../lab/lab'
 import {
   activeAnnouncements,
   loadMessages,
@@ -98,18 +103,27 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   // The same people the Lab and Pharmacy cards show payments to.
   const payer = staff.role === 'front_desk' || staff.role === 'admin'
   const empty = Promise.resolve([])
-  const [messages, rooms, announcements, readAnnouncements, ready, testsToPay, drugsToPay, testsToDo, toDispense] =
-    await Promise.all([
-      staff.room_id ? loadMessages(client) : empty,
-      staff.room_id ? loadRooms(client) : empty,
-      activeAnnouncements(client),
-      myAnnouncementReads(client, staff.id),
-      listMyReadyResults(client, staff.id),
-      payer ? listAwaitingPayment(client) : empty,
-      payer ? drugsAwaitingPayment(client) : empty,
-      staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
-      staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
-    ])
+  const [
+    messages,
+    rooms,
+    announcements,
+    readAnnouncements,
+    ready,
+    testsToPay,
+    drugsToPay,
+    testsToDo,
+    toDispense,
+  ] = await Promise.all([
+    staff.room_id ? loadMessages(client) : empty,
+    staff.room_id ? loadRooms(client) : empty,
+    activeAnnouncements(client),
+    myAnnouncementReads(client, staff.id),
+    listMyReadyResults(client, staff.id),
+    payer ? listAwaitingPayment(client) : empty,
+    payer ? drugsAwaitingPayment(client) : empty,
+    staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
+    staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
+  ])
   const notices: Notice[] = []
 
   // ----- a. Messages to my room, not read yet, per room -----
@@ -119,7 +133,8 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     incoming.map((message) => message.id),
   )
   const unread = incoming.filter(
-    (message) => !reads.some((read) => read.message_id === message.id && read.staff_id === staff.id),
+    (message) =>
+      !reads.some((read) => read.message_id === message.id && read.staff_id === staff.id),
   )
   for (const room of rooms) {
     const fromRoom = unread.filter((message) => message.from_room_id === room.id)
@@ -165,7 +180,10 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
       words: `${many(ready.length, 'lab result is', 'lab results are')} ready for tests you asked for.`,
       items: testItems(
         ready,
-        (request) => ({ label: 'See results', href: `/patients/record/?p=${request.patient_id}#lab` }),
+        (request) => ({
+          label: 'See results',
+          href: `/patients/record/?p=${request.patient_id}#lab`,
+        }),
         (request) => request.completed_at ?? request.requested_at,
       ),
     })
