@@ -4,7 +4,10 @@
  *
  * Why: the RHEMA demo's form, in its three sections: Patient (name, date of
  * birth with the age shown under it, sex, category), Contact and address,
- * and Next of kin. The demo's payment section joins when payments are built.
+ * and Next of kin. Register also shows Payment, the card fee (request 141,
+ * Anthony, 2026-11-04: "registration is like they are buying card... they
+ * used to pay some amount of money"; "fee can be left empty"). Edit does
+ * not: a later payment is taken on the patient's page.
  *
  * Checks before saving: a name, a date of birth (not in the future), sex,
  * and phone numbers written as 11 digits starting with 0 (spaces, dashes
@@ -19,6 +22,7 @@ import { useState } from 'react'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
+import { PAYMENT_MODES, type PaymentMode } from '@/lib/lab/lab'
 import {
   cleanPhone,
   phoneLooksRight,
@@ -46,12 +50,26 @@ export const EMPTY_DETAILS: PatientDetails = {
   family_id: null,
 }
 
+// The card fee typed at registration. Null when the fee was left empty.
+export type CardFee = { amount: number; mode: PaymentMode } | null
+
 type FormProps = {
   initial: PatientDetails
   saveLabel: string
   busy: boolean
   problem: string | null
-  onSave: (details: PatientDetails) => void
+  // Register only: show the Payment section.
+  withPayment?: boolean
+  onSave: (details: PatientDetails, fee: CardFee) => void
+}
+
+// "7,500" and "7500.50" read as numbers; empty reads as nothing (null);
+// anything else reads as NaN, which the check below refuses.
+function readFee(typed: string): number | null {
+  const plain = typed.replace(/[,\s]/g, '')
+  if (!plain) return null
+  const value = Number(plain)
+  return Number.isFinite(value) ? Math.round(value * 100) / 100 : NaN
 }
 
 // Text fields are kept as typed; empty ones are saved as nothing (null).
@@ -92,9 +110,18 @@ function check(details: PatientDetails): Record<string, string> {
 }
 
 // ===== 2. The form =====
-export default function PatientForm({ initial, saveLabel, busy, problem, onSave }: FormProps) {
+export default function PatientForm({
+  initial,
+  saveLabel,
+  busy,
+  problem,
+  withPayment = false,
+  onSave,
+}: FormProps) {
   const [details, setDetails] = useState<PatientDetails>(initial)
   const [shown, setShown] = useState<Record<string, string>>({})
+  const [fee, setFee] = useState('')
+  const [mode, setMode] = useState<PaymentMode>('cash')
 
   function set<K extends keyof PatientDetails>(key: K, value: PatientDetails[K]) {
     setDetails((now) => ({ ...now, [key]: value }))
@@ -103,8 +130,11 @@ export default function PatientForm({ initial, saveLabel, busy, problem, onSave 
   function save() {
     const ready = tidy(details)
     const wrong = check(ready)
+    const amount = withPayment ? readFee(fee) : null
+    if (amount !== null && !(amount > 0 && amount < 100000000))
+      wrong.fee = 'Type the card fee in naira, like 2,000, or leave it empty.'
     setShown(wrong)
-    if (Object.keys(wrong).length === 0) onSave(ready)
+    if (Object.keys(wrong).length === 0) onSave(ready, amount ? { amount, mode } : null)
     else document.getElementById(`field-${Object.keys(wrong)[0]}`)?.focus()
   }
 
@@ -238,7 +268,55 @@ export default function PatientForm({ initial, saveLabel, busy, problem, onSave 
         </section>
       </div>
 
-      {/* ===== 6. Save ===== */}
+      {/* ===== 6. Payment: the card fee (Register only) ===== */}
+      {withPayment ? (
+        <section className={styles.card}>
+          <div className={styles.sectionHead}>
+            <i>
+              <Icon name="file" />
+            </i>
+            <div>
+              <b>Payment</b>
+              <small>The card fee, if the patient is paying now.</small>
+            </div>
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <label htmlFor="field-fee">Card fee (optional)</label>
+              <div className={styles.money}>
+                <span aria-hidden="true">₦</span>
+                <input
+                  id="field-fee"
+                  className={styles.input}
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={fee}
+                  aria-invalid={shown.fee ? 'true' : undefined}
+                  onChange={(event) => setFee(event.target.value.replace(/[^\d.,\s]/g, ''))}
+                />
+              </div>
+              {shown.fee ? <small className={styles.error}>{shown.fee}</small> : null}
+            </div>
+            <div className={styles.field}>
+              <span className={styles.fieldTitle}>Paid by</span>
+              <div className={styles.segments} role="group" aria-label="Paid by">
+                {PAYMENT_MODES.map(([value, words]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={mode === value}
+                    onClick={() => setMode(value)}
+                  >
+                    {words}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ===== 7. Save ===== */}
       {problem ? <p className={styles.error}>{problem}</p> : null}
       <div className={styles.buttons}>
         <button className={`${styles.button} ${styles.primary}`} disabled={busy} onClick={save}>

@@ -8,7 +8,9 @@
  *      them and can open that patient instead (Anthony, 2026-10-29: "reuse
  *      this patient's information since it's already there"), or register
  *      a new patient anyway when it really is somebody else;
- *   3. once saved, the new RMC number shows, with Send to room.
+ *   3. once saved, the card fee, if one was typed, is recorded as a payment
+ *      with its receipt (request 141; the fee may be left empty);
+ *   4. the new RMC number shows, with Send to room.
  *
  * Family (request 128, step 2): after saving a patient with Family chosen,
  * "Add family member" starts the family (it gets a FAM number) and opens
@@ -24,7 +26,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
-import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
+import PatientForm, { EMPTY_DETAILS, type CardFee } from '../_parts/PatientForm'
 import SendToRoom from '../_parts/SendToRoom'
 import styles from '../_parts/patients.module.css'
 import { lastSeenWords } from '../_parts/PatientDetail'
@@ -38,6 +40,8 @@ import {
   type PatientDetails,
   type PatientResult,
 } from '@/lib/patients/patients'
+import { naira, PAYMENT_MODES } from '@/lib/lab/lab'
+import { takePayment } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -55,7 +59,11 @@ function RegisterPatient() {
 
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
-  const [waiting, setWaiting] = useState<PatientDetails | null>(null)
+  const [waiting, setWaiting] = useState<{ details: PatientDetails; fee: CardFee } | null>(null)
+  // The card fee: what was typed, and whether it was saved.
+  const [fee, setFee] = useState<CardFee>(null)
+  const [feeSaved, setFeeSaved] = useState(false)
+  const [paying, setPaying] = useState(false)
   const [matches, setMatches] = useState<PatientResult[]>([])
   const [saved, setSaved] = useState<PatientCard | null>(null)
   const [sending, setSending] = useState(false)
@@ -88,12 +96,28 @@ function RegisterPatient() {
     }
     setSaved(null)
     setSentTo(null)
+    setFee(null)
     setFormKey((key) => key + 1)
     router.push(`/patients/register/?family=${family}`)
   }
 
   // ===== 1. Save, but look for the same patient first =====
-  async function save(details: PatientDetails, skipCheck = false) {
+  // ===== 1a. Record the card fee for a saved patient =====
+  async function payFee(patientId: number, cardFee: CardFee) {
+    if (!client || !cardFee) return
+    setPaying(true)
+    const answer = await takePayment(
+      client,
+      patientId,
+      'registration_card',
+      [{ label: 'Registration card', amount: cardFee.amount }],
+      cardFee.mode,
+    )
+    setPaying(false)
+    setFeeSaved(typeof answer === 'number')
+  }
+
+  async function save(details: PatientDetails, cardFee: CardFee, skipCheck = false) {
     if (!client || !staff) return
     setBusy(true)
     setProblem(null)
@@ -101,7 +125,7 @@ function RegisterPatient() {
       const found = await findPossibleDuplicates(client, details.full_name, details.date_of_birth)
       if (found.length > 0) {
         setBusy(false)
-        setWaiting(details)
+        setWaiting({ details, fee: cardFee })
         setMatches(found)
         return
       }
@@ -110,9 +134,14 @@ function RegisterPatient() {
     setBusy(false)
     setWaiting(null)
     setMatches([])
+    setFee(cardFee)
+    setFeeSaved(false)
     if (result.queued) setQueued(details.full_name)
     else if (result.problem) setProblem(result.problem)
-    else setSaved(result.patient)
+    else {
+      setSaved(result.patient)
+      if (result.patient) await payFee(result.patient.id, cardFee)
+    }
   }
 
   // ===== 1b. No network: saved on this device, sent later =====
@@ -129,6 +158,7 @@ function RegisterPatient() {
               <b>{queued}</b>
               <small>
                 No network. Saved on this device. It registers by itself when the network is back.
+                {fee ? ' Take the card fee on the patient’s page once it is registered.' : ''}
               </small>
             </div>
           </div>
@@ -171,6 +201,35 @@ function RegisterPatient() {
             {saved.full_name} · {ageFrom(saved.date_of_birth)}
             {familyCard && saved.family_id ? ` · Family ${familyCard}` : ''}
           </p>
+          {/* ----- The card fee, if one was typed ----- */}
+          {fee && paying ? <p className={styles.muted}>Saving the card fee…</p> : null}
+          {fee && !paying && feeSaved ? (
+            <div className={styles.paidBar}>
+              <span>
+                Card fee {naira(fee.amount)} paid by{' '}
+                {PAYMENT_MODES.find(([value]) => value === fee.mode)?.[1]}.
+              </span>
+              <Link className={styles.button} href={`/payments/receipt/?latest=${saved.id}`}>
+                Print receipt
+              </Link>
+            </div>
+          ) : null}
+          {fee && !paying && !feeSaved ? (
+            <div className={styles.warn} role="alert">
+              <b>The card fee was not saved</b>
+              <p className={styles.muted}>
+                The patient is registered. Check the network and save the fee again.
+              </p>
+              <div className={styles.buttons}>
+                <button
+                  className={`${styles.button} ${styles.primary}`}
+                  onClick={() => payFee(saved.id, fee)}
+                >
+                  Save the card fee again
+                </button>
+              </div>
+            </div>
+          ) : null}
           {problem ? <p className={styles.error}>{problem}</p> : null}
           {sentTo ? (
             <div className={styles.ok}>
@@ -213,6 +272,7 @@ function RegisterPatient() {
                 onClick={() => {
                   setSaved(null)
                   setSentTo(null)
+                  setFee(null)
                   setFormKey((key) => key + 1)
                   if (familyId) router.push('/patients/register/')
                 }}
@@ -278,7 +338,11 @@ function RegisterPatient() {
               </div>
             ))}
             <div className={styles.buttons}>
-              <button className={styles.button} disabled={busy} onClick={() => save(waiting, true)}>
+              <button
+                className={styles.button}
+                disabled={busy}
+                onClick={() => save(waiting.details, waiting.fee, true)}
+              >
                 No, register a new patient
               </button>
             </div>
@@ -302,7 +366,8 @@ function RegisterPatient() {
           saveLabel="Save patient"
           busy={busy}
           problem={problem}
-          onSave={(details) => save(details)}
+          withPayment
+          onSave={(details, cardFee) => save(details, cardFee)}
         />
       </div>
     </AppShell>
