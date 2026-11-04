@@ -551,6 +551,9 @@ E. Watching after the move:
       answers again, never every run and not repeated every 5 minutes. The
       alerts go through AWS SNS, kept outside Resend and Supabase on
       purpose, so they still reach him when the app is down.
+      State 2026-11-04 (his screenshot): the StellaXafe account is open,
+      $100 credit, spend limit $20, a card saved. Next for him: MFA (via
+      "Manage security and sign-in"), then the $1 budget alarm.
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
