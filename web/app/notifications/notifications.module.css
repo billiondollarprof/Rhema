@@ -1,9 +1,11 @@
-/* notifications.module.css: Notifications (request 132). */
+/* notifications.module.css: Notifications (requests 132 and 148). Each
+   notice is a fold that opens in place. */
 .page {
   display: grid;
   gap: 10px;
   max-width: 720px;
   margin: 0 auto;
+  min-width: 0;
 }
 
 .page h2 {
@@ -16,36 +18,121 @@
   margin: 0;
 }
 
+/* ===== 1. One notice ===== */
 .notice {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* The line you tap to unfold or fold it. */
+.fold {
+  font: inherit;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #fff;
+  border: 0;
+  background: none;
   color: var(--ink);
-  text-decoration: none;
-  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+  min-height: 52px;
 }
 
-.notice:hover {
-  border-color: #8fb4f0;
+.fold:hover {
   background: #f4f8ff;
 }
 
-.notice > svg {
+.fold[aria-expanded='true'] {
+  background: #f4f8ff;
+  border-bottom: 1px solid var(--line);
+}
+
+.fold > svg {
   color: var(--brand-red);
   flex-shrink: 0;
 }
 
-.notice span {
+.fold > span:first-of-type {
   flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.chevron {
+  display: inline-flex;
+  color: var(--bl);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.up {
+  transform: rotate(180deg);
+}
+
+/* ===== 2. What is inside, once unfolded ===== */
+.inside {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px 14px;
   min-width: 0;
 }
 
-.open {
-  color: var(--bl);
-  font-size: 13px;
+.item {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcfe;
+  min-width: 0;
+}
+
+.itemTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.itemTop b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.itemTop small {
+  color: var(--mut);
   flex-shrink: 0;
+}
+
+.detail {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  font: inherit;
+  font-weight: 600;
+  justify-self: start;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid #1f5fd0;
+  background: #fff;
+  color: #1f5fd0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.action:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

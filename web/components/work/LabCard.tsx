@@ -1,5 +1,6 @@
 /*
- * app/_home/LabCard.tsx: the Laboratory card on Home. It shows a different
+ * components/work/LabCard.tsx: the Laboratory card, on Home and inside a
+ * notice on Notifications (request 148). It shows a different
  * list to each person (request 115):
  *   Front Desk, Admin     tests waiting for payment: a price for each test
  *                         (the app adds them up), the mode (Cash, POS,
@@ -23,7 +24,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
-import styles from './home.module.css'
+import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { waitedSince } from '@/lib/patients/age'
 import {
@@ -52,7 +53,16 @@ const TITLES: Record<View, [string, string]> = {
 }
 
 // ===== 2. The card =====
-export default function LabCard({ client, staff }: { client: SupabaseClient; staff: StaffMember }) {
+export default function LabCard({
+  client,
+  staff,
+  bare = false,
+}: {
+  client: SupabaseClient
+  staff: StaffMember
+  // Inside a notice: no frame and no heading, the notice is the heading.
+  bare?: boolean
+}) {
   const view = viewFor(staff)
   const [requests, setRequests] = useState<LabRequest[] | null>(null)
 
@@ -86,13 +96,15 @@ export default function LabCard({ client, staff }: { client: SupabaseClient; sta
 
   const [title, empty] = TITLES[view]
   return (
-    <div className={styles.card} id="lab">
-      <h3>
-        {title}
-        {requests && requests.length ? (
-          <span className={styles.count}>{requests.length}</span>
-        ) : null}
-      </h3>
+    <div className={bare ? styles.bare : styles.card} id={bare ? undefined : 'lab'}>
+      {bare ? null : (
+        <h3>
+          {title}
+          {requests && requests.length ? (
+            <span className={styles.count}>{requests.length}</span>
+          ) : null}
+        </h3>
+      )}
       {view === 'lab' ? (
         <Link className={`${styles.button} ${styles.wide}`} href="/lab/result/">
           Add a result without a request

@@ -1,5 +1,5 @@
 /*
- * app/_home/PriceForm.tsx: the Front Desk's payment form, used for lab tests
+ * components/work/PriceForm.tsx: the Front Desk's payment form, used for lab tests
  * and for drugs: a price for each line, the total worked out by the app,
  * and how it was paid (Cash, POS, Transfer).
  *
@@ -15,7 +15,7 @@
 'use client'
 
 import { useState } from 'react'
-import styles from './home.module.css'
+import styles from './work.module.css'
 import { PAYMENT_MODES, naira, type PaymentMode } from '@/lib/lab/lab'
 
 type Line = { label: string; amount: number }

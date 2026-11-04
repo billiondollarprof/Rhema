@@ -1,5 +1,6 @@
 /*
- * app/_home/PharmacyCard.tsx: the Pharmacy card on Home (request 123). A
+ * components/work/PharmacyCard.tsx: the Pharmacy card, on Home and inside a
+ * notice on Notifications (requests 123 and 148). A
  * different list for each person:
  *   Front Desk, Admin   drugs waiting for payment: a price for each drug,
  *                       the app adds them up, then the mode, Record payment.
@@ -20,7 +21,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
-import styles from './home.module.css'
+import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { waitedSince } from '@/lib/patients/age'
 import {
@@ -50,9 +51,12 @@ const TITLES: Record<View, [string, string]> = {
 export default function PharmacyCard({
   client,
   staff,
+  bare = false,
 }: {
   client: SupabaseClient
   staff: StaffMember
+  // Inside a notice: no frame and no heading, the notice is the heading.
+  bare?: boolean
 }) {
   const view = viewFor(staff)
   const [list, setList] = useState<Prescription[] | null>(null)
@@ -84,11 +88,13 @@ export default function PharmacyCard({
   const [title, empty] = TITLES[view]
 
   return (
-    <div className={styles.card} id="pharmacy">
-      <h3>
-        {title}
-        {list && list.length ? <span className={styles.count}>{list.length}</span> : null}
-      </h3>
+    <div className={bare ? styles.bare : styles.card} id={bare ? undefined : 'pharmacy'}>
+      {bare ? null : (
+        <h3>
+          {title}
+          {list && list.length ? <span className={styles.count}>{list.length}</span> : null}
+        </h3>
+      )}
       {list === null ? <p className={styles.muted}>Loading…</p> : null}
       {list && list.length === 0 ? <p className={styles.muted}>{empty}</p> : null}
       {/* Straight after a payment: its receipt, one tap away (request 123). */}
