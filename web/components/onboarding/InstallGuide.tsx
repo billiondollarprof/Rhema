@@ -27,6 +27,7 @@
 import { useEffect, useState } from 'react'
 import styles from './onboarding.module.css'
 import type { Platform } from '@/lib/install/device'
+import { BRAND } from '@/lib/brand/brand'
 
 // ===== 1. The steps for each device =====
 type Scene =
@@ -52,23 +53,26 @@ export const GUIDES: Record<Device, Step[]> = {
     { scene: 'sheet-top', words: 'A menu opens. Scroll down the menu with your finger.' },
     { scene: 'sheet-scrolled', words: 'Tap Add to Home Screen.' },
     { scene: 'confirm', words: 'Tap Add at the top right.' },
-    { scene: 'home', words: 'Go to your home screen and tap the RHEMA icon.' },
-    { scene: 'app-open', words: 'RHEMA opens on its own. Sign in, and you are done.' },
+    { scene: 'home', words: `Go to your home screen and tap the ${BRAND.short} icon.` },
+    { scene: 'app-open', words: `${BRAND.short} opens on its own. Sign in, and you are done.` },
   ],
   ipad: [
     { scene: 'share', words: 'In Safari, tap the Share button at the top right of the screen.' },
     { scene: 'sheet-top', words: 'A menu opens. Scroll down the menu with your finger.' },
     { scene: 'sheet-scrolled', words: 'Tap Add to Home Screen.' },
     { scene: 'confirm', words: 'Tap Add at the top right.' },
-    { scene: 'home', words: 'Go to your home screen and tap the RHEMA icon.' },
-    { scene: 'app-open', words: 'RHEMA opens on its own. Sign in, and you are done.' },
+    { scene: 'home', words: `Go to your home screen and tap the ${BRAND.short} icon.` },
+    { scene: 'app-open', words: `${BRAND.short} opens on its own. Sign in, and you are done.` },
   ],
   'mac-safari': [
     { scene: 'mac-file', words: 'In Safari, click File in the menu bar at the top of the screen.' },
     { scene: 'mac-dock-item', words: 'Click Add to Dock.' },
     { scene: 'confirm', words: 'Click Add.' },
-    { scene: 'mac-dock', words: 'Click the RHEMA icon in the Dock.' },
-    { scene: 'app-open', words: 'RHEMA opens in its own window. Sign in, and you are done.' },
+    { scene: 'mac-dock', words: `Click the ${BRAND.short} icon in the Dock.` },
+    {
+      scene: 'app-open',
+      words: `${BRAND.short} opens in its own window. Sign in, and you are done.`,
+    },
   ],
   android: [
     { scene: 'android-menu', words: 'In Chrome, tap the three dots at the top right.' },
@@ -77,8 +81,8 @@ export const GUIDES: Record<Device, Step[]> = {
       words: 'Tap Install app. On some phones it says Add to Home screen.',
     },
     { scene: 'confirm', words: 'Tap Install.' },
-    { scene: 'home', words: 'Go to your home screen and tap the RHEMA icon.' },
-    { scene: 'app-open', words: 'RHEMA opens on its own. Sign in, and you are done.' },
+    { scene: 'home', words: `Go to your home screen and tap the ${BRAND.short} icon.` },
+    { scene: 'app-open', words: `${BRAND.short} opens on its own. Sign in, and you are done.` },
   ],
   desktop: [
     {
@@ -88,7 +92,7 @@ export const GUIDES: Record<Device, Step[]> = {
     { scene: 'confirm', words: 'Click Install.' },
     {
       scene: 'app-open',
-      words: 'RHEMA opens in its own window. Next time, open it from your apps.',
+      words: `${BRAND.short} opens in its own window. Next time, open it from your apps.`,
     },
   ],
 }
@@ -406,7 +410,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
             <rect x="60" y="56" width="140" height="80" rx="10" fill="#f1f4f9" stroke="#e5eaf2" />
             <RhemaIcon x={72} y={68} size={26} />
             <text x="106" y="85" fontSize="9" fontWeight="700" fill="#0f2238">
-              Install RHEMA?
+              Install {BRAND.short}?
             </text>
             <rect x="140" y="110" width="50" height="18" rx="6" fill="#1f5fd0" />
             <text x="165" y="122" textAnchor="middle" fontSize="8" fontWeight="700" fill="#fff">
@@ -434,7 +438,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           </text>
           <RhemaIcon x={sheet.x + 10} y={sheet.y + 6} size={26} />
           <text x={sheet.x + 42} y={sheet.y + 23} fontSize="9" fontWeight="700" fill="#0f2238">
-            RHEMA
+            {BRAND.short}
           </text>
           <Target x={sheet.x + sheet.w - 18} y={sheet.y - 9} step={step} side={1} />
         </PhoneFrame>
@@ -460,7 +464,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           ))}
           <RhemaIcon x={ox} y={oy + 90} size={20} />
           <text x={ox + 10} y={oy + 120} textAnchor="middle" fontSize="6.5" fill="#0f2238">
-            RHEMA
+            {BRAND.short}
           </text>
           <Target x={ox + 10} y={oy + 100} step={step} />
         </PhoneFrame>
@@ -482,7 +486,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
             />
             <rect x="10" y="20" width="240" height="22" fill="#0a2a5e" />
             <text x="22" y="35" fontSize="8" fontWeight="700" fill="#fff">
-              RHEMA
+              {BRAND.short}
             </text>
             <RhemaIcon x={112} y={70} size={36} />
             <rect x="90" y="120" width="80" height="16" rx="6" fill="#1f5fd0" />
@@ -511,7 +515,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
             fontWeight="700"
             fill="#fff"
           >
-            RHEMA
+            {BRAND.short}
           </text>
           <rect x="100" y={tablet ? 140 : 150} width="60" height="16" rx="6" fill="#fff" />
           <text

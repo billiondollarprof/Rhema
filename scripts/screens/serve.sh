@@ -7,6 +7,7 @@
 # real database, so no patient data can ever end up in a picture.
 #
 # Usage: scripts/screens/serve.sh   (builds, then serves in the background)
+#        NEXT_PUBLIC_BRAND=mascap scripts/screens/serve.sh   (a pitch brand)
 # =============================================================================
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -14,6 +15,8 @@ cd "$HERE/web"
 NEXT_PUBLIC_SUPABASE_URL=http://fake-supabase.local \
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_fake \
   npx next build > /dev/null
+# A pitch brand (request 150): its icons go into the build.
+if [ -n "${NEXT_PUBLIC_BRAND:-}" ]; then (cd "$HERE" && node scripts/pitch-brand.mjs "$NEXT_PUBLIC_BRAND" > /dev/null); fi
 # Stop an old server on 3100, by its process id. Only a process whose own
 # command is exactly "python3 -m http.server 3100 ..." is matched, so this
 # script can never stop itself (pkill and grep on the text both did).

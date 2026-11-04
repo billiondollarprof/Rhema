@@ -40,6 +40,7 @@ import {
 } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { BRAND } from '@/lib/brand/brand'
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-GB', {
@@ -124,8 +125,8 @@ function Receipt() {
             <header className={styles.letterhead}>
               <Logo size={64} />
               <div>
-                <h1>RHEMA MEDICAL CENTRE</h1>
-                <p>Former License Office by Ojolu Junction, Sapele, Delta State, Nigeria</p>
+                <h1>{BRAND.name.toUpperCase()}</h1>
+                {BRAND.address ? <p>{BRAND.address}</p> : null}
               </div>
             </header>
             <div className={styles.redLine} aria-hidden="true" />

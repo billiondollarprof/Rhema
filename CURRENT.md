@@ -570,6 +570,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     branch, so we can hide it later... anytime we want to pitch a new
     client, you hide the Rema stuff and put the name of the client."
     He will confirm "Medical Center" when he gets there.
+    Later the same day: "Change name to LANA Medical Center. I have left
+    mascap." So testing shows LANA Medical Centre, letters LA.
 
 ### Standing instructions
 
