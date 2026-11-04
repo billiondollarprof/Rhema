@@ -655,6 +655,28 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-04, his answers to the say backs:
+  - 141 "fee can be left empty"; Register from old file "not necessarily
+    but during edit it can be found in case they're paying for something
+    new/else".
+  - 142 "if the sender's colleagues are also front desk they should also
+    see it, except they are not in the same department or role level but
+    each person's message must carry their name on it so everyone knows
+    who said what." "reply goes to the office, so any matron in that
+    office during that shift sees it but if you want to be specific, a
+    person can be tagged by mentioning their name or clicking and holding
+    their own previous chat so they know the message is for them even if
+    another person in their role level can still see it (by role level I
+    mean a colleague in the same room or office." Plus a General chat for
+    everyone.
+  - 144 "editing, yes go with your plan" (own messages, 15 minutes,
+    "edited" shown, old wording kept in the activity log).
+  - 140 and 147 "your recommendation for ended visit is okay": Move to
+    another room, Has left (Front Desk and admin), calling the next
+    patient finishes the one before, and open visits close by themselves
+    at the end of the day.
+  - 146 "you can run the SQL above". "check everything well."
+
 - 2026-11-03: the Supabase keys stay as they are at handover. "Is it not
   the same key you have been using? Why change it?" He may rename the
   project on the 6th.
