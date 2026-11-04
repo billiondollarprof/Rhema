@@ -63,7 +63,17 @@ export type PatientDetails = Omit<
 // visit in the queue), and whether they are in the hospital now.
 export type PatientResult = PatientCard & {
   last_seen: string | null
-  open_visit: { status: string; room: string } | null
+  open_visit: { id: number; status: string; room: string } | null
+  // Today's visits, oldest first: where they were, from when to when, and
+  // how each one ended (requests 140 and 147).
+  today: TodayVisit[]
+}
+
+export type TodayVisit = {
+  room: string
+  from: string
+  to: string | null
+  reason: string | null
 }
 
 // Also used for the device copy (lib/offline/patientCopy).
@@ -88,6 +98,7 @@ const offline = (patient: PatientCard): PatientResult => ({
   ...patient,
   last_seen: null,
   open_visit: null,
+  today: [],
 })
 
 // ===== 2. Phone numbers: one way of writing them =====
@@ -168,7 +179,7 @@ async function withVisits(
   if (patients.length === 0) return []
   const { data } = await client
     .from('queue_entries')
-    .select('patient_id, status, created_at, room:rooms(name)')
+    .select('id, patient_id, status, created_at, finished_at, finish_reason, room:rooms(name)')
     .in(
       'patient_id',
       patients.map((patient) => patient.id),
@@ -176,19 +187,33 @@ async function withVisits(
     .order('created_at', { ascending: false })
 
   type Visit = {
+    id: number
     patient_id: number
     status: string
     created_at: string
+    finished_at: string | null
+    finish_reason: string | null
     room: { name: string } | null
   }
   const visits = (data as unknown as Visit[] | null) ?? []
   return patients.map((patient) => {
     const mine = visits.filter((visit) => visit.patient_id === patient.id)
     const open = mine.find((visit) => visit.status !== 'done')
+    const midnight = new Date()
+    midnight.setHours(0, 0, 0, 0)
     return {
       ...patient,
       last_seen: mine[0]?.created_at ?? null,
-      open_visit: open ? { status: open.status, room: open.room?.name ?? '' } : null,
+      open_visit: open ? { id: open.id, status: open.status, room: open.room?.name ?? '' } : null,
+      today: mine
+        .filter((visit) => new Date(visit.created_at) >= midnight)
+        .reverse()
+        .map((visit) => ({
+          room: visit.room?.name ?? 'A room',
+          from: visit.created_at,
+          to: visit.finished_at,
+          reason: visit.finish_reason,
+        })),
     }
   })
 }

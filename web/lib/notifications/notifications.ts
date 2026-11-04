@@ -135,22 +135,36 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     (message) =>
       !reads.some((read) => read.message_id === message.id && read.staff_id === staff.id),
   )
+  // A message that tags you says so first (request 142).
+  const messageItem = (message: (typeof unread)[number], href: string): NoticeItem => ({
+    key: `message-${message.id}`,
+    title: `${message.mention_staff === staff.id ? 'For you · ' : ''}${message.sender?.full_name ?? 'Staff'}`,
+    detail: message.body,
+    time: when(message.created_at),
+    action: { label: 'Reply', href },
+  })
   for (const room of rooms) {
-    const fromRoom = unread.filter((message) => message.from_room_id === room.id)
+    const fromRoom = unread.filter(
+      (message) => message.from_room_id === room.id && !message.to_everyone,
+    )
     if (fromRoom.length) {
       notices.push({
         key: `messages-${room.id}`,
         count: fromRoom.length,
         words: `${many(fromRoom.length, 'new message', 'new messages')} from ${room.name}.`,
-        items: fromRoom.map((message) => ({
-          key: `message-${message.id}`,
-          title: message.sender?.full_name ?? room.name,
-          detail: message.body,
-          time: when(message.created_at),
-          action: { label: 'Reply', href: `/messages/?c=room:${room.id}` },
-        })),
+        items: fromRoom.map((message) => messageItem(message, `/messages/?c=room:${room.id}`)),
       })
     }
+  }
+  // General, for everybody, in one notice of its own.
+  const general = unread.filter((message) => message.to_everyone)
+  if (general.length) {
+    notices.push({
+      key: 'messages-general',
+      count: general.length,
+      words: `${many(general.length, 'new message', 'new messages')} in General.`,
+      items: general.map((message) => messageItem(message, '/messages/?c=general')),
+    })
   }
 
   // ----- b. Announcements not read yet -----

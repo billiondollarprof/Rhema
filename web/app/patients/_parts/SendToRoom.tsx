@@ -3,8 +3,10 @@
  * optional note for the staff there.
  *
  * Why: the demo's "Send to room". The patient joins that room's queue and
- * shows on that room's Home. A patient already waiting somewhere is
- * refused, because a patient is never in two rooms at once.
+ * shows on that room's Home. A patient already in a room is moved instead
+ * (request 140, Anthony, 2026-11-04: "a patient is in a laboratory, but
+ * doctor calls..."): the visit there ends with the time, and a new one
+ * starts in the chosen room, so a patient is never in two rooms at once.
  *
  * Never: put clinical detail in the note. Everyone at that desk reads it.
  */
@@ -14,12 +16,15 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
 import { loadRooms, sendToRoom } from '@/lib/patients/patients'
+import { movePatient } from '@/lib/queue/queue'
 
 type SendProps = {
   client: SupabaseClient
   staffId: string
   patientId: number
   patientName: string
+  // The visit the patient is in now, if any: they are moved from it.
+  openVisit?: { id: number; room: string } | null
   onSent: (roomName: string) => void
   onCancel: () => void
 }
@@ -29,6 +34,7 @@ export default function SendToRoom({
   staffId,
   patientId,
   patientName,
+  openVisit = null,
   onSent,
   onCancel,
 }: SendProps) {
@@ -40,15 +46,19 @@ export default function SendToRoom({
 
   // ===== 1. The rooms a patient can be sent to (not the front desk) =====
   useEffect(() => {
-    loadRooms(client).then((all) => setRooms(all.filter((room) => room.kind !== 'front_desk')))
-  }, [client])
+    loadRooms(client).then((all) =>
+      setRooms(all.filter((room) => room.kind !== 'front_desk' && room.name !== openVisit?.room)),
+    )
+  }, [client, openVisit?.room])
 
   // ===== 2. Send =====
   async function send() {
     if (!roomId) return
     setBusy(true)
     setProblem(null)
-    const result = await sendToRoom(client, patientId, roomId, note, staffId)
+    const result = openVisit
+      ? await movePatient(client, openVisit.id, roomId, note)
+      : await sendToRoom(client, patientId, roomId, note, staffId)
     setBusy(false)
     if (result) setProblem(result)
     else onSent(rooms.find((room) => room.id === roomId)?.name ?? '')
@@ -57,8 +67,12 @@ export default function SendToRoom({
   return (
     <section className={styles.card} aria-label="Send to room">
       <div>
-        <b>Send {patientName} to a room</b>
-        <p className={styles.muted}>The staff in that room see the patient on their Home.</p>
+        <b>{openVisit ? `Move ${patientName} to another room` : `Send ${patientName} to a room`}</b>
+        <p className={styles.muted}>
+          {openVisit
+            ? `${patientName} is in ${openVisit.room} now. Moving ends that visit.`
+            : 'The staff in that room see the patient on their Home.'}
+        </p>
       </div>
       <div className={styles.field}>
         <label htmlFor="send-room">Room</label>
@@ -94,7 +108,7 @@ export default function SendToRoom({
           disabled={!roomId || busy}
           onClick={send}
         >
-          {busy ? 'Sending…' : 'Send to room'}
+          {busy ? 'Saving…' : openVisit ? 'Move to room' : 'Send to room'}
         </button>
         <button className={styles.button} onClick={onCancel}>
           Cancel

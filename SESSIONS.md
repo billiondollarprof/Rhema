@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-04 afternoon: his answers recorded. 141 (card fee) live, 146
+  visit history ran on testing. 140, 142, 144 and 147 built and tested
+  locally (two migrations, 17 deliberate breaks all caught), waiting for
+  his yes on the SQL before they go to testing.
+
 - 2026-11-04 later: 138 (profile saves), 148 (notifications fold open),
   143 (instant messages) and 145 (screens keep their last data) live.
   Slip: once more a push ran after a failed verify, because the command

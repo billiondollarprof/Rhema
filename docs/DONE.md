@@ -825,3 +825,19 @@ this file.
     down to review all the notification... fold it back, open the next
     one."
     Live and checked 2026-11-04: each notice is a fold; messages show with Reply, announcements with Got it, and the Lab and Pharmacy cards open inside the notice, so payment and dispensing happen there. Checked at 390 and 1280: nothing goes to Home.
+
+141. **Payment at registration.** (2026-11-04) "Why is it that during
+    registration there's no place where payment was mentioned? In the demo
+    I gave you, I had payment... registration is like they are buying
+    card... they used to pay some amount of money... even if they can still
+    add payment later for something, but there's payments during
+    registration."
+    Live and checked 2026-11-04: an optional card fee and Cash, POS or Transfer at the end of Register patient; saved as a Registration card payment with its receipt; a failed fee can be saved again; Payments shows on Edit patient too. Checked with a fee, no fee, a wrong fee and a failed fee, at 390 wide.
+
+146. **Patients seen chart on Home shows nothing.** (2026-11-04) "check it
+    that it's working, because even now that we have demo data, the demo
+    data does not even make it work." Checked 2026-11-04: the chart works;
+    it counts finished visits, and the demo data has none. ops/testing-
+    visits.sql adds a year of made up finished visits (tested locally:
+    27 this week, 121 this month). Waiting for his yes to run it.
+    Done 2026-11-04: the chart works; ops/testing-visits.sql ran on testing with his yes ("Visit history added: 540 finished visits").

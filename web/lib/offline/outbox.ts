@@ -47,8 +47,13 @@ export type OutboxTask =
       kind: 'message'
       created: number
       label: string
-      toKind: string
+      // Null with toEveryone for General (request 142). Older tasks on a
+      // device have no toEveryone, replyTo or mention, and send as before.
+      toKind: string | null
       toRoom: number | null
+      toEveryone?: boolean
+      replyTo?: number | null
+      mention?: string | null
       body: string
       clientKey: string
       failed?: string
@@ -92,8 +97,11 @@ type NewTask =
   | {
       kind: 'message'
       label: string
-      toKind: string
+      toKind: string | null
       toRoom: number | null
+      toEveryone?: boolean
+      replyTo?: number | null
+      mention?: string | null
       body: string
       clientKey: string
     }

@@ -46,6 +46,7 @@ const PATIENT = {
   created_at: new Date().toISOString(),
   last_seen: null,
   open_visit: null,
+  today: [],
 }
 
 // ===== 2. A signed in person in the browser (unlocked unless locked: true) =====

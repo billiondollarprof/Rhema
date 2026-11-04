@@ -2,7 +2,8 @@
  * app/_home/QueueCard.tsx: the queue card on Home (the demo's queue()).
  *
  * Who sees which part of the queue, as in the demo:
- *   Front Desk, Admin       every patient in the hospital now
+ *   Front Desk, Admin       every patient in the hospital now; Has left
+ *                           ends a visit with the time (request 140)
  *   Doctor, Nurse, Matron   their own room only; Call in, then Finish visit
  *   Pharmacy                patients at the pharmacy; Mark dispensed
  *   Laboratory              patients at the lab; Finished at the lab
@@ -11,6 +12,9 @@
  *
  * Changes show on screen at once and save behind (optimistic), and come
  * back if the save fails.
+ *
+ * Calling in the next patient ends the visit of the one before, in the
+ * database (requests 140 and 147).
  *
  * A waiting patient also shows how long they have waited (Anthony's pick
  * (a), 2026-10-29).
@@ -28,6 +32,7 @@ import { waitedSince } from '@/lib/patients/age'
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
+  markLeft,
   moveTo,
   type QueueEntry,
   type QueueStatus,
@@ -70,7 +75,12 @@ function pick(staff: StaffMember, entries: QueueEntry[]) {
 }
 
 // ===== 2. The buttons each role gets on a queue entry =====
-function buttonsFor(role: string, status: QueueStatus): [string, QueueStatus, boolean][] {
+// 'left' is Has left (the Front Desk and admins), not a status of its own.
+type Next = QueueStatus | 'left'
+
+function buttonsFor(staff: StaffMember, status: QueueStatus): [string, Next, boolean][] {
+  const role = staff.role
+  if (role === 'front_desk' || role === 'admin') return [['Has left', 'left', false]]
   if (['doctor', 'nurse', 'matron'].includes(role)) {
     return status === 'waiting'
       ? [['Call in patient', 'in_consultation', true]]
@@ -96,10 +106,12 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
     .filter((entry) => entry.status !== 'done')
   const { title, list, empty } = pick(staff, all)
 
-  async function move(entry: QueueEntry, status: QueueStatus) {
+  async function move(entry: QueueEntry, next: Next) {
+    const status: QueueStatus = next === 'left' ? 'done' : next
     setError(null)
     setPending((now) => ({ ...now, [entry.id]: status }))
-    const problem = await moveTo(client, entry.id, status)
+    const problem =
+      next === 'left' ? await markLeft(client, entry.id) : await moveTo(client, entry.id, status)
     if (problem) setError(problem)
     setPending((now) => {
       const next = { ...now }
@@ -139,12 +151,12 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
               </span>
             </div>
             <small className={styles.muted}>{entry.room?.name}</small>
-            {buttonsFor(staff.role, entry.status).length > 0 ? (
+            {buttonsFor(staff, entry.status).length > 0 ? (
               <div className={styles.entryButtons}>
-                {buttonsFor(staff.role, entry.status).map(([label, next]) => (
+                {buttonsFor(staff, entry.status).map(([label, next, main]) => (
                   <button
                     key={label}
-                    className={`${styles.button} ${styles.primary}`}
+                    className={`${styles.button} ${main ? styles.primary : ''}`}
                     disabled={entry.id in pending}
                     onClick={() => move(entry, next)}
                   >

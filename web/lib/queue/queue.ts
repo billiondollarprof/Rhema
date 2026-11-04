@@ -44,6 +44,16 @@ export const STATUS_LABELS: Record<QueueStatus, string> = {
   done: 'Done',
 }
 
+// How a visit ended, in the words staff see (requests 140 and 147).
+// Calling in the next patient means this one was seen, so both say Seen.
+export const FINISH_WORDS: Record<string, string> = {
+  finished: 'Seen',
+  next_called: 'Seen',
+  moved: 'Moved',
+  left: 'Left',
+  end_of_day: 'Closed at the end of the day',
+}
+
 // The words staff see for each patient category (stored in lower case).
 export const CATEGORY_LABELS: Record<string, string> = {
   individual: 'Individual',
@@ -165,4 +175,31 @@ export async function loadPatientsSeen(
     }
   }
   return { labels, values }
+}
+
+// ===== 6. Move a patient who is already in a room, or mark that they left =====
+// Move ends the visit in the old room and starts one in the new room; the
+// database does both at once, and twice is once (request 140).
+export async function movePatient(
+  client: SupabaseClient,
+  entryId: number,
+  roomId: number,
+  note: string,
+): Promise<string | null> {
+  const { error } = await client.rpc('move_patient', { entry: entryId, room: roomId, note })
+  if (error) {
+    console.warn(`Queue entry ${entryId} could not be moved: ${error.code}`)
+    return 'The patient could not be moved. Check the network and try again.'
+  }
+  return null
+}
+
+// Has left: the Front Desk or an admin ends a visit, with the time.
+export async function markLeft(client: SupabaseClient, entryId: number): Promise<string | null> {
+  const { error } = await client.rpc('mark_left', { entry: entryId })
+  if (error) {
+    console.warn(`Queue entry ${entryId} could not be marked as left: ${error.code}`)
+    return 'That could not be saved. Try again.'
+  }
+  return null
 }
