@@ -21,6 +21,7 @@
 import { Montserrat } from 'next/font/google'
 import styles from './IdleScreen.module.css'
 import Logo from './brand/Logo'
+import { BRAND } from '@/lib/brand/brand'
 
 // Built into the app at build time, so no screen ever calls Google Fonts.
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['500', '600'] })
@@ -112,7 +113,7 @@ export default function IdleScreen({ footer, behind }: IdleScreenProps) {
         </div>
 
         {/* ===== 4. The name, with the shimmer passing across it ===== */}
-        <h1 className={styles.name}>RHEMA MEDICAL CENTRE</h1>
+        <h1 className={styles.name}>{BRAND.name.toUpperCase()}</h1>
         {/* A thin line in the hospital's red, as on its letterhead. */}
         <span className={styles.redLine} aria-hidden="true" />
         <p className={styles.subtitle}>HOSPITAL OPERATIONS SYSTEM</p>

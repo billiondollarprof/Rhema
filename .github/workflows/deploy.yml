@@ -71,8 +71,23 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_URL=https://$SUPABASE_REF.supabase.co" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$key" >> "$GITHUB_ENV"
 
+      # Request 150: the testing site can show a client being pitched
+      # (ops/pitch.json). The live site is always Rhema: this step only
+      # runs for testing, and main builds with no brand set.
+      - name: Choose the hospital shown on testing
+        if: steps.gate.outputs.ready == 'yes' && github.ref_name == 'testing'
+        run: |
+          brand=$(jq -r '.brand // "rhema"' ops/pitch.json)
+          echo "NEXT_PUBLIC_BRAND=$brand" >> "$GITHUB_ENV"
+          echo "Testing shows: $brand"
+
       - if: steps.gate.outputs.ready == 'yes'
         run: npm run build
+
+      # The client's icons and app name go into the finished build.
+      - name: Put the client's icons in the testing build
+        if: steps.gate.outputs.ready == 'yes' && github.ref_name == 'testing'
+        run: node scripts/pitch-brand.mjs "$NEXT_PUBLIC_BRAND"
 
       - name: Deploy to Cloudflare
         if: steps.gate.outputs.ready == 'yes'

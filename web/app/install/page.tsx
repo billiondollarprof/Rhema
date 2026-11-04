@@ -18,6 +18,7 @@ import InstallGuide from '@/components/onboarding/InstallGuide'
 import card from '@/components/onboarding/onboarding.module.css'
 import styles from './install.module.css'
 import { detectPlatform, type Platform } from '@/lib/install/device'
+import { BRAND } from '@/lib/brand/brand'
 
 type Device = Exclude<Platform, 'other'>
 
@@ -46,9 +47,9 @@ export default function InstallPage() {
       <div className={`${card.badge} ${card.badgeLogo}`}>
         <Logo size={58} />
       </div>
-      <h1>Get RHEMA on every device</h1>
+      <h1>Get {BRAND.short} on every device</h1>
       <div className={card.explain}>
-        <p>Install RHEMA once, and you open it from your home screen like any other app.</p>
+        <p>Install {BRAND.short} once, and you open it from your home screen like any other app.</p>
         <p>Calls from other rooms reach you even when the app is closed.</p>
         <p>Pick your device below and follow the steps.</p>
       </div>
@@ -72,7 +73,7 @@ export default function InstallPage() {
       </section>
 
       <Link className={card.help} href="/">
-        Open RHEMA
+        Open {BRAND.short}
       </Link>
     </main>
   )

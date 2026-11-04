@@ -19,6 +19,7 @@ import Icon from './Icon'
 import styles from './AppShell.module.css'
 import { useAuth } from '@/lib/auth/session'
 import { readOutbox } from '@/lib/offline/outbox'
+import { BRAND } from '@/lib/brand/brand'
 
 export default function MainMenu({
   buttonClass,
@@ -101,6 +102,18 @@ export default function MainMenu({
             <Icon name="guide" size={18} />
             Installation guide
           </Link>
+          {/* Only on a build shown to a new client (request 150). */}
+          {BRAND.pitch ? (
+            <Link
+              className={styles.menuItem}
+              role="menuitem"
+              href="/automations/"
+              onClick={() => setOpen(false)}
+            >
+              <Icon name="bolt" size={18} />
+              Automations
+            </Link>
+          ) : null}
           <hr className={styles.menuLine} />
           <button
             className={`${styles.menuItem} ${styles.menuRed}`}

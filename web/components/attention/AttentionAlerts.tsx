@@ -36,6 +36,7 @@ import {
   loadRecentCalls,
   type AttentionCall,
 } from '@/lib/attention/attention'
+import { BRAND } from '@/lib/brand/brand'
 
 const CHECK_EVERY_MS = 20_000
 
@@ -156,8 +157,8 @@ export default function AttentionAlerts({
             </small>
             {alertsBlocked() ? (
               <small className={styles.blockedHint}>
-                Calls can&apos;t reach you when RHEMA is closed. Allow notifications for RHEMA in
-                your Settings.
+                Calls can&apos;t reach you when {BRAND.short} is closed. Allow notifications for{' '}
+                {BRAND.short} in your Settings.
               </small>
             ) : null}
           </div>

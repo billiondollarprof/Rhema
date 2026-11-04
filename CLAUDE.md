@@ -270,7 +270,7 @@ Skills live in `.claude/skills/`, with sources and licences in
 is added.
 
 **Our own skills:** `ship`, `screens`, `clickthrough`, `new-migration`,
-`switch-role`.
+`switch-role`, `pitch-client`.
 
 **Anything an agent does more than twice becomes a skill**, so the next
 agent runs it instead of working it out again.

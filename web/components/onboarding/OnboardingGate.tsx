@@ -47,6 +47,7 @@ import {
   skipInstall,
   type Platform,
 } from '@/lib/install/device'
+import { BRAND } from '@/lib/brand/brand'
 
 type Stage = 'checking' | 'install' | 'installed-elsewhere' | 'allow' | 'ring' | 'done'
 
@@ -191,16 +192,18 @@ export default function OnboardingGate({
             <div className={`${styles.badge} ${styles.badgeLogo}`}>
               <Logo size={58} />
             </div>
-            <h2 id="onboarding-title">Install RHEMA on this {device}</h2>
+            <h2 id="onboarding-title">
+              Install {BRAND.short} on this {device}
+            </h2>
             <Explain
               lines={[
-                `Once it is installed, you open RHEMA from your ${phone || platform === 'ipad' ? 'home screen' : 'apps'} with one tap.`,
+                `Once it is installed, you open ${BRAND.short} from your ${phone || platform === 'ipad' ? 'home screen' : 'apps'} with one tap.`,
                 'Calls from other rooms will reach you even when the app is closed.',
                 'Every staff phone and computer needs it. It takes about a minute.',
               ]}
             >
               <button className={styles.skip} onClick={skip} style={{ animationDelay: '1.1s' }}>
-                Already installed RHEMA on this {device}? Tap here to skip this.
+                Already installed {BRAND.short} on this {device}? Tap here to skip this.
               </button>
             </Explain>
             <button className={styles.primary} onClick={install} disabled={busy}>
@@ -215,16 +218,16 @@ export default function OnboardingGate({
             <div className={`${styles.badge} ${styles.badgeLogo}`}>
               <Logo size={58} />
             </div>
-            <h2 id="onboarding-title">RHEMA is installed</h2>
+            <h2 id="onboarding-title">{BRAND.short} is installed</h2>
             <Explain
               lines={
                 platform === 'android'
                   ? [
-                      'Open RHEMA from your home screen and sign in there.',
+                      `Open ${BRAND.short} from your home screen and sign in there.`,
                       'You can close this browser tab now.',
                     ]
                   : [
-                      'RHEMA has opened in its own window. Carry on there.',
+                      `${BRAND.short} has opened in its own window. Carry on there.`,
                       'You can close this browser tab now.',
                     ]
               }
@@ -253,7 +256,7 @@ export default function OnboardingGate({
             <h2 id="onboarding-title">Turn on call alerts</h2>
             <Explain
               lines={[
-                `When a room calls you, this ${device} will ring straight away, even when RHEMA is closed.`,
+                `When a room calls you, this ${device} will ring straight away, even when ${BRAND.short} is closed.`,
                 'Every staff member needs this on. Tap Allow, then tap Allow again when you are asked.',
               ]}
             />
@@ -285,11 +288,11 @@ export default function OnboardingGate({
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </div>
-            <h2 id="onboarding-title">Now make RHEMA ring loud</h2>
+            <h2 id="onboarding-title">Now make {BRAND.short} ring loud</h2>
             <Explain
               lines={[
-                'Right now your phone uses its quiet message tone for RHEMA calls.',
-                'Open Settings, then Apps, then RHEMA, then Notifications.',
+                `Right now your phone uses its quiet message tone for ${BRAND.short} calls.`,
+                `Open Settings, then Apps, then ${BRAND.short}, then Notifications.`,
                 'Tap Sound and pick a loud ringtone. Then come back here.',
               ]}
             />
