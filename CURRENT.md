@@ -553,56 +553,23 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     records for 3 patients, 3 prescriptions, 5 messages, 1 announcement."
     He is Front Desk on testing from 2026-11-04. Open until his walk is done.
 
-140. **Moving a patient who is already in a room, and marking that they
-    left.** (2026-11-04) "When a patient is also already in a room, you
-    can't send the patient data to another room... a patient is in a
-    laboratory, but doctor calls... there's no way for somebody to know
-    that the patient left a particular room. Is there a way, like, okay,
-    person has left, it marks the time the patient left? Or a patient who
-    have been sent to consultant room 1 since 48 hours ago, it will still
-    be showing consultant room 1. There has to be a way." He also settled:
-    a doctor does not need the record sent; a doctor finds any registered
-    patient and sees the updated record. Proposal sent 2026-11-04, waiting
-    for his yes and his pick on old visits.
-    Also 2026-11-04: show the SQL and wait before running it (the profile
-    fix, 138).
-
-142. **Chats scoped to departments, plus one general chat.** (2026-11-04)
-    "people should see chats that is in their own department... it did not
-    even put front desk... there should be a general chat that everybody in
-    the hospital sees... if Matron started chatting nursing station, then
-    the particular matron that was chatting nursing station is the only
-    matron that sees that chat, apart from the nurses in the nursing
-    stations... If it's all nursing station, then it's all. If it's nursing
-    station one, then it's nursing station one... if you are not in that
-    department, but you started a chat for that department... only you see
-    what you are sending to that department with the department... If I
-    click all consultants rooms, I will not see the chat [sent to
-    Consultant Room 1]. I can only start a new chat."
-
-144. **Edit a sent message.** (2026-11-04) "When you send a message and you
-    want to edit it... in case you made a mistake... You hold on to the
-    message and edit it."
-
-147. **How a visit ends, at every room.** (2026-11-04) "can the consultant
-    check the person out?... how do you know that consultant is done with a
-    particular person? Is it when he calls the second person in?... Then
-    what about pharmacy? What about laboratory?... Also check how others do
-    it." Goes with 140.
-
 149. **Test every button properly, and look for oversights.** (2026-11-04)
     "take your time to check not just the fixes you did, but also each and
     every button in this place... Anything that doesn't look right, take
     your time." And: "now run your SQL" (the profile fix, 138).
 
-**Built 2026-11-04, waiting for his yes on the SQL** (140, 142, 144, 147):
-migrations 20261104061628_messages_general_tags_edits and
-20261104061952_visit_endings, tests 020 and 021, every deliberate break
-caught (8 and 9). Screens built and walked through with made up data:
-General, Reply, @ tags, Edit for 15 minutes; Move to another room, Has
-left, Today on the patient, calling in the next patient ends the one
-before; the nightly job ends open visits (backup.yml step 6c). On the
-working branch only: pushing to testing runs the SQL, so it waits.
+
+150. **Pitch a new client on the testing site: MASCAP.** (2026-11-04) "I
+    want to use the same remote testing platform to pitch the client...
+    the name of the hospital... is MASCAP... we hide the logo of Rema and
+    the name, and just change it to MASCAP Medical Center... hide the logo
+    and just put MA as the logo, just like we had ROH or Rema before...
+    at the back of the hamburger menu, put automations there... the
+    WhatsApp messaging stuff that we are going to automate, the birthday,
+    happy birthday... put them as coming soon... it's just on the testing
+    branch, so we can hide it later... anytime we want to pitch a new
+    client, you hide the Rema stuff and put the name of the client."
+    He will confirm "Medical Center" when he gets there.
 
 ### Standing instructions
 

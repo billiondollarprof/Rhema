@@ -841,3 +841,41 @@ this file.
     visits.sql adds a year of made up finished visits (tested locally:
     27 this week, 121 this month). Waiting for his yes to run it.
     Done 2026-11-04: the chart works; ops/testing-visits.sql ran on testing with his yes ("Visit history added: 540 finished visits").
+
+140. **Moving a patient who is already in a room, and marking that they
+    left.** (2026-11-04) "When a patient is also already in a room, you
+    can't send the patient data to another room... a patient is in a
+    laboratory, but doctor calls... there's no way for somebody to know
+    that the patient left a particular room. Is there a way, like, okay,
+    person has left, it marks the time the patient left? Or a patient who
+    have been sent to consultant room 1 since 48 hours ago, it will still
+    be showing consultant room 1. There has to be a way." He also settled:
+    a doctor does not need the record sent; a doctor finds any registered
+    patient and sees the updated record. Proposal sent 2026-11-04, waiting
+    for his yes and his pick on old visits.
+    Also 2026-11-04: show the SQL and wait before running it (the profile
+    fix, 138).
+
+142. **Chats scoped to departments, plus one general chat.** (2026-11-04)
+    "people should see chats that is in their own department... it did not
+    even put front desk... there should be a general chat that everybody in
+    the hospital sees... if Matron started chatting nursing station, then
+    the particular matron that was chatting nursing station is the only
+    matron that sees that chat, apart from the nurses in the nursing
+    stations... If it's all nursing station, then it's all. If it's nursing
+    station one, then it's nursing station one... if you are not in that
+    department, but you started a chat for that department... only you see
+    what you are sending to that department with the department... If I
+    click all consultants rooms, I will not see the chat [sent to
+    Consultant Room 1]. I can only start a new chat."
+
+144. **Edit a sent message.** (2026-11-04) "When you send a message and you
+    want to edit it... in case you made a mistake... You hold on to the
+    message and edit it."
+
+147. **How a visit ends, at every room.** (2026-11-04) "can the consultant
+    check the person out?... how do you know that consultant is done with a
+    particular person? Is it when he calls the second person in?... Then
+    what about pharmacy? What about laboratory?... Also check how others do
+    it." Goes with 140.
+    140, 142, 144, 147: Live and checked 2026-11-04: migrations 20261104061628_messages_general_tags_edits, 20261104061952_visit_endings and 20261104110430_message_edits_closed on testing and live, 0 security warnings, tests 020 to 022, 18 deliberate breaks all caught. Walked through at 390 and 1280: General first, Reply with its quote, @ offers the people of that room, Edit only on your own message, For you; Move to another room, Has left, Today on the patient. The nightly job ends open visits (backup.yml step 6c).
