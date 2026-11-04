@@ -4,6 +4,14 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-04 later: 138 (profile saves), 148 (notifications fold open),
+  143 (instant messages) and 145 (screens keep their last data) live.
+  Slip: once more a push ran after a failed verify, because the command
+  used ";" after verify. Testing caught it (formatting only) and live was
+  not touched. From now on every ship line is one && chain, verify first.
+  Waiting on him: 146 visit history SQL, and the say backs for 140, 141,
+  142, 144, 147.
+
 - 2026-11-04: he began his own walk (137), as Front Desk. Testing top up
   ran (pharmacy, messages, a family, records, an announcement), checked on
   the local database first. The top up found a real fault (138): saving a
