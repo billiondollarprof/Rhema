@@ -546,6 +546,11 @@ E. Watching after the move:
       StellaXafe. One watcher checks every hospital in one run every 5
       minutes (about 8,640 runs a month, under 1% of the free 1 million).
       Alerts by email, not SMS (SMS is charged per message).
+      Design (2026-11-04, after his question): the watcher emails only on a
+      change, once when a hospital stops answering and once when it
+      answers again, never every run and not repeated every 5 minutes. The
+      alerts go through AWS SNS, kept outside Resend and Supabase on
+      purpose, so they still reach him when the app is down.
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
