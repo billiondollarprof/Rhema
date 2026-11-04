@@ -561,6 +561,20 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     private.write_activity() use patient_id when there is no id, plus a
     test. Waiting for his yes, because it is SQL on live.
 
+140. **Moving a patient who is already in a room, and marking that they
+    left.** (2026-11-04) "When a patient is also already in a room, you
+    can't send the patient data to another room... a patient is in a
+    laboratory, but doctor calls... there's no way for somebody to know
+    that the patient left a particular room. Is there a way, like, okay,
+    person has left, it marks the time the patient left? Or a patient who
+    have been sent to consultant room 1 since 48 hours ago, it will still
+    be showing consultant room 1. There has to be a way." He also settled:
+    a doctor does not need the record sent; a doctor finds any registered
+    patient and sees the updated record. Proposal sent 2026-11-04, waiting
+    for his yes and his pick on old visits.
+    Also 2026-11-04: show the SQL and wait before running it (the profile
+    fix, 138).
+
 ### Standing instructions
 
 These never come off the list.
