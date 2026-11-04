@@ -13,14 +13,20 @@
  *   - work waiting for your role: tests to pay for and drugs to pay for
  *     (Front Desk and admins), tests to do (Laboratory), prescriptions to
  *     dispense (Pharmacy)
- * Each line says what it is in a whole sentence and opens the place where
- * it is dealt with. The bubble is the sum of the numbers.
+ * Each line says what it is in a whole sentence. Tapped, it unfolds in
+ * place and shows each thing waiting, with one button that goes straight
+ * to where it is dealt with (Anthony, 2026-11-04: "just be clicking a maybe
+ * a drop down to review all the notification... fold it back, open the
+ * next one"). The bubble is the sum of the numbers.
  *
- * Never: show a patient's name here. Counts and rooms only.
+ * The last list is kept in memory, so opening Notifications shows it at
+ * once while a fresh one loads (request 145).
+ *
+ * Never: send anybody to Home for something that has its own place.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { StaffMember } from '../auth/session'
-import { listAwaitingPayment, listAwaitingTest, listMyReadyResults } from '../lab/lab'
+import { listAwaitingPayment, listAwaitingTest, listMyReadyResults, type LabRequest } from '../lab/lab'
 import {
   activeAnnouncements,
   loadMessages,
@@ -31,111 +37,199 @@ import {
 import {
   listAwaitingDispense,
   listAwaitingPayment as drugsAwaitingPayment,
+  type Prescription,
 } from '../pharmacy/pharmacy'
+import { when } from '../record/record'
 
-export type Notice = { key: string; count: number; words: string; href: string }
+// ===== 1. The shapes =====
+// One thing waiting, shown when its notice is unfolded.
+export type NoticeItem = {
+  key: string
+  title: string
+  detail: string | null
+  time: string
+  // Where the button goes, or an announcement to mark as read.
+  action: { label: string; href: string } | { label: string; announcement: number }
+}
+
+// card: the Lab or Pharmacy card is shown inside the notice instead of the
+// items, so payment, results and dispensing are done right there.
+export type Notice = {
+  key: string
+  count: number
+  words: string
+  items: NoticeItem[]
+  card?: 'lab' | 'pharmacy'
+}
 
 const many = (count: number, one: string, more: string) => `${count} ${count === 1 ? one : more}`
 
+function patientWords(row: { patient: { full_name: string; patient_number: string } | null }) {
+  return row.patient ? `${row.patient.full_name} · ${row.patient.patient_number}` : 'Patient'
+}
+
+function drugWords(prescription: Prescription) {
+  return prescription.items.map((item) => item.drug).join(', ') || null
+}
+
+function testItems(
+  requests: LabRequest[],
+  action: (request: LabRequest) => { label: string; href: string },
+  time: (request: LabRequest) => string,
+): NoticeItem[] {
+  return requests.map((request) => ({
+    key: `lab-${request.id}`,
+    title: patientWords(request),
+    detail: request.tests.join(', '),
+    time: when(time(request)),
+    action: action(request),
+  }))
+}
+
+// ===== 2. The last list, kept in memory for an instant open =====
+let lastList: { staffId: string; notices: Notice[] } | null = null
+
+export function cachedNotices(staffId: string): Notice[] | null {
+  return lastList && lastList.staffId === staffId ? lastList.notices : null
+}
+
+// ===== 3. Load everything waiting, all at once =====
 export async function loadNotices(client: SupabaseClient, staff: StaffMember): Promise<Notice[]> {
+  // The same people the Lab and Pharmacy cards show payments to.
+  const payer = staff.role === 'front_desk' || staff.role === 'admin'
+  const empty = Promise.resolve([])
+  const [messages, rooms, announcements, readAnnouncements, ready, testsToPay, drugsToPay, testsToDo, toDispense] =
+    await Promise.all([
+      staff.room_id ? loadMessages(client) : empty,
+      staff.room_id ? loadRooms(client) : empty,
+      activeAnnouncements(client),
+      myAnnouncementReads(client, staff.id),
+      listMyReadyResults(client, staff.id),
+      payer ? listAwaitingPayment(client) : empty,
+      payer ? drugsAwaitingPayment(client) : empty,
+      staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
+      staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
+    ])
   const notices: Notice[] = []
 
-  // ===== 1. Messages to my room, not read yet, per room =====
-  if (staff.room_id) {
-    const [messages, rooms] = await Promise.all([loadMessages(client), loadRooms(client)])
-    const incoming = messages.filter((message) => message.from_room_id !== staff.room_id)
-    const reads = await loadReads(
-      client,
-      incoming.map((message) => message.id),
-    )
-    const unread = incoming.filter(
-      (message) =>
-        !reads.some((read) => read.message_id === message.id && read.staff_id === staff.id),
-    )
-    for (const room of rooms) {
-      const count = unread.filter((message) => message.from_room_id === room.id).length
-      if (count) {
-        notices.push({
-          key: `messages-${room.id}`,
-          count,
-          words: `${many(count, 'new message', 'new messages')} from ${room.name}.`,
-          href: `/messages/?c=room:${room.id}`,
-        })
-      }
+  // ----- a. Messages to my room, not read yet, per room -----
+  const incoming = messages.filter((message) => message.from_room_id !== staff.room_id)
+  const reads = await loadReads(
+    client,
+    incoming.map((message) => message.id),
+  )
+  const unread = incoming.filter(
+    (message) => !reads.some((read) => read.message_id === message.id && read.staff_id === staff.id),
+  )
+  for (const room of rooms) {
+    const fromRoom = unread.filter((message) => message.from_room_id === room.id)
+    if (fromRoom.length) {
+      notices.push({
+        key: `messages-${room.id}`,
+        count: fromRoom.length,
+        words: `${many(fromRoom.length, 'new message', 'new messages')} from ${room.name}.`,
+        items: fromRoom.map((message) => ({
+          key: `message-${message.id}`,
+          title: message.sender?.full_name ?? room.name,
+          detail: message.body,
+          time: when(message.created_at),
+          action: { label: 'Reply', href: `/messages/?c=room:${room.id}` },
+        })),
+      })
     }
   }
 
-  // ===== 2. Announcements not read yet =====
-  const [announcements, read] = await Promise.all([
-    activeAnnouncements(client),
-    myAnnouncementReads(client, staff.id),
-  ])
-  const newAnnouncements = announcements.filter((one) => !read.includes(one.id)).length
-  if (newAnnouncements) {
+  // ----- b. Announcements not read yet -----
+  const newAnnouncements = announcements.filter((one) => !readAnnouncements.includes(one.id))
+  if (newAnnouncements.length) {
     notices.push({
       key: 'announcements',
-      count: newAnnouncements,
-      words: `${many(newAnnouncements, 'new announcement', 'new announcements')} on Home.`,
-      href: '/',
+      count: newAnnouncements.length,
+      words: `${many(newAnnouncements.length, 'new announcement', 'new announcements')}.`,
+      items: newAnnouncements.map((one) => ({
+        key: `announcement-${one.id}`,
+        title: one.sender?.full_name ?? 'Announcement',
+        detail: one.body,
+        time: when(one.created_at),
+        action: { label: 'Got it', announcement: one.id },
+      })),
     })
   }
 
-  // ===== 3. Lab results ready for tests I asked for =====
-  const ready = (await listMyReadyResults(client, staff.id)).length
-  if (ready) {
+  // ----- c. Lab results ready for tests I asked for -----
+  if (ready.length) {
     notices.push({
       key: 'results',
-      count: ready,
-      words: `${many(ready, 'lab result is', 'lab results are')} ready for tests you asked for.`,
-      href: '/',
+      card: 'lab',
+      count: ready.length,
+      words: `${many(ready.length, 'lab result is', 'lab results are')} ready for tests you asked for.`,
+      items: testItems(
+        ready,
+        (request) => ({ label: 'See results', href: `/patients/record/?p=${request.patient_id}#lab` }),
+        (request) => request.completed_at ?? request.requested_at,
+      ),
     })
   }
 
-  // ===== 4. Work waiting for my role =====
-  if (staff.role === 'front_desk' || staff.can_admin) {
-    const [tests, drugs] = await Promise.all([
-      listAwaitingPayment(client),
-      drugsAwaitingPayment(client),
-    ])
-    if (tests.length) {
-      notices.push({
-        key: 'pay-tests',
-        count: tests.length,
-        words: `${many(tests.length, 'lab request is', 'lab requests are')} waiting for payment.`,
-        href: '/',
-      })
-    }
-    if (drugs.length) {
-      notices.push({
-        key: 'pay-drugs',
-        count: drugs.length,
-        words: `${many(drugs.length, 'prescription is', 'prescriptions are')} waiting for payment.`,
-        href: '/#pharmacy',
-      })
-    }
+  // ----- d. Work waiting for my role -----
+  if (testsToPay.length) {
+    notices.push({
+      key: 'pay-tests',
+      card: 'lab',
+      count: testsToPay.length,
+      words: `${many(testsToPay.length, 'lab request is', 'lab requests are')} waiting for payment.`,
+      items: testItems(
+        testsToPay,
+        () => ({ label: 'Take payment', href: '/#lab' }),
+        (request) => request.requested_at,
+      ),
+    })
   }
-  if (staff.role === 'laboratory') {
-    const tests = (await listAwaitingTest(client)).length
-    if (tests) {
-      notices.push({
-        key: 'do-tests',
-        count: tests,
-        words: `${many(tests, 'lab request is', 'lab requests are')} waiting to be tested.`,
-        href: '/',
-      })
-    }
+  if (drugsToPay.length) {
+    notices.push({
+      key: 'pay-drugs',
+      card: 'pharmacy',
+      count: drugsToPay.length,
+      words: `${many(drugsToPay.length, 'prescription is', 'prescriptions are')} waiting for payment.`,
+      items: drugsToPay.map((prescription) => ({
+        key: `rx-${prescription.id}`,
+        title: patientWords(prescription),
+        detail: drugWords(prescription),
+        time: when(prescription.prescribed_at),
+        action: { label: 'Take payment', href: '/#pharmacy' },
+      })),
+    })
   }
-  if (staff.role === 'pharmacy') {
-    const waiting = (await listAwaitingDispense(client)).length
-    if (waiting) {
-      notices.push({
-        key: 'dispense',
-        count: waiting,
-        words: `${many(waiting, 'prescription is', 'prescriptions are')} waiting to be dispensed.`,
-        href: '/#pharmacy',
-      })
-    }
+  if (testsToDo.length) {
+    notices.push({
+      key: 'do-tests',
+      card: 'lab',
+      count: testsToDo.length,
+      words: `${many(testsToDo.length, 'lab request is', 'lab requests are')} waiting to be tested.`,
+      items: testItems(
+        testsToDo,
+        (request) => ({ label: 'Enter results', href: `/lab/result/?r=${request.id}` }),
+        (request) => request.requested_at,
+      ),
+    })
   }
+  if (toDispense.length) {
+    notices.push({
+      key: 'dispense',
+      card: 'pharmacy',
+      count: toDispense.length,
+      words: `${many(toDispense.length, 'prescription is', 'prescriptions are')} waiting to be dispensed.`,
+      items: toDispense.map((prescription) => ({
+        key: `rx-${prescription.id}`,
+        title: patientWords(prescription),
+        detail: drugWords(prescription),
+        time: when(prescription.prescribed_at),
+        action: { label: 'Dispense', href: '/#pharmacy' },
+      })),
+    })
+  }
+
+  lastList = { staffId: staff.id, notices }
   return notices
 }
 
