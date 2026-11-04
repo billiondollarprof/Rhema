@@ -34,6 +34,7 @@ import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
 import { wipeOutbox } from '@/lib/offline/outbox'
 import { wipeCopy } from '@/lib/offline/patientCopy'
+import { forgetAll } from '@/lib/cache/memory'
 import { adoptSession, clientFor, dropClient, pendingClient } from './clients'
 import { forgetThisDevice } from '@/lib/attention/push'
 import {
@@ -163,6 +164,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // the copy of recent patients go too (request 128, step 3).
     wipeOutbox(id)
     wipeCopy(id)
+    // And what the screens kept in memory (request 145).
+    forgetAll(id)
     removeAccount(id)
     setAccount(null)
     setStaff(null)

@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './home.module.css'
 import { loadPatientsSeen, type Period } from '@/lib/queue/queue'
+import { recall, remember } from '@/lib/cache/memory'
 
 const PERIODS: [Period, string, string][] = [
   ['week', 'Week', 'this week'],
@@ -22,20 +23,28 @@ const PERIODS: [Period, string, string][] = [
   ['five_years', '5 years', 'over 5 years'],
 ]
 
-export default function SeenChart({ client }: { client: SupabaseClient }) {
+export default function SeenChart({
+  client,
+  staffId,
+}: {
+  client: SupabaseClient
+  staffId: string
+}) {
   const [period, setPeriod] = useState<Period>('week')
-  const [series, setSeries] = useState<{ labels: string[]; values: number[] } | null>(null)
+  type Series = { labels: string[]; values: number[] }
+  // The last chart shown, at once, while a fresh one loads (request 145).
+  const [series, setSeries] = useState<Series | null>(() => recall(staffId, 'seen-week'))
 
   // ===== 1. Load the counts for the chosen period =====
   useEffect(() => {
     let current = true
     loadPatientsSeen(client, period).then((result) => {
-      if (current) setSeries(result)
+      if (current) setSeries(remember(staffId, `seen-${period}`, result))
     })
     return () => {
       current = false
     }
-  }, [client, period])
+  }, [client, staffId, period])
 
   // ===== 2. Turn the counts into a line =====
   const values = series?.values ?? []

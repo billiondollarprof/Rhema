@@ -7,6 +7,9 @@
 # prescriptions, 5 messages and 1 announcement. Once only: a second run
 # changes nothing.
 #
+# part: visits runs ops/testing-visits.sql instead, a finished visit
+# history so the Patients seen chart has something to show (request 146).
+#
 # Why a separate workflow: testing-seed.yml has already run, and it stops
 # at once when its patients are there, so it cannot add anything new.
 #
@@ -16,6 +19,12 @@
 name: Testing demo data (top up)
 on:
   workflow_dispatch:
+    inputs:
+      part:
+        description: 'topup (staff, family, records, prescriptions, messages) or visits (the Patients seen history)'
+        type: choice
+        options: [topup, visits]
+        default: topup
 
 permissions:
   contents: read
@@ -44,4 +53,7 @@ jobs:
           export PGUSER=$(echo "$pooler" | jq -r '.[0].db_user')
           export PGPORT=5432 PGDATABASE=postgres
           case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: that is the live project"; exit 1 ;; esac
-          psql -v ON_ERROR_STOP=1 -q -f ops/testing-topup.sql
+          case "${{ inputs.part }}" in
+            visits) psql -v ON_ERROR_STOP=1 -q -f ops/testing-visits.sql ;;
+            *)      psql -v ON_ERROR_STOP=1 -q -f ops/testing-topup.sql ;;
+          esac

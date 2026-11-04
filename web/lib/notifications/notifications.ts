@@ -45,6 +45,7 @@ import {
   type Prescription,
 } from '../pharmacy/pharmacy'
 import { when } from '../record/record'
+import { recall, remember } from '../cache/memory'
 
 // ===== 1. The shapes =====
 // One thing waiting, shown when its notice is unfolded.
@@ -92,10 +93,8 @@ function testItems(
 }
 
 // ===== 2. The last list, kept in memory for an instant open =====
-let lastList: { staffId: string; notices: Notice[] } | null = null
-
 export function cachedNotices(staffId: string): Notice[] | null {
-  return lastList && lastList.staffId === staffId ? lastList.notices : null
+  return recall<Notice[]>(staffId, 'notices')
 }
 
 // ===== 3. Load everything waiting, all at once =====
@@ -247,8 +246,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     })
   }
 
-  lastList = { staffId: staff.id, notices }
-  return notices
+  return remember(staff.id, 'notices', notices)
 }
 
 export const totalOf = (notices: Notice[]) => notices.reduce((sum, notice) => sum + notice.count, 0)

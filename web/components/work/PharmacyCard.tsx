@@ -23,6 +23,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
 import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
+import { recall, remember } from '@/lib/cache/memory'
 import { waitedSince } from '@/lib/patients/age'
 import {
   dispense,
@@ -59,14 +60,18 @@ export default function PharmacyCard({
   bare?: boolean
 }) {
   const view = viewFor(staff)
-  const [list, setList] = useState<Prescription[] | null>(null)
+  // The last list shown, at once, while a fresh one loads (request 145).
+  const [list, setList] = useState<Prescription[] | null>(() =>
+    recall(staff.id, `pharmacy-${view}`),
+  )
 
   // The patient just paid for, to offer their receipt.
   const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
-    if (view === 'pay') setList(await listAwaitingPayment(client))
-    else if (view === 'dispense') setList(await listAwaitingDispense(client))
-  }, [client, view])
+    const keep = (found: Prescription[]) => setList(remember(staff.id, `pharmacy-${view}`, found))
+    if (view === 'pay') keep(await listAwaitingPayment(client))
+    else if (view === 'dispense') keep(await listAwaitingDispense(client))
+  }, [client, staff.id, view])
 
   // Load now, then every 30 seconds, like the rest of Home.
   useEffect(() => {
