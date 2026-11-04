@@ -541,6 +541,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
       and why, and who answers for data protection at the hospital.
 
+137. **His own walk through all 13 modules.** (2026-11-04) "I want to go
+    through all 13 modules and go through the entire system myself... I'll
+    go from front desk to the last and test every single section of it
+    myself. And I hope you populated them with dummy data." The demo data
+    from 2026-10-31 covers patients, queue, lab and payments only. A top
+    up for the newer modules (pharmacy, messages, announcements, families,
+    files, record notes) is offered, waiting for his yes and the SQL.
+
 ### Standing instructions
 
 These never come off the list.
