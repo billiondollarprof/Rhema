@@ -666,6 +666,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+152. **Live on the real address, and the first real admin.** (2026-11-06,
+    night) "You can fix the live, I don't know. Then tomorrow we are going
+    to set up the admin account... admin at rhemamedical.app has to be set
+    up. Then whoever logs in as the admin... will then become the one to
+    invite others and make any other person an admin... before I probably
+    will visit the hospital tomorrow evening. Then either the matron or the
+    director would have to be made admin. Then we can still either change
+    admin routing to that person's particular Gmail... and fix senders as
+    well, so they can log in. Through the weekend we are just going to be
+    checking things... the deploy role from AWS... tomorrow or Sunday."
+    Steps: (a) live on rhemamedical.app tonight (nobody at the hospital has
+    installed it yet, so nobody has to reinstall); (b) 7 Nov: admin@
+    rhemamedical.app made the first admin on live (Supabase invite, then
+    the First admin workflow, SQL shown first); (c) at the hospital: the
+    admin invites the matron or director and makes them admin; (d) maybe
+    point admin@ routing to that person's Gmail; (e) weekend checks; (f)
+    AWS DeployRoleArn, Saturday or Sunday.
+
 151. **FAULT (mine), found 2026-11-06: the nightly backup's housekeeping
     steps failed on 4 nights in a row (3, 4, 5 and 6 November).** The
     backup itself was saved and checked each night (copy, lock, upload,
