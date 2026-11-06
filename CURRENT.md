@@ -522,7 +522,18 @@ A. He does (the domain opens for moving on 6 November):
      blue box, no picture), for both "Magic link" and "Confirm signup",
      subject "Your Rhema sign-in code". Next: he pastes it on testing and
      tests again; then the same on live with its own key (rhema-live).
-     The Cloudflare zone is still waiting for the registrar to switch
+     2026-11-06 15:24: LIVE works too (key rhema-live, both templates on
+     live; he signed in on live as Dr. Evans and set his PIN; live home
+     shows zeros, so no demo rows). Zone Active ("protected by
+     Cloudflare"). The orange "Proxy DNS records" triangle is only a hint:
+     the 3 Resend records must stay DNS only.
+     8 (Supabase URL Configuration): ops/supabase_check.py now accepts the
+     old (workers.dev) and the new (rhemamedical.app, testing.
+     rhemamedical.app) address, in any order, nothing else (13 tests, 9
+     deliberate breaks caught). He adds the new addresses to the redirect
+     list on both projects AFTER it is on main; Site URL stays on the old
+     address until the app really answers on the new one.
+     (Earlier note, now out of date:) The Cloudflare zone was waiting for the registrar to switch
      the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
      he taps "Check nameservers now". Email Routing and my part (B) wait
      for the zone to be Active.
