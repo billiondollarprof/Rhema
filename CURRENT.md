@@ -702,6 +702,14 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-06: Email Routing goes to rhemamedical7@gmail.com for now (the
+  account made for the hospital, behind its Cloudflare, Supabase and
+  Resend). "Use this one when I get to the hospital and then add it to
+  their Gmail. It becomes their second Gmail." At handover: either point
+  the rules at the hospital's official Gmail, or keep this one on their
+  phones. records@ may carry patient reports (NDPA), so by handover it must
+  land in an account the hospital controls.
+
 - 2026-11-04: pitches keep the brand switch: "next time switching it
   becomes just one switch" (skill pitch-client, ops/pitch.json). Testing
   is back to Rhema. Automations stays in the menu on every build, live
