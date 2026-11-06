@@ -537,7 +537,35 @@ A. He does (the domain opens for moving on 6 November):
      the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
      he taps "Check nameservers now". Email Routing and my part (B) wait
      for the zone to be Active.
+  8 DONE 2026-11-06 15:48: he added https://rhemamedical.app/** (live) and
+     https://testing.rhemamedical.app/** (testing) to Redirect URLs, kept
+     workers.dev, Site URL unchanged. Supabase check run on main: both
+     projects "Sign in settings are as set".
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
+     2026-11-06: set up in the hospital's Cloudflare. Destination
+     rhemamedical7@gmail.com verified; rules info@, admin@, records@ to it,
+     all Active; catch-all Disabled (Drop). "Onboard domain" added 3 MX
+     (route1/2/3.mx.cloudflare.net), TXT cf2024-1._domainkey and the root
+     SPF; nothing removed, Resend records untouched. Tests forwarded with
+     SPF, DKIM, DMARC and ARC all pass, but Gmail put them in SPAM (new
+     domain). His first search was in another Google account in the same
+     browser. Fix given: "Not spam" on each, and a Gmail filter on To:
+     info@ OR admin@ OR records@ with "Never send it to Spam" and label
+     Hospital. Then one more test to the inbox.
+     His question (2026-11-06): will emails we SEND (e.g. from info@ to a
+     patient) land in spam? Answer: sending goes through Resend, signed
+     with our own DKIM and SPF, and the code emails already land in the
+     Inbox. Asked him to add DMARC now (TXT _dmarc, value copied from the
+     DMARC row on Resend's domain page). Rules for patient emails (mine):
+     whole sentences, hospital name and address, plain subject, no short
+     links, reply-to info@, and send gently in the first weeks. The
+     Gmail filter needs the BROWSER (desktop site), not the Gmail app.
+     21:05: he made the filter (3 addresses, label Hospital) but a new
+     test STILL went to spam; he is tired and will wait 24 hours. Next
+     time: ask for a photo of the filter list (check it uses OR, the To
+     field, and "Never send it to Spam" is ticked). DMARC: told him TXT
+     _dmarc "v=DMARC1; p=none;" TTL Auto. Resend "Enable receiving" stays
+     OFF (Email Routing owns incoming mail).
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
 B. I do, in the app, once A1 is done:
@@ -697,6 +725,14 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-06: Email Routing goes to rhemamedical7@gmail.com for now (the
+  account made for the hospital, behind its Cloudflare, Supabase and
+  Resend). "Use this one when I get to the hospital and then add it to
+  their Gmail. It becomes their second Gmail." At handover: either point
+  the rules at the hospital's official Gmail, or keep this one on their
+  phones. records@ may carry patient reports (NDPA), so by handover it must
+  land in an account the hospital controls.
 
 - 2026-11-04: pitches keep the brand switch: "next time switching it
   becomes just one switch" (skill pitch-client, ops/pitch.json). Testing

@@ -32,7 +32,11 @@ import { mkdirSync } from 'node:fs'
 const APP = process.env.APP_URL ?? 'http://127.0.0.1:3000'
 const MAILPIT = process.env.MAILPIT_URL ?? 'http://127.0.0.1:54324'
 for (const address of [APP, MAILPIT]) {
-  if (address.includes('supabase.co') || address.includes('workers.dev')) {
+  if (
+    address.includes('supabase.co') ||
+    address.includes('workers.dev') ||
+    address.includes('rhemamedical.app')
+  ) {
     throw new Error('Refusing: e2e only runs against local addresses')
   }
 }

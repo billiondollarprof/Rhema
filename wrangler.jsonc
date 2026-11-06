@@ -25,7 +25,11 @@
   "env": {
     "testing": {
       "name": "rhema-hospital-testing",
+      // Request B (6 November list): testing answers on the hospital's own
+      // address. Cloudflare makes its DNS record and certificate itself.
+      // The workers.dev address stays on too, so nothing breaks meanwhile.
       "workers_dev": true,
+      "routes": [{ "pattern": "testing.rhemamedical.app", "custom_domain": true }],
       "observability": { "enabled": true },
       "assets": {
         "directory": "web/out",

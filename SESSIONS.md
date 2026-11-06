@@ -4,6 +4,16 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-06: the 6 November day. Domain moved to the hospital's
+  Cloudflare (accepted by email), zone Active. Resend on the hospital's
+  own account, verified; SMTP and the branded sign-in code templates on
+  testing and live (both tested). Supabase redirect list has the new
+  addresses (check updated first, 13 tests). Email Routing set up; tests
+  forwarded but land in Gmail spam (new domain), filter made, still
+  spam, waiting 24 hours. Found and fixed my backup fault (151: the
+  housekeeping steps failed 4 nights; backup itself fine). AWS watcher on
+  main, waiting for his DeployRoleArn. Next: real address on testing.
+
 - 2026-11-04 night: testing back to Rhema; the brand switch stays (one
   line in ops/pitch.json, skill pitch-client). Automations is in the menu
   on every build, live included, by his word. Layout check now covers 26
