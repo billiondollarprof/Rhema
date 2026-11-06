@@ -560,6 +560,12 @@ A. He does (the domain opens for moving on 6 November):
      whole sentences, hospital name and address, plain subject, no short
      links, reply-to info@, and send gently in the first weeks. The
      Gmail filter needs the BROWSER (desktop site), not the Gmail app.
+     21:05: he made the filter (3 addresses, label Hospital) but a new
+     test STILL went to spam; he is tired and will wait 24 hours. Next
+     time: ask for a photo of the filter list (check it uses OR, the To
+     field, and "Never send it to Spam" is ticked). DMARC: told him TXT
+     _dmarc "v=DMARC1; p=none;" TTL Auto. Resend "Enable receiving" stays
+     OFF (Email Routing owns incoming mail).
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
 B. I do, in the app, once A1 is done:
