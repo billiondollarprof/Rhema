@@ -537,6 +537,10 @@ A. He does (the domain opens for moving on 6 November):
      the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
      he taps "Check nameservers now". Email Routing and my part (B) wait
      for the zone to be Active.
+  8 DONE 2026-11-06 15:48: he added https://rhemamedical.app/** (live) and
+     https://testing.rhemamedical.app/** (testing) to Redirect URLs, kept
+     workers.dev, Site URL unchanged. Supabase check run on main: both
+     projects "Sign in settings are as set".
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
