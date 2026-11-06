@@ -501,10 +501,22 @@ A. He does (the domain opens for moving on 6 November):
      hospital account shows rhemamedical.app Active under Registrations,
      Action Center: no pending actions. Still to confirm: the website
      (zone) in Domains, Overview shows Active, not Pending.
-     Open question for him: Resend on the hospital's own account (my
-     recommendation) or StellaXafe's (the one I can reach by connection).
+     Decided 2026-11-06: Resend on the HOSPITAL's own account
+     (rhemamedical7). (The Resend connection I can reach belongs to
+     StellaXafe, with stellaxafe.com; it is not used for the hospital.)
   2. Resend: add rhemamedical.app, put its DNS records (SPF, DKIM, DMARC)
      in the hospital's zone, wait for "Verified".
+     2026-11-06 14:37: DONE for sending. Domain added in Resend (Ireland,
+     tracking off, receiving off so Email Routing can own incoming mail),
+     records added by Resend's Auto configure into the hospital's
+     Cloudflare (CNAME send, CNAME rsend, TXT resend._domainkey, all DNS
+     only), status Verified. Still to do: DMARC (optional record), a
+     Resend API key for testing and one for live (Sending access, this
+     domain only), typed straight into Supabase SMTP, never in chat.
+     The Cloudflare zone is still waiting for the registrar to switch
+     the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
+     he taps "Check nameservers now". Email Routing and my part (B) wait
+     for the zone to be Active.
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
