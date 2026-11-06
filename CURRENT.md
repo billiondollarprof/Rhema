@@ -552,6 +552,14 @@ A. He does (the domain opens for moving on 6 November):
      browser. Fix given: "Not spam" on each, and a Gmail filter on To:
      info@ OR admin@ OR records@ with "Never send it to Spam" and label
      Hospital. Then one more test to the inbox.
+     His question (2026-11-06): will emails we SEND (e.g. from info@ to a
+     patient) land in spam? Answer: sending goes through Resend, signed
+     with our own DKIM and SPF, and the code emails already land in the
+     Inbox. Asked him to add DMARC now (TXT _dmarc, value copied from the
+     DMARC row on Resend's domain page). Rules for patient emails (mine):
+     whole sentences, hospital name and address, plain subject, no short
+     links, reply-to info@, and send gently in the first weeks. The
+     Gmail filter needs the BROWSER (desktop site), not the Gmail app.
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
 B. I do, in the app, once A1 is done:
