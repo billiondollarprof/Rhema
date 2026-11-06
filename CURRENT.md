@@ -489,6 +489,13 @@ A. He does (the domain opens for moving on 6 November):
   1. Move rhemamedical.app from his Cloudflare account to the hospital's
      (DNSSEC already off; the zone waits in the new account). Never delete
      the domain.
+     2026-11-06 12:42 to 13:13: he started the move from his personal
+     account (Domains, Registrations, rhemamedical.app, "Move to another
+     account", the hospital account ID typed twice). The old zone had 0 DNS
+     records. Status now "Pending Account Move Out". Next: he checks the
+     hospital account (rhemamedical7), Domains, Registrations, and sends a
+     photo (arrived? Active or Pending?). Then Resend (his order of
+     2026-11-03), then Email Routing, then my part (B).
   2. Resend: add rhemamedical.app, put its DNS records (SPF, DKIM, DMARC)
      in the hospital's zone, wait for "Verified".
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
