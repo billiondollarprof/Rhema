@@ -542,6 +542,16 @@ A. He does (the domain opens for moving on 6 November):
      workers.dev, Site URL unchanged. Supabase check run on main: both
      projects "Sign in settings are as set".
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
+     2026-11-06: set up in the hospital's Cloudflare. Destination
+     rhemamedical7@gmail.com verified; rules info@, admin@, records@ to it,
+     all Active; catch-all Disabled (Drop). "Onboard domain" added 3 MX
+     (route1/2/3.mx.cloudflare.net), TXT cf2024-1._domainkey and the root
+     SPF; nothing removed, Resend records untouched. Tests forwarded with
+     SPF, DKIM, DMARC and ARC all pass, but Gmail put them in SPAM (new
+     domain). His first search was in another Google account in the same
+     browser. Fix given: "Not spam" on each, and a Gmail filter on To:
+     info@ OR admin@ OR records@ with "Never send it to Spam" and label
+     Hospital. Then one more test to the inbox.
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
 B. I do, in the app, once A1 is done:
