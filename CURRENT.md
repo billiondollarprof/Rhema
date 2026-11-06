@@ -683,6 +683,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     admin invites the matron or director and makes them admin; (d) maybe
     point admin@ routing to that person's Gmail; (e) weekend checks; (f)
     AWS DeployRoleArn, Saturday or Sunday.
+    (a) DONE 2026-11-06 night: https://rhemamedical.app is live (health
+    ok, sign in 200, the deploy's own smoke test passed on it). The old
+    workers.dev address still works; it gets a redirect once the saved
+    push address is moved (SQL on live, to be shown first). www is not
+    set up yet.
 
 151. **FAULT (mine), found 2026-11-06: the nightly backup's housekeeping
     steps failed on 4 nights in a row (3, 4, 5 and 6 November).** The
