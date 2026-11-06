@@ -496,6 +496,13 @@ A. He does (the domain opens for moving on 6 November):
      hospital account (rhemamedical7), Domains, Registrations, and sends a
      photo (arrived? Active or Pending?). Then Resend (his order of
      2026-11-03), then Email Routing, then my part (B).
+     14:19: DONE. He accepted the move by the email Cloudflare sent to the
+     hospital account (I had not warned him an email would come). The
+     hospital account shows rhemamedical.app Active under Registrations,
+     Action Center: no pending actions. Still to confirm: the website
+     (zone) in Domains, Overview shows Active, not Pending.
+     Open question for him: Resend on the hospital's own account (my
+     recommendation) or StellaXafe's (the one I can reach by connection).
   2. Resend: add rhemamedical.app, put its DNS records (SPF, DKIM, DMARC)
      in the hospital's zone, wait for "Verified".
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
