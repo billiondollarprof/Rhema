@@ -12,7 +12,9 @@ Log of each work session. Newest at the top. Keep entries short.
   forwarded but land in Gmail spam (new domain), filter made, still
   spam, waiting 24 hours. Found and fixed my backup fault (151: the
   housekeeping steps failed 4 nights; backup itself fine). AWS watcher on
-  main, waiting for his DeployRoleArn. Next: real address on testing.
+  main, waiting for his DeployRoleArn. Late: testing now answers on
+  https://testing.rhemamedical.app (deploy checks it each time); merged
+  to main, live unchanged and healthy. Next: live switch at his time.
 
 - 2026-11-04 night: testing back to Rhema; the brand switch stays (one
   line in ops/pitch.json, skill pitch-client). Automations is in the menu

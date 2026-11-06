@@ -571,6 +571,11 @@ A. He does (the domain opens for moving on 6 November):
 B. I do, in the app, once A1 is done:
   5. NEW: wrangler.jsonc: the real address for live (rhemamedical.app) and
      testing (testing.rhemamedical.app); keep workers.dev until both work.
+     TESTING DONE 2026-11-06: testing answers on
+     https://testing.rhemamedical.app (health ok, sign in screen 200), with
+     workers.dev still on. The deploy smoke test checks the real testing
+     address too (step 6 for testing). Live waits for the time Anthony
+     picks, because staff must reinstall (C15, C16).
   6. NEW: deploy.yml smoke test reads the workers.dev address: point it at
      the real address.
   7. NEW: push-keys.yml and the database's saved push address
@@ -580,7 +585,7 @@ B. I do, in the app, once A1 is done:
   9. NEW: the install guide pictures show "rhema-hospital…workers.dev":
      show rhemamedical.app.
   10. NEW: scripts/e2e-signin.mjs refuses live addresses by name: add the
-      real address so a test can never touch live.
+      real address so a test can never touch live. DONE 2026-11-06.
   11. Supabase email through Resend (no-reply@rhemamedical.app); the sign
       in code wording in BOTH hosted templates, Magic link and Confirm
       signup (109).
