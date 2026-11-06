@@ -58,12 +58,21 @@ DB_PASSWORD = os.environ.get("SUPABASE_DB_PASSWORD", "")
 
 API = "https://api.supabase.com/v1/projects/" + PROJECT_REF
 
-# The web address each project's sign in sends people back to. This is a
-# dictionary (a list of pairs): the project ID on the left, its address on
-# the right. Set by hand in the dashboard on 2026-10-29.
-SITE_URLS = {
-    "ntfvckqczpmylskusgft": "https://rhema-hospital.rhemamedical.workers.dev",
-    "nfrvwvqmfxudaarfuwxg": "https://rhema-hospital-testing.rhemamedical.workers.dev",
+# The web addresses each project's sign in may send people back to. This is
+# a dictionary (a list of pairs): the project ID on the left, and on the
+# right its "old" address (the free workers.dev one, set by hand in the
+# dashboard on 2026-10-29) and its "new" address (the hospital's own domain,
+# 6 November 2026, 6 November list item 8). During the move both are
+# allowed, so nobody is locked out; when the old one is retired, remove it.
+SITES = {
+    "ntfvckqczpmylskusgft": {
+        "old": "https://rhema-hospital.rhemamedical.workers.dev",
+        "new": "https://rhemamedical.app",
+    },
+    "nfrvwvqmfxudaarfuwxg": {
+        "old": "https://rhema-hospital-testing.rhemamedical.workers.dev",
+        "new": "https://testing.rhemamedical.app",
+    },
 }
 
 # Security warnings Anthony has looked at and decided to accept. Each one is
@@ -77,6 +86,43 @@ ACCEPTED_WARNINGS = {
     # Supabase's paid Pro plan.
     "auth_leaked_password_protection": "No passwords are used; needs the Pro plan.",
 }
+
+
+# ===== 2b. The sign in addresses rule (kept apart so it can be tested) =====
+
+# Looks at the two address settings and answers a list of problems, in plain
+# words. An empty list means all is well. "auth" is Supabase's answer, "old"
+# and "new" are this project's two allowed addresses (section 2).
+def address_problems(auth, old, new):
+    # Start with no problems; each wrong thing adds one line.
+    problems = []
+
+    # The Site URL (where sign in sends people by default) must be one of
+    # our two addresses.
+    site_url = auth.get("site_url")
+    if site_url not in (old, new):
+        problems.append("site_url is " + str(site_url) + ", should be " + old + " or " + new)
+
+    # The redirect list is one piece of text with the addresses separated by
+    # commas. Split it into a set (a group where order does not matter and
+    # nothing repeats), tidying each address and dropping empty ones.
+    listed = set()
+    for entry in str(auth.get("uri_allow_list") or "").split(","):
+        if entry.strip() != "":
+            listed.add(entry.strip())
+
+    # Only our own two addresses may be in the list, each followed by /**
+    # (any page under that address). Nothing else, and no wildcard for
+    # everybody, because the list decides where sign in links may lead.
+    allowed = {old + "/**", new + "/**"}
+    for entry in sorted(listed - allowed):
+        problems.append("uri_allow_list holds " + entry + ", which is not allowed")
+
+    # The list must not be empty, and must hold the Site URL's own address.
+    if site_url in (old, new) and site_url + "/**" not in listed:
+        problems.append("uri_allow_list does not hold " + str(site_url) + "/**")
+
+    return problems
 
 
 # ===== 3. A helper that asks Supabase one question =====
@@ -167,7 +213,7 @@ def main():
     # them, so any change was made by hand in the dashboard. If one moved,
     # say which one and fail, so it is noticed the same day.
     auth = ask_supabase("/config/auth")
-    site_url = SITE_URLS.get(PROJECT_REF, "")
+    sites = SITES.get(PROJECT_REF, {"old": "", "new": ""})
 
     # Each pair is: the setting's name in Supabase, and the value it must have.
     expected = {
@@ -177,8 +223,6 @@ def main():
         "mailer_autoconfirm": False,
         "mailer_otp_exp": 600,
         "mailer_otp_length": 6,
-        "site_url": site_url,
-        "uri_allow_list": site_url + "/**",
     }
 
     # Start with no problems, then add one line for each setting that is wrong.
@@ -188,6 +232,8 @@ def main():
         actual = auth.get(name)
         if actual != wanted:
             problems.append(name + " is " + str(actual) + ", should be " + str(wanted))
+    # The two address settings have their own rule (section 2b).
+    problems.extend(address_problems(auth, sites["old"], sites["new"]))
 
     if len(problems) > 0:
         print("Sign in settings have CHANGED:")

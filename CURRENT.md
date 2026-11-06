@@ -489,8 +489,54 @@ A. He does (the domain opens for moving on 6 November):
   1. Move rhemamedical.app from his Cloudflare account to the hospital's
      (DNSSEC already off; the zone waits in the new account). Never delete
      the domain.
+     2026-11-06 12:42 to 13:13: he started the move from his personal
+     account (Domains, Registrations, rhemamedical.app, "Move to another
+     account", the hospital account ID typed twice). The old zone had 0 DNS
+     records. Status now "Pending Account Move Out". Next: he checks the
+     hospital account (rhemamedical7), Domains, Registrations, and sends a
+     photo (arrived? Active or Pending?). Then Resend (his order of
+     2026-11-03), then Email Routing, then my part (B).
+     14:19: DONE. He accepted the move by the email Cloudflare sent to the
+     hospital account (I had not warned him an email would come). The
+     hospital account shows rhemamedical.app Active under Registrations,
+     Action Center: no pending actions. Still to confirm: the website
+     (zone) in Domains, Overview shows Active, not Pending.
+     Decided 2026-11-06: Resend on the HOSPITAL's own account
+     (rhemamedical7). (The Resend connection I can reach belongs to
+     StellaXafe, with stellaxafe.com; it is not used for the hospital.)
   2. Resend: add rhemamedical.app, put its DNS records (SPF, DKIM, DMARC)
      in the hospital's zone, wait for "Verified".
+     2026-11-06 14:37: DONE for sending. Domain added in Resend (Ireland,
+     tracking off, receiving off so Email Routing can own incoming mail),
+     records added by Resend's Auto configure into the hospital's
+     Cloudflare (CNAME send, CNAME rsend, TXT resend._domainkey, all DNS
+     only), status Verified. Still to do: DMARC (optional record), a
+     Resend API key for testing and one for live (Sending access, this
+     domain only), typed straight into Supabase SMTP, never in chat.
+     2026-11-06 14:56: SMTP saved on TESTING (key rhema-testing typed by
+     him into Supabase, never in chat). Test: the sign-in email arrived in
+     about a minute, Inbox, from "Rhema Medical Centre
+     <no-reply@rhemamedical.app>", but with a LINK and no code, because the
+     hosted templates still have Supabase's wording. Wording written in
+     ops/email-templates/sign-in-code.html (navy band, red line, code in a
+     blue box, no picture), for both "Magic link" and "Confirm signup",
+     subject "Your Rhema sign-in code". Next: he pastes it on testing and
+     tests again; then the same on live with its own key (rhema-live).
+     2026-11-06 15:24: LIVE works too (key rhema-live, both templates on
+     live; he signed in on live as Dr. Evans and set his PIN; live home
+     shows zeros, so no demo rows). Zone Active ("protected by
+     Cloudflare"). The orange "Proxy DNS records" triangle is only a hint:
+     the 3 Resend records must stay DNS only.
+     8 (Supabase URL Configuration): ops/supabase_check.py now accepts the
+     old (workers.dev) and the new (rhemamedical.app, testing.
+     rhemamedical.app) address, in any order, nothing else (13 tests, 9
+     deliberate breaks caught). He adds the new addresses to the redirect
+     list on both projects AFTER it is on main; Site URL stays on the old
+     address until the app really answers on the new one.
+     (Earlier note, now out of date:) The Cloudflare zone was waiting for the registrar to switch
+     the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
+     he taps "Check nameservers now". Email Routing and my part (B) wait
+     for the zone to be Active.
   3. Email Routing: info@, admin@, records@ to the hospital Gmail (80).
   4. The $0.01 budget alerts on both Cloudflare accounts.
 
