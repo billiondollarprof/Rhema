@@ -53,6 +53,11 @@ it goes live without asking again. This skill is that rule as steps.
 7. **Report to Anthony in a few lines:** what went live, CI, the deploy and
    smoke test, and the security warnings on testing and live.
 8. Move the request to `docs/DONE.md`, and note it in `SESSIONS.md`.
+9. **Look at the scheduled runs, not only the push.** A push runs CI and
+   the deploy; the nightly backup runs by itself. If the change touches
+   `backup.yml` or anything it calls, or on any new day, open the latest
+   "Nightly backup" run and read every step. On 2026-11-06 it had failed 4
+   nights in a row after a change on 2026-11-02, and nobody was looking.
 
 ## If the skill itself goes wrong
 

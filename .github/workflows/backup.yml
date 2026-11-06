@@ -158,8 +158,10 @@ jobs:
       # copy still holds them for its 35 days.
       - name: Delete messages older than a year
         run: |
+          # The command is in single quotes so that $URL is read inside the
+          # container, where it is set, as in the backup step above.
           gone=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
-            psql "$URL" -tA -c "select private.forget_old_messages()")
+            sh -c 'psql "$URL" -tA -c "select private.forget_old_messages()"')
           echo "Messages and announcements older than a year deleted: $gone"
 
       # ===== 6c. The end of the day: visits still open are ended =====
@@ -169,7 +171,7 @@ jobs:
       - name: End yesterday's open visits
         run: |
           ended=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
-            psql "$URL" -tA -c "select private.close_old_visits()")
+            sh -c 'psql "$URL" -tA -c "select private.close_old_visits()"')
           echo "Visits still open from before today, now ended: $ended"
 
       # ===== 7. The lab result files: copy the new ones, each locked =====
