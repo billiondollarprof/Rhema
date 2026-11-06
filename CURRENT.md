@@ -571,6 +571,11 @@ A. He does (the domain opens for moving on 6 November):
 B. I do, in the app, once A1 is done:
   5. NEW: wrangler.jsonc: the real address for live (rhemamedical.app) and
      testing (testing.rhemamedical.app); keep workers.dev until both work.
+     TESTING DONE 2026-11-06: testing answers on
+     https://testing.rhemamedical.app (health ok, sign in screen 200), with
+     workers.dev still on. The deploy smoke test checks the real testing
+     address too (step 6 for testing). Live waits for the time Anthony
+     picks, because staff must reinstall (C15, C16).
   6. NEW: deploy.yml smoke test reads the workers.dev address: point it at
      the real address.
   7. NEW: push-keys.yml and the database's saved push address
@@ -580,7 +585,7 @@ B. I do, in the app, once A1 is done:
   9. NEW: the install guide pictures show "rhema-hospital…workers.dev":
      show rhemamedical.app.
   10. NEW: scripts/e2e-signin.mjs refuses live addresses by name: add the
-      real address so a test can never touch live.
+      real address so a test can never touch live. DONE 2026-11-06.
   11. Supabase email through Resend (no-reply@rhemamedical.app); the sign
       in code wording in BOTH hosted templates, Magic link and Confirm
       signup (109).
@@ -660,6 +665,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     every button in this place... Anything that doesn't look right, take
     your time." And: "now run your SQL" (the profile fix, 138).
 
+
+152. **Live on the real address, and the first real admin.** (2026-11-06,
+    night) "You can fix the live, I don't know. Then tomorrow we are going
+    to set up the admin account... admin at rhemamedical.app has to be set
+    up. Then whoever logs in as the admin... will then become the one to
+    invite others and make any other person an admin... before I probably
+    will visit the hospital tomorrow evening. Then either the matron or the
+    director would have to be made admin. Then we can still either change
+    admin routing to that person's particular Gmail... and fix senders as
+    well, so they can log in. Through the weekend we are just going to be
+    checking things... the deploy role from AWS... tomorrow or Sunday."
+    Steps: (a) live on rhemamedical.app tonight (nobody at the hospital has
+    installed it yet, so nobody has to reinstall); (b) 7 Nov: admin@
+    rhemamedical.app made the first admin on live (Supabase invite, then
+    the First admin workflow, SQL shown first); (c) at the hospital: the
+    admin invites the matron or director and makes them admin; (d) maybe
+    point admin@ routing to that person's Gmail; (e) weekend checks; (f)
+    AWS DeployRoleArn, Saturday or Sunday.
 
 151. **FAULT (mine), found 2026-11-06: the nightly backup's housekeeping
     steps failed on 4 nights in a row (3, 4, 5 and 6 November).** The

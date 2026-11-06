@@ -130,12 +130,13 @@ jobs:
           done
           echo "Smoke test FAILED: $url"; exit 1
 
-      # Request B: testing also answers on testing.rhemamedical.app. Prove the
-      # real address works too, not only the workers.dev one.
-      - name: Smoke test the real testing address
-        if: steps.gate.outputs.ready == 'yes' && env.WORKER_NAME == 'rhema-hospital-testing'
+      # Requests B and 152: the site also answers on the hospital's own
+      # address (testing.rhemamedical.app, or rhemamedical.app for live).
+      # Prove the real address works too, not only the workers.dev one.
+      - name: Smoke test the real address
+        if: steps.gate.outputs.ready == 'yes'
         run: |
-          url="https://testing.rhemamedical.app"
+          if [ "$WORKER_NAME" = "rhema-hospital" ]; then url="https://rhemamedical.app"; else url="https://testing.rhemamedical.app"; fi
           for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
             if curl -fsS "$url/api/health" | grep -q '"ok":true' && curl -fsS -o /dev/null "$url/sign-in/"; then
               echo "Smoke test passed: $url"; exit 0

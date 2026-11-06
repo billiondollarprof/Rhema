@@ -13,8 +13,12 @@
     // Only /api/ goes to the Worker code. Every screen file is served free.
     "run_worker_first": ["/api/*"],
   },
-  // The free workers.dev address, used until the domain moves on 6 November.
+  // Request 152: live answers on the hospital's own address. Cloudflare
+  // makes its DNS record and certificate itself. The free workers.dev
+  // address stays on, so the push alerts saved in the database (which
+  // still point at workers.dev) keep working until they are moved.
   "workers_dev": true,
+  "routes": [{ "pattern": "rhemamedical.app", "custom_domain": true }],
   "observability": { "enabled": true },
   // Lab result files (request 115). Live uses rhema-files; testing uses its
   // own bucket (below), which deletes its files after 7 days. The buckets

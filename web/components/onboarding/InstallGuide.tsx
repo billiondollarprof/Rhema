@@ -339,7 +339,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
         <PhoneFrame tablet>
           <rect x="20" y="22" width="220" height="20" rx="6" fill="#f1f4f9" />
           <text x="30" y="35" fontSize="7.5" fill="#64748b">
-            rhema-hospital…workers.dev
+            rhemamedical.app
           </text>
           <ShareIcon x={196} y={33} />
           {/* The real iPad bar: Share, then +, then the tabs button. */}
@@ -356,7 +356,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           <Lines x={84} y={36} rows={9} />
           <rect x="73" y="176" width="114" height="34" fill="#f1f4f9" />
           <text x="130" y="170" textAnchor="middle" fontSize="7" fill="#64748b">
-            rhema…workers.dev
+            rhemamedical.app
           </text>
           {/* The real iPhone bar: back, forward, Share, bookmarks, tabs. */}
           <g
@@ -613,7 +613,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
         <PhoneFrame tablet={false}>
           <rect x="74" y="24" width="112" height="20" rx="4" fill="#f1f4f9" />
           <text x="80" y="37" fontSize="7" fill="#64748b">
-            rhema…workers.dev
+            rhemamedical.app
           </text>
           {[0, 1, 2].map((i) => (
             <circle key={i} cx="178" cy={29 + i * 5} r="1.6" fill="#0f2238" />
@@ -667,7 +667,7 @@ function SceneDrawing({ scene, step, device }: { scene: Scene; step: number; dev
           />
           <rect x="20" y="30" width="220" height="18" rx="9" fill="#f1f4f9" />
           <text x="32" y="42" fontSize="8" fill="#64748b">
-            rhema-hospital…workers.dev
+            rhemamedical.app
           </text>
           <g stroke="#0f2238" strokeWidth="1.5" fill="none" strokeLinecap="round">
             <rect x="214" y="34" width="12" height="10" rx="2" />
