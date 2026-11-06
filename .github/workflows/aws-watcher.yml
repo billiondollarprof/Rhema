@@ -1,0 +1,96 @@
+# aws-watcher.yml: puts the uptime watcher code into AWS, then proves it works.
+#
+# Why: request 74 and PLAN.md section 7. The AWS side (the function, the
+# clock, the alerts) is built once from aws/template.yaml. After that,
+# every change to the watcher or to aws/sites.json (a new hospital, or a
+# hospital's new address) goes live by merging to main, like the app.
+#
+# No AWS key is stored anywhere. GitHub shows AWS a short lived proof of who
+# it is (OIDC), and the deploy role in the template accepts it only from the
+# main branch of this repository, for this one function.
+#
+# It starts only when aws/target.json has the role's address in it. Until
+# then it says so and stops, without failing.
+#
+# Never: add an access key or a secret to this file.
+name: AWS uptime watcher
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aws/**'
+      - '.github/workflows/aws-watcher.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Lets this job ask GitHub for its proof of identity.
+  id-token: write
+
+concurrency:
+  group: aws-watcher
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      # ===== 1. Is AWS set up yet? =====
+      - name: Stop if AWS is not set up yet
+        id: gate
+        run: |
+          role=$(jq -r '.role_arn' aws/target.json)
+          if [ -z "$role" ] || [ "$role" = "null" ]; then
+            echo "::notice::aws/target.json has no role_arn yet, so nothing was deployed."
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+            echo "role=$role" >> "$GITHUB_OUTPUT"
+            echo "region=$(jq -r '.region' aws/target.json)" >> "$GITHUB_OUTPUT"
+            echo "function=$(jq -r '.function' aws/target.json)" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ===== 2. The watcher's own tests, before anything goes live =====
+      - if: steps.gate.outputs.ready == 'yes'
+        name: Run the watcher's tests
+        run: python3 -B -m unittest discover -s aws -p "test_*.py"
+
+      # ===== 3. Log in to AWS, with no key =====
+      - if: steps.gate.outputs.ready == 'yes'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ steps.gate.outputs.role }}
+          aws-region: ${{ steps.gate.outputs.region }}
+
+      # ===== 4. Put the code in, and tell AWS which file starts it =====
+      - if: steps.gate.outputs.ready == 'yes'
+        name: Deploy the watcher code
+        env:
+          FUNCTION: ${{ steps.gate.outputs.function }}
+        run: |
+          (cd aws && zip -q ../watcher.zip uptime_watcher.py sites.json)
+          aws lambda update-function-code --function-name "$FUNCTION" \
+            --zip-file fileb://watcher.zip --query LastModified --output text
+          aws lambda wait function-updated --function-name "$FUNCTION"
+          aws lambda update-function-configuration --function-name "$FUNCTION" \
+            --handler uptime_watcher.handler --query Handler --output text
+          aws lambda wait function-updated --function-name "$FUNCTION"
+
+      # ===== 5. Prove it works: look at every hospital, send nothing =====
+      - if: steps.gate.outputs.ready == 'yes'
+        name: Run the watcher once in test mode
+        env:
+          FUNCTION: ${{ steps.gate.outputs.function }}
+        run: |
+          aws lambda invoke --function-name "$FUNCTION" \
+            --payload '{"test": true}' --cli-binary-format raw-in-base64-out \
+            --query FunctionError --output text out.json | tee error.txt
+          if [ "$(cat error.txt)" != "None" ]; then
+            echo "The watcher failed in AWS:"; cat out.json; exit 1
+          fi
+          jq -r '.results[] | "\(.name): \(if .ok then "up" else "DOWN" end) \(.why)"' out.json
+          echo "Watcher deployed: $(jq '.results | length' out.json) hospital(s) checked."

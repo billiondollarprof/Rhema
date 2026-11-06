@@ -29,6 +29,9 @@ jobs:
           python-version: '3.13'
       - run: npm ci
       - run: npm run verify
+      # The AWS template is checked by AWS's own linter (request 74).
+      - name: Check the AWS template
+        run: pip install --quiet cfn-lint && cfn-lint aws/template.yaml
 
   # The database: starts a throwaway Supabase on GitHub's computer, which
   # applies every migration, then runs the security tests and proves every

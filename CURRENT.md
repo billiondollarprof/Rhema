@@ -536,6 +536,34 @@ E. Watching after the move:
       new "messages older than a year" step.
   22. The AWS uptime watcher (74): set up 2026-11-03 if his phone code
       arrives; on the 6th it is pointed at the real address.
+      2026-11-04: the new AWS account offered no $200 credit (AWS says it
+      is linked to an older account of his) and asks for a card first. He
+      may use the older account. Advised: either works, the watcher stays
+      inside the always-free allowance; use the company account, choose
+      the Paid plan (the Free plan closes after 6 months), MFA and the $1
+      budget, then "AWS done".
+      Decided 2026-11-04: he uses the NEW account, which is registered to
+      StellaXafe. One watcher checks every hospital in one run every 5
+      minutes (about 8,640 runs a month, under 1% of the free 1 million).
+      Alerts by email, not SMS (SMS is charged per message).
+      Design (2026-11-04, after his question): the watcher emails only on a
+      change, once when a hospital stops answering and once when it
+      answers again, never every run and not repeated every 5 minutes. The
+      alerts go through AWS SNS, kept outside Resend and Supabase on
+      purpose, so they still reach him when the app is down.
+      State 2026-11-04 (his screenshot): the StellaXafe account is open,
+      $100 credit, spend limit $20, a card saved. Next for him: MFA (via
+      "Manage security and sign-in"), then the $1 budget alarm.
+      2026-11-04 later: MFA done ("MFA1, TOTP"). Watcher BUILT in aws/
+      (uptime_watcher.py, 35 tests, 18 deliberate breaks caught,
+      template.yaml passes cfn-lint, aws-watcher.yml, README with his
+      steps). Waiting for him: upload template.yaml in CloudFormation
+      (Ireland), confirm the SNS email, give me DeployRoleArn. Then: put it
+      in aws/target.json, merge to main, the workflow deploys and runs it
+      once in test mode. On the 6th: change the address in aws/sites.json.
+      Least access: watcher = one table + one topic; deploy role = one
+      function, main branch of this repo only, no keys anywhere.
+      Not yet checked: the $1 budget alarm (the $20 spend limit is set).
 
 F. NEW: for the hospital to own (NDPA 2023), not code:
   23. A privacy notice for patients and staff, a record of what is kept
