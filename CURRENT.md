@@ -513,6 +513,15 @@ A. He does (the domain opens for moving on 6 November):
      only), status Verified. Still to do: DMARC (optional record), a
      Resend API key for testing and one for live (Sending access, this
      domain only), typed straight into Supabase SMTP, never in chat.
+     2026-11-06 14:56: SMTP saved on TESTING (key rhema-testing typed by
+     him into Supabase, never in chat). Test: the sign-in email arrived in
+     about a minute, Inbox, from "Rhema Medical Centre
+     <no-reply@rhemamedical.app>", but with a LINK and no code, because the
+     hosted templates still have Supabase's wording. Wording written in
+     ops/email-templates/sign-in-code.html (navy band, red line, code in a
+     blue box, no picture), for both "Magic link" and "Confirm signup",
+     subject "Your Rhema sign-in code". Next: he pastes it on testing and
+     tests again; then the same on live with its own key (rhema-live).
      The Cloudflare zone is still waiting for the registrar to switch
      the nameservers to cheryl and tim (usually 1 to 2 hours, up to 24):
      he taps "Check nameservers now". Email Routing and my part (B) wait
