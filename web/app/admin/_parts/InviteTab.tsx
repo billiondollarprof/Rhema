@@ -8,9 +8,9 @@
  * It lasts 72 hours; "the admin will see that this invitation has expired"
  * and can send it again. Cancelling asks for the admin's PIN.
  *
- * Until the hospital's email sender is connected (6 November), the email
- * cannot reach staff, so each invitation has a "Copy link" button to send
- * the link another way, such as WhatsApp.
+ * Saving the invitation also emails it (2026-11-07, through the Worker and
+ * Resend). Each invitation keeps a "Copy link" button too, for when the
+ * email does not arrive and the link goes another way, such as WhatsApp.
  *
  * Never: show an invitation as waiting once it has run out.
  */
@@ -26,6 +26,7 @@ import {
   ROLES,
   accessForRole,
   cancelInvite,
+  emailInvite,
   inviteLink,
   inviteStaff,
   inviteState,
@@ -89,12 +90,16 @@ function InviteForm({
       room_id: roomId,
       ...access,
     })
-    setBusy(false)
     if (problem) {
+      setBusy(false)
       setError(problem)
       return
     }
-    setSent(cleanEmail)
+    // Saved. Now email it; if the email fails, the link can still be copied.
+    const emailProblem = await emailInvite(client, cleanEmail)
+    setBusy(false)
+    if (emailProblem) setError(emailProblem)
+    else setSent(cleanEmail)
     setName('')
     setEmail('')
     await reload()
@@ -178,7 +183,7 @@ function InviteForm({
       {error ? <p className={styles.error}>{error}</p> : null}
       {sent ? (
         <p className={styles.good}>
-          Invitation ready for {sent}. It lasts 72 hours. Copy the link below to send it.
+          Invitation emailed to {sent}. It lasts 72 hours. Ask them to check spam too.
         </p>
       ) : null}
 
@@ -187,7 +192,7 @@ function InviteForm({
         onClick={send}
         disabled={!ready || busy}
       >
-        {busy ? 'Saving…' : 'Send invitation'}
+        {busy ? 'Sending…' : 'Send invitation'}
       </button>
     </div>
   )
@@ -229,6 +234,10 @@ function Invitations({
     setError(null)
     const problem = await sendInviteAgain(client, invite.id)
     if (problem) setError(problem)
+    else {
+      const emailProblem = await emailInvite(client, invite.email)
+      if (emailProblem) setError(emailProblem)
+    }
     await reload()
   }
 

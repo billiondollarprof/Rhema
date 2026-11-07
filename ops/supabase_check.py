@@ -125,6 +125,33 @@ def address_problems(auth, old, new):
     return problems
 
 
+# ===== 2c. The email wording rule (kept apart so it can be tested) =====
+
+# Staff sign in with a 6 digit code, never a link (CLAUDE.md section 8).
+# Supabase sends "Magic link" to a person who signed in before, and
+# "Confirm signup" to a person signing in for the first time, such as a
+# newly invited member of staff. BOTH must carry the code ({{ .Token }})
+# and no link. Found 2026-11-07: a new admin on testing got Supabase's own
+# "Confirm your email address" link instead of a code.
+EMAIL_SUBJECT = "Your Rhema sign-in code"
+
+
+def template_problems(auth):
+    # Start with no problems; each wrong thing adds one line.
+    problems = []
+    # Each pair is: Supabase's short name for the email, and our name for it.
+    for key, name in (("magic_link", "Magic link"), ("confirmation", "Confirm signup")):
+        content = str(auth.get("mailer_templates_" + key + "_content") or "")
+        subject = str(auth.get("mailer_subjects_" + key) or "")
+        if "{{ .Token }}" not in content:
+            problems.append(name + " email has no sign in code ({{ .Token }})")
+        if "ConfirmationURL" in content or "TokenHash" in content:
+            problems.append(name + " email has a link in it")
+        if subject != EMAIL_SUBJECT:
+            problems.append(name + " subject is " + repr(subject) + ", should be " + repr(EMAIL_SUBJECT))
+    return problems
+
+
 # ===== 3. A helper that asks Supabase one question =====
 
 def ask_supabase(path):
@@ -234,6 +261,8 @@ def main():
             problems.append(name + " is " + str(actual) + ", should be " + str(wanted))
     # The two address settings have their own rule (section 2b).
     problems.extend(address_problems(auth, sites["old"], sites["new"]))
+    # And the two sign in emails carry the code, not a link (section 2c).
+    problems.extend(template_problems(auth))
 
     if len(problems) > 0:
         print("Sign in settings have CHANGED:")

@@ -666,6 +666,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+153. **Invitation email.** (2026-11-07) "You have to first of all work it.
+    Let's do it that when you invite someone, the person needs to receive an
+    invitation email. Fix that one first." (Item 13 of the 6 November list.)
+    Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
+    checks as that admin that the invitation is waiting and emails it
+    through Resend from no-reply@rhemamedical.app, with the sign in link.
+    Needs: two sending-only Resend keys (his question 2026-11-07: one key
+    or two? Two, like the SMTP keys): GitHub secrets RESEND_KEY_TESTING
+    (Resend name rhema-worker-testing) and RESEND_KEY_LIVE
+    (rhema-worker-live). The deploy hands each Worker its own.
+
 152. **Live on the real address, and the first real admin.** (2026-11-06,
     night) "You can fix the live, I don't know. Then tomorrow we are going
     to set up the admin account... admin at rhemamedical.app has to be set
@@ -678,30 +689,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     checking things... the deploy role from AWS... tomorrow or Sunday."
     Steps: (a) live on rhemamedical.app tonight (nobody at the hospital has
     installed it yet, so nobody has to reinstall); (b) 7 Nov: admin@
-    rhemamedical.app made the first admin on live (Supabase invite, then
-    the First admin workflow, SQL shown first); (c) at the hospital: the
+    rhemamedical.app made admin on live. No SQL needed: Dr. Evans
+    (rhemamedical7@gmail.com) is already admin on live (run
+    40838481441), so he invites admin@ from Admin, Invite, and admin@
+    signs in with the email code (2026-11-07, steps given); (c) at the hospital: the
     admin invites the matron or director and makes them admin; (d) maybe
     point admin@ routing to that person's Gmail; (e) weekend checks; (f)
     AWS DeployRoleArn, Saturday or Sunday.
-
-151. **FAULT (mine), found 2026-11-06: the nightly backup's housekeeping
-    steps failed on 4 nights in a row (3, 4, 5 and 6 November).** The
-    backup itself was saved and checked each night (copy, lock, upload,
-    open, clear old copies all passed). The step "Delete messages older
-    than a year", added 2026-11-02, passed the database address wrongly
-    (`psql "$URL"` outside `sh -c`, so $URL was empty on the runner), so it
-    failed in 0 seconds and the steps after it were skipped: "End
-    yesterday's open visits" (added 2026-11-04, same mistake) and "Copy new
-    lab result files". No data was lost: the lab files are still in the live
-    store, and the copy is incremental, so the next good run catches up.
-    Nobody noticed because I only watched push runs, never scheduled ones.
-    Fix: both steps use `sh -c '...'` like the working backup step; proved
-    with a pretend docker (before: exit 2, after: exit 0, and still fails
-    loudly with no address). Ship skill step 9 now says to read the
-    scheduled runs. Closes when a nightly run passes every step (next:
-    2026-11-07). He may also say "run the backup now" to prove it sooner;
-    that run would also close yesterday's open visits on live for the
-    first time.
+    (a) DONE 2026-11-06 night: https://rhemamedical.app is live (health
+    ok, sign in 200, the deploy's own smoke test passed on it). The old
+    workers.dev address still works; it gets a redirect once the saved
+    push address is moved (SQL on live, to be shown first). www is not
+    set up yet.
 
 ### Standing instructions
 

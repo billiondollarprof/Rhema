@@ -14,7 +14,8 @@ Log of each work session. Newest at the top. Keep entries short.
   housekeeping steps failed 4 nights; backup itself fine). AWS watcher on
   main, waiting for his DeployRoleArn. Late: testing now answers on
   https://testing.rhemamedical.app (deploy checks it each time); merged
-  to main, live unchanged and healthy. Next: live switch at his time.
+  to main. Then, on his word, live on https://rhemamedical.app (152a).
+  Next, 7 Nov: admin@rhemamedical.app as the first admin on live.
 
 - 2026-11-04 night: testing back to Rhema; the brand switch stays (one
   line in ops/pitch.json, skill pitch-client). Automations is in the menu

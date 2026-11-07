@@ -107,6 +107,24 @@ jobs:
           url=$(grep -o 'https://[a-z0-9.-]*workers\.dev' deploy.log | head -1)
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
+      # Invitation emails (2026-11-07): the Worker needs a Resend key that
+      # may only send. Testing and live each have their own key, like the
+      # Supabase email keys, so one can be cancelled without touching the
+      # other: GitHub secrets RESEND_KEY_TESTING and RESEND_KEY_LIVE. Until
+      # Anthony adds them, this says so and the invite screen offers Copy link.
+      - name: Give the Worker its email key
+        if: steps.gate.outputs.ready == 'yes'
+        env:
+          RESEND_API_KEY: ${{ github.ref_name == 'main' && secrets.RESEND_KEY_LIVE || secrets.RESEND_KEY_TESTING }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ]; then
+            echo "::notice::This site's Resend key is not set yet, so invitations are not emailed."
+            exit 0
+          fi
+          if [ "$WORKER_NAME" = "rhema-hospital" ]; then target=""; else target="--env testing"; fi
+          printf '%s' "$RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY $target > /dev/null
+          echo "The Worker has its email key."
+
       # The smoke test: the deploy reporting success is not proof the site
       # works, so ask the address that was just deployed for the screen and
       # for the health check.
