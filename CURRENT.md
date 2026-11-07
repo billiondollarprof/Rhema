@@ -666,16 +666,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
-153. **Invitation email.** (2026-11-07) "You have to first of all work it.
-    Let's do it that when you invite someone, the person needs to receive an
-    invitation email. Fix that one first." (Item 13 of the 6 November list.)
-    Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
-    checks as that admin that the invitation is waiting and emails it
-    through Resend from no-reply@rhemamedical.app, with the sign in link.
-    Needs: two sending-only Resend keys (his question 2026-11-07: one key
-    or two? Two, like the SMTP keys): GitHub secrets RESEND_KEY_TESTING
-    (Resend name rhema-worker-testing) and RESEND_KEY_LIVE
-    (rhema-worker-live). The deploy hands each Worker its own.
+154. **Email inside the app.** (2026-11-07) "They are not going to be
+    sending email via Gmail... they will be sending their Gmail out from
+    inside the app. So you have to create email section. You just put the
+    button in back of the hamburger, and that place is where any email that
+    is sent to info@... records@... the emails they are sending to them and
+    the emails they are sending out, it will just be there... to reply
+    emails... or send emails officially." "Plan the email, put the button
+    there. If it requires me to do something, do the part you need to do
+    and wait for me." Plan and his questions sent 2026-11-07; waiting.
+    Also from that message: AWS watcher tomorrow (Sunday); Monday 9
+    November is the handover day.
 
 152. **Live on the real address, and the first real admin.** (2026-11-06,
     night) "You can fix the live, I don't know. Then tomorrow we are going
