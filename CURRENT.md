@@ -666,6 +666,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+153. **Invitation email.** (2026-11-07) "You have to first of all work it.
+    Let's do it that when you invite someone, the person needs to receive an
+    invitation email. Fix that one first." (Item 13 of the 6 November list.)
+    Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
+    checks as that admin that the invitation is waiting and emails it
+    through Resend from no-reply@rhemamedical.app, with the sign in link.
+    Needs: a sending-only Resend key in the GitHub secret RESEND_API_KEY
+    (he adds it); the deploy hands it to both Workers.
+
 152. **Live on the real address, and the first real admin.** (2026-11-06,
     night) "You can fix the live, I don't know. Then tomorrow we are going
     to set up the admin account... admin at rhemamedical.app has to be set

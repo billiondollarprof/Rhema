@@ -215,6 +215,26 @@ export async function sendInviteAgain(client: SupabaseClient, inviteId: number) 
   return INVITE_WORDS[data as string] || null
 }
 
+// Emails the invitation (2026-11-07). The Worker checks, as this admin,
+// that a waiting invitation exists for the email, then sends it through
+// Resend. Returns null when the email went, or the words to show.
+export async function emailInvite(client: SupabaseClient, email: string): Promise<string | null> {
+  const { data } = await client.auth.getSession()
+  const token = data.session?.access_token
+  if (!token) return 'Please sign in again.'
+  try {
+    const response = await fetch('/api/invites/email', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    if (response.ok) return null
+  } catch {
+    // No network: fall through to the words below.
+  }
+  return 'The invitation is saved, but the email did not go. Copy the link below and send it another way.'
+}
+
 // The link in the invitation: the sign in page with the email already
 // typed in. The email rides after the #, so it never reaches a server log.
 export function inviteLink(email: string): string {
