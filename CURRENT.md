@@ -675,6 +675,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     emails... or send emails officially." "Plan the email, put the button
     there. If it requires me to do something, do the part you need to do
     and wait for me." Plan and his questions sent 2026-11-07; waiting.
+    DECIDED 2026-11-07: NOT building it. "There's no point... because of
+    that memory thing, I think we should focus on other things and leave
+    that email. Let the admin just get it set up in their Gmail. So if they
+    want to send email as info@, they will do it. And it's not only admin
+    that can do that. Even doctor can still do it." So: incoming mail stays
+    on Email Routing to Gmail; each person who sends as info@ or admin@
+    sets Gmail "Send mail as" through Resend's SMTP with their own sending
+    key. Steps to give him at the hospital.
     Also from that message: AWS watcher tomorrow (Sunday); Monday 9
     November is the handover day.
 
