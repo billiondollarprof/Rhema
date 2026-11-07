@@ -94,5 +94,46 @@ class RealAddresses(unittest.TestCase):
         self.assertEqual(len(addresses), len(set(addresses)))
 
 
+
+# ===== The email wording rule =====
+
+GOOD = "<div>Use this code: {{ .Token }}</div>"
+
+
+# Builds pretend settings for the two emails.
+def emails(magic=GOOD, confirm=GOOD, subject=check.EMAIL_SUBJECT):
+    return {
+        "mailer_templates_magic_link_content": magic,
+        "mailer_templates_confirmation_content": confirm,
+        "mailer_subjects_magic_link": subject,
+        "mailer_subjects_confirmation": subject,
+    }
+
+
+class EmailRule(unittest.TestCase):
+    def test_both_emails_with_the_code_pass(self):
+        self.assertEqual(check.template_problems(emails()), [])
+
+    def test_supabase_s_own_confirm_link_fails(self):
+        default = '<a href="{{ .ConfirmationURL }}">Confirm your mail</a>'
+        problems = check.template_problems(emails(confirm=default))
+        self.assertEqual(len(problems), 2)
+        self.assertTrue(all("Confirm signup" in p for p in problems))
+
+    def test_a_magic_link_without_the_code_fails(self):
+        problems = check.template_problems(emails(magic="<p>Hello</p>"))
+        self.assertEqual(problems, ["Magic link email has no sign in code ({{ .Token }})"])
+
+    def test_a_code_with_a_link_beside_it_fails(self):
+        both = GOOD + '<a href="{{ .ConfirmationURL }}">or tap</a>'
+        self.assertEqual(len(check.template_problems(emails(magic=both))), 1)
+
+    def test_the_wrong_subject_fails(self):
+        self.assertEqual(len(check.template_problems(emails(subject="Confirm Your Signup"))), 2)
+
+    def test_missing_settings_fail(self):
+        self.assertEqual(len(check.template_problems({})), 4)
+
+
 if __name__ == "__main__":
     unittest.main()
