@@ -678,8 +678,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     checking things... the deploy role from AWS... tomorrow or Sunday."
     Steps: (a) live on rhemamedical.app tonight (nobody at the hospital has
     installed it yet, so nobody has to reinstall); (b) 7 Nov: admin@
-    rhemamedical.app made the first admin on live (Supabase invite, then
-    the First admin workflow, SQL shown first); (c) at the hospital: the
+    rhemamedical.app made admin on live. No SQL needed: Dr. Evans
+    (rhemamedical7@gmail.com) is already admin on live (run
+    40838481441), so he invites admin@ from Admin, Invite, and admin@
+    signs in with the email code (2026-11-07, steps given); (c) at the hospital: the
     admin invites the matron or director and makes them admin; (d) maybe
     point admin@ routing to that person's Gmail; (e) weekend checks; (f)
     AWS DeployRoleArn, Saturday or Sunday.
