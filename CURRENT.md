@@ -689,25 +689,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     push address is moved (SQL on live, to be shown first). www is not
     set up yet.
 
-151. **FAULT (mine), found 2026-11-06: the nightly backup's housekeeping
-    steps failed on 4 nights in a row (3, 4, 5 and 6 November).** The
-    backup itself was saved and checked each night (copy, lock, upload,
-    open, clear old copies all passed). The step "Delete messages older
-    than a year", added 2026-11-02, passed the database address wrongly
-    (`psql "$URL"` outside `sh -c`, so $URL was empty on the runner), so it
-    failed in 0 seconds and the steps after it were skipped: "End
-    yesterday's open visits" (added 2026-11-04, same mistake) and "Copy new
-    lab result files". No data was lost: the lab files are still in the live
-    store, and the copy is incremental, so the next good run catches up.
-    Nobody noticed because I only watched push runs, never scheduled ones.
-    Fix: both steps use `sh -c '...'` like the working backup step; proved
-    with a pretend docker (before: exit 2, after: exit 0, and still fails
-    loudly with no address). Ship skill step 9 now says to read the
-    scheduled runs. Closes when a nightly run passes every step (next:
-    2026-11-07). He may also say "run the backup now" to prove it sooner;
-    that run would also close yesterday's open visits on live for the
-    first time.
-
 ### Standing instructions
 
 These never come off the list.
