@@ -672,8 +672,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
     checks as that admin that the invitation is waiting and emails it
     through Resend from no-reply@rhemamedical.app, with the sign in link.
-    Needs: a sending-only Resend key in the GitHub secret RESEND_API_KEY
-    (he adds it); the deploy hands it to both Workers.
+    Needs: two sending-only Resend keys (his question 2026-11-07: one key
+    or two? Two, like the SMTP keys): GitHub secrets RESEND_KEY_TESTING
+    (Resend name rhema-worker-testing) and RESEND_KEY_LIVE
+    (rhema-worker-live). The deploy hands each Worker its own.
 
 152. **Live on the real address, and the first real admin.** (2026-11-06,
     night) "You can fix the live, I don't know. Then tomorrow we are going
