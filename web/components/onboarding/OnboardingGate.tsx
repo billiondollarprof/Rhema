@@ -51,14 +51,15 @@ import { BRAND } from '@/lib/brand/brand'
 
 type Stage = 'checking' | 'install' | 'installed-elsewhere' | 'allow' | 'ring' | 'done'
 
-// PAUSED, Anthony 2026-10-30: "we should pause the ask for now... before
-// we hand over to the hospital... we can now bring it back." Why: until
-// Resend sends a 6 digit code (6 November), signing in uses the email
-// link, and on an iPhone or iPad the link opens Safari, not the installed
-// app, so nobody can sign in inside the app yet. Set this to false before
-// handover (it is on the handover list in CURRENT.md). The /install/ page
-// and the "Turn on" line in the Call attention list still work meanwhile.
-const CARDS_PAUSED = true
+// PAUSED 2026-10-30 to 2026-11-08. Anthony, 2026-10-30: "we should pause
+// the ask for now... before we hand over to the hospital... we can now
+// bring it back." The reason was that sign in used an email link, which on
+// an iPhone or iPad opens Safari, not the installed app. Since 2026-11-07
+// both sign in emails carry the 6 digit code (checked every day by
+// ops/supabase_check.py), so the cards are back on for the handover
+// (request 109, found missing in the pass of 2026-11-08, request 155).
+// Set it to true again only on his word.
+const CARDS_PAUSED = false
 
 const RING_SET_KEY = 'rhema-loud-ring-set'
 

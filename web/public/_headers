@@ -1,5 +1,23 @@
-# Cloudflare sends these headers with every screen (request 136).
-# A private hospital tool: never indexed, never shown in search results,
-# never kept in a search engine's copy.
+# Cloudflare sends these headers with every screen.
+#
+# Request 136: a private hospital tool, never indexed, never shown in search
+# results, never kept in a search engine's copy.
+#
+# Request 155 (2026-11-08, security pass): the browser's own protections.
+#   Content-Security-Policy: the page may only run its own code, and only
+#     talk to itself and Supabase. A script slipped in from elsewhere does
+#     not run, and no other site may show this app inside a frame
+#     (frame-ancestors), so nobody can trick a nurse into clicking through
+#     a disguised page. 'unsafe-inline' is needed by the Next.js build.
+#   Strict-Transport-Security: always https, never plain http.
+#   X-Content-Type-Options: a file is only ever treated as what it says.
+#   Referrer-Policy: other sites never see which screen a link came from.
+#   Permissions-Policy: no microphone or location; camera only for this app.
+# Never: loosen these to make a new feature work without saying why here.
 /*
   X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self' blob:; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=()

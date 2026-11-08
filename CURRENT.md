@@ -666,6 +666,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+155. **What is left, and a quick pass before handover.** (2026-11-08)
+    "Apart from the what else is left? Also do a quick pass for both
+    buttons and screens. Check anything missing, any step ignored from a
+    process or any button that was forgotten or anything broken or left
+    unfixed and also the security of the platform."
+
 154. **Email inside the app.** (2026-11-07) "They are not going to be
     sending email via Gmail... they will be sending their Gmail out from
     inside the app. So you have to create email section. You just put the
