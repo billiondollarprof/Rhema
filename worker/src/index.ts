@@ -162,6 +162,10 @@ export default {
       : await env.ASSETS.fetch(request)
     const answered = new Response(response.body, response)
     answered.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+    // The /api answers get the same basic protections as the screens
+    // (request 155): never treated as another type, never shown in a frame.
+    answered.headers.set('X-Content-Type-Options', 'nosniff')
+    answered.headers.set('X-Frame-Options', 'DENY')
     return answered
   },
 }

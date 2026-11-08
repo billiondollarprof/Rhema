@@ -666,16 +666,40 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
-153. **Invitation email.** (2026-11-07) "You have to first of all work it.
-    Let's do it that when you invite someone, the person needs to receive an
-    invitation email. Fix that one first." (Item 13 of the 6 November list.)
-    Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
-    checks as that admin that the invitation is waiting and emails it
-    through Resend from no-reply@rhemamedical.app, with the sign in link.
-    Needs: two sending-only Resend keys (his question 2026-11-07: one key
-    or two? Two, like the SMTP keys): GitHub secrets RESEND_KEY_TESTING
-    (Resend name rhema-worker-testing) and RESEND_KEY_LIVE
-    (rhema-worker-live). The deploy hands each Worker its own.
+155. **What is left, and a quick pass before handover.** (2026-11-08)
+    "Apart from the what else is left? Also do a quick pass for both
+    buttons and screens. Check anything missing, any step ignored from a
+    process or any button that was forgotten or anything broken or left
+    unfixed and also the security of the platform."
+    Done 2026-11-08: layout check 26 screens clean; 138 buttons pressed,
+    none broke (the "changed nothing" ones are options already chosen, or
+    Home tiles that scroll smoothly, proved by a scroll test). Security:
+    npm audit 0 in what ships (8 moderate in lint tools only); database
+    advisors 0 new (Supabase check run 42407659217, both projects). FOUND
+    and FIXED: no browser security headers at all (CSP, HSTS, nosniff,
+    referrer, permissions, no-frame); added and proved on testing with a
+    real sign in request. FOUND and FIXED: CARDS_PAUSED still true (109),
+    turned off, cards walked on iPhone, Android, desktop.
+
+154. **Email inside the app.** (2026-11-07) "They are not going to be
+    sending email via Gmail... they will be sending their Gmail out from
+    inside the app. So you have to create email section. You just put the
+    button in back of the hamburger, and that place is where any email that
+    is sent to info@... records@... the emails they are sending to them and
+    the emails they are sending out, it will just be there... to reply
+    emails... or send emails officially." "Plan the email, put the button
+    there. If it requires me to do something, do the part you need to do
+    and wait for me." Plan and his questions sent 2026-11-07; waiting.
+    DECIDED 2026-11-07: NOT building it. "There's no point... because of
+    that memory thing, I think we should focus on other things and leave
+    that email. Let the admin just get it set up in their Gmail. So if they
+    want to send email as info@, they will do it. And it's not only admin
+    that can do that. Even doctor can still do it." So: incoming mail stays
+    on Email Routing to Gmail; each person who sends as info@ or admin@
+    sets Gmail "Send mail as" through Resend's SMTP with their own sending
+    key. Steps to give him at the hospital.
+    Also from that message: AWS watcher tomorrow (Sunday); Monday 9
+    November is the handover day.
 
 152. **Live on the real address, and the first real admin.** (2026-11-06,
     night) "You can fix the live, I don't know. Then tomorrow we are going

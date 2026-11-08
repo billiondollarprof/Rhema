@@ -920,3 +920,19 @@ this file.
     DONE 2026-11-07: the nightly run of 7 November (run 42350271340)
     passed every step: backup checked, old messages, yesterday's open
     visits, lab files (0 live, all locked).
+
+153. **Invitation email.** (2026-11-07) "You have to first of all work it.
+    Let's do it that when you invite someone, the person needs to receive an
+    invitation email. Fix that one first." (Item 13 of the 6 November list.)
+    Built: Send invitation saves it, then the Worker (worker/src/invites.ts)
+    checks as that admin that the invitation is waiting and emails it
+    through Resend from no-reply@rhemamedical.app, with the sign in link.
+    Needs: two sending-only Resend keys (his question 2026-11-07: one key
+    or two? Two, like the SMTP keys): GitHub secrets RESEND_KEY_TESTING
+    (Resend name rhema-worker-testing) and RESEND_KEY_LIVE
+    (rhema-worker-live). The deploy hands each Worker its own.
+    DONE 2026-11-07: he invited admin@ on testing, the email arrived in the
+    inbox, admin@ signed in and invited a Front Desk. Live has its own key
+    (deploy: "The Worker has its email key"). Also found and fixed with him:
+    the Confirm signup email on testing and live still sent a link; he
+    pasted the code wording; the daily check now guards both emails.
