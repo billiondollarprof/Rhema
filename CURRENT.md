@@ -666,6 +666,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+156. **Privacy Policy and Terms of Use, and the staff agreement tick.**
+    (2026-11-08) "Write a standard privacy protection section and terms and
+    agreement... put that button somewhere before you log in... it will
+    include the Nigeria Data Protection Act... when a person is coming for
+    the first time as an invited staff, the terms... should be at the
+    bottom there for them to tick the button, so they are agreeing to
+    protect patients' information... check Amara's own section... It
+    stays outside of the app, just on its own... On desktop: developed by
+    StellaXafe Technologies Limited at the mid bottom... On mobile phone,
+    terms and privacy policy at the top left corner, so the developed by
+    StellaXafe Technologies Limited still remains at the bottom." Then:
+    AWS straight after church, then www and the little things.
+
 155. **What is left, and a quick pass before handover.** (2026-11-08)
     "Apart from the what else is left? Also do a quick pass for both
     buttons and screens. Check anything missing, any step ignored from a
