@@ -678,6 +678,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     terms and privacy policy at the top left corner, so the developed by
     StellaXafe Technologies Limited still remains at the bottom." Then:
     AWS straight after church, then www and the little things.
+    2026-11-08: Privacy Policy (/privacy/) and Terms of Use (/terms/) LIVE,
+    linked from sign in (top left on a phone, bottom left on a computer),
+    "Developed by StellaXafe Technologies Limited" bottom middle. The tick
+    on the first Choose your PIN is BUILT on the feature branch (migration
+    20261108061606_staff_terms_agreement, 6 tests, 8 breaks caught, walked
+    at 320, 390, 1440): WAITING for his yes on the SQL before testing.
 
 155. **What is left, and a quick pass before handover.** (2026-11-08)
     "Apart from the what else is left? Also do a quick pass for both

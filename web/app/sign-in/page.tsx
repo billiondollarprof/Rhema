@@ -36,6 +36,7 @@ import { listAccounts, type DeviceAccount } from '@/lib/auth/device-accounts'
 import { roleLabel } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { LEGAL_VERSION } from '@/components/legal/PrivacyText'
 
 type Step = 'choose' | 'email' | 'code'
 
@@ -216,12 +217,60 @@ export default function SignInPage() {
 }
 
 // ===== 4. First PIN: choose it, then type it again =====
+// The first time, the person also ticks that they agree to the Terms of
+// Use and the Privacy Policy (request 156, 2026-11-08). The tick is saved
+// in the database (agree_to_terms) before the PIN, with the version of the
+// words. Somebody who already agreed to these words (for example after 5
+// wrong PINs) is not asked again.
+type Agreement = 'checking' | 'needed' | 'done'
+
 function ChoosePin() {
   const auth = useAuth()
   const [first, setFirst] = useState('')
   const [again, setAgain] = useState('')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [agreement, setAgreement] = useState<Agreement>('checking')
+  const [ticked, setTicked] = useState(false)
+
+  // Has this person already agreed to these words?
+  const client = auth.client
+  const personId = auth.account?.id
+  useEffect(() => {
+    if (!client || !personId) return
+    let stillHere = true
+    client
+      .from('staff')
+      .select('terms_version')
+      .eq('id', personId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!stillHere) return
+        setAgreement(data?.terms_version === LEGAL_VERSION ? 'done' : 'needed')
+      })
+    return () => {
+      stillHere = false
+    }
+  }, [client, personId])
+  const mustTick = agreement !== 'done'
+
+  // The first 4 digits are in: carry on, unless the box still needs a tick.
+  function firstDone() {
+    if (mustTick && !ticked) {
+      setError('Tick the box below to agree, then carry on.')
+      return
+    }
+    setError(null)
+    setConfirming(true)
+  }
+
+  function tick(on: boolean) {
+    setTicked(on)
+    if (on && first.length === PIN_LENGTH && !confirming) {
+      setError(null)
+      setConfirming(true)
+    }
+  }
 
   async function save(repeated: string) {
     if (repeated !== first) {
@@ -230,6 +279,17 @@ function ChoosePin() {
       setAgain('')
       setConfirming(false)
       return
+    }
+    if (mustTick) {
+      const { data, error: failed } = (await auth.client?.rpc('agree_to_terms', {
+        terms: LEGAL_VERSION,
+      })) ?? { data: null, error: true }
+      if (failed || data !== true) {
+        setError('Your agreement could not be saved. Check the internet and try again.')
+        setAgain('')
+        return
+      }
+      setAgreement('done')
     }
     const problem = await auth.setPin(repeated)
     if (problem) setError(problem)
@@ -261,10 +321,7 @@ function ChoosePin() {
           length={PIN_LENGTH}
           value={first}
           onChange={setFirst}
-          onComplete={() => {
-            setError(null)
-            setConfirming(true)
-          }}
+          onComplete={firstDone}
           secret
           label="Choose your PIN"
           autoFocus
@@ -274,6 +331,27 @@ function ChoosePin() {
       <p className={styles.note}>
         Do not share your PIN. Everything done under it carries your name.
       </p>
+      {mustTick && !confirming ? (
+        <label className={styles.agree}>
+          <input
+            type="checkbox"
+            checked={ticked}
+            disabled={agreement === 'checking'}
+            onChange={(event) => tick(event.target.checked)}
+          />
+          <span>
+            I have read the{' '}
+            <a href="/terms/" target="_blank" rel="noopener">
+              Terms of Use
+            </a>{' '}
+            and the{' '}
+            <a href="/privacy/" target="_blank" rel="noopener">
+              Privacy Policy
+            </a>
+            . I will keep patient information confidential and use it only for patient care.
+          </span>
+        </label>
+      ) : null}
     </Shell>
   )
 }
