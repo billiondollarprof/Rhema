@@ -13,6 +13,9 @@
 #   X-Content-Type-Options: a file is only ever treated as what it says.
 #   Referrer-Policy: other sites never see which screen a link came from.
 #   Permissions-Policy: no microphone or location; camera only for this app.
+#   Cloudflare adds its own visitor counter script (Web Analytics) to the
+#   page; the policy blocks it on purpose, because it would send screen
+#   addresses (which carry patient numbers) out of the app. Harmless.
 # Never: loosen these to make a new feature work without saying why here.
 /*
   X-Robots-Tag: noindex, nofollow, noarchive, nosnippet

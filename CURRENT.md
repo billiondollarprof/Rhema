@@ -671,6 +671,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     buttons and screens. Check anything missing, any step ignored from a
     process or any button that was forgotten or anything broken or left
     unfixed and also the security of the platform."
+    Done 2026-11-08: layout check 26 screens clean; 138 buttons pressed,
+    none broke (the "changed nothing" ones are options already chosen, or
+    Home tiles that scroll smoothly, proved by a scroll test). Security:
+    npm audit 0 in what ships (8 moderate in lint tools only); database
+    advisors 0 new (Supabase check run 42407659217, both projects). FOUND
+    and FIXED: no browser security headers at all (CSP, HSTS, nosniff,
+    referrer, permissions, no-frame); added and proved on testing with a
+    real sign in request. FOUND and FIXED: CARDS_PAUSED still true (109),
+    turned off, cards walked on iPhone, Android, desktop.
 
 154. **Email inside the app.** (2026-11-07) "They are not going to be
     sending email via Gmail... they will be sending their Gmail out from
