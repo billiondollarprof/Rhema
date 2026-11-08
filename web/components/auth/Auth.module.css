@@ -297,6 +297,7 @@
 
 /* ===== The agreement tick on the first PIN (request 156) ===== */
 .agree {
+  text-align: left;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
