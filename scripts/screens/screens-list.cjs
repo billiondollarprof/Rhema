@@ -21,6 +21,9 @@ module.exports.SCREENS = [
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
   { path: '/install/', waitFor: 'Get RHEMA on every device' },
+  // Request 156: the two documents, open without signing in.
+  { path: '/privacy/', waitFor: 'Your rights' },
+  { path: '/terms/', waitFor: 'Your account is yours alone' },
   { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
   { path: '/lab/result/', waitFor: 'Add a lab result' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },

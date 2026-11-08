@@ -9,7 +9,10 @@
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 20px 16px;
+  /* Room above and below the card for the legal links and the developer
+     line (request 156), so the card never covers them. */
+  padding: 64px 16px;
+  position: relative;
   background: linear-gradient(150deg, #0a2a5e, #1565c0 60%, #42a5f5);
 }
 
@@ -240,4 +243,54 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+}
+
+/* ===== The legal links and the developer line (request 156) ===== */
+/* Phone: the links sit at the top left; the developer line at the bottom. */
+.legalLinks {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+}
+
+.legalLinks a {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 10px;
+  min-height: 34px;
+  border-radius: 999px;
+  background: rgba(10, 42, 94, 0.45);
+}
+
+.legalLinks a:hover {
+  background: rgba(10, 42, 94, 0.7);
+}
+
+.credit {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  right: 16px;
+  z-index: 2;
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  /* It is only words: taps go through it to the links beside it. */
+  pointer-events: none;
+}
+
+/* Computer: the links move to the bottom left corner, beside the line. */
+@media (min-width: 900px) {
+  .legalLinks {
+    top: auto;
+    bottom: 8px;
+    left: 16px;
+  }
 }

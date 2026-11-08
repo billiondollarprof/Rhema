@@ -25,6 +25,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import CodeBoxes from '@/components/auth/CodeBoxes'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Logo from '@/components/brand/Logo'
@@ -297,6 +298,14 @@ function Shell({
         {lead ? <p className={styles.lead}>{lead}</p> : null}
         {children}
       </section>
+      {/* Request 156 (2026-11-08): the two documents, open without signing
+          in. Top left on a phone, bottom left on a computer, so the
+          developer line keeps the bottom middle. */}
+      <nav className={styles.legalLinks} aria-label="Privacy and terms">
+        <Link href="/privacy/">Privacy Policy</Link>
+        <Link href="/terms/">Terms of Use</Link>
+      </nav>
+      <p className={styles.credit}>Developed by StellaXafe Technologies Limited</p>
     </main>
   )
 }
