@@ -3,11 +3,13 @@
  *
  * Why: Anthony, 2026-11-08, about the installed app: "as it is loading...
  * it's just as if they all plastered the logo on this thing, so it didn't
- * blend and it didn't show dynamic loading." The phone's own start screen
- * is now white (manifest background_color), the same white as the logo's
- * square, so the logo sits on one clean page. Then this screen takes over:
- * the same logo in the middle, breathing gently, with a thin bar moving
- * under it, until the app is ready.
+ * blend and it didn't show dynamic loading." Then: "why change the app's
+ * loading screen to white instead of making the logo circular and letting
+ * the edges blend well with the blue background." So the installed app's
+ * icon is now the round logo with clear corners (web/public/icon-*.png),
+ * the phone's start screen stays navy, and this screen continues it: the
+ * same round logo on the same navy, breathing gently, with a light bar
+ * moving under it, until the app is ready.
  *
  * Never: show anybody's data here. It shows before sign in is known.
  */
