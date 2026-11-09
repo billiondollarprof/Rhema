@@ -189,7 +189,10 @@ function LabEntry({
             Take payment
           </button>
         ) : null}
-        {view === 'lab' ? (
+        {view === 'lab' && request.status === 'awaiting_payment' ? (
+          <span className={styles.waitingPay}>Waiting for payment at the Front Desk</span>
+        ) : null}
+        {view === 'lab' && request.status !== 'awaiting_payment' ? (
           <Link
             className={`${styles.button} ${styles.primary}`}
             href={`/lab/result/?r=${request.id}`}

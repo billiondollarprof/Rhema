@@ -697,6 +697,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
         can't be ignored, maybe a pop up sound or iPhone notification sound."
     (e) "Pharmacy request too, simultaneously send to pharmacy and front
         desk for payment."
+    BUILT 2026-11-09: (a) refresh button back; (b) a Back button first in
+    the top bar on every screen but Home (back in the app, or Home); (c)
+    lab: the Lab sees a request at once, "Waiting for payment at the Front
+    Desk", ready the moment it is paid, live; the option reads "Lab and
+    Front Desk (payment)"; "Straight to the lab" kept; (e) pharmacy: the
+    first option, "Pharmacy and Front Desk (payment)", sends to both at
+    once; "Straight to the pharmacy" kept; (d) a three note chime, twice,
+    whenever anything new waits (not a message while Messages is open).
+    STILL TO DO: (c) the doctor told when a prescription is dispensed (lab
+    results already tell them): needs a "seen" column, SQL with the
+    antenatal batch. Note: the pharmacy file said "No alert when dispensed"
+    (his earlier word); his new word replaces it.
 
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be

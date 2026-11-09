@@ -145,11 +145,15 @@ export async function payLabRequestLines(
 }
 
 // ===== 4. The lab: tests to do, and the results =====
+// The lab sees a request the moment the doctor sends it, at the same time
+// as the Front Desk sees it for payment (Anthony, 2026-11-09: "request lab
+// goes to lab and front desk simultaneously"). An unpaid one shows as
+// waiting for payment and turns ready the moment it is paid.
 export async function listAwaitingTest(client: SupabaseClient): Promise<LabRequest[]> {
   const { data } = await client
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
-    .eq('status', 'awaiting_test')
+    .in('status', ['awaiting_test', 'awaiting_payment'])
     .order('requested_at')
   return (data as unknown as LabRequest[] | null) ?? []
 }

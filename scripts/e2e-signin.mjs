@@ -405,7 +405,9 @@ try {
   await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
   await page.getByRole('button', { name: 'Malaria test' }).click()
   await page.getByRole('button', { name: 'Send request' }).click()
-  await page.getByText('Sent to the Front Desk for payment: Malaria test.').waitFor()
+  await page
+    .getByText('Sent to the Lab, and to the Front Desk for payment: Malaria test.')
+    .waitFor()
 
   step('Lab: the front desk takes 2,000 naira by POS; it leaves the list and stays gone')
   await desk.reload()
