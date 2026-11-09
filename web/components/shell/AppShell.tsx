@@ -157,6 +157,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <Icon name="back" size={18} />
               </button>
             ) : null}
+            {/* Refresh, near the logo and away from Call attention and the
+                menu, so it is not tapped by mistake (Anthony, 2026-11-09). */}
+            <button
+              type="button"
+              className={`${styles.topButton} ${refreshing ? styles.turning : ''}`}
+              onClick={refreshApp}
+              aria-label="Refresh"
+              title="Refresh"
+            >
+              <Icon name="refresh" size={18} />
+            </button>
             {/* A thin line keeps the hospital's logo apart from the person. */}
             <span className={styles.topDivider} aria-hidden="true" />
             <PersonBadge name={staff.full_name} />
@@ -170,15 +181,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               myRoomId={staff.room_id}
               buttonClass={styles.topButton}
             />
-            <button
-              type="button"
-              className={`${styles.topButton} ${refreshing ? styles.turning : ''}`}
-              onClick={refreshApp}
-              aria-label="Refresh"
-              title="Refresh"
-            >
-              <Icon name="refresh" size={18} />
-            </button>
             {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
             <MainMenu buttonClass={styles.topButton} waiting={waitingTotal} />
           </div>
