@@ -684,6 +684,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
+168. **www.rhemamedical.app redirect.** DONE by him 2026-11-09 in Cloudflare
+    Redirect Rules. His first rule used a wildcard (*.rhemamedical.app/*),
+    which also sent testing.rhemamedical.app to live; he changed it to www
+    only. Checked: www (with path and query) 301 to rhemamedical.app;
+    testing and live answer 200 on their own.
+    workers.dev: on his word ("go ahead with the workers.dev redirect"),
+    every screen opened on the old workers.dev address moves at once to the
+    real one (same screen, same address after it), live to rhemamedical.app
+    and testing to testing.rhemamedical.app. /api/ on workers.dev still
+    answers, for the deploy checks.
+
 167. **LATER: patients get their own medical record by email.** (2026-11-09)
     "All they need to do is to send their REMA ID, their card ID with their
     phone number and their name... to records@rhemamedical.app, then

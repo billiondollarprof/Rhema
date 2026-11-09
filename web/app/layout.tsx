@@ -36,9 +36,27 @@ export const viewport: Viewport = {
   themeColor: '#0a2a5e',
 }
 
+// ===== The old workers.dev addresses send people to the real ones =====
+// Anthony, 2026-11-09: "go ahead with the workers.dev redirect". The
+// screens on workers.dev are served as plain files before any code runs,
+// so the move happens here, as the very first thing the page does, keeping
+// the same screen and anything after it in the address. The /api/ door on
+// workers.dev keeps answering, because the deploy checks use it.
+const MOVE_TO_REAL_ADDRESS = `(function () {
+  var h = location.hostname;
+  if (!/\\.workers\\.dev$/.test(h)) return;
+  var to = /^rhema-hospital-testing\\./.test(h)
+    ? 'https://testing.rhemamedical.app'
+    : /^rhema-hospital\\./.test(h) ? 'https://rhemamedical.app' : null;
+  if (to) location.replace(to + location.pathname + location.search + location.hash);
+})();`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: MOVE_TO_REAL_ADDRESS }} />
+      </head>
       <body>
         {/* Who is signed in and whether the screen is locked, for every
             screen. It decides which screen shows, never what data a person
