@@ -32,7 +32,7 @@ import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import OutboxSender from '@/components/offline/OutboxSender'
 import { loadNotices, totalOf } from '@/lib/notifications/notifications'
-import { onChange } from '@/lib/live/changes'
+import { onChange, refreshHere } from '@/lib/live/changes'
 import { playNoticeSound } from '@/lib/live/sound'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
@@ -72,9 +72,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // refresh spinning wheel at the top bar will be needed"): it turns for a
   // moment, then the app loads again.
   const [refreshing, setRefreshing] = useState(false)
+  // It no longer reloads the app (Anthony, 2026-11-09: "as if nothing
+  // happened... updates will appear"): every screen fetches again in the
+  // background, and the person's own details too. The arrow turns once.
   function refreshApp() {
+    if (refreshing || !client) return
     setRefreshing(true)
-    window.setTimeout(() => window.location.reload(), 450)
+    refreshHere(client)
+    void auth.refreshStaff()
+    window.setTimeout(() => setRefreshing(false), 700)
   }
   // The back button (request 171b): back to the previous screen of the
   // app; when this screen was opened first (a link, a refresh), to Home.

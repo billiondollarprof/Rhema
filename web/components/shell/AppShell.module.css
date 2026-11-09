@@ -370,7 +370,7 @@
 
 /* The refresh button turns while the app loads again (request 157). */
 .turning svg {
-  animation: turn 0.6s linear infinite;
+  animation: turn 0.7s ease-in-out;
 }
 
 @keyframes turn {
@@ -379,7 +379,15 @@
   }
 }
 
-/* The back button sits first in the top bar (request 171b). */
+/* The back button sits first in the top bar (request 171b), on tablets
+   and computers only; on a phone it would crowd the bar (his word,
+   2026-11-09). */
 .backButton {
   margin-right: 4px;
+}
+
+@media (max-width: 699px) {
+  .backButton {
+    display: none;
+  }
 }
