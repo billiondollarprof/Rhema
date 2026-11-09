@@ -15,6 +15,9 @@
  * taken while editing (request 141, Anthony, 2026-11-04: "during edit it
  * can be found in case they're paying for something new/else").
  *
+ * A family member changed to Individual pays the card fee before the change
+ * saves (request 160, 2026-11-09).
+ *
  * Never: delete a patient from here. A wrong registration is voided with a
  * reason, by the admin, in a later step.
  */
@@ -26,7 +29,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import PatientFilesCard from '../_parts/PatientFilesCard'
 import PaymentsCard from '../_parts/PaymentsCard'
-import PatientForm, { EMPTY_DETAILS } from '../_parts/PatientForm'
+import PatientForm, { EMPTY_DETAILS, type CardFee } from '../_parts/PatientForm'
 import styles from '../_parts/patients.module.css'
 import {
   getPatient,
@@ -34,6 +37,7 @@ import {
   type PatientDetails,
   type PatientResult,
 } from '@/lib/patients/patients'
+import { takePayment } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -63,10 +67,26 @@ function EditPatient() {
   if (auth.status !== 'ready' || !client) return null
 
   // ===== 2. Save, then back to the patient =====
-  async function save(details: PatientDetails) {
+  async function save(details: PatientDetails, cardFee: CardFee) {
     if (!client || !id) return
     setBusy(true)
     setProblem(null)
+    // A family member who becomes Individual pays their card fee first
+    // (request 160). If the payment does not save, nothing changes.
+    if (cardFee) {
+      const paid = await takePayment(
+        client,
+        id,
+        'registration_card',
+        [{ label: 'Registration card', amount: cardFee.amount }],
+        cardFee.mode,
+      )
+      if (typeof paid !== 'number') {
+        setBusy(false)
+        setProblem(typeof paid === 'string' ? paid : 'The card fee could not be saved. Try again.')
+        return
+      }
+    }
     const result = await updatePatient(client, id, details)
     setBusy(false)
     if (result) setProblem(result)
@@ -113,6 +133,11 @@ function EditPatient() {
               saveLabel="Save changes"
               busy={busy}
               problem={problem}
+              // A family member changed to Individual pays the card fee
+              // (Anthony, 2026-11-09: "Yes if changed to individual").
+              feeRequiredIf={(details) =>
+                patient.category === 'family' && details.category === 'individual'
+              }
               onSave={save}
             />
             {staff ? (

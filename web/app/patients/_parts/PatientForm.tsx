@@ -63,6 +63,10 @@ type FormProps = {
   // Adding a family member (request 160): what the family already paid,
   // shown above the payment, which stays optional.
   familyPaid?: { key: string; label: string; amount: string; detail: string }[]
+  // Edit patient (request 160, his answer 2026-11-09: "Yes if changed to
+  // individual"): when this answers true for what is on the form, the
+  // Payment section shows and the card fee must be paid before saving.
+  feeRequiredIf?: (details: PatientDetails) => boolean
   onSave: (details: PatientDetails, fee: CardFee) => void
 }
 
@@ -120,12 +124,16 @@ export default function PatientForm({
   problem,
   withPayment = false,
   familyPaid,
+  feeRequiredIf,
   onSave,
 }: FormProps) {
   const [details, setDetails] = useState<PatientDetails>(initial)
   const [shown, setShown] = useState<Record<string, string>>({})
   const [fee, setFee] = useState('')
   const [mode, setMode] = useState<PaymentMode>('cash')
+
+  // Whether the card fee must be paid now, for what is on the form.
+  const feeNeededNow = feeRequiredIf?.(details) ?? false
 
   function set<K extends keyof PatientDetails>(key: K, value: PatientDetails[K]) {
     setDetails((now) => ({ ...now, [key]: value }))
@@ -134,8 +142,11 @@ export default function PatientForm({
   function save() {
     const ready = tidy(details)
     const wrong = check(ready)
-    const amount = withPayment ? readFee(fee) : null
-    if (amount !== null && !(amount > 0 && amount < 100000000))
+    const feeNeeded = feeRequiredIf?.(details) ?? false
+    const amount = withPayment || feeNeeded ? readFee(fee) : null
+    if (feeNeeded && amount === null)
+      wrong.fee = 'A patient of their own pays the card fee. Type it in naira, like 2,000.'
+    else if (amount !== null && !(amount > 0 && amount < 100000000))
       wrong.fee = 'Type the card fee in naira, like 2,000, or leave it empty.'
     setShown(wrong)
     if (Object.keys(wrong).length === 0) onSave(ready, amount ? { amount, mode } : null)
@@ -273,7 +284,7 @@ export default function PatientForm({
       </div>
 
       {/* ===== 6. Payment: the card fee (Register only) ===== */}
-      {withPayment ? (
+      {withPayment || feeNeededNow ? (
         <section className={styles.card}>
           <div className={styles.sectionHead}>
             <i>
@@ -282,9 +293,11 @@ export default function PatientForm({
             <div>
               <b>Payment</b>
               <small>
-                {familyPaid
-                  ? 'This family has paid before. Add a payment only if they are paying more now.'
-                  : 'The card fee, if the patient is paying now.'}
+                {feeNeededNow
+                  ? 'Leaving the family for a card of their own: the card fee is paid now.'
+                  : familyPaid
+                    ? 'This family has paid before. Add a payment only if they are paying more now.'
+                    : 'The card fee, if the patient is paying now.'}
               </small>
             </div>
           </div>
@@ -311,7 +324,11 @@ export default function PatientForm({
           <div className={styles.fields}>
             <div className={styles.field}>
               <label htmlFor="field-fee">
-                {familyPaid ? 'Add a payment (optional)' : 'Card fee (optional)'}
+                {feeNeededNow
+                  ? 'Card fee'
+                  : familyPaid
+                    ? 'Add a payment (optional)'
+                    : 'Card fee (optional)'}
               </label>
               <div className={styles.money}>
                 <span aria-hidden="true">₦</span>

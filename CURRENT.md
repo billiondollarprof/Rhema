@@ -675,8 +675,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     you can add the payments." Built 2026-11-09: the form starts with the
     first member's phone, email, address and next of kin (editable), the
     biodata empty; the Payment card lists what the family has paid and the
-    new payment stays optional. NOT built (he was unsure, "I don't know"):
-    making payment required once a member is turned into Individual.
+    new payment stays optional. 2026-11-09 his answer: "Yes if changed to
+    individual": a family member changed to Individual must pay. Built
+    2026-11-09 on Edit patient: the Payment section shows only for that
+    change, the card fee is required, and it is paid before the change
+    saves (checked: no fee refused; with a fee, payment then update).
 
 159. **Receipt: send by email, a receipt number that looks different, and
     alignment.** (2026-11-09) "When a patient receipt is being printed,
