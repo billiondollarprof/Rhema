@@ -184,3 +184,21 @@ export async function emailReceipt(client: SupabaseClient, ids: number[]): Promi
   }
   return 'The email did not go.'
 }
+
+// ===== Everything a family has paid (request 160) =====
+// Shown when a member is added to the family, so the front desk sees what
+// was already paid before adding a payment. Newest first.
+export async function familyPayments(
+  client: SupabaseClient,
+  patientIds: number[],
+): Promise<Payment[]> {
+  if (!patientIds.length) return []
+  const { data } = await client
+    .from('payments')
+    .select(COLUMNS)
+    .in('patient_id', patientIds)
+    .is('voided_at', null)
+    .order('received_at', { ascending: false })
+    .limit(20)
+  return (data as unknown as Payment[] | null) ?? []
+}

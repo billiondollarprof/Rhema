@@ -60,6 +60,9 @@ type FormProps = {
   problem: string | null
   // Register only: show the Payment section.
   withPayment?: boolean
+  // Adding a family member (request 160): what the family already paid,
+  // shown above the payment, which stays optional.
+  familyPaid?: { key: string; label: string; amount: string; detail: string }[]
   onSave: (details: PatientDetails, fee: CardFee) => void
 }
 
@@ -116,6 +119,7 @@ export default function PatientForm({
   busy,
   problem,
   withPayment = false,
+  familyPaid,
   onSave,
 }: FormProps) {
   const [details, setDetails] = useState<PatientDetails>(initial)
@@ -277,12 +281,38 @@ export default function PatientForm({
             </i>
             <div>
               <b>Payment</b>
-              <small>The card fee, if the patient is paying now.</small>
+              <small>
+                {familyPaid
+                  ? 'This family has paid before. Add a payment only if they are paying more now.'
+                  : 'The card fee, if the patient is paying now.'}
+              </small>
             </div>
           </div>
+          {familyPaid ? (
+            <div className={styles.familyPaid}>
+              <span className={styles.fieldTitle}>Already paid by this family</span>
+              {familyPaid.length === 0 ? (
+                <small>Nothing yet.</small>
+              ) : (
+                <ul>
+                  {familyPaid.map((item) => (
+                    <li key={item.key}>
+                      <span>
+                        {item.label}
+                        <small>{item.detail}</small>
+                      </span>
+                      <b>{item.amount}</b>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : null}
           <div className={styles.fields}>
             <div className={styles.field}>
-              <label htmlFor="field-fee">Card fee (optional)</label>
+              <label htmlFor="field-fee">
+                {familyPaid ? 'Add a payment (optional)' : 'Card fee (optional)'}
+              </label>
               <div className={styles.money}>
                 <span aria-hidden="true">₦</span>
                 <input
