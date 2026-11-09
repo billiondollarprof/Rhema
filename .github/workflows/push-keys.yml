@@ -87,7 +87,7 @@ jobs:
           if [ "$WORKER" = "rhema-hospital-testing" ]; then
             case "$PGHOST$PGUSER" in *ntfvckqczpmylskusgft*) echo "Refusing: testing must never touch live"; exit 1 ;; esac
           fi
-          export PUSH_URL="https://$WORKER.rhemamedical.workers.dev"
+          export PUSH_URL="${{ inputs.site == 'live' && 'https://rhemamedical.app' || 'https://testing.rhemamedical.app' }}"
           export PUSH_SECRET="$(cat "$RUNNER_TEMP/keys/push-secret.txt")"
           psql -v ON_ERROR_STOP=1 -q <<'SQL'
           \getenv push_url PUSH_URL
@@ -103,7 +103,7 @@ jobs:
 
       - name: Check the Worker took the keys
         run: |
-          url="https://$WORKER.rhemamedical.workers.dev"
+          url="${{ inputs.site == 'live' && 'https://rhemamedical.app' || 'https://testing.rhemamedical.app' }}"
           for i in 1 2 3 4 5 6; do
             if curl -fsS "$url/api/push/key" | grep -q publicKey; then
               # A wrong secret must be refused.
