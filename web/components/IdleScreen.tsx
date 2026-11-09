@@ -21,6 +21,7 @@
 import { Montserrat } from 'next/font/google'
 import styles from './IdleScreen.module.css'
 import Logo from './brand/Logo'
+import CanvasColour from './shell/CanvasColour'
 import { BRAND } from '@/lib/brand/brand'
 
 // Built into the app at build time, so no screen ever calls Google Fonts.
@@ -37,6 +38,9 @@ type IdleScreenProps = {
 export default function IdleScreen({ footer, behind }: IdleScreenProps) {
   return (
     <main className={`${styles.screen} ${montserrat.className}`}>
+      {/* The bottom strip on an installed iPad or iPhone (request 163):
+          the same blue as the bottom of the waves. */}
+      <CanvasColour colour="#2461cd" />
       {/* ===== 0. Optional layer behind everything (the lock screen photos) ===== */}
       {behind ? <div className={styles.behind}>{behind}</div> : null}
 
