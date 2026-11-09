@@ -20,6 +20,13 @@ module.exports.SCREENS = [
   { path: '/patients/register/', waitFor: 'Register patient' },
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
+  // Request 170: an antenatal patient's record, with the booking and the consent.
+  {
+    path: '/patients/record/?p=1',
+    waitFor: 'Antenatal booking',
+    medical: true,
+    extra: { 'rest/v1/patients': { ...require('./mock.cjs').PATIENT, category: 'antenatal' } },
+  },
   { path: '/install/', waitFor: 'Get RHEMA on every device' },
   // Request 156: the two documents, open without signing in.
   { path: '/privacy/', waitFor: 'Your rights' },

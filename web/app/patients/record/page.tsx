@@ -25,6 +25,8 @@
  */
 'use client'
 
+import { markDispensedSeenFor } from '@/lib/pharmacy/pharmacy'
+import { AntenatalSection, ConsentSection } from './_parts/Antenatal'
 import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { onChange } from '@/lib/live/changes'
@@ -78,6 +80,7 @@ function PatientRecord() {
   const id = Number(useSearchParams().get('p')) || null
   const { client, staff } = auth
   const allowed = Boolean(staff?.can_medical)
+  const staffId = staff?.id ?? null
 
   const [patient, setPatient] = useState<PatientResult | null | undefined>(undefined)
   const [record, setRecord] = useState<MedicalRecord | null>(null)
@@ -104,11 +107,14 @@ function PatientRecord() {
       }
       const loaded = await loadRecord(client, id)
       if (current) setRecord(loaded)
+      // Opening the record clears this doctor's "dispensed" notices for
+      // this patient (request 171c).
+      if (staffId) void markDispensedSeenFor(client, staffId, id)
     })()
     return () => {
       current = false
     }
-  }, [client, id, auth.status, allowed])
+  }, [client, id, auth.status, allowed, staffId])
 
   // Read again after a change. The opening is still fresh, so no new one.
   const reload = useCallback(() => {
@@ -288,6 +294,16 @@ function PatientRecord() {
                   female={patient.sex === 'female'}
                 />
                 <ConditionsSection {...props} />
+                {/* The hospital's antenatal card (request 170), for antenatal
+                    patients; the operation consent for every patient. */}
+                {patient.category === 'antenatal' ? (
+                  <AntenatalSection
+                    client={client}
+                    staffId={staff.id}
+                    patientId={props.patientId}
+                  />
+                ) : null}
+                <ConsentSection client={client} staffId={staff.id} patientId={props.patientId} />
               </div>
             </div>
           </>

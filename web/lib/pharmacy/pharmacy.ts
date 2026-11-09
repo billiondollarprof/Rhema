@@ -185,3 +185,34 @@ export async function dispense(client: SupabaseClient, prescriptionId: number) {
   if (data === 'not_paid') return 'This prescription has not been paid for yet.'
   return null
 }
+
+// ===== The doctor is told when their prescription is dispensed =====
+// Anthony, 2026-11-09: "once any request is fulfilled, the doctor gets a
+// notification." Shown until the doctor opens that patient's record.
+export async function listMyDispensed(
+  client: SupabaseClient,
+  staffId: string,
+): Promise<Prescription[]> {
+  const { data } = await client
+    .from('prescriptions')
+    .select(COLUMNS)
+    .eq('prescribed_by', staffId)
+    .eq('status', 'dispensed')
+    .is('dispense_seen_at', null)
+    .order('dispensed_at', { ascending: false })
+  return (data as unknown as Prescription[] | null) ?? []
+}
+
+// Opening the patient's record marks their dispensed prescriptions seen.
+export async function markDispensedSeenFor(
+  client: SupabaseClient,
+  staffId: string,
+  patientId: number,
+): Promise<void> {
+  const mine = await listMyDispensed(client, staffId)
+  await Promise.all(
+    mine
+      .filter((prescription) => prescription.patient_id === patientId)
+      .map((prescription) => client.rpc('mark_dispense_seen', { prescription: prescription.id })),
+  )
+}

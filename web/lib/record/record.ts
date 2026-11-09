@@ -121,6 +121,10 @@ export type VoidableTable =
   | 'vital_signs'
   | 'nursing_notes'
   | 'consultation_notes'
+  // The antenatal booking and the operation consent (request 170).
+  | 'antenatal_tests'
+  | 'previous_pregnancies'
+  | 'operation_consents'
 
 const VOID = 'id, voided_at, void_reason, voider:staff!voided_by(full_name)'
 
@@ -225,6 +229,9 @@ const ENTRY_WORDS: Record<string, string> = {
   vital_signs: 'Vital signs',
   nursing_notes: 'Nursing note',
   consultation_notes: 'Consultation note',
+  antenatal_tests: 'Antenatal test',
+  previous_pregnancies: 'Previous pregnancy',
+  operation_consents: 'Operation consent',
 }
 
 // ===== 3. Adding a line =====
