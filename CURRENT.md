@@ -700,6 +700,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     has GitHubDeploy (default no) and he uploads watcher.zip (aws/
     make_zip.py) in the Lambda console. Region eu-north-1. Alerts to
     stellaxafe@gmail.com. Later, on the Paid plan: GitHubDeploy yes.
+    DONE 2026-11-09: stack CREATE_COMPLETE, watcher.zip uploaded, test run
+    in AWS answered "Rhema live" ok: true, email subscription confirmed.
+    It now runs every 5 minutes. (Request 74 is live.)
 
 160. **Adding a family member inherits the family's details.** (2026-11-09)
     "The contact that you've already filled before should be a family
