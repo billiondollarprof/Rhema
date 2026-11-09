@@ -5,7 +5,15 @@
  */
 .page {
   position: fixed;
-  inset: 0;
+  /* Covers the whole screen on an iPad and a Mac too (request 163): there
+     inset 0 stopped at the small viewport and left a white strip at the
+     bottom. 100lvh is the screen's tallest height, with the browser bars
+     hidden, so nothing shows under it. */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: 90;
   display: grid;
   place-content: center;
