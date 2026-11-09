@@ -904,3 +904,29 @@
   color: var(--mut);
   font-size: 13px;
 }
+
+/* A family member's category: the family, with Change category (request 165). */
+.familyCategory {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f3eefb;
+  color: #4c2a85;
+}
+
+.linkButton {
+  font: inherit;
+  font-weight: 600;
+  justify-self: start;
+  margin-top: 6px;
+  min-height: 36px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: #1f5fd0;
+  cursor: pointer;
+}

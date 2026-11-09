@@ -407,13 +407,6 @@ function RegisterPatient() {
           </div>
         ) : null}
 
-        {familyId && familyStart ? (
-          <p className={styles.familyNote}>
-            Contact, address and next of kin are filled in from the family. Change anything that is
-            different for this member.
-          </p>
-        ) : null}
-
         {/* A family member's form waits for the family's details, so it
             starts filled in rather than filling while somebody types. */}
         {familyId && !familyStart ? (
@@ -426,6 +419,10 @@ function RegisterPatient() {
             busy={busy}
             problem={problem}
             withPayment
+            // Family member changed to Individual or Antenatal: a fresh
+            // registration, so the card fee is paid (requests 160, 165).
+            feeRequiredIf={familyId ? (details) => details.category !== 'family' : undefined}
+            familyCard={familyId ? (familyCard ?? '') : undefined}
             familyPaid={
               familyId && familyStart
                 ? familyStart.paid.map((payment) => ({

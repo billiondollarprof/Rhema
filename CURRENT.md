@@ -608,6 +608,8 @@ D. Accounts and keys:
   18. (Dropped 2026-11-03, his decision: the keys stay as they are.)
   19. NEW: rename the Supabase project ("rhemamedical7@gmail.com's
       Project") to rhema-hospital.
+      DONE by him 2026-11-09: live renamed (Rhema Medical), testing renamed
+      (testing).
   20. NEW: check live has no demo rows (the demo data was testing only).
 
 E. Watching after the move:
@@ -666,19 +668,34 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+165. **Adding a family member: the category is the family, with Change
+    category.** (2026-11-09) "Because this person is already a family...
+    the only thing that can be there is change category... change category
+    to individual or antenatal. Once that category is changed, every other
+    thing concerning contact, address... can just clean off, the payment and
+    the rest just refreshes. It becomes a fresh registration. But the
+    person can still keep their old family member records... It will
+    maintain family and then still maintain individual or antenatal."
+    Built 2026-11-09: the form shows "Family FAM-..." with Change category;
+    Individual or Antenatal clears contact, address and next of kin, hides
+    the family's payments, and asks for the card fee; family_id is kept.
+    "Keep in the family" puts the family's details back.
+
 164. **White secondary buttons must look like buttons.** (2026-11-09,
     photos of the receipt and Find patient) "Those secondary buttons that
     are white... put an outline, blue outline... a white button on a white
     screen, it's just looking like you just wrote a text... all the buttons
     should look like buttons, especially the flat ones, excluding the ones
     that already look like 3D." Every flat white button app wide gets a blue
-    outline and blue words (like Register from old file). To do AFTER the
-    AWS setup (his order).
+    outline and blue words (like Register from old file). DONE 2026-11-09:
+    every base .button in 9 screen styles, plus record, offline and alerts
+    buttons; primary, danger and the raised 3D ones unchanged.
 
 163. **iPad: the lock (idle) screen leaves a white strip at the bottom.**
     (2026-11-09, photo) "This blue cover is not covering completely... The
     white part is showing at the bottom... peculiar to iPad and maybe Mac."
-    To do AFTER the AWS setup (his order).
+    FIXED 2026-11-09: the lock screen and the starting screen now use the
+    screen's full height (100lvh), not inset 0.
 
 162. **GitHub Actions out of free minutes; repository public for now.**
     (2026-11-09) Runs stopped: "recent account payments have failed or your
