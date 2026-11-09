@@ -32,7 +32,9 @@ data, and costs nothing inside AWS's always free allowance.
 
 1. Save `aws/template.yaml` to the device (Claude sends it in the chat).
 2. Sign in to the StellaXafe AWS account. At the top right, set the region
-   to **Europe (Ireland) eu-west-1**.
+   to **Europe (Stockholm) eu-north-1** (the account opens there; changed
+   from Ireland on 2026-11-09 because the console showed no other choice).
+   Direct link: https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/create
 3. Search for **CloudFormation**, then **Create stack**, then **With new
    resources (standard)**.
 4. Choose **Upload a template file**, choose `template.yaml`, then **Next**.

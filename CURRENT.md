@@ -676,8 +676,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     phone's start colour navy again, the app's starting screen navy with
     the same round logo. Refresh button removed. Rooms A: built on the
     feature branch (office room kind, Admin Office room, room required when
-    inviting, admin picks the Admin Office by itself); WAITING for his yes
-    on the SQL.
+    inviting, admin picks the Admin Office by itself). HIS YES 2026-11-09
+    ("yes, rooms SQL"); on testing, 0 new warnings.
+    Same message: "hope the updates aren't going to be disturbing people...
+    someone is typing name and all of a sudden the screen refreshes and
+    clears what they were doing?" Checked every live update: they swap the
+    data only, no form is cleared. The one risk (a new version reloading
+    the app when it comes back) now waits while anything is typed.
+    AWS: the console opened in eu-north-1 (Stockholm) with no Ireland
+    choice shown, so the watcher goes to eu-north-1 (aws/target.json).
+    Ticks (2026-11-09): "the double mark... the second mark is usually on
+    top of the first one... just like on WhatsApp." Drawn now: the second
+    tick starts inside the first. Checked on screen.
 
 157. **His messages of 8 November evening (after the AWS profile photo).**
     Word for word where it matters:
