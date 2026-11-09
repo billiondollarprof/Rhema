@@ -8,11 +8,18 @@
 #   - a small table (DynamoDB) that remembers which hospitals are down;
 #   - an SNS topic (AWS's email sender) that emails the alerts;
 #   - an alarm that emails when the watcher itself breaks;
-#   - a deploy role, so GitHub can put new watcher code in AFTER this, with
-#     no password or key (GitHub proves who it is to AWS each time).
+#   - ONLY when GitHubDeploy is yes: a deploy role, so GitHub can put new
+#     watcher code in AFTER this, with no password or key.
 #
-# The watcher's own code is not in this file. It starts as a placeholder,
-# and .github/workflows/aws-watcher.yml puts aws/uptime_watcher.py in.
+# The watcher's own code is not in this file (AWS allows only 4 KB here).
+# It starts as a placeholder. Then either:
+#   - GitHubDeploy no (the default, 2026-11-09): Anthony uploads
+#     watcher.zip in the Lambda console (aws/README.md, "Without GitHub").
+#     Why: the account is on AWS's Free plan, whose rules forbid creating
+#     the GitHub login link (iam:CreateOpenIDConnectProvider, denied by a
+#     service control policy). He chose this until his card is added.
+#   - GitHubDeploy yes (Paid plan): .github/workflows/aws-watcher.yml puts
+#     aws/uptime_watcher.py in on every merge to main.
 #
 # Least access, each with its reason (CLAUDE.md section 10):
 #   - the watcher can read and write ONE table and publish to ONE topic;
@@ -34,6 +41,14 @@ Parameters:
     Type: String
     Default: billiondollarprof/Rhema
     Description: The repository allowed to deploy the watcher code
+  GitHubDeploy:
+    Type: String
+    Default: 'no'
+    AllowedValues: ['no', 'yes']
+    Description: yes lets GitHub deploy the code (needs the Paid plan); no means the code is uploaded by hand
+
+Conditions:
+  UseGitHub: !Equals [!Ref GitHubDeploy, 'yes']
 
 Resources:
   # ===== 1. The email sender =====
@@ -159,6 +174,7 @@ Resources:
   # ===== 6. GitHub may deploy the watcher code, and nothing else =====
   GitHubProvider:
     Type: AWS::IAM::OIDCProvider
+    Condition: UseGitHub
     Properties:
       Url: https://token.actions.githubusercontent.com
       ClientIdList:
@@ -166,6 +182,7 @@ Resources:
 
   DeployRole:
     Type: AWS::IAM::Role
+    Condition: UseGitHub
     Properties:
       RoleName: stellaxafe-uptime-deploy
       AssumeRolePolicyDocument:
@@ -196,6 +213,7 @@ Resources:
 
 Outputs:
   DeployRoleArn:
+    Condition: UseGitHub
     Description: Give this to Claude, so GitHub can deploy the watcher code
     Value: !GetAtt DeployRole.Arn
   FunctionName:

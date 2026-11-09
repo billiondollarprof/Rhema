@@ -20,3 +20,4 @@ __pycache__/
 .DS_Store
 e2e-screens/
 web/public/version.json
+aws/watcher.zip
