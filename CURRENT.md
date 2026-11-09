@@ -684,6 +684,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
+169. **A chosen patient opens on its own screen, with their files.**
+    (2026-11-09, phone photo) "When you click on a patient... why does it
+    open on that same screen?... it should open a new screen... What if the
+    names are plenty?" And: "If I am a doctor, I should be able to see the
+    document. If I am front desk and I'm the one who uploaded the document,
+    I should be seeing the documents." Built: tapping a result opens the
+    patient alone ("Patient", Back to search, the phone's back works too);
+    the patient's files show below the details (preview; attach; delete
+    only by the uploader on an old file patient, as decided on 2 Nov). The
+    database already let the patients tick and the opened record read them;
+    only the screen was missing them. Same on every screen size.
+
 168. **www.rhemamedical.app redirect.** DONE by him 2026-11-09 in Cloudflare
     Redirect Rules. His first rule used a wildcard (*.rhemamedical.app/*),
     which also sent testing.rhemamedical.app to live; he changed it to www

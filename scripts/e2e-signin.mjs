@@ -284,6 +284,9 @@ try {
   await page.getByText(number).first().waitFor()
 
   step('Find shows her by number, with where she is now, and last seen')
+  // A chosen patient opens on a screen of their own (request 169), so she
+  // goes back to the search first.
+  await page.getByRole('button', { name: /Back to search/ }).click()
   await page.getByLabel('Search by name, patient number or phone').fill(number)
   await page.getByRole('button', { name: /Made Up Patient C/ }).waitFor()
   // The exact status and room, not just "In hospital" (2026-11-02).

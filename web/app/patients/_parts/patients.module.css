@@ -930,3 +930,21 @@
   color: #1f5fd0;
   cursor: pointer;
 }
+
+/* Find patient: the search, or one patient on a screen of their own
+   (request 169). One column either way. */
+.searchScreen,
+.patientScreen {
+  display: grid;
+  gap: 14px;
+  max-width: 900px;
+}
+
+.patientScreen > div {
+  display: grid;
+  gap: 14px;
+}
+
+.backButton {
+  justify-self: start;
+}
