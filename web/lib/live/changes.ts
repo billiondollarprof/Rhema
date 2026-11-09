@@ -124,3 +124,14 @@ export function noteSave(client: SupabaseClient, url: string, method: string): v
     announceChange(client, 'records')
   }, 300)
 }
+
+// ===== 6. Refresh here, without reloading the app =====
+// The refresh button (Anthony, 2026-11-09: "it just reloads the page in the
+// background... as if nothing happened... updates will appear"). Every
+// screen that listens for changes fetches again at once, on this device
+// only; nothing is announced to other devices.
+export function refreshHere(client: SupabaseClient): void {
+  const { listeners } = channelFor(client)
+  for (const kind of ['records', 'messages'] as ChangeKind[])
+    listeners.forEach((listener) => listener(kind))
+}
