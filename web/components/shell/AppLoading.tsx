@@ -16,10 +16,13 @@
 import Logo from '@/components/brand/Logo'
 import { BRAND } from '@/lib/brand/brand'
 import styles from './AppLoading.module.css'
+import CanvasColour from './CanvasColour'
 
 export default function AppLoading() {
   return (
     <div className={styles.page} role="status" aria-label={`Opening ${BRAND.short}`}>
+      {/* The bottom strip on an installed iPad or iPhone (request 163). */}
+      <CanvasColour colour="#0a2a5e" />
       <div className={styles.mark}>
         <Logo size={112} />
       </div>

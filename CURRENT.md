@@ -696,7 +696,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     (2026-11-09, photo) "This blue cover is not covering completely... The
     white part is showing at the bottom... peculiar to iPad and maybe Mac."
     FIXED 2026-11-09: the lock screen and the starting screen now use the
-    screen's full height (100lvh), not inset 0.
+    screen's full height (100lvh), not inset 0. NOT enough: his photo still showed the
+    strip in the installed app. Real cause: the installed app draws under
+    the clock bar (black-translucent), so about 24 points at the bottom
+    show the html background. Fix: CanvasColour paints the html background
+    the cover's colour while a cover shows. Also (his Android): the phone's
+    own start screen showed a square logo; the launcher icon (maskable) is
+    now the round logo on navy, and the icon addresses carry ?v=2 so
+    Chrome refreshes them. A reinstall shows it at once.
 
 162. **GitHub Actions out of free minutes; repository public for now.**
     (2026-11-09) Runs stopped: "recent account payments have failed or your
