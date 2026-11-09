@@ -737,7 +737,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     notice column and function), 6 tests, 7 deliberate breaks caught; the
     record shows "Antenatal booking" for antenatal patients and "Consent
     for an operation" for every patient; doctors get "dispensed" notices,
-    cleared by opening the record. WAITING for his yes on the SQL.
+    cleared by opening the record. HIS YES 2026-11-09 ("yes, antenatal SQL").
 
 169. **A chosen patient opens on its own screen, with their files.**
     (2026-11-09, phone photo) "When you click on a patient... why does it
