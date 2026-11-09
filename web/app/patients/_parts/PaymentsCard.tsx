@@ -22,6 +22,7 @@ import {
   TAKE_PURPOSES,
   patientPayments,
   takePayment,
+  receiptCode,
   type Payment,
   type PaymentPurpose,
 } from '@/lib/payments/payments'
@@ -240,7 +241,7 @@ export default function PaymentsCard({
                   {PURPOSE_WORDS[payment.purpose]} · {naira(Number(payment.amount))}
                 </b>
                 <small>
-                  {payment.receipt_number} ·{' '}
+                  {receiptCode(payment.receipt_number, payment.received_at)} ·{' '}
                   {new Date(payment.received_at).toLocaleString('en-GB', {
                     day: 'numeric',
                     month: 'short',
