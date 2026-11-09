@@ -669,6 +669,32 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+166. **His answers of 2026-11-09 (after the leftovers list).**
+    - Demo patients on live: STAY for now ("I'm still testing the
+      platform... even when I meet with the director, we'll be putting in
+      demo data"). Removed later, on his word.
+    - Phone alerts to rhemamedical.app: "Yes, you should do that." Done as
+      migration 20261109111740_push_address_real_domain (each site's old
+      workers.dev address to its own new one; keys unchanged).
+    - Privacy Policy and Terms: enough as they are; a lawyer only if the
+      hospital wants one.
+    - admin@ on live: he invites it when setting up for them.
+    - GitHub stays public until the end of the month (training first, no
+      real patient data yet), then private again, after the minutes reset.
+    - His walk through the modules is gradual this week, with the hospital;
+      he sends screenshots; I also fix what I find myself.
+
+167. **LATER: patients get their own medical record by email.** (2026-11-09)
+    "All they need to do is to send their REMA ID, their card ID with their
+    phone number and their name... to records@rhemamedical.app, then
+    automatically in return they will receive their medical records... for
+    patients who travel out... they just email using the same email that
+    they submitted with REMA. Otherwise the hospital will just have to
+    manually send it to them via email or WhatsApp." Not now ("it's not an
+    obstruction, so you can record it"). When built: send ONLY to the email
+    already on the patient's record, never to the address that wrote in
+    (an email's sender can be faked), and log every request.
+
 165. **Adding a family member: the category is the family, with Change
     category.** (2026-11-09) "Because this person is already a family...
     the only thing that can be there is change category... change category
