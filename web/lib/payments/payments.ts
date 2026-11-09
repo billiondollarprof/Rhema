@@ -53,14 +53,35 @@ export type Payment = {
   received_at: string
   voided_at: string | null
   receiver: { full_name: string } | null
-  patient: { id: number; full_name: string; patient_number: string } | null
+  patient: { id: number; full_name: string; patient_number: string; email: string | null } | null
   lines: { label: string; amount: number }[]
+}
+
+// ===== 1b. The receipt number, as people see it =====
+// Anthony, 2026-11-09: "make receipt number to look significantly
+// different. You know how bank transaction numbers used to look?" The
+// database keeps RCT-000123 (unique, never changes). People see the day it
+// was paid and that number, as one long figure in groups of four, like a
+// bank reference: paid 9 November 2026, number 123 -> 2611 0900 0123. It
+// can never be mistaken for a patient number (RMC-000001). The same rule
+// is in worker/src/receipts.ts, for the email: change both together.
+export function receiptCode(receiptNumber: string, receivedAt: string): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Lagos',
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date(receivedAt))
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? '00'
+  const sequence = receiptNumber.replace(/\D/g, '').padStart(6, '0')
+  const digits = part('year') + part('month') + part('day') + sequence
+  return digits.replace(/(\d{4})(?=\d)/g, '$1 ')
 }
 
 const COLUMNS =
   'id, receipt_number, amount, purpose, mode, received_at, voided_at, ' +
   'receiver:staff!payments_received_by_fkey(full_name), ' +
-  'patient:patients(id, full_name, patient_number), ' +
+  'patient:patients(id, full_name, patient_number, email), ' +
   'lines:payment_lines(label, amount)'
 
 // ===== 2. Take a payment =====
@@ -141,4 +162,25 @@ export async function latestPayment(
     .limit(1)
     .maybeSingle()
   return (data as unknown as Payment | null) ?? null
+}
+
+// ===== Send a receipt to the patient's email (request 159) =====
+// The Worker reads the payments again as this person (so only staff who
+// may see receipts can send one) and emails them to the patient's own
+// address. Returns null when it went, or the words to show.
+export async function emailReceipt(client: SupabaseClient, ids: number[]): Promise<string | null> {
+  const { data } = await client.auth.getSession()
+  const token = data.session?.access_token
+  if (!token) return 'Please sign in again.'
+  try {
+    const answer = await fetch('/api/receipts/email', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids }),
+    })
+    if (answer.ok) return null
+  } catch {
+    // No network: the words below.
+  }
+  return 'The email did not go.'
 }

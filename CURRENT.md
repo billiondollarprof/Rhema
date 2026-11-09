@@ -666,6 +666,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+159. **Receipt: send by email, a receipt number that looks different, and
+    alignment.** (2026-11-09) "When a patient receipt is being printed,
+    there should be an option for sending receipt to email... If the person
+    actually dropped their email, then it shows that option... the
+    infrastructure that we used for invitation... By the time you just
+    click on it, it sends to email automatically. Also, check the receipt.
+    The alignment of text... where the patient number is written is a bit
+    drifted... make receipt number to look significantly different. You
+    know how bank transaction numbers used to look?" (Also item 14 of the
+    6 November list.)
+    Built 2026-11-09: "Send to email" beside Print, only when the patient
+    has an email; the Worker (worker/src/receipts.ts) reads the payments as
+    the staff member and sends to the email on the patient's record only
+    (10 tests). Receipt number shown bank style: the day paid and the
+    number in groups of four (RCT-000123 paid 9 Nov 2026 -> 2611 0900 0123),
+    in its own box; the stored number is unchanged. The two columns now line
+    up with the right edge.
+
 158. **Start screen navy, rooms option A, no refresh button.** (2026-11-09)
     "Why change the app's loading screen to white instead of making the
     logo circular and letting the edges blend well with the blue

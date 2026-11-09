@@ -17,9 +17,13 @@
  * when. The file name, if saved as PDF, is the patient's name, number and
  * the receipt number.
  *
+ * Send to email (request 159, 2026-11-09): when the patient gave an email,
+ * a button beside Print sends this receipt to it, through the Worker
+ * (worker/src/receipts.ts), the same way staff invitations go.
+ *
  * Never: show a receipt to anybody but the Front Desk and admins (the
- * database refuses them too). Email comes when the hospital email is
- * connected; no button shows for it before then.
+ * database refuses them too), or show the email button when there is no
+ * email to send to.
  */
 'use client'
 
@@ -36,6 +40,8 @@ import {
   getPayment,
   latestPayment,
   paymentsOnDay,
+  receiptCode,
+  emailReceipt,
   type Payment,
 } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
@@ -57,6 +63,7 @@ function Receipt() {
   const params = useSearchParams()
   const { client, staff } = auth
   const [payments, setPayments] = useState<Payment[] | null>(null)
+  const [emailState, setEmailState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
 
   // ===== 1. Load the payment, or the day's payments =====
   useEffect(() => {
@@ -88,7 +95,22 @@ function Receipt() {
 
   const patient = payments?.[0]?.patient ?? null
   const total = (payments ?? []).reduce((sum, payment) => sum + Number(payment.amount), 0)
-  const numbers = (payments ?? []).map((payment) => payment.receipt_number).join(', ')
+  // The numbers people see: bank style, never like a patient number.
+  const numbers = (payments ?? [])
+    .map((payment) => receiptCode(payment.receipt_number, payment.received_at))
+    .join(', ')
+
+  // ===== 2b. Send it to the patient's email (request 159) =====
+  // Shown only when the patient gave an email. One tap sends it.
+  async function sendEmail() {
+    if (!client || !payments?.length) return
+    setEmailState('sending')
+    const problem = await emailReceipt(
+      client,
+      payments.map((payment) => payment.id),
+    )
+    setEmailState(problem ? 'failed' : 'sent')
+  }
 
   // ===== 2. Print, with the file named after the patient =====
   function print() {
@@ -106,6 +128,19 @@ function Receipt() {
           <button className={`${styles.button} ${styles.primary}`} onClick={print}>
             Print receipt
           </button>
+          {patient?.email ? (
+            <button
+              className={styles.button}
+              onClick={sendEmail}
+              disabled={emailState === 'sending' || emailState === 'sent'}
+            >
+              {emailState === 'sending'
+                ? 'Sending…'
+                : emailState === 'sent'
+                  ? 'Sent to email'
+                  : 'Send to email'}
+            </button>
+          ) : null}
           {/* Back to the patient, so it works however the receipt was opened. */}
           {patient ? (
             <Link className={styles.button} href={`/patients/?p=${patient.id}`}>
@@ -114,6 +149,12 @@ function Receipt() {
           ) : null}
         </div>
 
+        {emailState === 'sent' && patient?.email ? (
+          <p className={styles.good}>The receipt was sent to {patient.email}.</p>
+        ) : null}
+        {emailState === 'failed' ? (
+          <p className={styles.bad}>The email did not go. Check the internet, then try again.</p>
+        ) : null}
         {payments === null ? <p className={styles.muted}>Loading…</p> : null}
         {payments && payments.length === 0 ? (
           <p className={styles.muted}>This receipt was not found.</p>
@@ -133,7 +174,10 @@ function Receipt() {
 
             <div className={styles.titleRow}>
               <h2>Receipt</h2>
-              <span>{numbers}</span>
+              <div className={styles.receiptNo}>
+                <small>Receipt no.</small>
+                <span>{numbers}</span>
+              </div>
             </div>
 
             <dl className={styles.facts}>
@@ -166,7 +210,8 @@ function Receipt() {
                         {line.label}
                         {payments.length > 1 && at === 0 ? (
                           <small>
-                            {PURPOSE_WORDS[payment.purpose]} · {payment.receipt_number} ·{' '}
+                            {PURPOSE_WORDS[payment.purpose]} ·{' '}
+                            {receiptCode(payment.receipt_number, payment.received_at)} ·{' '}
                             {MODE_WORDS[payment.mode]}
                           </small>
                         ) : null}

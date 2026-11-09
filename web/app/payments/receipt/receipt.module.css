@@ -92,17 +92,47 @@
   font-size: 22px;
 }
 
-.titleRow span {
-  font-weight: 700;
+/* The receipt number: bank style, so it never reads like a patient number
+   (request 159). A small label over a long figure in groups of four. */
+.receiptNo {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  text-align: right;
+}
+
+.receiptNo small {
+  font-size: 11px;
   color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.receiptNo span {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: #0a2a5e;
+  background: #f1f5fb;
+  border: 1px solid #dbe4f3;
+  border-radius: 8px;
+  padding: 4px 8px;
   overflow-wrap: anywhere;
 }
 
 .facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
+  /* Two columns: the left one starts at the left edge, the right one ends
+     at the right edge, in line with the receipt number and the amounts
+     (request 159: the patient number looked drifted in the middle). */
+  grid-template-columns: 1fr auto;
+  gap: 10px 16px;
   margin: 0;
+}
+
+.facts > div:nth-child(even) {
+  text-align: right;
 }
 
 .facts dt {
@@ -191,4 +221,16 @@
   .letterhead p {
     font-size: 12px;
   }
+}
+
+.good {
+  margin: 0;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.bad {
+  margin: 0;
+  color: #b91c1c;
+  font-weight: 600;
 }

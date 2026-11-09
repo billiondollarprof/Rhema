@@ -50,6 +50,8 @@ module.exports.SCREENS = [
           id: 1,
           full_name: 'Oluwaseyifunmi Chukwuemeka-Adebayo Okonkwo',
           patient_number: 'RMC-000001',
+          // The Send to email button shows only with an email (request 159).
+          email: 'made.up@example.com',
         },
         lines: [
           { label: 'Admission and overnight observation in the female ward', amount: 45000 },

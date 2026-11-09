@@ -17,10 +17,11 @@ import {
   type FilesEnv,
 } from './files'
 import { emailInvite, type InvitesEnv } from './invites'
+import { emailReceipt, type ReceiptsEnv } from './receipts'
 import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
-export interface Env extends FilesEnv, InvitesEnv {
+export interface Env extends FilesEnv, InvitesEnv, ReceiptsEnv {
   // The built screens (web/out), served as static files.
   ASSETS: Fetcher
   // Call attention push (set by the push-keys workflow). Until they are
@@ -141,6 +142,11 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
   }
   if (url.pathname.startsWith('/api/files/record/') && request.method === 'DELETE') {
     return deleteRecordFile(request, url.pathname.slice('/api/files/'.length), env)
+  }
+
+  // Receipt emails (request 159, 2026-11-09): see receipts.ts.
+  if (url.pathname === '/api/receipts/email' && request.method === 'POST') {
+    return emailReceipt(request, env)
   }
 
   // Invitation emails (2026-11-07): see invites.ts.
