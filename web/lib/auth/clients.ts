@@ -16,6 +16,7 @@
  */
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
 import { SUPABASE_KEY, SUPABASE_URL } from './config'
+import { noteSave } from '../live/changes'
 
 // ===== 1. Each person's own connection, made once and reused =====
 const clients = new Map<string, SupabaseClient>()
@@ -28,6 +29,16 @@ export function clientFor(id: string): SupabaseClient {
   const existing = clients.get(id)
   if (existing) return existing
 
+  // Every save this person makes is noticed (savedSomething), so every
+  // other open app updates at once (request 157). The connection itself
+  // only fetches; whether a request was a save is decided in lib/live.
+  let made: SupabaseClient | null = null
+  const watchedFetch: typeof fetch = async (input, init) => {
+    const answer = await fetch(input, init)
+    if (made && answer.ok)
+      noteSave(made, String(input instanceof Request ? input.url : input), init?.method ?? 'GET')
+    return answer
+  }
   const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: {
       storageKey: storageKeyFor(id),
@@ -35,7 +46,9 @@ export function clientFor(id: string): SupabaseClient {
       autoRefreshToken: true,
       detectSessionInUrl: false,
     },
+    global: { fetch: watchedFetch },
   })
+  made = client
   clients.set(id, client)
   return client
 }

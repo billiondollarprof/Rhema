@@ -44,6 +44,7 @@ import {
   type QueueEntry,
   type TodayCounts,
 } from '@/lib/queue/queue'
+import { onChange } from '@/lib/live/changes'
 
 function greetingWord() {
   const hour = new Date().getHours()
@@ -78,7 +79,10 @@ export default function HomePage() {
     }
     const first = window.setTimeout(run, 0)
     const timer = window.setInterval(run, 30000)
+    // Something saved anywhere: fetch at once (request 157).
+    const stopListening = client ? onChange(client, 'records', run) : () => {}
     return () => {
+      stopListening()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)

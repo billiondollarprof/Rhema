@@ -23,6 +23,7 @@ import {
   type StaffRow,
 } from '@/lib/admin/admin'
 import { roleLabel } from '@/lib/auth/roles'
+import { onChange } from '@/lib/live/changes'
 
 // The app says "seen" every 3 minutes, so 5 minutes of quiet means offline.
 const ONLINE_WITHIN_MS = 5 * 60 * 1000
@@ -88,7 +89,12 @@ export default function ActivityTab({
     }
     void quietly()
     const timer = window.setInterval(() => void quietly(), 10_000)
+    // Something saved anywhere: show it at once (request 157).
+    const stopRecords = onChange(client, 'records', () => void quietly())
+    const stopMessages = onChange(client, 'messages', () => void quietly())
     return () => {
+      stopRecords()
+      stopMessages()
       current = false
       window.clearInterval(timer)
     }

@@ -36,6 +36,7 @@ import {
   payLabRequestLines,
   type LabRequest,
 } from '@/lib/lab/lab'
+import { onChange } from '@/lib/live/changes'
 
 type View = 'pay' | 'lab' | 'mine'
 
@@ -88,7 +89,10 @@ export default function LabCard({
     }
     const first = window.setTimeout(run, 0)
     const timer = window.setInterval(run, 30000)
+    // Something saved anywhere: fetch at once (request 157).
+    const stopListening = client ? onChange(client, 'records', run) : () => {}
     return () => {
+      stopListening()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)

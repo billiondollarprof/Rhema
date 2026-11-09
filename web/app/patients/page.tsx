@@ -14,6 +14,7 @@
 
 import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useState } from 'react'
+import { onChange } from '@/lib/live/changes'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
@@ -64,6 +65,16 @@ function FindPatient() {
     const timer = window.setTimeout(loadChosen, 0)
     return () => window.clearTimeout(timer)
   }, [auth.status, chosenId, loadChosen])
+
+  // Something saved by anybody (a new patient, a visit): the list and the
+  // chosen patient update at once (request 157).
+  useEffect(() => {
+    if (!client || auth.status !== 'ready') return
+    return onChange(client, 'records', () => {
+      void searchPatients(client, typed).then(setResults)
+      void loadChosen()
+    })
+  }, [client, auth.status, typed, loadChosen])
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
