@@ -709,6 +709,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     results already tell them): needs a "seen" column, SQL with the
     antenatal batch. Note: the pharmacy file said "No alert when dispensed"
     (his earlier word); his new word replaces it.
+    LATER 2026-11-09: "That back button should be only for desktop and
+    maybe tablet, iPad... on a smartphone, it will probably clutter." "The
+    spinning wheel, let it be fast... like it just reloads the page in the
+    background... as if nothing happened." LIVE 2026-11-09 (e24844a): Back
+    hidden under 700px wide; Refresh fetches every screen's data in the
+    background, no page reload, the arrow turns once. Waiting for him to
+    try it on his phone and iPad.
 
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be
