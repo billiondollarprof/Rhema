@@ -672,13 +672,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     screen, it's just looking like you just wrote a text... all the buttons
     should look like buttons, especially the flat ones, excluding the ones
     that already look like 3D." Every flat white button app wide gets a blue
-    outline and blue words (like Register from old file). To do AFTER the
-    AWS setup (his order).
+    outline and blue words (like Register from old file). DONE 2026-11-09:
+    every base .button in 9 screen styles, plus record, offline and alerts
+    buttons; primary, danger and the raised 3D ones unchanged.
 
 163. **iPad: the lock (idle) screen leaves a white strip at the bottom.**
     (2026-11-09, photo) "This blue cover is not covering completely... The
     white part is showing at the bottom... peculiar to iPad and maybe Mac."
-    To do AFTER the AWS setup (his order).
+    FIXED 2026-11-09: the lock screen and the starting screen now use the
+    screen's full height (100lvh), not inset 0.
 
 162. **GitHub Actions out of free minutes; repository public for now.**
     (2026-11-09) Runs stopped: "recent account payments have failed or your
