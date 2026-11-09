@@ -10,14 +10,21 @@
  * changes what it keeps, where, or for how long, this text changes in the
  * same commit, and LEGAL_UPDATED moves.
  *
+ * Anthony, 2026-11-08: "Our backend services should be confidential." So
+ * the page never names the providers (the database, hosting, email or
+ * monitoring companies) or where they are. The list lives with the
+ * hospital (CURRENT.md, NDPA papers), for the regulator.
+ *
  * Never: promise something the system does not do, or name a person,
- * a patient, or a key.
+ * a patient, a key, or a provider.
  */
 import { BRAND } from '@/lib/brand/brand'
 
 // The dates shown at the top of both documents.
 export const LEGAL_EFFECTIVE = '9 November 2026'
-export const LEGAL_UPDATED = '8 November 2026'
+// 9 November: the providers are no longer named (his decision below). The
+// promises did not change, so LEGAL_VERSION stays and nobody re-agrees.
+export const LEGAL_UPDATED = '9 November 2026'
 // Saved with each staff agreement, so we know which words they agreed to.
 export const LEGAL_VERSION = '2026-11-08'
 
@@ -126,33 +133,28 @@ export default function PrivacyText() {
         </li>
       </ul>
 
-      <h2>6. Where it is stored, and the companies that help</h2>
+      <h2>6. Where it is stored</h2>
       <ul>
         <li>
-          <b>Supabase</b> holds the database and handles sign in. The live database is in the
-          European Union (Paris, France).
+          The records are held by established cloud service providers that StellaXafe chose for
+          their security. Each one works under a written agreement and may use the information only
+          to provide its service.
         </li>
         <li>
-          <b>Cloudflare</b> runs the app and stores files added to records (such as lab result
-          photos and scans).
-        </li>
-        <li>
-          <b>Resend</b> sends sign in codes and staff invitations by email. It does not receive
-          medical information.
-        </li>
-        <li>
-          A copy of the database is made every night, locked with a passphrase, and stored in a
-          separate account, so the records survive a fault.
-        </li>
-        <li>
-          <b>Amazon Web Services</b> only checks that the app is answering. It receives no personal
+          The email service that sends sign in codes and staff invitations never receives medical
           information.
         </li>
+        <li>
+          A copy of the database is made every night, locked with a passphrase, and stored
+          separately, so the records survive a fault.
+        </li>
+        <li>The service that checks the app is answering receives no personal information.</li>
       </ul>
       <p>
-        Some of this storage is outside Nigeria. Information leaves Nigeria only to places and
-        companies with strong data protection rules (the EU&apos;s General Data Protection
-        Regulation applies there), and only as the Act allows.
+        Some of this storage may be outside Nigeria. Information leaves Nigeria only to places and
+        providers with strong data protection rules, and only as the Act allows. The hospital keeps
+        the list of providers and where they store information, and gives it to the Nigeria Data
+        Protection Commission when asked.
       </p>
 
       <h2>7. How long we keep it</h2>

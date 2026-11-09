@@ -129,7 +129,12 @@ export async function emailInvite(
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
       // One email per invitation, however many times the button is tapped.
-      'Idempotency-Key': `rhema-invite-${invite.id}`,
+      // The site's own address is part of the key (fault found 2026-11-08):
+      // testing and live send through the same Resend account, and both
+      // number their invitations from 1. With the number alone, live's
+      // invitation 1 reused testing's key from the day before, Resend
+      // refused it (409), and no email went.
+      'Idempotency-Key': `rhema-invite-${new URL(request.url).hostname}-${invite.id}`,
     },
     body: JSON.stringify({
       from: FROM,
@@ -140,8 +145,10 @@ export async function emailInvite(
       html,
     }),
   })
-  // The number only, never the address.
-  console.log(`Invitation email for invite ${invite.id}: ${sent.status}`)
+  // The number and Resend's answer, never the address. Resend's answer says
+  // why a send was refused (a key problem, a reused key), with no person in it.
+  const why = sent.ok ? '' : ` ${(await sent.text().catch(() => '')).slice(0, 200)}`
+  console.log(`Invitation email for invite ${invite.id}: ${sent.status}${why}`)
   if (!sent.ok) return no(502, 'The email could not be sent')
   return Response.json({ sent: true })
 }

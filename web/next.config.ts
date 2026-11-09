@@ -9,9 +9,22 @@
  * routes, server side rendering at request time). The build will fail, and
  * that failure is on purpose.
  */
+import { writeFileSync } from 'node:fs'
 import type { NextConfig } from 'next'
 
+// Which build this is (request 157, 2026-11-08). The deploy builds from a
+// commit, so its id is the build's id. The same id goes into the app and
+// into /version.json; an open app that finds a different id there knows a
+// newer version went live and reloads itself (AppFreshness), instead of
+// keeping buttons whose screens no longer exist.
+const BUILD_ID = process.env.GITHUB_SHA ?? 'local'
+writeFileSync(
+  new URL('./public/version.json', import.meta.url),
+  JSON.stringify({ build: BUILD_ID }),
+)
+
 const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   output: 'export',
   // Every page is a folder with its own index.html, so /patients/ works
   // when Cloudflare serves the files directly.

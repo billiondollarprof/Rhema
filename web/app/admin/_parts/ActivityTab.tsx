@@ -63,17 +63,34 @@ export default function ActivityTab({
 }) {
   const [today, setToday] = useState<{ sessions: SessionRow[]; lines: LogRow[] } | null>(null)
 
+  // When it last came back, and whether a Refresh tap is running.
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const [busy, setBusy] = useState(false)
+
   const load = useCallback(async () => {
-    setToday(await loadToday(client))
+    setBusy(true)
+    const found = await loadToday(client)
+    setBusy(false)
+    setToday(found)
+    setUpdatedAt(new Date())
   }, [client])
 
+  // It updates by itself every 10 seconds while the tab is open (Anthony,
+  // 2026-11-08: "as the log page is open like that, it's being updated
+  // without admin having to refresh it"). Refresh does the same at once.
   useEffect(() => {
     let current = true
-    loadToday(client).then((found) => {
-      if (current) setToday(found)
-    })
+    async function quietly() {
+      const found = await loadToday(client)
+      if (!current) return
+      setToday(found)
+      setUpdatedAt(new Date())
+    }
+    void quietly()
+    const timer = window.setInterval(() => void quietly(), 10_000)
     return () => {
       current = false
+      window.clearInterval(timer)
     }
   }, [client])
 
@@ -92,9 +109,19 @@ export default function ActivityTab({
   return (
     <>
       <div className={styles.buttons}>
-        <button className={styles.button} onClick={load}>
-          Refresh
+        <button className={styles.button} onClick={load} disabled={busy}>
+          {busy ? 'Refreshing…' : 'Refresh'}
         </button>
+        {updatedAt ? (
+          <span className={styles.muted}>
+            Updates by itself · last at{' '}
+            {updatedAt.toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
+          </span>
+        ) : null}
       </div>
       <div className={styles.people}>
         {people.map(({ person, day, lines }) => (

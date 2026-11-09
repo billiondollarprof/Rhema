@@ -20,6 +20,7 @@
  */
 'use client'
 
+import { announceChange } from '@/lib/live/changes'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './offline.module.css'
@@ -89,7 +90,11 @@ async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask
         })
     if (isNetworkFailure(error)) return false
     if (error) markFailed(staffId, task.id, 'Could not be sent. Open Messages and send it again.')
-    else removeFromOutbox(staffId, task.id)
+    else {
+      removeFromOutbox(staffId, task.id)
+      // Every open app fetches it at once (request 157).
+      announceChange(client, 'messages')
+    }
     return true
   }
   try {

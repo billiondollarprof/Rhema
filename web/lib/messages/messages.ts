@@ -12,6 +12,7 @@
  *
  * Never: log what a message says. Counts only.
  */
+import { announceChange } from '@/lib/live/changes'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '../offline/outbox'
 
@@ -145,6 +146,8 @@ export async function sendMessage(
     return 'waiting'
   }
   if (error) return 'The message could not be sent. Try again.'
+  // Every open app fetches it at once (request 157).
+  announceChange(client, 'messages')
   return null
 }
 
@@ -158,11 +161,15 @@ export async function editMessage(
   const { error } = await client.rpc('edit_message', { message: id, body: body.trim() })
   if (isNetworkFailure(error)) return 'No network. Check the connection and save it again.'
   if (error) return 'A message can be changed for 15 minutes after sending.'
+  announceChange(client, 'messages')
   return null
 }
 
 export async function markRead(client: SupabaseClient, ids: number[]) {
-  if (ids.length) await client.rpc('mark_messages_read', { ids })
+  if (!ids.length) return
+  await client.rpc('mark_messages_read', { ids })
+  // The sender's ticks turn to two at once (request 157).
+  announceChange(client, 'messages')
 }
 
 // ===== 4. Announcements =====

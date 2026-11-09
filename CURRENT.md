@@ -666,6 +666,59 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+157. **His messages of 8 November evening (after the AWS profile photo).**
+    Word for word where it matters:
+    (a) Messages for everyone: "Messages is default for everyone. Everyone
+        should be able to initiate message... you don't see messages that
+        is not sent to your own department... general messages and
+        messages sent to your department." "Everyone should have a room,
+        including the admin, right? Or... the admin sees messages that are
+        being sent to different departments." OPEN: needs his choice (asked
+        2026-11-09).
+    (b) "This refresh button, does it even work?" (Admin, Activity) It did,
+        with no sign. Now it says Refreshing, shows the time, and the log
+        updates by itself every 10 seconds. DONE on testing 2026-11-09.
+    (c) "I also want updates to appear in the app without somebody having
+        to refresh." Messages: a live signal (lib/live/changes.ts, no
+        content in it) makes every open app fetch at once; heard in 40 ms on
+        testing. DONE on testing 2026-11-09. Other screens: next.
+    (d) "Is this even okay to publicly mention where our database is
+        sitting?... Our backend services should be confidential." Privacy
+        Policy no longer names any provider or place. DONE on testing.
+    (e) "I sent an invitation to someone in the live site. The person did
+        not get an email." Likely cause: testing and live share one Resend
+        account, both number invitations from 1, and the Idempotency-Key
+        was the number alone, so live's first invitation reused testing's
+        key and Resend refused it. Key now includes the site. Resend's
+        refusal reason is now logged. FIXED on testing; to confirm on live.
+    (f) Installed app start: "as if they all plastered the logo... it
+        didn't show dynamic loading." Start colour white (logo blends), then
+        a white starting screen with the logo breathing and a moving bar.
+        DONE on testing.
+    (g) "We need an app refresher at the top bar... rotational arrow head."
+        DONE on testing. And: "I gave myself a room, came back, it is still
+        saying the same thing." Staff details now reload when the app comes
+        back to the front, and on Refresh.
+    (h) "Dr. Evans... was given access to consultant room 1, but he didn't
+        receive any message." Same cause as (g): his app still held his old
+        details. Fixed by (g) and (c).
+    (i) "Maybe we should take it from 1 hour to 15 minutes." Lock after 15
+        minutes, also checked the moment the app comes back. DONE on testing.
+    (j) "Messages takes... almost a minute... make it instant." See (c).
+    (k) "When a message drops... a pop sound. Pom pom." Our own soft two
+        note sound (Apple's belongs to Apple), on the messages screen, for
+        messages from others. DONE on testing.
+    (l) "When the app is open for long, the buttons are dead... the buttons
+        at the bottom." Cause: each deploy replaces the app's files; an app
+        left open asks for files that are gone. Now the app checks which
+        version is live when it comes back and reloads, and reloads if a
+        screen file fails. DONE on testing.
+    (m) "Register from old file... should be a secondary button." White
+        with a blue outline now; Register patient stays the blue one. Find
+        patient (Register screen) keeps its own raised look. DONE on testing.
+    Also: CI turned red only because GitHub's store for test pictures was
+    full; the pictures are now kept only when the test fails, for 3 days.
+
 156. **Privacy Policy and Terms of Use, and the staff agreement tick.**
     (2026-11-08) "Write a standard privacy protection section and terms and
     agreement... put that button somewhere before you log in... it will

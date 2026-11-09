@@ -95,10 +95,15 @@ jobs:
         run: npm install --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
       - name: Sign in, used for real
         run: scripts/e2e-signin.sh
+      # The pictures are for finding out why the sign in test failed, so they
+      # are kept only when it failed, for 3 days. On 2026-11-09 GitHub's
+      # storage for them filled up and this step turned a passing run red;
+      # keeping them is never a test, so a full store must not fail the run.
       - name: Keep the screenshots
-        if: always()
+        if: failure()
+        continue-on-error: true
         uses: actions/upload-artifact@v6
         with:
           name: sign-in-screens
           path: e2e-screens/
-          retention-days: 14
+          retention-days: 3

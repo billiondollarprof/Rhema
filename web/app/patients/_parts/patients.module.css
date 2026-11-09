@@ -436,12 +436,25 @@
   color: var(--mut);
 }
 
-/* Register from old file: a raised button of its own, the same 3D look
-   as the Home buttons, in slate so it sits apart from the blue Register
-   patient (Anthony, 2026-11-02: "let it look like... a protruding 3D
-   button"). */
+/* Register from old file: the secondary button beside the blue Register
+   patient. Anthony, 2026-11-08: "it should be a secondary button... the
+   blue button is the primary button." White, with a blue outline and blue
+   words (it was a raised slate button from 2026-11-02). */
 .oldFile {
-  --c: #546e7a;
+  background: #fff;
+  color: #1f5fd0;
+  border-color: #1f5fd0;
+}
+
+.oldFile:hover {
+  background: #eef4ff;
+}
+
+/* Find patient (on Register patient): a raised 3D button in the app's
+   blue, so it reads as a button and not as text (Anthony, 2026-11-04).
+   It keeps its own look; only Register from old file became secondary. */
+.findPatient {
+  --c: #1f62d6;
   color: #fff;
   border: 0;
   border-bottom: 4px solid color-mix(in srgb, var(--c), #000 40%);
@@ -455,15 +468,17 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.oldFile:active {
-  transform: translateY(2px);
-  border-bottom-width: 2px;
+.findPatient:hover {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--c), #fff 8%),
+    color-mix(in srgb, var(--c), #000 22%)
+  );
 }
 
-/* Find patient beside it, the same raised button in the app's blue, so it
-   reads as a button and not as text (Anthony, 2026-11-04). */
-.findPatient {
-  --c: #1f62d6;
+.findPatient:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }
 
 /* A heading over a group that is not a single input, like the old file. */

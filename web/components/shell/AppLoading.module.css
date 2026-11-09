@@ -1,0 +1,64 @@
+/*
+ * AppLoading.module.css: the starting screen. White, like the phone's own
+ * start screen, so the change from one to the other cannot be seen.
+ */
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 28px;
+  background: #fff;
+}
+
+/* The logo breathes: a little bigger, a little smaller. */
+.mark {
+  border-radius: 50%;
+  animation: breathe 1.6s ease-in-out infinite;
+}
+
+.bar {
+  width: 120px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+/* A short navy piece runs along the bar, again and again. */
+.bar span {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0a2a5e, #1f5fd0);
+  animation: run 1.1s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes run {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark,
+  .bar span {
+    animation: none;
+  }
+}
