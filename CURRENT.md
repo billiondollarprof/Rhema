@@ -608,6 +608,8 @@ D. Accounts and keys:
   18. (Dropped 2026-11-03, his decision: the keys stay as they are.)
   19. NEW: rename the Supabase project ("rhemamedical7@gmail.com's
       Project") to rhema-hospital.
+      DONE by him 2026-11-09: live renamed (Rhema Medical), testing renamed
+      (testing).
   20. NEW: check live has no demo rows (the demo data was testing only).
 
 E. Watching after the move:
@@ -665,6 +667,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     every button in this place... Anything that doesn't look right, take
     your time." And: "now run your SQL" (the profile fix, 138).
 
+
+165. **Adding a family member: the category is the family, with Change
+    category.** (2026-11-09) "Because this person is already a family...
+    the only thing that can be there is change category... change category
+    to individual or antenatal. Once that category is changed, every other
+    thing concerning contact, address... can just clean off, the payment and
+    the rest just refreshes. It becomes a fresh registration. But the
+    person can still keep their old family member records... It will
+    maintain family and then still maintain individual or antenatal."
+    Built 2026-11-09: the form shows "Family FAM-..." with Change category;
+    Individual or Antenatal clears contact, address and next of kin, hides
+    the family's payments, and asks for the card fee; family_id is kept.
+    "Keep in the family" puts the family's details back.
 
 164. **White secondary buttons must look like buttons.** (2026-11-09,
     photos of the receipt and Find patient) "Those secondary buttons that

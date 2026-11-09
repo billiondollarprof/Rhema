@@ -67,6 +67,11 @@ type FormProps = {
   // individual"): when this answers true for what is on the form, the
   // Payment section shows and the card fee must be paid before saving.
   feeRequiredIf?: (details: PatientDetails) => boolean
+  // Adding a member to a family (request 165, 2026-11-09): the family's
+  // card number. The category shows as that family, with Change category.
+  // Changing it to Individual or Antenatal starts a fresh registration
+  // (contact, address and next of kin cleared), still linked to the family.
+  familyCard?: string | null
   onSave: (details: PatientDetails, fee: CardFee) => void
 }
 
@@ -125,9 +130,39 @@ export default function PatientForm({
   withPayment = false,
   familyPaid,
   feeRequiredIf,
+  familyCard,
   onSave,
 }: FormProps) {
   const [details, setDetails] = useState<PatientDetails>(initial)
+  // Family member form: whether Change category was tapped.
+  const [changingCategory, setChangingCategory] = useState(false)
+  const inFamilyForm = familyCard !== undefined && initial.family_id !== null
+
+  // The shared family details that a new category clears (request 165).
+  const SHARED: (keyof PatientDetails)[] = [
+    'phone',
+    'email',
+    'address',
+    'town',
+    'lga',
+    'state',
+    'country',
+    'next_of_kin_name',
+    'next_of_kin_relationship',
+    'next_of_kin_phone',
+  ]
+  function chooseCategory(value: Category) {
+    setDetails((now) => {
+      const next = { ...now, category: value }
+      for (const key of SHARED) {
+        // Back to Family: the family's details again. Anything else: empty.
+        ;(next as Record<string, unknown>)[key] =
+          value === 'family' ? initial[key] : EMPTY_DETAILS[key]
+      }
+      return next
+    })
+    if (value === 'family') setChangingCategory(false)
+  }
   const [shown, setShown] = useState<Record<string, string>>({})
   const [fee, setFee] = useState('')
   const [mode, setMode] = useState<PaymentMode>('cash')
@@ -177,6 +212,14 @@ export default function PatientForm({
 
   return (
     <div className={styles.page}>
+      {/* Adding to a family: what was filled in, or that it starts fresh. */}
+      {inFamilyForm ? (
+        <p className={styles.familyNote}>
+          {details.category === 'family'
+            ? 'Contact, address and next of kin are filled in from the family. Change anything that is different for this member.'
+            : `A fresh registration with its own card. This patient stays linked to family ${familyCard ?? ''}.`}
+        </p>
+      ) : null}
       <div className={`${styles.twoColumns} ${styles.stack}`}>
         <div className={styles.stack}>
           {/* ===== 3. Patient ===== */}
@@ -225,18 +268,55 @@ export default function PatientForm({
               </div>
               <div className={styles.field}>
                 <label>Patient category</label>
-                <div className={styles.segments} role="group" aria-label="Patient category">
-                  {(['individual', 'family', 'antenatal'] as Category[]).map((value) => (
+                {inFamilyForm && details.category === 'family' && !changingCategory ? (
+                  <div className={styles.familyCategory}>
+                    <span>
+                      Family <b>{familyCard ?? ''}</b>
+                    </span>
                     <button
-                      key={value}
                       type="button"
-                      aria-pressed={details.category === value}
-                      onClick={() => set('category', value)}
+                      className={styles.button}
+                      onClick={() => setChangingCategory(true)}
                     >
-                      {value[0].toUpperCase() + value.slice(1)}
+                      Change category
                     </button>
-                  ))}
-                </div>
+                  </div>
+                ) : inFamilyForm ? (
+                  <>
+                    <div className={styles.segments} role="group" aria-label="Patient category">
+                      {(['individual', 'antenatal'] as Category[]).map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          aria-pressed={details.category === value}
+                          onClick={() => chooseCategory(value)}
+                        >
+                          {value[0].toUpperCase() + value.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      onClick={() => chooseCategory('family')}
+                    >
+                      Keep in the family
+                    </button>
+                  </>
+                ) : (
+                  <div className={styles.segments} role="group" aria-label="Patient category">
+                    {(['individual', 'family', 'antenatal'] as Category[]).map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-pressed={details.category === value}
+                        onClick={() => set('category', value)}
+                      >
+                        {value[0].toUpperCase() + value.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -295,13 +375,13 @@ export default function PatientForm({
               <small>
                 {feeNeededNow
                   ? 'Leaving the family for a card of their own: the card fee is paid now.'
-                  : familyPaid
+                  : familyPaid && details.category === 'family'
                     ? 'This family has paid before. Add a payment only if they are paying more now.'
                     : 'The card fee, if the patient is paying now.'}
               </small>
             </div>
           </div>
-          {familyPaid ? (
+          {familyPaid && details.category === 'family' ? (
             <div className={styles.familyPaid}>
               <span className={styles.fieldTitle}>Already paid by this family</span>
               {familyPaid.length === 0 ? (
@@ -326,7 +406,7 @@ export default function PatientForm({
               <label htmlFor="field-fee">
                 {feeNeededNow
                   ? 'Card fee'
-                  : familyPaid
+                  : familyPaid && details.category === 'family'
                     ? 'Add a payment (optional)'
                     : 'Card fee (optional)'}
               </label>
