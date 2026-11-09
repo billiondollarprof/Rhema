@@ -608,8 +608,9 @@ D. Accounts and keys:
   18. (Dropped 2026-11-03, his decision: the keys stay as they are.)
   19. NEW: rename the Supabase project ("rhemamedical7@gmail.com's
       Project") to rhema-hospital.
-      DONE by him 2026-11-09: live renamed (Rhema Medical), testing renamed
-      (testing).
+      DONE by him 2026-11-09 (his photo): live is "RHEMA MEDICALS"
+      (eu-west-3, Paris), testing is "Rhema-testing" (eu-west-1, Ireland),
+      in the organisation "Rhema Medical Center", Free plan.
   20. NEW: check live has no demo rows (the demo data was testing only).
 
 E. Watching after the move:
