@@ -666,6 +666,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+164. **White secondary buttons must look like buttons.** (2026-11-09,
+    photos of the receipt and Find patient) "Those secondary buttons that
+    are white... put an outline, blue outline... a white button on a white
+    screen, it's just looking like you just wrote a text... all the buttons
+    should look like buttons, especially the flat ones, excluding the ones
+    that already look like 3D." Every flat white button app wide gets a blue
+    outline and blue words (like Register from old file). To do AFTER the
+    AWS setup (his order).
+
 163. **iPad: the lock (idle) screen leaves a white strip at the bottom.**
     (2026-11-09, photo) "This blue cover is not covering completely... The
     white part is showing at the bottom... peculiar to iPad and maybe Mac."
