@@ -9,7 +9,9 @@
  *      finds the email typed in, signs in, chooses a PIN and reaches Home
  *      (Admin, 2026-10-30).
  *   1. Nurse One signs in with an email code (read from the local mailbox
- *      that the throwaway Supabase sends to), and chooses a PIN.
+ *      that the throwaway Supabase sends to), finds the PIN will not go on
+ *      until she ticks the agreement (request 156), ticks it, and chooses
+ *      a PIN.
  *   2. She locks the screen, types a wrong PIN, then the right one.
  *   3. Nurse Two signs in on the same device and chooses her own PIN.
  *   4. At the lock screen, Nurse One taps her own name and unlocks with
@@ -101,8 +103,21 @@ async function signInWithCode(page, email) {
   await typeDigits(page, 'Email code', code)
 }
 
+// The agreement tick on the first PIN (request 156). It shows, disabled,
+// while the app asks whether this person already agreed, then it is either
+// ready to tick or gone (already agreed). Tick it when it is there.
+async function tickAgreementIfAsked(page) {
+  await page.waitForFunction(() => {
+    const box = document.querySelector('input[type=checkbox]')
+    return !box || !box.disabled
+  })
+  const box = page.getByRole('checkbox')
+  if (await box.count()) await box.click()
+}
+
 async function choosePin(page, pin) {
   await page.getByText('Choose your PIN').waitFor()
+  await tickAgreementIfAsked(page)
   await typeDigits(page, 'Choose your PIN', pin)
   await page.getByText('Type it again').waitFor()
   await typeDigits(page, 'Type your PIN again', pin)
@@ -185,7 +200,19 @@ try {
   step('She chooses her PIN, twice')
   await page.getByText('Choose your PIN').waitFor()
   await shot(page, 'choose-pin')
+  // Without the agreement tick the PIN does not go on (request 156).
+  await page.waitForFunction(() => {
+    const box = document.querySelector('input[type=checkbox]')
+    return box && !box.disabled
+  })
   await typeDigits(page, 'Choose your PIN', '4821')
+  await page.getByText('Tick the box below to agree, then carry on.').waitFor()
+  if (await page.getByText('Type it again').count()) {
+    throw new Error('The PIN went on without the agreement tick')
+  }
+  // Ticking it carries on to the second PIN, and the agreement is saved in
+  // the database before the PIN (agree_to_terms on the throwaway Supabase).
+  await page.getByRole('checkbox').click()
   await page.getByText('Type it again').waitFor()
   await typeDigits(page, 'Type your PIN again', '4821')
   await expectHome(page, 'Test Nurse One')

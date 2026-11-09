@@ -34,6 +34,7 @@ import OutboxSender from '@/components/offline/OutboxSender'
 import { loadNotices, totalOf } from '@/lib/notifications/notifications'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
+import AgreementGate from '@/components/legal/AgreementGate'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Logo from '@/components/brand/Logo'
@@ -62,6 +63,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const path = usePathname()
   const [attentionOpen, setAttentionOpen] = useState(false)
+  // The install and alerts cards wait until the agreement card is answered,
+  // so only one card shows at a time (request 156).
+  const [agreementDone, setAgreementDone] = useState(false)
   const staff = auth.staff
   const client = auth.client
   // Everything waiting, checked every 30 seconds: the red bubble on the
@@ -162,8 +166,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* Sends what waited while the network was down (request 128, step 3). */}
         <OutboxSender client={client} staffId={staff.id} />
 
+        {/* ===== 6. Agreeing to the Terms of Use and Privacy Policy, once per
+            version of the words (request 156) ===== */}
+        <AgreementGate client={client} staffId={staff.id} onDone={() => setAgreementDone(true)} />
+
         {/* ===== 6. Install and alerts, once per device (must-do cards) ===== */}
-        <OnboardingGate client={client} staffId={staff.id} />
+        {agreementDone ? <OnboardingGate client={client} staffId={staff.id} /> : null}
       </div>
     </AttentionMenuContext.Provider>
   )
