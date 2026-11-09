@@ -666,6 +666,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+163. **iPad: the lock (idle) screen leaves a white strip at the bottom.**
+    (2026-11-09, photo) "This blue cover is not covering completely... The
+    white part is showing at the bottom... peculiar to iPad and maybe Mac."
+    To do AFTER the AWS setup (his order).
+
 162. **GitHub Actions out of free minutes; repository public for now.**
     (2026-11-09) Runs stopped: "recent account payments have failed or your
     spending limit needs to be increased" (about 2,000 free minutes used
