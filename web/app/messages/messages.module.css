@@ -394,3 +394,10 @@
 .person small {
   color: var(--mut);
 }
+
+/* The ticks (WhatsApp style): a small drawing beside the time. */
+.tickMark {
+  display: inline-block;
+  vertical-align: -1px;
+  margin-left: 4px;
+}

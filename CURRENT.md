@@ -685,6 +685,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     the app when it comes back) now waits while anything is typed.
     AWS: the console opened in eu-north-1 (Stockholm) with no Ireland
     choice shown, so the watcher goes to eu-north-1 (aws/target.json).
+    Ticks (2026-11-09): "the double mark... the second mark is usually on
+    top of the first one... just like on WhatsApp." Drawn now: the second
+    tick starts inside the first. Checked on screen.
 
 157. **His messages of 8 November evening (after the AWS profile photo).**
     Word for word where it matters:

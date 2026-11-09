@@ -488,7 +488,7 @@ function Messages() {
                               className={ticks(message) === 2 ? styles.read : styles.sent}
                               aria-label={ticks(message) === 2 ? 'Read' : 'Sent'}
                             >
-                              {ticks(message) === 2 ? ' ✓✓' : ' ✓'}
+                              <TickMark double={ticks(message) === 2} />
                             </span>
                           ) : null}
                         </small>
@@ -613,5 +613,29 @@ export default function MessagesPage() {
     <Suspense fallback={null}>
       <Messages />
     </Suspense>
+  )
+}
+
+// ===== Ticks, drawn like WhatsApp's =====
+// Anthony, 2026-11-09: the second tick sits over the first, "stacked...
+// just like on WhatsApp", not two ticks side by side. The second tick
+// starts inside the first, so its short arm hides behind it.
+function TickMark({ double }: { double: boolean }) {
+  return (
+    <svg
+      className={styles.tickMark}
+      width={double ? 17 : 12}
+      height="11"
+      viewBox={double ? '0 0 17 11' : '0 0 12 11'}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M1.2 6.2 4.4 9.4 10.8 1.6" />
+      {double ? <path d="M7.4 8.3 8.6 9.4 15 1.6" /> : null}
+    </svg>
   )
 }
