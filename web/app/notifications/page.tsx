@@ -38,6 +38,7 @@ import {
 } from '@/lib/notifications/notifications'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { onChange } from '@/lib/live/changes'
 
 export default function NotificationsPage() {
   const auth = useAuth()
@@ -63,7 +64,10 @@ export default function NotificationsPage() {
     }
     const first = window.setTimeout(run, 0)
     const timer = window.setInterval(run, 30_000)
+    // Something saved anywhere: fetch at once (request 157).
+    const stopListening = client ? onChange(client, 'records', run) : () => {}
     return () => {
+      stopListening()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)

@@ -19,6 +19,7 @@ import {
   myAnnouncementReads,
   type Announcement,
 } from '@/lib/messages/messages'
+import { onChange } from '@/lib/live/changes'
 
 export default function AnnouncementsCard({
   client,
@@ -40,7 +41,10 @@ export default function AnnouncementsCard({
   useEffect(() => {
     const first = window.setTimeout(() => void load(), 0)
     const timer = window.setInterval(() => void load(), 60_000)
+    // Something saved anywhere: fetch at once (request 157).
+    const stopListening = client ? onChange(client, 'records', () => void load()) : () => {}
     return () => {
+      stopListening()
       window.clearTimeout(first)
       window.clearInterval(timer)
     }

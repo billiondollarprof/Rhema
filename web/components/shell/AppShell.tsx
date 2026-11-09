@@ -92,8 +92,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const timer = window.setInterval(check, 30_000)
     // A message sent anywhere: count again at once (request 157).
     const stopListening = onChange(client, 'messages', check)
+    const stopRecords = onChange(client, 'records', check)
     return () => {
       stopListening()
+      stopRecords()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)

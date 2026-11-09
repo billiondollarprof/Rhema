@@ -27,6 +27,7 @@
 
 import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useState } from 'react'
+import { onChange } from '@/lib/live/changes'
 import { useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
@@ -113,6 +114,14 @@ function PatientRecord() {
   const reload = useCallback(() => {
     if (client && id) loadRecord(client, id).then(setRecord)
   }, [client, id])
+
+  // Something saved by anybody (a nurse's vitals, a lab result): show it at
+  // once, without leaving the record (request 157).
+  const opened = record !== null
+  useEffect(() => {
+    if (!client || !opened) return
+    return onChange(client, 'records', reload)
+  }, [client, opened, reload])
 
   if (auth.status !== 'ready' || !client || !staff) return null
 

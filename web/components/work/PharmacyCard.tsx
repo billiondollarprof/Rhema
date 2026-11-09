@@ -33,6 +33,7 @@ import {
   payPrescription,
   type Prescription,
 } from '@/lib/pharmacy/pharmacy'
+import { onChange } from '@/lib/live/changes'
 
 type View = 'pay' | 'dispense'
 
@@ -82,7 +83,10 @@ export default function PharmacyCard({
     }
     const first = window.setTimeout(run, 0)
     const timer = window.setInterval(run, 30000)
+    // Something saved anywhere: fetch at once (request 157).
+    const stopListening = client ? onChange(client, 'records', run) : () => {}
     return () => {
+      stopListening()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)

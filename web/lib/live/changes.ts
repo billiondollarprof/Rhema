@@ -20,7 +20,10 @@
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 
 // ===== 1. The kinds of change =====
-export type ChangeKind = 'messages'
+// messages: a message was sent, changed or read.
+// records:  anything else was saved (a patient, the queue, a lab request or
+//           result, a prescription, a payment, an announcement, a call...).
+export type ChangeKind = 'messages' | 'records'
 
 const CHANNEL = 'rhema-changes'
 const EVENT = 'changed'
@@ -37,7 +40,8 @@ function channelFor(client: SupabaseClient) {
       .channel(CHANNEL, { config: { broadcast: { self: false } } })
       .on('broadcast', { event: EVENT }, ({ payload }) => {
         const kind = (payload as { kind?: unknown })?.kind
-        if (kind === 'messages') listeners.forEach((listener) => listener(kind))
+        if (kind === 'messages' || kind === 'records')
+          listeners.forEach((listener) => listener(kind))
       })
       .subscribe()
     found = { channel, listeners }
@@ -65,4 +69,58 @@ export function onChange(client: SupabaseClient, kind: ChangeKind, run: () => vo
   }
   listeners.add(listener)
   return () => listeners.delete(listener)
+}
+
+// ===== 5. Noticing a save, for every request the app makes =====
+// Called by the database connection after every answer that worked
+// (lib/auth/clients.ts). Reads never count. A save is: writing a table
+// straight (POST, PATCH or DELETE), or calling one of the database
+// functions that change shared things. Functions that only read, or that
+// change only the caller's own things (their PIN, their device, what they
+// have read), are left out, so one person reading can never make every
+// other app fetch again, round and round.
+const SHARED_SAVES = new Set([
+  'take_payment',
+  'start_family',
+  'send_prescription_also',
+  'send_announcement',
+  'request_lab',
+  'remove_patient_file',
+  'record_lab_results',
+  'prescribe',
+  'pay_prescription',
+  'pay_lab_request_lines',
+  'pay_lab_request',
+  'move_patient',
+  'mark_left',
+  'invite_staff',
+  'send_invite_again',
+  'cancel_invite',
+  'dispense_prescription',
+  'change_staff_access',
+  'change_medication_status',
+  'call_attention',
+  'add_patient_file',
+])
+
+let waiting: number | null = null
+
+// True when this request saved something other people should see.
+export function isSharedSave(url: string, method: string): boolean {
+  if (method.toUpperCase() === 'GET' || method.toUpperCase() === 'HEAD') return false
+  const path = url.split('?')[0]
+  const rest = path.indexOf('/rest/v1/')
+  if (rest < 0) return false
+  const name = path.slice(rest + '/rest/v1/'.length)
+  return name.startsWith('rpc/') ? SHARED_SAVES.has(name.slice(4)) : name.length > 0
+}
+
+export function noteSave(client: SupabaseClient, url: string, method: string): void {
+  if (!isSharedSave(url, method)) return
+  // Many saves in a moment (a form with several parts) send one signal.
+  if (waiting !== null) return
+  waiting = window.setTimeout(() => {
+    waiting = null
+    announceChange(client, 'records')
+  }, 300)
 }

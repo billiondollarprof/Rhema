@@ -681,7 +681,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     (c) "I also want updates to appear in the app without somebody having
         to refresh." Messages: a live signal (lib/live/changes.ts, no
         content in it) makes every open app fetch at once; heard in 40 ms on
-        testing. DONE on testing 2026-11-09. Other screens: next.
+        testing. DONE 2026-11-09. Every other save (patients, queue, lab,
+        pharmacy, payments, announcements, calls, invitations) now sends
+        the same kind of signal ("records"), noticed in one place (the
+        database connection, lib/auth/clients.ts); Home, notices, the lab
+        and pharmacy cards, announcements, the patient list, the open record,
+        the activity log and the top bar counts fetch at once. Reads never
+        send it (tested), so apps cannot set each other off.
     (d) "Is this even okay to publicly mention where our database is
         sitting?... Our backend services should be confidential." Privacy
         Policy no longer names any provider or place. DONE on testing.
