@@ -52,6 +52,28 @@ data, and costs nothing inside AWS's always free allowance.
 Then Claude puts the address in `target.json` and merges to `main`, and the
 workflow deploys the watcher and runs it once in test mode.
 
+## Without GitHub (the way it is set up today, 2026-11-09)
+
+The AWS account is on the Free plan. Its rules forbid the GitHub login link
+(the stack failed with "iam:CreateOpenIDConnectProvider ... explicit deny in
+a service control policy"). So the template's GitHubDeploy is "no" by
+default, and the code goes in by hand:
+
+1. Make the zip: `python3 aws/make_zip.py` (Claude sends it in the chat).
+2. CloudFormation (Stockholm, eu-north-1): create the stack as above, with
+   GitHubDeploy left as no. Wait for CREATE_COMPLETE.
+3. Search for **Lambda**, open `stellaxafe-uptime-watcher`, then **Code**,
+   then **Upload from**, then **.zip file**, choose `watcher.zip`, **Save**.
+4. Still there: **Test**, event JSON `{"test": true}`, **Test**. It should
+   answer with each hospital and "ok": true.
+5. Confirm the "AWS Notification - Subscription Confirmation" email.
+
+A new hospital or a new address: change `sites.json`, make the zip again,
+upload it again (step 3).
+
+When the account moves to the Paid plan: update the stack with GitHubDeploy
+yes, give Claude the DeployRoleArn output, and merging to main deploys again.
+
 ## Everyday
 
 - **A new hospital, or a hospital's new address:** edit `sites.json`, merge

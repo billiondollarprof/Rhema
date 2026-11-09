@@ -666,6 +666,27 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+162. **GitHub Actions out of free minutes; repository public for now.**
+    (2026-11-09) Runs stopped: "recent account payments have failed or your
+    spending limit needs to be increased" (about 2,000 free minutes used
+    this month, mostly the checks). His decision: "let's make it public
+    now... I will make it private by next month, or by the time we are
+    done." History scanned first: no keys, no patient data. LICENSE changed
+    on his word: "StellaXafe reserve the right to publish, reuse, and do
+    anything with the code" (hospital data and branding still never
+    shared). He switches visibility himself (Settings, Danger Zone); the
+    session cannot. REMIND HIM to make it private again, and cut the checks
+    first so 2,000 minutes a month are enough.
+
+161. **AWS watcher, without GitHub for now.** (2026-11-09) The first stack
+    failed: the account is on AWS's Free plan, whose service control policy
+    denies iam:CreateOpenIDConnectProvider (the GitHub login link). His
+    choice: "my card is not really with me... we just go to option B. Then
+    maybe before another hospital, I would put my card." So the template
+    has GitHubDeploy (default no) and he uploads watcher.zip (aws/
+    make_zip.py) in the Lambda console. Region eu-north-1. Alerts to
+    stellaxafe@gmail.com. Later, on the Paid plan: GitHubDeploy yes.
+
 160. **Adding a family member inherits the family's details.** (2026-11-09)
     "The contact that you've already filled before should be a family
     contact... next of kin, you don't have to fill it again... the next
