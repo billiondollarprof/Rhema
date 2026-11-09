@@ -666,6 +666,20 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+164. **White secondary buttons must look like buttons.** (2026-11-09,
+    photos of the receipt and Find patient) "Those secondary buttons that
+    are white... put an outline, blue outline... a white button on a white
+    screen, it's just looking like you just wrote a text... all the buttons
+    should look like buttons, especially the flat ones, excluding the ones
+    that already look like 3D." Every flat white button app wide gets a blue
+    outline and blue words (like Register from old file). To do AFTER the
+    AWS setup (his order).
+
+163. **iPad: the lock (idle) screen leaves a white strip at the bottom.**
+    (2026-11-09, photo) "This blue cover is not covering completely... The
+    white part is showing at the bottom... peculiar to iPad and maybe Mac."
+    To do AFTER the AWS setup (his order).
+
 162. **GitHub Actions out of free minutes; repository public for now.**
     (2026-11-09) Runs stopped: "recent account payments have failed or your
     spending limit needs to be increased" (about 2,000 free minutes used
@@ -686,6 +700,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     has GitHubDeploy (default no) and he uploads watcher.zip (aws/
     make_zip.py) in the Lambda console. Region eu-north-1. Alerts to
     stellaxafe@gmail.com. Later, on the Paid plan: GitHubDeploy yes.
+    DONE 2026-11-09: stack CREATE_COMPLETE, watcher.zip uploaded, test run
+    in AWS answered "Rhema live" ok: true, email subscription confirmed.
+    It now runs every 5 minutes. (Request 74 is live.)
 
 160. **Adding a family member inherits the family's details.** (2026-11-09)
     "The contact that you've already filled before should be a family

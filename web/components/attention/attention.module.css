@@ -171,9 +171,9 @@
   min-height: 32px;
   padding: 4px 12px;
   border-radius: 10px;
-  border: 1px solid var(--line);
+  border: 1.5px solid #1f5fd0;
   background: #fff;
-  color: var(--ink);
+  color: #1f5fd0;
   cursor: pointer;
 }
 

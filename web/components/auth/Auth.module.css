@@ -88,14 +88,21 @@
   min-height: 42px;
   padding: 9px 14px;
   border-radius: 12px;
-  border: 1px solid var(--line);
+  /* A secondary button looks like a button: blue outline, blue words
+     (Anthony, 2026-11-09: "a white button on a white screen... looking
+     like you just wrote a text"). Primary and danger set their own. */
+  border: 1.5px solid #1f5fd0;
   background: #fff;
-  color: var(--ink);
+  color: #1f5fd0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.button:hover:not(:disabled) {
+  background: #eef4ff;
 }
 
 .primary {
