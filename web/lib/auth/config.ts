@@ -20,10 +20,11 @@ export const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? 
 export const isConfigured = SUPABASE_URL !== '' && SUPABASE_KEY !== ''
 
 // ===== 2. Time limits (decided by Anthony, 2026-10-28) =====
-// No use for 1 hour: the screen locks and asks for the PIN. It was 10
+// No use for 15 minutes: the screen locks and asks for the PIN. It was 10
 // minutes until 2026-10-31, when Anthony moved it to 1 hour so a slow
-// network does not lock people out while a page is loading.
-export const LOCK_AFTER_MS = 60 * 60 * 1000
+// network does not lock people out while a page is loading. On 2026-11-08
+// he moved it to 15 minutes: "I think 1 hour is too long."
+export const LOCK_AFTER_MS = 15 * 60 * 1000
 // No use for 24 hours: that person is signed out of this device and must
 // use an email code again.
 export const EXPIRE_AFTER_MS = 24 * 60 * 60 * 1000

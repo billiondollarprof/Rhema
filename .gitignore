@@ -19,3 +19,4 @@ __pycache__/
 # System files
 .DS_Store
 e2e-screens/
+web/public/version.json

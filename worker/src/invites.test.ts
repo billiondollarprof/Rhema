@@ -51,7 +51,8 @@ describe('emailInvite', () => {
     const headers = calls[1].init?.headers as Record<string, string>
     expect(calls[1].url).toBe('https://api.resend.com/emails')
     expect(headers.Authorization).toBe('Bearer rk')
-    expect(headers['Idempotency-Key']).toBe('rhema-invite-7')
+    // The site's address is in the key, so testing and live never collide.
+    expect(headers['Idempotency-Key']).toBe('rhema-invite-rhemamedical.app-7')
     const sent = JSON.parse(String(calls[1].init?.body))
     expect(sent.to).toEqual(['chioma@example.com'])
     expect(sent.from).toContain('no-reply@rhemamedical.app')

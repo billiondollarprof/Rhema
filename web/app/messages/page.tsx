@@ -51,6 +51,8 @@ import {
   type Target,
 } from '@/lib/messages/messages'
 import { useRightPage } from '@/lib/auth/routes'
+import { onChange } from '@/lib/live/changes'
+import { playMessageSound } from '@/lib/live/sound'
 import { useAuth } from '@/lib/auth/session'
 
 // ===== 1. Which conversation a message belongs to, for this room =====
@@ -130,7 +132,10 @@ function Messages() {
     })
     const first = window.setTimeout(() => void load(), 0)
     const timer = window.setInterval(() => void load(), 15_000)
+    // A message sent or read anywhere: fetch at once (request 157).
+    const stopListening = onChange(client, 'messages', () => void load())
     return () => {
+      stopListening()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)
@@ -162,6 +167,23 @@ function Messages() {
     window.addEventListener(OUTBOX_CHANGED, show)
     return () => window.removeEventListener(OUTBOX_CHANGED, show)
   }, [staff, messages])
+
+  // ===== 2b. A soft "pom pom" when a message from somebody else arrives =====
+  // Anthony, 2026-11-08: "when a message drops and the person is on the
+  // chatting screen, you should just say a pop sound." Not for the first
+  // load, not for your own room's messages.
+  const seen = useRef<Set<number> | null>(null)
+  useEffect(() => {
+    if (!messages) return
+    const ids = new Set(messages.map((message) => message.id))
+    if (seen.current) {
+      const arrived = messages.some(
+        (message) => !seen.current?.has(message.id) && message.from_room_id !== myRoom,
+      )
+      if (arrived) playMessageSound()
+    }
+    seen.current = ids
+  }, [messages, myRoom])
 
   // ===== 3. The conversations, newest first =====
   const conversations = useMemo(() => {

@@ -14,7 +14,7 @@
  *   locked          signed in, but the PIN must be typed to carry on
  *   ready           signed in and unlocked
  *
- * Rules from Anthony (2026-10-28 and 29): lock after 1 hour without use (10 minutes until 2026-10-31);
+ * Rules from Anthony (2026-10-28 and 29): lock after 15 minutes without use (10 minutes until 2026-10-31, 1 hour until 2026-11-08);
  * signed out of the device after 24 hours without use; 5 wrong PINs means
  * sign in again with an email code. The PIN is checked by the database.
  *
@@ -82,6 +82,9 @@ type AuthState = {
   requestCode: (email: string) => Promise<string | null>
   verifyCode: (email: string, code: string) => Promise<string | null>
   setPin: (pin: string) => Promise<string | null>
+  // Reads this person's staff row again (their room, their ticks), for
+  // the refresh button and when the app comes back to the front.
+  refreshStaff: () => Promise<void>
   unlock: (pin: string) => Promise<UnlockResult>
   lock: () => void
   switchTo: (id: string) => Promise<void>
@@ -265,7 +268,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     start()
   }, [activate, finishSignIn, signOutHere])
 
-  // ----- 3e. Lock after 1 hour without use (LOCK_AFTER_MS) -----
+  // ----- 3e. Lock after 15 minutes without use (LOCK_AFTER_MS) -----
   const lastTouch = useRef(0)
   useEffect(() => {
     if (status !== 'ready' || !account) return
@@ -287,15 +290,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // A phone pauses the timer while the app is in the background, so the
+    // lock is checked again the moment the app comes back to the front
+    // (Anthony, 2026-11-08: "the instant lock should still be working").
+    function cameBack() {
+      if (document.visibilityState === 'visible') checkIdle()
+    }
+
     window.addEventListener('pointerdown', touched)
     window.addEventListener('keydown', touched)
+    document.addEventListener('visibilitychange', cameBack)
     const timer = window.setInterval(checkIdle, 15000)
     return () => {
       window.removeEventListener('pointerdown', touched)
       window.removeEventListener('keydown', touched)
+      document.removeEventListener('visibilitychange', cameBack)
       window.clearInterval(timer)
     }
   }, [status, account])
+
+  // ----- 3e2. Fresh staff details: on request, and on coming back -----
+  // A change the admin makes (a new room, a new tick) shows without
+  // closing the app (Anthony, 2026-11-08: "I gave myself a room, came back,
+  // it is still saying the same thing").
+  const refreshStaff = useCallback(async () => {
+    if (!client || !account) return
+    const member = await loadStaff(client, account.id)
+    if (member) setStaff(member)
+  }, [client, account])
+
+  useEffect(() => {
+    if (status !== 'ready') return
+    function cameBack() {
+      if (document.visibilityState === 'visible') void refreshStaff()
+    }
+    document.addEventListener('visibilitychange', cameBack)
+    return () => document.removeEventListener('visibilitychange', cameBack)
+  }, [status, refreshStaff])
 
   // ----- 3f. Signed in and signed out times, for the activity log -----
   // While a person uses the app, it tells the database "seen" every 3
@@ -429,6 +460,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         requestCode,
         verifyCode,
         setPin,
+        refreshStaff,
         unlock,
         lock,
         switchTo,

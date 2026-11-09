@@ -13,6 +13,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import BellWaker from '@/components/attention/BellWaker'
 import { AuthProvider } from '@/lib/auth/session'
+import LoadingGate from '@/components/shell/LoadingGate'
+import AppFreshness from '@/components/shell/AppFreshness'
 import { BRAND } from '@/lib/brand/brand'
 
 export const metadata: Metadata = {
@@ -41,7 +43,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Who is signed in and whether the screen is locked, for every
             screen. It decides which screen shows, never what data a person
             may read: the database decides that. */}
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          {/* The logo, breathing, while the app starts (request 157). */}
+          <LoadingGate />
+        </AuthProvider>
+        {/* Reloads an open app when a newer version has gone live. */}
+        <AppFreshness />
         {/* Gets the Call attention bell ready on the first touch. */}
         <BellWaker />
       </body>
