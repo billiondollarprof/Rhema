@@ -666,6 +666,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+158. **Start screen navy, rooms option A, no refresh button.** (2026-11-09)
+    "Why change the app's loading screen to white instead of making the
+    logo circular and letting the edges blend well with the blue
+    background." "For options on rooms, A is okay." "Since the app now
+    refreshes itself, there may be no need for the spinning refresher in
+    the top bar, right?" Start screen: icon-192/512 are now the round logo
+    with clear corners (the maskable launcher icon is unchanged), the
+    phone's start colour navy again, the app's starting screen navy with
+    the same round logo. Refresh button removed. Rooms A: built on the
+    feature branch (office room kind, Admin Office room, room required when
+    inviting, admin picks the Admin Office by itself); WAITING for his yes
+    on the SQL.
+
 157. **His messages of 8 November evening (after the AWS profile photo).**
     Word for word where it matters:
     (a) Messages for everyone: "Messages is default for everyone. Everyone

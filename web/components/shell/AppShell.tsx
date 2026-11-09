@@ -67,12 +67,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // The install and alerts cards wait until the agreement card is answered,
   // so only one card shows at a time (request 156).
   const [agreementDone, setAgreementDone] = useState(false)
-  // The refresh button: it turns for a moment, then the app loads again.
-  const [refreshing, setRefreshing] = useState(false)
-  function refreshApp() {
-    setRefreshing(true)
-    window.setTimeout(() => window.location.reload(), 450)
-  }
   const staff = auth.staff
   const client = auth.client
   // Everything waiting, checked every 30 seconds: the red bubble on the
@@ -130,17 +124,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               myRoomId={staff.room_id}
               buttonClass={styles.topButton}
             />
-            {/* Refresh (request 157): turns, then loads the app again with
-                everything fresh, for when something has not updated. */}
-            <button
-              type="button"
-              className={`${styles.topButton} ${refreshing ? styles.turning : ''}`}
-              onClick={refreshApp}
-              aria-label="Refresh"
-              title="Refresh"
-            >
-              <Icon name="refresh" size={18} />
-            </button>
             {/* Lock screen, Notifications, the guide and Sign out (request 117). */}
             <MainMenu buttonClass={styles.topButton} waiting={waitingTotal} />
           </div>
