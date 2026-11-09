@@ -18,7 +18,7 @@ import { addToOutbox, isNetworkFailure } from '../offline/outbox'
 
 // ===== 1. Shapes =====
 export type RoomKind =
-  'front_desk' | 'nursing' | 'laboratory' | 'pharmacy' | 'consultation' | 'matron'
+  'front_desk' | 'nursing' | 'laboratory' | 'pharmacy' | 'consultation' | 'matron' | 'office'
 
 export const GROUP_WORDS: Record<RoomKind, string> = {
   front_desk: 'All Front Desks',
@@ -27,6 +27,8 @@ export const GROUP_WORDS: Record<RoomKind, string> = {
   pharmacy: 'All Pharmacies',
   consultation: 'All Consultant Rooms',
   matron: "All Matron's Offices",
+  // The admin's room (2026-11-09, option A).
+  office: 'All Admin Offices',
 }
 
 export type Room = { id: number; name: string; kind: RoomKind }

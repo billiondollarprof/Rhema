@@ -24,7 +24,8 @@ const ROOMS = [
   [6, 'Nursing Station 1', 'nursing'],
   [8, 'Laboratory', 'laboratory'],
   [9, 'Pharmacy', 'pharmacy'],
-].map(([id, name, kind]) => ({ id, name, kind }))
+  [10, 'Admin Office', 'office'],
+].map(([id, name, kind]) => ({ id, name, kind, is_active: true }))
 
 const PATIENT = {
   id: 1,

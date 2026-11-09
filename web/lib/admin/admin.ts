@@ -96,6 +96,8 @@ export const ROOM_KINDS: [string, string][] = [
   ['laboratory', 'Laboratory'],
   ['pharmacy', 'Pharmacy'],
   ['front_desk', 'Front desk'],
+  // The admin's own room (2026-11-09, option A).
+  ['office', 'Admin office'],
 ]
 
 // The starting ticks for a role, the same as the database gives a new

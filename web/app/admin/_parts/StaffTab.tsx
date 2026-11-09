@@ -172,6 +172,10 @@ function PersonEditor({
   }
 
   async function save() {
+    if (roomId === null) {
+      setMessage({ good: false, text: 'Choose a room first. Messages go from room to room.' })
+      return
+    }
     setBusy(true)
     setMessage(null)
     const problem = await saveStaff(client, person.id, { role, room_id: roomId, ...access })
@@ -222,7 +226,11 @@ function PersonEditor({
                   setRoomId(event.target.value ? Number(event.target.value) : null)
                 }
               >
-                <option value="">No room</option>
+                {/* Everybody has a room (2026-11-09, option A). Somebody
+                    without one yet is asked to choose. */}
+                <option value="" disabled>
+                  Choose a room
+                </option>
                 {rooms
                   .filter((room) => room.is_active)
                   .map((room) => (

@@ -341,8 +341,8 @@ function Messages() {
         <div className={styles.page}>
           <h2>Messages</h2>
           <p className={styles.muted}>
-            Messages go from room to room. Ask your administrator to give you a room, then come
-            back.
+            Messages go from room to room, and you have no room yet. Ask your admin to give you one
+            in Admin, Staff.
           </p>
         </div>
       </AppShell>

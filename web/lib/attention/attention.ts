@@ -21,7 +21,7 @@ import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 
 // ===== 1. Shapes and words =====
 export type RoomKind =
-  'front_desk' | 'nursing' | 'laboratory' | 'pharmacy' | 'consultation' | 'matron'
+  'front_desk' | 'nursing' | 'laboratory' | 'pharmacy' | 'consultation' | 'matron' | 'office'
 
 // One line in the list. roomId null means the whole group.
 export type Target = { kind: RoomKind; roomId: number | null; label: string; detail: string | null }
@@ -52,6 +52,9 @@ export const KIND_LABELS: Record<RoomKind, string> = {
   pharmacy: 'Pharmacy',
   consultation: 'Consultant',
   matron: 'Matron',
+  // The admin's room (2026-11-09). Not in the Call attention list: who can
+  // be called is his design, unchanged.
+  office: 'Admin Office',
 }
 
 // ===== 2. The list =====

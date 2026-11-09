@@ -78,7 +78,8 @@ function InviteForm({
   const [sent, setSent] = useState<string | null>(null)
 
   const cleanEmail = email.trim().toLowerCase()
-  const ready = name.trim().length >= 2 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleanEmail)
+  const ready =
+    name.trim().length >= 2 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleanEmail) && roomId !== null
 
   async function send() {
     setBusy(true)
@@ -149,6 +150,9 @@ function InviteForm({
             onChange={(event) => {
               setRole(event.target.value)
               setAccess(accessForRole(event.target.value))
+              // An admin goes to an Admin Office, if there is one.
+              const office = rooms.find((room) => room.kind === 'office' && room.is_active)
+              if (event.target.value === 'admin' && office) setRoomId(office.id)
             }}
           >
             {ROLES.map(([value, words]) => (
@@ -166,7 +170,11 @@ function InviteForm({
             value={roomId ?? ''}
             onChange={(event) => setRoomId(event.target.value ? Number(event.target.value) : null)}
           >
-            <option value="">No room</option>
+            {/* Everybody has a room, admins included (Anthony, 2026-11-09,
+                option A): messages go from room to room. */}
+            <option value="" disabled>
+              Choose a room
+            </option>
             {rooms
               .filter((room) => room.is_active)
               .map((room) => (
