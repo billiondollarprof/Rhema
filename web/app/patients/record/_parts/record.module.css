@@ -514,3 +514,10 @@ a.small {
   accent-color: var(--bl);
   flex-shrink: 0;
 }
+
+/* The Yes / No consent box (request 170): big enough to tap. */
+.bigChip {
+  min-height: 40px;
+  min-width: 72px;
+  font-size: 14px;
+}

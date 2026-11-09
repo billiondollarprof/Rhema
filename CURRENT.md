@@ -732,6 +732,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     photos and video." Signatures: "no signature, you can put a checkbox to
     serve for the signature, including name and date." Consent form: "any
     patient should have one." To build (SQL shown first).
+    BUILT 2026-11-09 on the feature branch: migration
+    20261109170525_antenatal_booking_and_consent (4 tables + the dispensed
+    notice column and function), 6 tests, 7 deliberate breaks caught; the
+    record shows "Antenatal booking" for antenatal patients and "Consent
+    for an operation" for every patient; doctors get "dispensed" notices,
+    cleared by opening the record. WAITING for his yes on the SQL.
 
 169. **A chosen patient opens on its own screen, with their files.**
     (2026-11-09, phone photo) "When you click on a patient... why does it

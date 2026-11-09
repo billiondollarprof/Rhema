@@ -40,6 +40,7 @@ import {
   myAnnouncementReads,
 } from '../messages/messages'
 import {
+  listMyDispensed,
   listAwaitingDispense,
   listAwaitingPayment as drugsAwaitingPayment,
   type Prescription,
@@ -112,6 +113,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     drugsToPay,
     testsToDo,
     toDispense,
+    dispensed,
   ] = await Promise.all([
     staff.room_id ? loadMessages(client) : empty,
     staff.room_id ? loadRooms(client) : empty,
@@ -122,6 +124,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     payer ? drugsAwaitingPayment(client) : empty,
     staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
     staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
+    staff.role === 'doctor' ? listMyDispensed(client, staff.id) : empty,
   ])
   const notices: Notice[] = []
 
@@ -199,6 +202,22 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
         }),
         (request) => request.completed_at ?? request.requested_at,
       ),
+    })
+  }
+
+  // ----- c2. My prescriptions, dispensed (request 171c) -----
+  if (dispensed.length) {
+    notices.push({
+      key: 'dispensed',
+      count: dispensed.length,
+      words: `${many(dispensed.length, 'prescription you wrote was', 'prescriptions you wrote were')} dispensed.`,
+      items: dispensed.map((prescription) => ({
+        key: `dispensed-${prescription.id}`,
+        title: patientWords(prescription),
+        detail: drugWords(prescription),
+        time: when(prescription.dispensed_at ?? prescription.prescribed_at),
+        action: { label: 'Open record', href: `/patients/record/?p=${prescription.patient_id}` },
+      })),
     })
   }
 
