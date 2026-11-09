@@ -82,7 +82,7 @@ function RequestLab() {
     }
     setSent(
       sendTo === 'front_desk'
-        ? `Sent to the Front Desk for payment: ${tests.join(', ')}.`
+        ? `Sent to the Lab, and to the Front Desk for payment: ${tests.join(', ')}.`
         : `Sent to the Laboratory: ${tests.join(', ')}.`,
     )
   }
@@ -197,7 +197,7 @@ function RequestLab() {
                   aria-pressed={sendTo === 'front_desk'}
                   onClick={() => setSendTo('front_desk')}
                 >
-                  Front Desk for payment
+                  Lab and Front Desk (payment)
                 </button>
                 <button
                   aria-pressed={sendTo === 'laboratory'}

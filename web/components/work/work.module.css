@@ -281,3 +281,14 @@ a.button {
   color: #1f6b4a;
   font-weight: 600;
 }
+
+/* A lab request not paid yet: the lab sees it, the Front Desk takes the
+   payment (request 171c). */
+.waitingPay {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9a5b00;
+  background: #fff3dc;
+  border-radius: 999px;
+  padding: 6px 10px;
+}

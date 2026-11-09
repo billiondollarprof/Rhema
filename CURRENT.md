@@ -684,6 +684,55 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
+171. **His list of 2026-11-09 (with the antenatal answers).**
+    (a) "That refresh spinning wheel at the top bar will be needed" (it
+        was removed earlier the same day on his question; now back).
+    (b) "Simple back buttons will also be needed to help move back to
+        previous pages on a desktop."
+    (c) "Request lab goes to lab and front desk simultaneously and the
+        updates on payment and test results ready should not wait for a
+        reload... once any request is fulfilled, the doctor gets a
+        notification."
+    (d) "All notifications should come with a sound... a unique sound that
+        can't be ignored, maybe a pop up sound or iPhone notification sound."
+    (e) "Pharmacy request too, simultaneously send to pharmacy and front
+        desk for payment."
+    BUILT 2026-11-09: (a) refresh button back; (b) a Back button first in
+    the top bar on every screen but Home (back in the app, or Home); (c)
+    lab: the Lab sees a request at once, "Waiting for payment at the Front
+    Desk", ready the moment it is paid, live; the option reads "Lab and
+    Front Desk (payment)"; "Straight to the lab" kept; (e) pharmacy: the
+    first option, "Pharmacy and Front Desk (payment)", sends to both at
+    once; "Straight to the pharmacy" kept; (d) a three note chime, twice,
+    whenever anything new waits (not a message while Messages is open).
+    STILL TO DO: (c) the doctor told when a prescription is dispensed (lab
+    results already tell them): needs a "seen" column, SQL with the
+    antenatal batch. Note: the pharmacy file said "No alert when dispensed"
+    (his earlier word); his new word replaces it.
+
+170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
+    photo of the card) "The matron said these information have to be
+    there including the one written at the bottom with pen, for consent.
+    Like a consent box." The card: P.H.C. DATA; Next of kin (name, surname,
+    relation, occupation, religion, level of education, age, phone, tribe);
+    Route (routine) test (PCV, RVS, blood group, genotype, hepatitis B,
+    hepatitis C, urinalysis, RBS/FBS, H. pylori, PT); Previous pregnancies
+    (date of birth, duration, birth weight, method of delivery, sex; the
+    card shows two); number of abortions, miscarriages, total pregnancies,
+    parity; Baby if death (age at death, cause, living/alive); Consent form
+    for an operation (name, operation, relationship, address, date,
+    signature, witness, date, signature); handwritten: "Would you like your
+    delivery to be documented? Yes / No". Plan and questions sent
+    2026-11-09; WAITING for his answers (it changes what patient data is
+    kept, so it needs his yes under the NDPA).
+    HIS ANSWERS 2026-11-09: "yes to all" (one Antenatal booking section in
+    the record; tests with result and date; any number of previous
+    pregnancies; baby if death on its pregnancy; extra next of kin
+    details; religion, tribe, education confirmed). "Documented means
+    photos and video." Signatures: "no signature, you can put a checkbox to
+    serve for the signature, including name and date." Consent form: "any
+    patient should have one." To build (SQL shown first).
+
 169. **A chosen patient opens on its own screen, with their files.**
     (2026-11-09, phone photo) "When you click on a patient... why does it
     open on that same screen?... it should open a new screen... What if the

@@ -367,3 +367,19 @@
   display: grid;
   place-items: center;
 }
+
+/* The refresh button turns while the app loads again (request 157). */
+.turning svg {
+  animation: turn 0.6s linear infinite;
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The back button sits first in the top bar (request 171b). */
+.backButton {
+  margin-right: 4px;
+}

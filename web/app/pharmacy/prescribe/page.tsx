@@ -104,9 +104,22 @@ function Prescribe() {
       note: draft.note.trim() || null,
     }))
     const problem = await prescribe(client, patient.id, items, note, sendTo)
+    if (problem) {
+      setBusy(false)
+      setError(problem)
+      return
+    }
+    // Front Desk and Pharmacy at the same time (Anthony, 2026-11-09:
+    // "pharmacy request too, simultaneously send to pharmacy and front desk
+    // for payment"): the pharmacy sees it at once while the Front Desk
+    // takes the payment.
+    if (sendTo === 'front_desk') {
+      const also = await sendAlso(client, patient.id, staff?.id ?? '')
+      if (also) setAlsoProblem(also)
+      else setAlsoSent(true)
+    }
     setBusy(false)
-    if (problem) setError(problem)
-    else setSent(true)
+    setSent(true)
   }
 
   return (
@@ -127,18 +140,14 @@ function Prescribe() {
           <div className={styles.card}>
             <p className={styles.good}>
               {sendTo === 'front_desk'
-                ? 'Sent to the Front Desk for payment.'
+                ? 'Sent to the Front Desk for payment and to the Pharmacy.'
                 : 'Sent to the Pharmacy.'}
             </p>
             <p className={styles.muted}>
               Once dispensed, the drugs join {patient.full_name}&apos;s current medications.
             </p>
-            {alsoSent ? (
-              <p className={styles.good}>
-                {sendTo === 'front_desk'
-                  ? 'Also sent to the Pharmacy.'
-                  : 'Also sent to the Front Desk.'}
-              </p>
+            {alsoSent && sendTo === 'pharmacy' ? (
+              <p className={styles.good}>Also sent to the Front Desk.</p>
             ) : null}
             {alsoProblem ? <p className={styles.error}>{alsoProblem}</p> : null}
             <div className={styles.buttons}>
@@ -325,7 +334,7 @@ function Prescribe() {
                   aria-pressed={sendTo === 'front_desk'}
                   onClick={() => setSendTo('front_desk')}
                 >
-                  Front Desk for payment
+                  Pharmacy and Front Desk (payment)
                 </button>
                 <button aria-pressed={sendTo === 'pharmacy'} onClick={() => setSendTo('pharmacy')}>
                   Straight to the pharmacy
