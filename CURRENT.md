@@ -684,6 +684,20 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
+171. **His list of 2026-11-09 (with the antenatal answers).**
+    (a) "That refresh spinning wheel at the top bar will be needed" (it
+        was removed earlier the same day on his question; now back).
+    (b) "Simple back buttons will also be needed to help move back to
+        previous pages on a desktop."
+    (c) "Request lab goes to lab and front desk simultaneously and the
+        updates on payment and test results ready should not wait for a
+        reload... once any request is fulfilled, the doctor gets a
+        notification."
+    (d) "All notifications should come with a sound... a unique sound that
+        can't be ignored, maybe a pop up sound or iPhone notification sound."
+    (e) "Pharmacy request too, simultaneously send to pharmacy and front
+        desk for payment."
+
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be
     there including the one written at the bottom with pen, for consent.
@@ -699,6 +713,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     delivery to be documented? Yes / No". Plan and questions sent
     2026-11-09; WAITING for his answers (it changes what patient data is
     kept, so it needs his yes under the NDPA).
+    HIS ANSWERS 2026-11-09: "yes to all" (one Antenatal booking section in
+    the record; tests with result and date; any number of previous
+    pregnancies; baby if death on its pregnancy; extra next of kin
+    details; religion, tribe, education confirmed). "Documented means
+    photos and video." Signatures: "no signature, you can put a checkbox to
+    serve for the signature, including name and date." Consent form: "any
+    patient should have one." To build (SQL shown first).
 
 169. **A chosen patient opens on its own screen, with their files.**
     (2026-11-09, phone photo) "When you click on a patient... why does it
