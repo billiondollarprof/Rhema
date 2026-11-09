@@ -684,6 +684,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
+170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
+    photo of the card) "The matron said these information have to be
+    there including the one written at the bottom with pen, for consent.
+    Like a consent box." The card: P.H.C. DATA; Next of kin (name, surname,
+    relation, occupation, religion, level of education, age, phone, tribe);
+    Route (routine) test (PCV, RVS, blood group, genotype, hepatitis B,
+    hepatitis C, urinalysis, RBS/FBS, H. pylori, PT); Previous pregnancies
+    (date of birth, duration, birth weight, method of delivery, sex; the
+    card shows two); number of abortions, miscarriages, total pregnancies,
+    parity; Baby if death (age at death, cause, living/alive); Consent form
+    for an operation (name, operation, relationship, address, date,
+    signature, witness, date, signature); handwritten: "Would you like your
+    delivery to be documented? Yes / No". Plan and questions sent
+    2026-11-09; WAITING for his answers (it changes what patient data is
+    kept, so it needs his yes under the NDPA).
+
 169. **A chosen patient opens on its own screen, with their files.**
     (2026-11-09, phone photo) "When you click on a patient... why does it
     open on that same screen?... it should open a new screen... What if the
