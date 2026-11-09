@@ -39,9 +39,10 @@ import {
   type PatientCard,
   type PatientDetails,
   type PatientResult,
+  familyMembers,
 } from '@/lib/patients/patients'
 import { naira, PAYMENT_MODES } from '@/lib/lab/lab'
-import { takePayment } from '@/lib/payments/payments'
+import { familyPayments, takePayment, type Payment } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -81,6 +82,54 @@ function RegisterPatient() {
       current = false
     }
   }, [client, familyId])
+
+  // ===== 0a. Adding to a family: start from the family's own details =====
+  // Anthony, 2026-11-09 (request 160): "the contact that you've already
+  // filled before should be a family contact... next of kin, you don't have
+  // to fill it again... the next family member should inherit most of
+  // those data... Let the front desk be the decider." So the first member's
+  // contact, address and next of kin fill the form; the biodata starts
+  // empty; everything stays editable. The family's payments show above an
+  // optional new payment.
+  const [familyStart, setFamilyStart] = useState<{
+    details: PatientDetails
+    paid: Payment[]
+  } | null>(null)
+  useEffect(() => {
+    if (!client || !familyId) return
+    let current = true
+    ;(async () => {
+      const members = await familyMembers(client, familyId)
+      const first = members[0] as unknown as Partial<PatientDetails> | undefined
+      const paid = await familyPayments(
+        client,
+        members.map((member) => member.id),
+      )
+      if (!current) return
+      const shared = (key: keyof PatientDetails) => (first?.[key] ?? EMPTY_DETAILS[key]) as never
+      setFamilyStart({
+        details: {
+          ...EMPTY_DETAILS,
+          category: 'family',
+          family_id: familyId,
+          phone: shared('phone'),
+          email: shared('email'),
+          address: shared('address'),
+          town: shared('town'),
+          lga: shared('lga'),
+          state: shared('state'),
+          country: shared('country'),
+          next_of_kin_name: shared('next_of_kin_name'),
+          next_of_kin_relationship: shared('next_of_kin_relationship'),
+          next_of_kin_phone: shared('next_of_kin_phone'),
+        },
+        paid,
+      })
+    })()
+    return () => {
+      current = false
+    }
+  }, [client, familyId, formKey])
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
@@ -358,17 +407,44 @@ function RegisterPatient() {
           </div>
         ) : null}
 
-        <PatientForm
-          key={`${formKey}-${familyId ?? 'none'}`}
-          initial={
-            familyId ? { ...EMPTY_DETAILS, category: 'family', family_id: familyId } : EMPTY_DETAILS
-          }
-          saveLabel="Save patient"
-          busy={busy}
-          problem={problem}
-          withPayment
-          onSave={(details, cardFee) => save(details, cardFee)}
-        />
+        {familyId && familyStart ? (
+          <p className={styles.familyNote}>
+            Contact, address and next of kin are filled in from the family. Change anything that is
+            different for this member.
+          </p>
+        ) : null}
+
+        {/* A family member's form waits for the family's details, so it
+            starts filled in rather than filling while somebody types. */}
+        {familyId && !familyStart ? (
+          <p className={styles.muted}>Loading the family…</p>
+        ) : (
+          <PatientForm
+            key={`${formKey}-${familyId ?? 'none'}-${familyStart ? 'family' : 'new'}`}
+            initial={familyId && familyStart ? familyStart.details : EMPTY_DETAILS}
+            saveLabel="Save patient"
+            busy={busy}
+            problem={problem}
+            withPayment
+            familyPaid={
+              familyId && familyStart
+                ? familyStart.paid.map((payment) => ({
+                    key: String(payment.id),
+                    label: payment.lines.map((line) => line.label).join(', ') || 'Payment',
+                    amount: naira(Number(payment.amount)),
+                    detail: `${payment.patient?.full_name ?? ''} · ${new Date(
+                      payment.received_at,
+                    ).toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}`,
+                  }))
+                : undefined
+            }
+            onSave={(details, cardFee) => save(details, cardFee)}
+          />
+        )}
       </div>
     </AppShell>
   )

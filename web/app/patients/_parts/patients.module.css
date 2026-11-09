@@ -856,3 +856,44 @@
   color: var(--mut);
   font-size: 13px;
 }
+
+/* Adding a family member (request 160): what the family already paid. */
+.familyPaid {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.familyPaid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.familyPaid li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+}
+
+.familyPaid li span {
+  display: grid;
+}
+
+.familyPaid small {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+/* The note over a family member's form: what was filled in for them. */
+.familyNote {
+  margin: -6px 0 10px;
+  color: var(--mut);
+  font-size: 13px;
+}

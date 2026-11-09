@@ -666,6 +666,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     your time." And: "now run your SQL" (the profile fix, 138).
 
 
+160. **Adding a family member inherits the family's details.** (2026-11-09)
+    "The contact that you've already filled before should be a family
+    contact... next of kin, you don't have to fill it again... the next
+    family member should inherit most of those data. The only different
+    thing is the biodata... Let the front desk be the decider... they
+    should see the payment that was previously made by that family. Then
+    you can add the payments." Built 2026-11-09: the form starts with the
+    first member's phone, email, address and next of kin (editable), the
+    biodata empty; the Payment card lists what the family has paid and the
+    new payment stays optional. NOT built (he was unsure, "I don't know"):
+    making payment required once a member is turned into Individual.
+
 159. **Receipt: send by email, a receipt number that looks different, and
     alignment.** (2026-11-09) "When a patient receipt is being printed,
     there should be an option for sending receipt to email... If the person
