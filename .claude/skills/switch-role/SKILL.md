@@ -1,6 +1,6 @@
 ---
 name: switch-role
-description: Switch Anthony's testing account (rhemamedical7@gmail.com, Dr. Evans) to another role on the TESTING site, so he can see the app as front desk, doctor, nurse, matron, pharmacy, laboratory or admin. Use when he says "make me front desk", "switch me to doctor", "put me back to admin" or similar.
+description: Switch Anthony's testing account (rhemamedical7@gmail.com, now named Master Account) to another role on the TESTING site, so he can see the app as front desk, doctor, nurse, matron, pharmacy, laboratory or admin. Use when he says "make me front desk", "switch me to doctor", "put me back to admin" or similar.
 ---
 
 # switch-role
