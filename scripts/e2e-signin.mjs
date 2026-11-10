@@ -262,8 +262,8 @@ try {
   await signInWithCode(desk, 'desk1@test.rhema')
   await choosePin(desk, '2468')
   await expectHome(desk, 'Test Desk One')
-  await desk.getByRole('button', { name: 'Find patient' }).first().click()
-  await desk.getByRole('button', { name: 'Find patient' }).first().click()
+  // The menu link, which does not redraw while Home loads.
+  await desk.locator('nav a[href="/patients/"]').click()
   await desk.getByRole('heading', { name: 'Find patient' }).waitFor()
   await desk.getByRole('link', { name: 'Register patient' }).click()
   await desk.getByRole('heading', { name: 'Register patient' }).waitFor()
