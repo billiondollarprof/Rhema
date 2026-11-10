@@ -26,3 +26,4 @@ create policy consultation_insert on public.consultation_notes for insert to aut
   with check (private.can_use_record(patient_id) and written_by = (select auth.uid()));
 
 drop function if exists private.is_front_desk();
+drop function if exists private.has_consulting_room();

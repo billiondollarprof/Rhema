@@ -739,9 +739,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     register pages) only for the Front Desk; no consultation note button
     for anybody but a doctor. The deploy test now has the Front Desk
     register the patient.
-    BUILT, NOT LIVE (needs his yes to the SQL): migration
-    20261110141814_doctor_notes_front_desk_registers_med_edit (doctor only
-    writes/voids notes; only front desk inserts patients; nurse may edit a
+    His yes to the SQL: "yes, doctor and edit SQL" (2026-11-10), with:
+    "all consultant rooms can write consultations whether the person is a
+    doctor or nurse/matron, as long as they have a consulting room assigned".
+    So the rule is the ROOM, not the role (private.has_consulting_room).
+    Migration 20261110141814_doctor_notes_front_desk_registers_med_edit (a
+    person in an active consultation room writes/voids notes; only front desk inserts patients; nurse may edit a
     current medicine, not a stopped one) and the Edit button on a medicine
     (Medications.tsx, record.ts). Test 015 now uses a doctor.
     Already true: a dispensed prescription adds its drugs to current

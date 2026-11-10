@@ -2,7 +2,9 @@
 -- 20261110141814_doctor_notes_front_desk_registers_med_edit.sql
 --
 -- What this is: three rules about who may do what.
---   1. Only a doctor writes or voids a consultation note.
+--   1. Only somebody working in a consulting room writes or voids a
+--      consultation note (a doctor, nurse or matron with a consultation
+--      room assigned).
 --   2. Only the Front Desk registers a patient.
 --   3. A nurse (anybody with the record open) may correct a current
 --      medicine's name, dose and how often, while it is not stopped.
@@ -11,7 +13,10 @@
 -- doctors are supposed to do like consultation notes... only front desk
 -- registers patients, while others can find a patient but not register
 -- them... only when the medication is there... shall the nurse be able to
--- stop/suspend/edit that particular medication info."
+-- stop/suspend/edit that particular medication info." And, the same day:
+-- "all consultant rooms can write consultations whether the person is a
+-- doctor or nurse/matron, as long as they have a consulting room assigned
+-- to them."
 --
 -- Rules:
 --   - Everybody with the record open still READS consultation notes.
@@ -20,8 +25,8 @@
 --     limited to the Front Desk.
 --   - A stopped or voided medicine cannot be edited.
 --
--- Never: let a nurse write a consultation note, or let anybody but the Front
--- Desk create a patient.
+-- Never: let somebody with no consulting room write a consultation note, or
+-- let anybody but the Front Desk create a patient.
 -- =============================================================================
 
 
@@ -43,21 +48,42 @@ revoke execute on function private.is_front_desk() from public, anon;
 grant  execute on function private.is_front_desk() to authenticated;
 
 
--- ===== 2. Consultation notes: a doctor writes and voids =====
+-- ===== 2. Consultation notes: whoever has a consulting room writes and voids =====
+-- Active, and the room the admin gave them is an active consultation room.
+-- (The record rules already ask that they may use medical records.)
+create function private.has_consulting_room()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1
+    from public.staff s
+    join public.rooms r on r.id = s.room_id
+    where s.id = (select auth.uid()) and s.is_active
+      and r.is_active and r.kind = 'consultation'
+  );
+$$;
+
+revoke execute on function private.has_consulting_room() from public, anon;
+grant  execute on function private.has_consulting_room() to authenticated;
+
 drop policy consultation_insert on public.consultation_notes;
 create policy consultation_insert on public.consultation_notes for insert to authenticated
   with check (
     private.can_use_record(patient_id)
-    and (select private.is_doctor())
+    and (select private.has_consulting_room())
     and written_by = (select auth.uid())
   );
 
 drop policy consultation_update on public.consultation_notes;
 create policy consultation_update on public.consultation_notes for update to authenticated
-  using (private.can_use_record(patient_id) and (select private.is_doctor()))
+  using (private.can_use_record(patient_id) and (select private.has_consulting_room()))
   with check (
     private.can_use_record(patient_id)
-    and (select private.is_doctor())
+    and (select private.has_consulting_room())
     and (voided_by is null or voided_by = (select auth.uid()))
   );
 
