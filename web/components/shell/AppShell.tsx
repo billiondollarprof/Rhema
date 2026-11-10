@@ -61,6 +61,10 @@ function isHere(path: string, href: string) {
   return href === '/' ? path === '/' : path.startsWith(href)
 }
 
+// Set once the person has moved between screens in this visit.
+let movedInApp = false
+let lastSeenPath = ''
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const path = usePathname()
@@ -85,10 +89,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // The back button (request 171b): back to the previous screen of the
   // app; when this screen was opened first (a link, a refresh), to Home.
   const router = useRouter()
-  const firstPath = useRef(path)
-  const [movedInApp, setMovedInApp] = useState(false)
+  // Remembered outside the component, because each screen may mount the
+  // shell again: a flag kept inside it forgot every move and always went
+  // Home (Anthony, 2026-11-10: "it always takes me straight to the home").
   useEffect(() => {
-    if (path !== firstPath.current) setMovedInApp(true)
+    if (lastSeenPath && lastSeenPath !== path) movedInApp = true
+    lastSeenPath = path
   }, [path])
   function goBack() {
     if (movedInApp) router.back()
@@ -163,17 +169,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <Icon name="back" size={18} />
               </button>
             ) : null}
-            {/* Refresh, near the logo and away from Call attention and the
-                menu, so it is not tapped by mistake (Anthony, 2026-11-09). */}
-            <button
-              type="button"
-              className={`${styles.topButton} ${refreshing ? styles.turning : ''}`}
-              onClick={refreshApp}
-              aria-label="Refresh"
-              title="Refresh"
-            >
-              <Icon name="refresh" size={18} />
-            </button>
             {/* A thin line keeps the hospital's logo apart from the person. */}
             <span className={styles.topDivider} aria-hidden="true" />
             <PersonBadge name={staff.full_name} />
@@ -224,6 +219,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               ),
             )}
+            {/* Refresh, bottom of the menu on a computer, the only blue
+                button there (Anthony, 2026-11-10). Not on a phone. */}
+            <button
+              type="button"
+              className={`${styles.refreshSide} ${refreshing ? styles.turning : ''}`}
+              onClick={refreshApp}
+              aria-label="Refresh"
+              title="Refresh"
+            >
+              <Icon name="refresh" size={22} />
+              Refresh
+            </button>
           </nav>
 
           {/* ===== 4. The screen itself ===== */}
