@@ -84,8 +84,8 @@ const BY_ROLE: Record<string, Action[]> = {
 }
 
 // ===== 2. The buttons =====
-export default function QuickActions({ role }: { role: string }) {
-  const actions = BY_ROLE[role] ?? ADMIN
+export default function QuickActions({ role, only }: { role: string; only?: Action[] }) {
+  const actions = only ?? BY_ROLE[role] ?? ADMIN
   const router = useRouter()
   const attention = useAttentionMenu()
 
@@ -117,5 +117,16 @@ export default function QuickActions({ role }: { role: string }) {
         </button>
       ))}
     </div>
+  )
+}
+
+// The admin's own buttons, shown last for somebody who also works with
+// patients (Anthony, 2026-11-10).
+export function AdminQuickActions() {
+  return (
+    <QuickActions
+      role="admin"
+      only={ADMIN.filter((a) => a.label !== 'Find patient' && a.label !== 'Call attention')}
+    />
   )
 }

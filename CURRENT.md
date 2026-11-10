@@ -793,11 +793,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     His next words: "just leave the charts and the details in home page.
     But if admin is also a doctor or nurse or matron, let them see in the
     home page what's more urgent and important before any admin related
-    information." DONE: Home is not slimmed for anybody. An admin who works
-    in a consulting, nursing or matron's room (worksWithPatients in
-    lib/auth/roles.ts) sees the patient queue ABOVE the counts and chart,
-    gets Call in / Finish visit, and the room's waiting patients as a
-    notification. The Home Lab and Pharmacy payment cards are unchanged.
+    information." Then his CORRECTION: "The patient queue sits below the
+    charts... it's okay where it is normally. The things that pertain to
+    admin come later at the bottom... Admin office only gets the things of
+    admin." DONE: Home order is the same for everybody (counts, chart, queue,
+    Lab, Pharmacy). An admin who works in a consulting, nursing or matron's
+    room (worksWithPatients, lib/auth/roles.ts), and a doctor/nurse/matron
+    who is also admin, gets the room's four buttons at the top (an admin
+    gets the doctor's set), Call in / Finish visit, the waiting-patients
+    notification, and the admin buttons (Invite staff, Announce) LAST. An
+    admin in the Admin Office gets only the admin's Home. Lab and Pharmacy
+    payment cards unchanged.
 
 173. **Refresh in the menu, Back steps back, old file needs only a name.**
     (2026-11-10) "The refresh spinning button... should go to the side bar,
