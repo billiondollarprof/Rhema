@@ -750,9 +750,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Already true: a dispensed prescription adds its drugs to current
     medications (dispense_prescription, migration pharmacy); the nurse
     already had Suspend, Resume, Stop and Void.
-    ASKED, WAITING: emailing a medical record sends medical information to
-    the email service, which the Privacy Policy says never happens, and it
-    is a change to where patient data goes (CLAUDE.md section 2).
+    EMAIL THE RECORD. His answer (2026-11-10): "the privacy policy is
+    adjusted to fit, this is only with the patient's consent, which means the
+    patient provided their email. Doctors and nurses should be able to as
+    well." BUILT, NOT LIVE: worker/src/records.ts (POST /api/records/email,
+    reads the record as the staff member, sends only to the email on the
+    record, writes the send to record_emails BEFORE sending, none = no
+    email); Email record button on the record page (confirm step shows the
+    address); Privacy Policy section 6 and LEGAL_UPDATED changed (version
+    kept, so staff are not asked to agree again). Held: migration
+    20261110151018_record_emails (new table, waits for his yes to the SQL).
+    Included in the email: profile, allergies, conditions, medicines, doses,
+    vitals, nursing and consultation notes, lab results. Not the files.
+    Anybody with medical record access can send it (doctor, nurse, matron).
 
 173. **Refresh in the menu, Back steps back, old file needs only a name.**
     (2026-11-10) "The refresh spinning button... should go to the side bar,

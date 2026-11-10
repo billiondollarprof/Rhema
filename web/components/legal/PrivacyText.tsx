@@ -20,11 +20,15 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 10 November: a doctor or nurse can email a patient their medical record,
+// to the email the patient gave (request 174). Section 6 says so. This is a
+// new promise to patients, not a new term for staff, so LEGAL_VERSION stays
+// and staff are not asked to agree again.
 // The dates shown at the top of both documents.
 export const LEGAL_EFFECTIVE = '9 November 2026'
 // 9 November: the providers are no longer named (his decision below). The
 // promises did not change, so LEGAL_VERSION stays and nobody re-agrees.
-export const LEGAL_UPDATED = '9 November 2026'
+export const LEGAL_UPDATED = '10 November 2026'
 // Saved with each staff agreement, so we know which words they agreed to.
 export const LEGAL_VERSION = '2026-11-08'
 
@@ -141,8 +145,14 @@ export default function PrivacyText() {
           to provide its service.
         </li>
         <li>
-          The email service that sends sign in codes and staff invitations never receives medical
-          information.
+          The email service that sends sign in codes and staff invitations receives no medical
+          information for them.
+        </li>
+        <li>
+          The same email service carries a patient&apos;s medical record or receipt only when a
+          doctor, nurse or the front desk sends it, and only because the patient gave us their email
+          address. It goes to that address and no other, and every send is written in the activity
+          log. Once it is in the patient&apos;s inbox, keeping it private is up to the patient.
         </li>
         <li>
           A copy of the database is made every night, locked with a passphrase, and stored
