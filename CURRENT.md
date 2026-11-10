@@ -727,6 +727,33 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     with the first error code. STILL TO DO: his phone tries the testing
     address; if the message shows an error code, send it. Not yet live.
 
+174. **Who may do what (nurse, front desk), email records, medicines.**
+    (2026-11-10) "Nurses are able to perform some things only doctors are
+    supposed to do like consultation notes. The register patient buttons
+    (old/new) should be hidden for others, only front desk registers.
+    The nurse should also be able to forward medical records to email if
+    the patient's email is included. If the doctor prescribes and pharmacy
+    has given it, it should automatically reflect under current
+    medication; when it is there the nurse can stop/suspend/edit it."
+    LIVE 2026-11-10: Register buttons (Find patient, family card, the two
+    register pages) only for the Front Desk; no consultation note button
+    for anybody but a doctor. The deploy test now has the Front Desk
+    register the patient.
+    His yes to the SQL: "yes, doctor and edit SQL" (2026-11-10), with:
+    "all consultant rooms can write consultations whether the person is a
+    doctor or nurse/matron, as long as they have a consulting room assigned".
+    So the rule is the ROOM, not the role (private.has_consulting_room).
+    Migration 20261110141814_doctor_notes_front_desk_registers_med_edit (a
+    person in an active consultation room writes/voids notes; only front desk inserts patients; nurse may edit a
+    current medicine, not a stopped one) and the Edit button on a medicine
+    (Medications.tsx, record.ts). Test 015 now uses a doctor.
+    Already true: a dispensed prescription adds its drugs to current
+    medications (dispense_prescription, migration pharmacy); the nurse
+    already had Suspend, Resume, Stop and Void.
+    ASKED, WAITING: emailing a medical record sends medical information to
+    the email service, which the Privacy Policy says never happens, and it
+    is a change to where patient data goes (CLAUDE.md section 2).
+
 173. **Refresh in the menu, Back steps back, old file needs only a name.**
     (2026-11-10) "The refresh spinning button... should go to the side bar,
     blue background, only that button... only for desktop. Back should not

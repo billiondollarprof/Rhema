@@ -252,16 +252,17 @@ const CONSULT_PARTS = [
   { key: 'plan', label: 'Plan', hint: 'Tests, treatment, next visit' },
 ] as const
 
-// Only a doctor writes or voids a consultation note (Anthony, 2026-11-10);
-// everybody with the record reads them.
+// Whoever has a consulting room writes or voids a consultation note, a
+// doctor, nurse or matron (Anthony, 2026-11-10); everybody with the record
+// reads them. The database decides it again.
 export function ConsultationsSection({
   client,
   staffId,
   patientId,
   record,
   reload,
-  isDoctor,
-}: Props & { isDoctor: boolean }) {
+  canWrite,
+}: Props & { canWrite: boolean }) {
   const empty = { complaint: '', findings: '', assessment: '', plan: '' }
   const [adding, setAdding] = useState(false)
   const [parts, setParts] = useState<Record<string, string>>(empty)
@@ -301,7 +302,7 @@ export function ConsultationsSection({
           meta={`Written by ${line.author?.full_name ?? 'staff'}`}
           voided={voidedOf(line)}
           voidable={
-            isDoctor
+            canWrite
               ? { client, table: 'consultation_notes', id: line.id, staffId, onDone: reload }
               : undefined
           }
@@ -341,7 +342,7 @@ export function ConsultationsSection({
             </button>
           </div>
         </div>
-      ) : isDoctor ? (
+      ) : canWrite ? (
         <div className={styles.actions}>
           <button className={styles.small} onClick={() => setAdding(true)}>
             + Write a consultation

@@ -237,6 +237,23 @@ const ENTRY_WORDS: Record<string, string> = {
 // ===== 3. Adding a line =====
 // Each add sends the signed in person as the writer; the database refuses
 // any other name.
+// Correct a current medicine's name, dose and how often (Anthony,
+// 2026-11-10). The database refuses it for a stopped or removed medicine.
+export async function editMedication(
+  client: SupabaseClient,
+  id: number,
+  values: { medicine: string; dose: string | null; how_often: string | null },
+): Promise<string | null> {
+  const { error } = await client.from('patient_medications').update(values).eq('id', id)
+  if (error) {
+    console.warn(`A medicine could not be edited: ${error.code}`)
+    return error.code === '23514'
+      ? 'A stopped medicine cannot be edited.'
+      : 'It could not be saved. Check the internet and try again.'
+  }
+  return null
+}
+
 export async function addLine(
   client: SupabaseClient,
   table: Exclude<VoidableTable, never> | 'medical_profiles',
