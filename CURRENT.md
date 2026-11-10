@@ -764,6 +764,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     vitals, nursing and consultation notes, lab results. Not the files.
     Anybody with medical record access can send it (doctor, nurse, matron).
 
+176. **Lab result entry: choices and numbers, from the lab's template.**
+    (2026-11-10) "The lab also said the lab results for entering results is
+    not fully built, that there are certain things he doesn't have to type
+    manually. That some things are options he needs to choose from and then
+    enters numbers on some. But he promised to send me the template. So take
+    note for when the template is sent so we work on it."
+    WAITING FOR THE TEMPLATE from the Laboratory. Today the result screen
+    (web/app/lab/result) takes free text per test. When it arrives: list each
+    test with its fields (a choice, a number with its unit and normal range,
+    or text), then ask him to confirm before building. Nothing built yet.
+
 175. **Everyone gets their own notifications; the master account is renamed.**
     (2026-11-10) "The notifications meant for front desk or lab or pharmacy
     should not be showing bubble on another person's account... if a patient
