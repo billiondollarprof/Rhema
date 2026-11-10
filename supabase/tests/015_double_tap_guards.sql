@@ -17,7 +17,8 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000e3', 'dt-nurse2@test.rhema');
 insert into public.staff (id, full_name, email, role) values
   ('00000000-0000-0000-0000-0000000000e1', 'Dt Desk',   'dt-desk@test.rhema',   'front_desk'),
-  ('00000000-0000-0000-0000-0000000000e2', 'Dt Nurse',  'dt-nurse@test.rhema',  'nurse'),
+  -- A doctor, because only a doctor writes a consultation note (2026-11-10).
+  ('00000000-0000-0000-0000-0000000000e2', 'Dt Nurse',  'dt-nurse@test.rhema',  'doctor'),
   ('00000000-0000-0000-0000-0000000000e3', 'Dt Nurse2', 'dt-nurse2@test.rhema', 'nurse');
 
 

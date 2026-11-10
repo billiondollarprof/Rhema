@@ -27,6 +27,7 @@ import {
   MEDICATION_STATUS,
   addLine,
   changeMedicationStatus,
+  editMedication,
   when,
   type MedicalRecord,
   type Medication,
@@ -174,6 +175,10 @@ function MedicationLine({
 }) {
   const [changing, setChanging] = useState<MedicationStatus | null>(null)
   const [giving, setGiving] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [newName, setNewName] = useState(medication.medicine)
+  const [newDose, setNewDose] = useState(medication.dose ?? '')
+  const [newOften, setNewOften] = useState(medication.how_often ?? '')
   const [dose, setDose] = useState(medication.dose ?? '')
   const [givenAt, setGivenAt] = useState(localNow())
   const [problem, setProblem] = useState<string | null>(null)
@@ -191,6 +196,24 @@ function MedicationLine({
     if (result) setProblem(result)
     else {
       setGiving(false)
+      setProblem(null)
+      reload()
+    }
+  }
+
+  async function saveEdit() {
+    if (newName.trim().length < 2) {
+      setProblem('Type the medicine.')
+      return
+    }
+    const result = await editMedication(client, medication.id, {
+      medicine: newName.trim(),
+      dose: newDose.trim() || null,
+      how_often: newOften.trim() || null,
+    })
+    if (result) setProblem(result)
+    else {
+      setEditing(false)
       setProblem(null)
       reload()
     }
@@ -245,6 +268,17 @@ function MedicationLine({
             </button>
           ) : null}
           {medication.status !== 'stopped' ? (
+            <button
+              className={styles.small}
+              onClick={() => {
+                setProblem(null)
+                setEditing(true)
+              }}
+            >
+              Edit
+            </button>
+          ) : null}
+          {medication.status !== 'stopped' ? (
             <button className={styles.small} onClick={() => setChanging('stopped')}>
               Stop
             </button>
@@ -252,8 +286,50 @@ function MedicationLine({
         </>
       }
       form={
-        changing || giving ? (
+        changing || giving || editing ? (
           <>
+            {editing ? (
+              <div className={styles.form}>
+                <div className={styles.fields}>
+                  <div className={`${styles.field} ${styles.fieldWide}`}>
+                    <label htmlFor={`edit-name-${medication.id}`}>Medicine</label>
+                    <input
+                      id={`edit-name-${medication.id}`}
+                      className={styles.input}
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label htmlFor={`edit-dose-${medication.id}`}>Dose</label>
+                    <input
+                      id={`edit-dose-${medication.id}`}
+                      className={styles.input}
+                      value={newDose}
+                      onChange={(e) => setNewDose(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label htmlFor={`edit-often-${medication.id}`}>How often</label>
+                    <input
+                      id={`edit-often-${medication.id}`}
+                      className={styles.input}
+                      value={newOften}
+                      onChange={(e) => setNewOften(e.target.value)}
+                    />
+                  </div>
+                </div>
+                {problem ? <p className={styles.error}>{problem}</p> : null}
+                <div className={styles.actions}>
+                  <button className={`${styles.small} ${styles.primary}`} onClick={saveEdit}>
+                    Save changes
+                  </button>
+                  <button className={styles.small} onClick={() => setEditing(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : null}
             {changing ? (
               <ReasonForm
                 question={
