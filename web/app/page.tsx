@@ -31,7 +31,7 @@ import CountTiles from './_home/CountTiles'
 import LabCard from '@/components/work/LabCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import QueueCard from './_home/QueueCard'
-import QuickActions from './_home/QuickActions'
+import QuickActions, { AdminQuickActions } from './_home/QuickActions'
 import SeenChart from './_home/SeenChart'
 import styles from './_home/home.module.css'
 import { roleLabel, worksWithPatients } from '@/lib/auth/roles'
@@ -91,7 +91,7 @@ export default function HomePage() {
 
   if (auth.status !== 'ready' || !staff || !client) return <div className={styles.page} />
 
-  const urgentFirst = staff.can_admin && worksWithPatients(staff)
+  const worksHere = worksWithPatients(staff)
   const closingTime = staff.role === 'front_desk' && new Date().getHours() >= 17
 
   return (
@@ -125,20 +125,21 @@ export default function HomePage() {
         {/* ===== 3 to 6 ===== */}
         {/* Announcements first, until each person taps Got it. */}
         <AnnouncementsCard client={client} staffId={staff.id} />
-        <QuickActions role={staff.role} />
-        {/* An admin who also works with patients sees the patients waiting
-            first, before the hospital's counts and chart (Anthony,
-            2026-11-10). */}
-        {urgentFirst ? (
-          <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
-        ) : null}
+        {/* Somebody who works in a patient room gets that room's four buttons
+            (an admin in a consulting room gets the doctor's); the Admin
+            Office gets the admin's (Anthony, 2026-11-10: "what pertains to
+            their office is what they get"). */}
+        <QuickActions
+          role={worksHere ? (staff.role === 'admin' ? 'doctor' : staff.role) : staff.role}
+        />
         <CountTiles counts={counts} />
         <SeenChart client={client} staffId={staff.id} />
-        {urgentFirst ? null : (
-          <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
-        )}
+        <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
         <LabCard client={client} staff={staff} />
         <PharmacyCard client={client} staff={staff} />
+        {/* What pertains to the admin comes last for somebody who also works
+            with patients. */}
+        {staff.can_admin && worksHere ? <AdminQuickActions /> : null}
       </div>
     </AppShell>
   )
