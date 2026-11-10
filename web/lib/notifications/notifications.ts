@@ -54,6 +54,7 @@ import {
 } from '../pharmacy/pharmacy'
 import { when } from '../record/record'
 import { loadOpenQueue } from '../queue/queue'
+import { worksWithPatients } from '../auth/roles'
 import { recall, remember } from '../cache/memory'
 
 // ===== 1. The shapes =====
@@ -111,7 +112,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   // Only the Front Desk is told about payments to take.
   const payer = staff.role === 'front_desk'
   // Who has a room's queue to watch (the same split as the Home queue card).
-  const watchesQueue = ['doctor', 'nurse', 'matron', 'pharmacy', 'laboratory'].includes(staff.role)
+  const watchesQueue = ['pharmacy', 'laboratory'].includes(staff.role) || worksWithPatients(staff)
   const empty = Promise.resolve([])
   const [
     messages,

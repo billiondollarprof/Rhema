@@ -28,6 +28,7 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './home.module.css'
 import type { StaffMember } from '@/lib/auth/session'
+import { worksWithPatients } from '@/lib/auth/roles'
 import { waitedSince } from '@/lib/patients/age'
 import {
   CATEGORY_LABELS,
@@ -47,7 +48,7 @@ type QueueCardProps = {
 
 // ===== 1. Which part of the queue this person sees =====
 function pick(staff: StaffMember, entries: QueueEntry[]) {
-  const clinical = ['doctor', 'nurse', 'matron'].includes(staff.role)
+  const clinical = worksWithPatients(staff)
   if (clinical) {
     return {
       title: staff.room ? `Patient queue · ${staff.room.name}` : 'Patient queue',
@@ -80,12 +81,12 @@ type Next = QueueStatus | 'left'
 
 function buttonsFor(staff: StaffMember, status: QueueStatus): [string, Next, boolean][] {
   const role = staff.role
-  if (role === 'front_desk' || role === 'admin') return [['Has left', 'left', false]]
-  if (['doctor', 'nurse', 'matron'].includes(role)) {
+  if (worksWithPatients(staff)) {
     return status === 'waiting'
       ? [['Call in patient', 'in_consultation', true]]
       : [['Finish visit', 'done', true]]
   }
+  if (role === 'front_desk' || role === 'admin') return [['Has left', 'left', false]]
   if (role === 'pharmacy') return [['Mark dispensed', 'done', true]]
   if (role === 'laboratory') return [['Finished at the lab', 'done', true]]
   return []
