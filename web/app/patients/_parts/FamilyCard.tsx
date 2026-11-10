@@ -29,9 +29,12 @@ import {
 export default function FamilyCard({
   client,
   patient,
+  canAdd,
 }: {
   client: SupabaseClient
   patient: PatientResult
+  // Adding a member registers a patient: the Front Desk only.
+  canAdd: boolean
 }) {
   const router = useRouter()
   const [members, setMembers] = useState<PatientCard[]>([])
@@ -82,15 +85,17 @@ export default function FamilyCard({
         </ul>
       ) : null}
       {problem ? <p className={styles.error}>{problem}</p> : null}
-      <div className={styles.buttons}>
-        <button
-          className={`${styles.button} ${styles.familyButton}`}
-          onClick={addMember}
-          disabled={busy}
-        >
-          <Icon name="users" size={16} /> {busy ? 'Starting…' : 'Add family member'}
-        </button>
-      </div>
+      {canAdd ? (
+        <div className={styles.buttons}>
+          <button
+            className={`${styles.button} ${styles.familyButton}`}
+            onClick={addMember}
+            disabled={busy}
+          >
+            <Icon name="users" size={16} /> {busy ? 'Starting…' : 'Add family member'}
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

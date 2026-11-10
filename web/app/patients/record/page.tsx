@@ -275,7 +275,7 @@ function PatientRecord() {
                 <DosesSection {...props} />
                 <VitalsSection {...props} />
                 <NursingNotesSection {...props} />
-                <ConsultationsSection {...props} />
+                <ConsultationsSection {...props} isDoctor={staff.role === 'doctor'} />
                 <LabSection client={client} patientId={props.patientId} />
                 <PrescriptionsSection client={client} patientId={props.patientId} />
                 <FilesSection

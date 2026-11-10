@@ -91,7 +91,7 @@ function FindPatient() {
       <div className={styles.page}>
         <div className={styles.head}>
           <h2>{chosenId ? 'Patient' : 'Find patient'}</h2>
-          {chosenId ? null : (
+          {chosenId || staff.role !== 'front_desk' ? null : (
             <div className={styles.buttons}>
               <Link className={`${styles.button} ${styles.oldFile}`} href="/patients/old-file/">
                 <Icon name="file" size={16} /> Register from old file
@@ -226,6 +226,8 @@ function FindPatient() {
                   canMedical={staff.can_medical}
                   // Payments: the Front Desk and admins (request 123, part 2).
                   canPay={staff.role === 'front_desk' || staff.can_admin}
+                  // Only the Front Desk registers patients (Anthony, 2026-11-10).
+                  canRegister={staff.role === 'front_desk'}
                   patient={chosen}
                   onChanged={() => {
                     loadChosen()

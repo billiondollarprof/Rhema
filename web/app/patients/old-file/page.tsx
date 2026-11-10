@@ -75,6 +75,20 @@ export default function OldFilePage() {
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
+  // Only the Front Desk registers patients (Anthony, 2026-11-10).
+  if (staff.role !== 'front_desk') {
+    return (
+      <AppShell>
+        <div className={styles.page}>
+          <p className={styles.muted}>Only the Front Desk registers patients.</p>
+          <Link className={styles.button} href="/patients/">
+            Find patient
+          </Link>
+        </div>
+      </AppShell>
+    )
+  }
+
   // ===== 1. What is wrong with what was typed =====
   const cleanedPhone = cleanPhone(phone)
   const nameWrong = name.trim().length < 2 ? 'Type the full name.' : null
