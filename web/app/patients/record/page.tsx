@@ -50,6 +50,7 @@ import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patient
 import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { emailRecord } from '@/lib/record/emailRecord'
 
 // ===== 1. The allergy banner =====
 // Red: allergies on file. Green: asked, and none. Amber: nobody has asked yet.
@@ -89,6 +90,9 @@ function PatientRecord() {
   const [files, setFiles] = useState<PatientFile[]>([])
   const [choosing, setChoosing] = useState(false)
   const [picking, setPicking] = useState(false)
+  // Emailing the record to the patient: asking, sending, then the answer.
+  const [emailStep, setEmailStep] = useState<'ask' | 'sending' | null>(null)
+  const [emailAnswer, setEmailAnswer] = useState<string | null>(null)
 
   // ===== 2. Open, then read =====
   useEffect(() => {
@@ -182,6 +186,18 @@ function PatientRecord() {
           Download
         </button>
       ) : null}
+      {allowed && record && patient?.email ? (
+        <button
+          className={buttons.button}
+          onClick={() => {
+            setChoosing(false)
+            setEmailAnswer(null)
+            setEmailStep('ask')
+          }}
+        >
+          Email record
+        </button>
+      ) : null}
       <Link className={buttons.button} href={`/patients/?p=${id}`}>
         Back to patient
       </Link>
@@ -244,6 +260,37 @@ function PatientRecord() {
             <small className={styles.muted}>To keep a file, choose Save as PDF.</small>
           </div>
         ) : null}
+        {/* ----- Email the record, to the patient's own email only ----- */}
+        {emailStep && patient?.email ? (
+          <div className={`${styles.choice} ${styles.noPrint}`}>
+            <b>Email the medical record to {patient.email}?</b>
+            <small className={styles.muted}>
+              Only send it because the patient asked. It goes to this email address and no other.
+            </small>
+            <div className={buttons.buttons}>
+              <button
+                className={`${buttons.button} ${buttons.primary}`}
+                disabled={emailStep === 'sending'}
+                onClick={async () => {
+                  setEmailStep('sending')
+                  const result = await emailRecord(client, patient.id)
+                  setEmailStep(null)
+                  setEmailAnswer(result ?? `Sent to ${patient.email}.`)
+                }}
+              >
+                {emailStep === 'sending' ? 'Sending…' : 'Send'}
+              </button>
+              <button
+                className={buttons.button}
+                disabled={emailStep === 'sending'}
+                onClick={() => setEmailStep(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : null}
+        {emailAnswer ? <p className={`${styles.muted} ${styles.noPrint}`}>{emailAnswer}</p> : null}
         {picking ? (
           <AttachmentPicker
             client={client}

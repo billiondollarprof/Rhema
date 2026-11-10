@@ -11,8 +11,15 @@
  *   - announcements you have not tapped Got it on
  *   - lab results ready for tests you asked for
  *   - work waiting for your role: tests to pay for and drugs to pay for
- *     (Front Desk and admins), tests to do (Laboratory), prescriptions to
- *     dispense (Pharmacy)
+ *     (Front Desk), tests that are paid and ready (Laboratory), prescriptions
+ *     that are paid and ready (Pharmacy)
+ *   - patients waiting in your room (doctors, nurses, matron, Lab, Pharmacy)
+ * Anthony, 2026-11-10: "everyone gets their appropriate notifications...
+ * admins should not get bubbles that belong to pharmacy, lab or front desk."
+ * So the work lists follow the person's ROLE, and an admin (who has no
+ * role of their own in those jobs) gets none of them. An unpaid test or
+ * prescription does not count for the Lab or Pharmacy: it counts the moment
+ * it is paid, so they know to proceed.
  * Each line says what it is in a whole sentence. Tapped, it unfolds in
  * place and shows each thing waiting, with one button that goes straight
  * to where it is dealt with (Anthony, 2026-11-04: "just be clicking a maybe
@@ -46,6 +53,7 @@ import {
   type Prescription,
 } from '../pharmacy/pharmacy'
 import { when } from '../record/record'
+import { loadOpenQueue } from '../queue/queue'
 import { recall, remember } from '../cache/memory'
 
 // ===== 1. The shapes =====
@@ -100,8 +108,10 @@ export function cachedNotices(staffId: string): Notice[] | null {
 
 // ===== 3. Load everything waiting, all at once =====
 export async function loadNotices(client: SupabaseClient, staff: StaffMember): Promise<Notice[]> {
-  // The same people the Lab and Pharmacy cards show payments to.
-  const payer = staff.role === 'front_desk' || staff.role === 'admin'
+  // Only the Front Desk is told about payments to take.
+  const payer = staff.role === 'front_desk'
+  // Who has a room's queue to watch (the same split as the Home queue card).
+  const watchesQueue = ['doctor', 'nurse', 'matron', 'pharmacy', 'laboratory'].includes(staff.role)
   const empty = Promise.resolve([])
   const [
     messages,
@@ -114,6 +124,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     testsToDo,
     toDispense,
     dispensed,
+    queue,
   ] = await Promise.all([
     staff.room_id ? loadMessages(client) : empty,
     staff.room_id ? loadRooms(client) : empty,
@@ -125,6 +136,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
     staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
     staff.role === 'doctor' ? listMyDispensed(client, staff.id) : empty,
+    watchesQueue ? loadOpenQueue(client) : empty,
   ])
   const notices: Notice[] = []
 
@@ -250,26 +262,60 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
       })),
     })
   }
-  if (testsToDo.length) {
+  // Only tests that are paid: an unpaid one waits at the Front Desk.
+  const paidTests = testsToDo.filter((request) => request.status === 'awaiting_test')
+  const paidDrugs = toDispense.filter((prescription) => prescription.status === 'awaiting_dispense')
+
+  // ----- d0. Patients waiting in my room -----
+  const mine = queue.filter((entry) => {
+    if (entry.status === 'in_consultation' || entry.status === 'done') return false
+    if (staff.role === 'pharmacy') return entry.room?.kind === 'pharmacy'
+    if (staff.role === 'laboratory') return entry.room?.kind === 'laboratory'
+    return Boolean(staff.room_id) && entry.room?.id === staff.room_id
+  })
+  if (mine.length) {
+    const place =
+      staff.role === 'pharmacy'
+        ? 'the pharmacy'
+        : staff.role === 'laboratory'
+          ? 'the lab'
+          : (staff.room?.name ?? 'your room')
+    notices.push({
+      key: 'room-queue',
+      count: mine.length,
+      words: `${many(mine.length, 'patient is', 'patients are')} waiting at ${place}.`,
+      items: mine.map((entry) => ({
+        key: `queue-${entry.id}`,
+        title: entry.patient
+          ? `${entry.patient.full_name} · ${entry.patient.patient_number}`
+          : 'Patient',
+        detail: entry.note,
+        time: when(entry.created_at),
+        action: { label: 'Open Home', href: '/#queue' },
+      })),
+    })
+  }
+
+  if (paidTests.length) {
     notices.push({
       key: 'do-tests',
       card: 'lab',
-      count: testsToDo.length,
-      words: `${many(testsToDo.length, 'lab request is', 'lab requests are')} waiting to be tested.`,
+      count: paidTests.length,
+      words: `${many(paidTests.length, 'lab request is', 'lab requests are')} paid and ready to test.`,
       items: testItems(
-        testsToDo,
+        paidTests,
         (request) => ({ label: 'Enter results', href: `/lab/result/?r=${request.id}` }),
         (request) => request.requested_at,
       ),
     })
   }
-  if (toDispense.length) {
+  if (paidDrugs.length) {
     notices.push({
       key: 'dispense',
       card: 'pharmacy',
-      count: toDispense.length,
-      words: `${many(toDispense.length, 'prescription is', 'prescriptions are')} waiting to be dispensed.`,
-      items: toDispense.map((prescription) => ({
+      count: paidDrugs.length,
+      words: `${many(paidDrugs.length, 'prescription is', 'prescriptions are')} paid and ready to dispense.`,
+      items: paidDrugs.map((prescription) => ({
         key: `rx-${prescription.id}`,
         title: patientWords(prescription),
         detail: drugWords(prescription),

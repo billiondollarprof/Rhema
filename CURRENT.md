@@ -750,9 +750,37 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Already true: a dispensed prescription adds its drugs to current
     medications (dispense_prescription, migration pharmacy); the nurse
     already had Suspend, Resume, Stop and Void.
-    ASKED, WAITING: emailing a medical record sends medical information to
-    the email service, which the Privacy Policy says never happens, and it
-    is a change to where patient data goes (CLAUDE.md section 2).
+    EMAIL THE RECORD. His answer (2026-11-10): "the privacy policy is
+    adjusted to fit, this is only with the patient's consent, which means the
+    patient provided their email. Doctors and nurses should be able to as
+    well." BUILT, NOT LIVE: worker/src/records.ts (POST /api/records/email,
+    reads the record as the staff member, sends only to the email on the
+    record, writes the send to record_emails BEFORE sending, none = no
+    email); Email record button on the record page (confirm step shows the
+    address); Privacy Policy section 6 and LEGAL_UPDATED changed (version
+    kept, so staff are not asked to agree again). Held: migration
+    20261110151018_record_emails (new table, waits for his yes to the SQL).
+    Included in the email: profile, allergies, conditions, medicines, doses,
+    vitals, nursing and consultation notes, lab results. Not the files.
+    Anybody with medical record access can send it (doctor, nurse, matron).
+
+175. **Everyone gets their own notifications; the master account is renamed.**
+    (2026-11-10) "The notifications meant for front desk or lab or pharmacy
+    should not be showing bubble on another person's account... if a patient
+    is sent to the doctor or room, the room receives notification... lab
+    knows when payment has been made so they proceed... Admins should not
+    get bubbles that belong to pharmacy, lab or front desk; if the admin is
+    also a doctor or nurse they get that role's." And: "change the name of
+    the doctor Evans with this email rhemamedical7@gmail.com to Master
+    Account." Also: "yes, record emails SQL".
+    BUILT: notifications follow the ROLE (payments: Front Desk only; admin
+    gets none of the Front Desk, Lab or Pharmacy ones); Lab and Pharmacy are
+    counted only once PAID (so the chime and bubble come at payment); a new
+    notice "N patients are waiting at <room>" for doctors, nurses, matron,
+    Lab and Pharmacy. Migration 20261110154435_rename_master_account (data
+    only, by email). Migration 20261110151018_record_emails (approved).
+    NOT CHANGED, asked nothing: the Home Lab and Pharmacy cards still show
+    payments for an admin (they are not notifications).
 
 173. **Refresh in the menu, Back steps back, old file needs only a name.**
     (2026-11-10) "The refresh spinning button... should go to the side bar,
