@@ -324,7 +324,7 @@ export async function registerPatient(
 export async function registerFromOldFile(
   client: SupabaseClient,
   fullName: string,
-  phone: string,
+  phone: string | null,
   staffId: string,
   dateOfBirth: string | null = null,
   sex: Sex | null = null,

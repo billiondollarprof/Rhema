@@ -41,12 +41,8 @@ begin
   if (select patient_number from public.patients where id = (select patient from t)) !~ '^RMC-[0-9]{6}$' then
     raise exception 'FAIL 1: a patient from an old file did not get an RMC number';
   end if;
-  begin
-    insert into public.patients (full_name, from_old_file, created_by)
-    values ('Old File No Phone', true, '00000000-0000-0000-0000-0000000000a1');
-    raise exception 'FAIL 1: an old file patient was saved without a phone number';
-  exception when check_violation then null;
-  end;
+  -- Since 2026-11-10 (migration old_file_without_phone, test 027) an old
+  -- file patient needs only a name, so no phone number is not refused.
   begin
     insert into public.patients (full_name, phone, created_by)
     values ('Ordinary No Birthday', '08035550991', '00000000-0000-0000-0000-0000000000a1');
@@ -55,7 +51,7 @@ begin
   end;
 end $$;
 reset role;
-\echo 'PASS 1: an old file needs only a name and a phone; everybody else still needs more'
+\echo 'PASS 1: an old file needs only a name; everybody else still needs more'
 
 
 -- ===== 2. The Front Desk attaches; somebody who may not register cannot =====
