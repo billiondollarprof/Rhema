@@ -740,7 +740,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     attachment of file." BUILT, NOT LIVE: page and code done and checked;
     needs migration 20261110130716_old_file_without_phone (loosens the rule
     patients_details_or_old_file: an old file patient no longer needs a
-    phone). WAITING for his yes to the SQL.
+    phone). His yes: "please work on it... merge to live" (2026-11-10), taken
+    as the yes to the batch he had been shown.
+    LATER 2026-11-10: Refresh smaller; Notifications (bell, with the count)
+    in the menu beside Messages, on desktop and the phone's bottom bar;
+    "Send to room" (or "Move to room") on each Find patient result card,
+    opening the same form under the card, no need to open the patient.
 
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be

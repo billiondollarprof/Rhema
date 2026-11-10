@@ -20,6 +20,7 @@ import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import PersonBadge from '@/components/auth/PersonBadge'
 import PatientFilesCard from './_parts/PatientFilesCard'
+import SendToRoom from './_parts/SendToRoom'
 import PatientDetail, { lastSeenWords } from './_parts/PatientDetail'
 import styles from './_parts/patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
@@ -41,6 +42,10 @@ function FindPatient() {
   const [chosen, setChosen] = useState<PatientResult | null>(null)
   // Whether the chosen patient was picked from the results on this screen.
   const cameFromList = useRef(false)
+  // Send to room straight from a result card, without opening the patient
+  // (Anthony, 2026-11-10): which card has the form open, and what was sent.
+  const [sendingFor, setSendingFor] = useState<number | null>(null)
+  const [sentTo, setSentTo] = useState<{ id: number; room: string } | null>(null)
 
   // ===== 1. Search as the person types (after a short pause) =====
   useEffect(() => {
@@ -124,40 +129,72 @@ function FindPatient() {
                 </p>
               ) : null}
               {(results ?? []).map((patient) => (
-                <button
-                  key={patient.id}
-                  className={styles.result}
-                  aria-current={chosenId === patient.id ? 'true' : undefined}
-                  onClick={() => {
-                    cameFromList.current = true
-                    router.push(`/patients/?p=${patient.id}`)
-                  }}
-                >
-                  <PersonBadge name={patient.full_name} />
-                  <div>
-                    <b>{patient.full_name}</b>
-                    <small>
-                      {patient.patient_number} · {ageFrom(patient.date_of_birth)}
-                      {patient.phone ? ` · ${patient.phone}` : ''}
-                    </small>
-                    <small>Last seen: {lastSeenWords(patient.last_seen)}</small>
-                  </div>
-                  {/* Where the patient is right now, e.g. "Waiting · Consultant Room 1"
+                <div key={patient.id} className={styles.resultBox}>
+                  <div className={styles.resultRow}>
+                    <button
+                      className={styles.result}
+                      aria-current={chosenId === patient.id ? 'true' : undefined}
+                      onClick={() => {
+                        cameFromList.current = true
+                        router.push(`/patients/?p=${patient.id}`)
+                      }}
+                    >
+                      <PersonBadge name={patient.full_name} />
+                      <div>
+                        <b>{patient.full_name}</b>
+                        <small>
+                          {patient.patient_number} · {ageFrom(patient.date_of_birth)}
+                          {patient.phone ? ` · ${patient.phone}` : ''}
+                        </small>
+                        <small>Last seen: {lastSeenWords(patient.last_seen)}</small>
+                      </div>
+                      {/* Where the patient is right now, e.g. "Waiting · Consultant Room 1"
                     (Anthony, 2026-11-02: "remove in hospital and then put the
                     actual tags"). */}
-                  {patient.open_visit ? (
-                    <span className={`${styles.tag} ${styles.tagBusy}`}>
-                      {STATUS_LABELS[patient.open_visit.status as QueueStatus] ??
-                        patient.open_visit.status}
-                      {patient.open_visit.room ? ` · ${patient.open_visit.room}` : ''}
-                    </span>
-                  ) : (
-                    <span className={styles.tag}>
-                      {CATEGORY_LABELS[patient.category] ?? patient.category}
-                      {patient.family ? ` · ${patient.family.family_number}` : ''}
-                    </span>
-                  )}
-                </button>
+                      {patient.open_visit ? (
+                        <span className={`${styles.tag} ${styles.tagBusy}`}>
+                          {STATUS_LABELS[patient.open_visit.status as QueueStatus] ??
+                            patient.open_visit.status}
+                          {patient.open_visit.room ? ` · ${patient.open_visit.room}` : ''}
+                        </span>
+                      ) : (
+                        <span className={styles.tag}>
+                          {CATEGORY_LABELS[patient.category] ?? patient.category}
+                          {patient.family ? ` · ${patient.family.family_number}` : ''}
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      className={`${styles.button} ${styles.resultSend}`}
+                      onClick={() => {
+                        setSentTo(null)
+                        setSendingFor(sendingFor === patient.id ? null : patient.id)
+                      }}
+                    >
+                      {patient.open_visit ? 'Move to room' : 'Send to room'}
+                    </button>
+                  </div>
+                  {sendingFor === patient.id ? (
+                    <SendToRoom
+                      client={client}
+                      staffId={staff.id}
+                      patientId={patient.id}
+                      patientName={patient.full_name}
+                      openVisit={patient.open_visit}
+                      onCancel={() => setSendingFor(null)}
+                      onSent={(room) => {
+                        setSendingFor(null)
+                        setSentTo({ id: patient.id, room })
+                        void searchPatients(client, typed).then(setResults)
+                      }}
+                    />
+                  ) : null}
+                  {sentTo?.id === patient.id ? (
+                    <p className={styles.sentNote}>
+                      {patient.full_name} sent to {sentTo.room}.
+                    </p>
+                  ) : null}
+                </div>
               ))}
             </div>
           )}
