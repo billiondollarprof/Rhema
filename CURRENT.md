@@ -790,8 +790,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     notice "N patients are waiting at <room>" for doctors, nurses, matron,
     Lab and Pharmacy. Migration 20261110154435_rename_master_account (data
     only, by email). Migration 20261110151018_record_emails (approved).
-    NOT CHANGED, asked nothing: the Home Lab and Pharmacy cards still show
-    payments for an admin (they are not notifications).
+    His next words: "just leave the charts and the details in home page.
+    But if admin is also a doctor or nurse or matron, let them see in the
+    home page what's more urgent and important before any admin related
+    information." DONE: Home is not slimmed for anybody. An admin who works
+    in a consulting, nursing or matron's room (worksWithPatients in
+    lib/auth/roles.ts) sees the patient queue ABOVE the counts and chart,
+    gets Call in / Finish visit, and the room's waiting patients as a
+    notification. The Home Lab and Pharmacy payment cards are unchanged.
 
 173. **Refresh in the menu, Back steps back, old file needs only a name.**
     (2026-11-10) "The refresh spinning button... should go to the side bar,

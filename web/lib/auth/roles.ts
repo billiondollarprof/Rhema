@@ -20,6 +20,18 @@ export function roleLabel(role: string): string {
   return ROLE_LABELS[role] ?? role
 }
 
+// Does this person see patients in a room (doctor, nurse, matron)? An admin
+// who works in a consulting, nursing or matron's room counts too, so they get
+// that work first (Anthony, 2026-11-10: "if admin is also a doctor or nurse
+// or matron, let them see in the home page what's more urgent and important
+// before any admin related information"). The Admin Office does not count.
+export function worksWithPatients(staff: { role: string; room: { kind: string } | null }): boolean {
+  if (['doctor', 'nurse', 'matron'].includes(staff.role)) return true
+  return (
+    staff.role === 'admin' && ['consultation', 'nursing', 'matron'].includes(staff.room?.kind ?? '')
+  )
+}
+
 // Two letters for the round name badge, e.g. "Chioma Eze" -> "CE".
 export function initials(name: string): string {
   const parts = name

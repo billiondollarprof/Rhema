@@ -34,7 +34,7 @@ import QueueCard from './_home/QueueCard'
 import QuickActions from './_home/QuickActions'
 import SeenChart from './_home/SeenChart'
 import styles from './_home/home.module.css'
-import { roleLabel } from '@/lib/auth/roles'
+import { roleLabel, worksWithPatients } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { recall, remember } from '@/lib/cache/memory'
@@ -91,6 +91,7 @@ export default function HomePage() {
 
   if (auth.status !== 'ready' || !staff || !client) return <div className={styles.page} />
 
+  const urgentFirst = staff.can_admin && worksWithPatients(staff)
   const closingTime = staff.role === 'front_desk' && new Date().getHours() >= 17
 
   return (
@@ -125,9 +126,17 @@ export default function HomePage() {
         {/* Announcements first, until each person taps Got it. */}
         <AnnouncementsCard client={client} staffId={staff.id} />
         <QuickActions role={staff.role} />
+        {/* An admin who also works with patients sees the patients waiting
+            first, before the hospital's counts and chart (Anthony,
+            2026-11-10). */}
+        {urgentFirst ? (
+          <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
+        ) : null}
         <CountTiles counts={counts} />
         <SeenChart client={client} staffId={staff.id} />
-        <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
+        {urgentFirst ? null : (
+          <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
+        )}
         <LabCard client={client} staff={staff} />
         <PharmacyCard client={client} staff={staff} />
       </div>
