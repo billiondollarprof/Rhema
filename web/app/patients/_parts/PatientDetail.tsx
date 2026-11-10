@@ -44,6 +44,7 @@ type DetailProps = {
   staffId: string
   canMedical: boolean
   canPay: boolean
+  canRegister: boolean
   patient: PatientResult
   onChanged: () => void
 }
@@ -67,6 +68,7 @@ export default function PatientDetail({
   staffId,
   canMedical,
   canPay,
+  canRegister,
   patient,
   onChanged,
 }: DetailProps) {
@@ -188,7 +190,7 @@ export default function PatientDetail({
       ) : null}
 
       {/* The family: its number, the other members, Add family member. */}
-      <FamilyCard client={client} patient={patient} />
+      <FamilyCard client={client} patient={patient} canAdd={canRegister} />
 
       {/* Payments and receipts, for the Front Desk and admins. */}
       {canPay ? <PaymentsCard client={client} patientId={patient.id} /> : null}

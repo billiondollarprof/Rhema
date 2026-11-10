@@ -133,6 +133,20 @@ function RegisterPatient() {
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
+  // Only the Front Desk registers patients (Anthony, 2026-11-10).
+  if (staff.role !== 'front_desk') {
+    return (
+      <AppShell>
+        <div className={styles.page}>
+          <p className={styles.muted}>Only the Front Desk registers patients.</p>
+          <Link className={styles.button} href="/patients/">
+            Find patient
+          </Link>
+        </div>
+      </AppShell>
+    )
+  }
+
   // ===== 0. Add family member: start the family (once), then a fresh form =====
   async function addMember(patientId: number) {
     if (!client) return

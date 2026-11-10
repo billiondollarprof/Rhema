@@ -252,7 +252,16 @@ const CONSULT_PARTS = [
   { key: 'plan', label: 'Plan', hint: 'Tests, treatment, next visit' },
 ] as const
 
-export function ConsultationsSection({ client, staffId, patientId, record, reload }: Props) {
+// Only a doctor writes or voids a consultation note (Anthony, 2026-11-10);
+// everybody with the record reads them.
+export function ConsultationsSection({
+  client,
+  staffId,
+  patientId,
+  record,
+  reload,
+  isDoctor,
+}: Props & { isDoctor: boolean }) {
   const empty = { complaint: '', findings: '', assessment: '', plan: '' }
   const [adding, setAdding] = useState(false)
   const [parts, setParts] = useState<Record<string, string>>(empty)
@@ -291,7 +300,11 @@ export function ConsultationsSection({ client, staffId, patientId, record, reloa
           what={<b>{when(line.created_at)}</b>}
           meta={`Written by ${line.author?.full_name ?? 'staff'}`}
           voided={voidedOf(line)}
-          voidable={{ client, table: 'consultation_notes', id: line.id, staffId, onDone: reload }}
+          voidable={
+            isDoctor
+              ? { client, table: 'consultation_notes', id: line.id, staffId, onDone: reload }
+              : undefined
+          }
         >
           <dl className={styles.consult}>
             {CONSULT_PARTS.filter((part) => line[part.key]).map((part) => (
@@ -328,13 +341,13 @@ export function ConsultationsSection({ client, staffId, patientId, record, reloa
             </button>
           </div>
         </div>
-      ) : (
+      ) : isDoctor ? (
         <div className={styles.actions}>
           <button className={styles.small} onClick={() => setAdding(true)}>
             + Write a consultation
           </button>
         </div>
-      )}
+      ) : null}
     </Section>
   )
 }
