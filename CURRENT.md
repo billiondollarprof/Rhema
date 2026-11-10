@@ -727,6 +727,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     with the first error code. STILL TO DO: his phone tries the testing
     address; if the message shows an error code, send it. Not yet live.
 
+173. **Refresh in the menu, Back steps back, old file needs only a name.**
+    (2026-11-10) "The refresh spinning button... should go to the side bar,
+    blue background, only that button... only for desktop. Back should not
+    take me to the home dashboard, but to the previous page." LIVE: Refresh
+    is the blue button at the bottom of the menu (760px and wider), gone
+    from the top bar and from phones; Back uses a flag kept outside the
+    shell, because each screen mounts it again and the old flag always
+    said "first screen", so it always went Home.
+    "In register from old file, allow submit even without date of birth or
+    phone number... name is enough, the rest says (optional), including the
+    attachment of file." BUILT, NOT LIVE: page and code done and checked;
+    needs migration 20261110130716_old_file_without_phone (loosens the rule
+    patients_details_or_old_file: an old file patient no longer needs a
+    phone). His yes: "please work on it... merge to live" (2026-11-10), taken
+    as the yes to the batch he had been shown.
+    LATER 2026-11-10: Refresh smaller; Notifications (bell, with the count)
+    in the menu beside Messages, on desktop and the phone's bottom bar;
+    "Send to room" (or "Move to room") on each Find patient result card,
+    opening the same form under the card, no need to open the patient.
+
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be
     there including the one written at the bottom with pen, for consent.

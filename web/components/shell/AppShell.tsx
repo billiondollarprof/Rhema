@@ -49,6 +49,8 @@ const MENU = [
   { href: '/', icon: 'home', label: 'Home', ready: true },
   { href: '/patients/', icon: 'users', label: 'Patients', ready: true },
   { href: '/messages/', icon: 'msg', label: 'Messages', ready: true },
+  // Next to Messages, so it is one tap away (Anthony, 2026-11-10).
+  { href: '/notifications/', icon: 'bell', label: 'Notifications', ready: true },
 ]
 
 // Only for a person with admin access (request 112). The database checks
@@ -206,6 +208,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       {unread > 99 ? '99+' : unread}
                     </em>
                   ) : null}
+                  {item.href === '/notifications/' && waitingTotal > 0 ? (
+                    <em className={styles.bubble} aria-label={`${waitingTotal} waiting`}>
+                      {waitingTotal > 99 ? '99+' : waitingTotal}
+                    </em>
+                  ) : null}
                 </Link>
               ) : (
                 <span
@@ -228,7 +235,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               aria-label="Refresh"
               title="Refresh"
             >
-              <Icon name="refresh" size={22} />
+              <Icon name="refresh" size={18} />
               Refresh
             </button>
           </nav>

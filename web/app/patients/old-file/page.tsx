@@ -7,11 +7,17 @@
  * there." The old card number is not used; the patient gets their own RMC
  * number like everybody else. One patient at a time, never in batches.
  *
+ * 2026-11-10: only the name is needed. Anthony: "Phone number and date of
+ * birth should not be compulsory for old files only because they do not
+ * have such data currently... Name of patient is enough, the rest says
+ * (optional), including attachment of file." A phone number that is typed
+ * must still be 11 digits. New patients (Register patient) need them all.
+ *
  * In order:
- *   1. the Front Desk types the full name and the phone number, adds the
- *      date of birth and sex if the old file has them (optional, 2026-11-02),
- *      and picks the scans and PDFs of the old file;
- *   2. if a patient with this phone number is already registered, they see
+ *   1. the Front Desk types the full name, and the phone number, date of
+ *      birth, sex and the scans and PDFs of the old file if they have them;
+ *   2. if a phone number is typed and a patient with it is already
+ *      registered, they see
  *      them first and can use that patient instead (a family may share a
  *      phone, so "register a new patient" stays possible);
  *   3. the patient is saved, then each file is sent and recorded. A file
@@ -72,10 +78,11 @@ export default function OldFilePage() {
   // ===== 1. What is wrong with what was typed =====
   const cleanedPhone = cleanPhone(phone)
   const nameWrong = name.trim().length < 2 ? 'Type the full name.' : null
-  const phoneWrong = !phoneLooksRight(cleanedPhone)
-    ? 'Type an 11 digit phone number, like 08031234567.'
-    : null
-  const filesWrong = files.length === 0 ? 'Add the old file.' : null
+  // Optional: wrong only when something is typed and it is not 11 digits.
+  const phoneWrong =
+    cleanedPhone !== '' && !phoneLooksRight(cleanedPhone)
+      ? 'Type an 11 digit phone number, like 08031234567.'
+      : null
   const bornWrong =
     born && new Date(born) > new Date() ? 'The date of birth cannot be in the future.' : null
 
@@ -94,10 +101,10 @@ export default function OldFilePage() {
   // ===== 3. Save: look for the same phone first =====
   async function save(skipCheck = false) {
     setTried(true)
-    if (!client || !staff || nameWrong || phoneWrong || filesWrong || bornWrong) return
+    if (!client || !staff || nameWrong || phoneWrong || bornWrong) return
     setBusy(true)
     setProblem(null)
-    if (!skipCheck) {
+    if (!skipCheck && cleanedPhone !== '') {
       const found = await findSamePhone(client, cleanedPhone)
       if (found.length > 0) {
         setBusy(false)
@@ -109,7 +116,7 @@ export default function OldFilePage() {
     const result = await registerFromOldFile(
       client,
       name,
-      cleanedPhone,
+      cleanedPhone || null,
       staff.id,
       born || null,
       sex,
@@ -120,7 +127,7 @@ export default function OldFilePage() {
       return
     }
     setSaved(result.patient)
-    await sendFiles(result.patient, files)
+    if (files.length > 0) await sendFiles(result.patient, files)
     setBusy(false)
   }
 
@@ -154,12 +161,16 @@ export default function OldFilePage() {
             </div>
           </div>
           <p className={styles.muted}>
-            {saved.full_name} · {saved.phone}
+            {saved.phone ? `${saved.full_name} · ${saved.phone}` : saved.full_name}
           </p>
           {progress ? <p className={styles.muted}>{progress}</p> : null}
           {!progress ? (
             <p className={failed.length ? styles.error : styles.muted}>
-              {sentCount === 1 ? '1 file attached.' : `${sentCount} files attached.`}
+              {sentCount === 0 && failed.length === 0
+                ? 'No file attached.'
+                : sentCount === 1
+                  ? '1 file attached.'
+                  : `${sentCount} files attached.`}
               {failed.length
                 ? ` ${failed.length === 1 ? '1 file was' : `${failed.length} files were`} not sent. Check the network and try again.`
                 : ''}
@@ -253,7 +264,7 @@ export default function OldFilePage() {
             {tried && nameWrong ? <small className={styles.error}>{nameWrong}</small> : null}
           </div>
           <div className={styles.field}>
-            <label htmlFor="old-phone">Phone number</label>
+            <label htmlFor="old-phone">Phone number (optional)</label>
             <input
               id="old-phone"
               className={styles.input}
@@ -300,9 +311,8 @@ export default function OldFilePage() {
             </div>
           </div>
           <div className={styles.field}>
-            <span className={styles.fieldTitle}>Old file</span>
+            <span className={styles.fieldTitle}>Old file (optional)</span>
             <FilePicker files={files} onChange={setFiles} disabled={busy} />
-            {tried && filesWrong ? <small className={styles.error}>{filesWrong}</small> : null}
           </div>
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.buttons}>

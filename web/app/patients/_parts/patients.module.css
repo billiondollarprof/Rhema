@@ -948,3 +948,65 @@
 .backButton {
   justify-self: start;
 }
+
+/* A result card with Send to room on it (Anthony, 2026-11-10): the card
+   and the button share one border, so the card stays as tall as before. */
+.resultBox {
+  display: grid;
+  gap: 8px;
+}
+
+.resultRow {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.resultRow:hover {
+  border-color: #8fb4f0;
+  background: #f4f8ff;
+}
+
+.resultRow > .result {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.resultSend {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 13px;
+  margin-right: 10px;
+}
+
+.sentNote {
+  margin: 0;
+  padding: 0 4px;
+  color: var(--grn, #1a7f4b);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* On a small phone the round letters give way, so the card keeps its
+   height with the button on it. */
+@media (max-width: 420px) {
+  .resultRow > .result > :first-child:not(div) {
+    display: none;
+  }
+
+  .resultRow > .result {
+    padding: 8px 6px 8px 12px;
+  }
+
+  .resultRow > .result > .tag {
+    margin-left: 0;
+  }
+}
