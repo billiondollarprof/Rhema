@@ -709,6 +709,23 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     results already tell them): needs a "seen" column, SQL with the
     antenatal batch. Note: the pharmacy file said "No alert when dispensed"
     (his earlier word); his new word replaces it.
+    LATER 2026-11-09: "That back button should be only for desktop and
+    maybe tablet, iPad... on a smartphone, it will probably clutter." "The
+    spinning wheel, let it be fast... like it just reloads the page in the
+    background... as if nothing happened." LIVE 2026-11-09 (e24844a): Back
+    hidden under 700px wide; Refresh fetches every screen's data in the
+    background, no page reload, the arrow turns once. Waiting for him to
+    try it on his phone and iPad.
+
+172. **One phone shows only the loading screen.** (2026-11-09) "The director's
+    phone is not loading the website... only showing the loading screen...
+    different browsers, same phone... other phones open instantly." The phone
+    is new (an iPhone 15 or 16 he thinks), so an old iOS may not be the cause.
+    DONE ON TESTING 2026-11-09: build now also targets iOS 15 (package.json
+    browserslist); start up can no longer hang on the logo (falls to sign in);
+    after 15 seconds on the logo a plain message and Try again button show,
+    with the first error code. STILL TO DO: his phone tries the testing
+    address; if the message shows an error code, send it. Not yet live.
 
 170. **Antenatal booking form, from the hospital's paper card.** (2026-11-09,
     photo of the card) "The matron said these information have to be

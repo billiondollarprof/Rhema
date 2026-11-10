@@ -391,3 +391,27 @@
     display: none;
   }
 }
+
+/* Refresh at the bottom of the menu: computers and tablets only, and the
+   only blue button in the menu (Anthony, 2026-11-10). */
+.refreshSide {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .refreshSide {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    margin-top: auto;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--bl);
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 2px;
+    cursor: pointer;
+  }
+}

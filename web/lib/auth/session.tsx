@@ -265,7 +265,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (activeId && getAccount(activeId)) await activate(activeId)
       else setStatus('signed-out')
     }
-    start()
+    // Whatever goes wrong while starting (a slow or blocked network, an
+    // error), the person reaches the sign in screen and never a screen that
+    // stays on the logo for ever. Nothing is wiped here.
+    start().catch(() => setStatus((now) => (now === 'loading' ? 'signed-out' : now)))
   }, [activate, finishSignIn, signOutHere])
 
   // ----- 3e. Lock after 15 minutes without use (LOCK_AFTER_MS) -----

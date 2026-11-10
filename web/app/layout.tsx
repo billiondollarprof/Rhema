@@ -51,6 +51,29 @@ const MOVE_TO_REAL_ADDRESS = `(function () {
   if (to) location.replace(to + location.pathname + location.search + location.hash);
 })();`
 
+// If the logo is still showing after 15 seconds, say so in plain words and
+// offer a reload, with the first error the phone hit (a code, never a person).
+// Anthony, 2026-11-09: one phone showed only the loading screen, for ever.
+// This runs on its own, so it still works when the app's own code fails.
+const STUCK_ON_LOGO = `(function () {
+  var firstError = '';
+  window.addEventListener('error', function (e) {
+    if (!firstError) firstError = String(e && e.message ? e.message : 'script error').slice(0, 120);
+  });
+  setTimeout(function () {
+    if (!document.querySelector('[role="status"][aria-label^="Opening"]')) return;
+    var box = document.createElement('div');
+    box.setAttribute('style', 'position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:16px;text-align:center;background:#ffffff;color:#0f2238;font:15px/22px Arial,sans-serif');
+    box.textContent = 'Taking longer than usual to open. ' + (firstError ? '(' + firstError + ') ' : '');
+    var b = document.createElement('button');
+    b.textContent = 'Try again';
+    b.setAttribute('style', 'margin-left:8px;padding:8px 16px;border-radius:8px;border:1.5px solid #1f5fd0;background:#ffffff;color:#1f5fd0;font:bold 15px Arial,sans-serif');
+    b.onclick = function () { location.reload(); };
+    box.appendChild(b);
+    document.body.appendChild(box);
+  }, 15000);
+})();`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB">
@@ -68,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </AuthProvider>
         {/* Reloads an open app when a newer version has gone live. */}
         <AppFreshness />
+        <script dangerouslySetInnerHTML={{ __html: STUCK_ON_LOGO }} />
         {/* Gets the Call attention bell ready on the first touch. */}
         <BellWaker />
       </body>
