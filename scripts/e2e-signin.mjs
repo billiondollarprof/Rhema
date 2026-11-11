@@ -153,6 +153,9 @@ page.on('console', (message) => {
   }
 })
 
+// The Front Desk's screen, opened part way through, so a failure can show it too.
+let desk = null
+
 try {
   step('A new device opens the app and lands on the email step')
   await page.goto(`${APP}/`)
@@ -256,7 +259,7 @@ try {
   if (registerButtons > 0) throw new Error('A nurse can see a Register button')
 
   step('The front desk signs in on a second screen and registers a new made up patient')
-  const desk = await browser.newPage({ viewport: { width: 1280, height: 1400 } })
+  desk = await browser.newPage({ viewport: { width: 1280, height: 1400 } })
   desk.on('pageerror', (error) => problems.push(`desk: ${error.message}`))
   await desk.goto(`${APP}/sign-in/`)
   await signInWithCode(desk, 'desk1@test.rhema')
@@ -515,6 +518,11 @@ try {
 } catch (error) {
   await page.screenshot({ path: `${SHOTS}/zz-failure.png`, fullPage: true }).catch(() => {})
   console.error('E2E SIGN IN FAILED:', error.message)
+  if (desk) {
+    await desk.screenshot({ path: `${SHOTS}/zz-failure-desk.png`, fullPage: true }).catch(() => {})
+    const deskScreen = await desk.innerText('body').catch(() => '')
+    console.error('On the Front Desk screen at the time:\n' + deskScreen.slice(0, 1500))
+  }
   const onScreen = await page.innerText('body').catch(() => '')
   console.error('On screen at the time:\n' + onScreen.slice(0, 1500))
   process.exitCode = 1
