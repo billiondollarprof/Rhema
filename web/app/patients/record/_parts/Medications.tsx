@@ -20,6 +20,8 @@
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
+import MedicinePicker from '@/components/medicines/MedicinePicker'
+import { medicineWords } from '@/lib/medicines/medicines'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
@@ -52,7 +54,9 @@ function localNow() {
 // ===== 1. Medications =====
 export function MedicationsSection({ client, staffId, patientId, record, reload }: Props) {
   const [adding, setAdding] = useState(false)
+  // The medicine and its strength come from the picker.
   const [medicine, setMedicine] = useState('')
+  const [strength, setStrength] = useState('')
   const [dose, setDose] = useState('')
   const [howOften, setHowOften] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
@@ -68,12 +72,12 @@ export function MedicationsSection({ client, staffId, patientId, record, reload 
 
   async function add() {
     if (medicine.trim().length < 2) {
-      setProblem('Type the medicine.')
+      setProblem('Choose the medicine.')
       return
     }
     const result = await addLine(client, 'patient_medications', {
       patient_id: patientId,
-      medicine: medicine.trim(),
+      medicine: medicineWords(medicine.trim(), strength.trim()),
       dose: dose.trim() || null,
       how_often: howOften.trim() || null,
       added_by: staffId,
@@ -82,6 +86,7 @@ export function MedicationsSection({ client, staffId, patientId, record, reload 
     else {
       setAdding(false)
       setMedicine('')
+      setStrength('')
       setDose('')
       setHowOften('')
       setProblem(null)
@@ -108,12 +113,16 @@ export function MedicationsSection({ client, staffId, patientId, record, reload 
           <div className={styles.fields}>
             <div className={`${styles.field} ${styles.fieldWide}`}>
               <label htmlFor="med-name">Medicine</label>
-              <input
+              <MedicinePicker
+                client={client}
+                staffId={staffId}
                 id="med-name"
-                className={styles.input}
-                placeholder="e.g. Metformin"
-                value={medicine}
-                onChange={(e) => setMedicine(e.target.value)}
+                name={medicine}
+                strength={strength}
+                onChange={(name, picked) => {
+                  setMedicine(name)
+                  setStrength(picked)
+                }}
               />
             </div>
             <div className={styles.field}>
@@ -409,18 +418,19 @@ function MedicationLine({
 export function DosesSection({ client, staffId, patientId, record, reload }: Props) {
   const [adding, setAdding] = useState(false)
   const [medicine, setMedicine] = useState('')
+  const [strength, setStrength] = useState('')
   const [dose, setDose] = useState('')
   const [givenAt, setGivenAt] = useState(localNow())
   const [problem, setProblem] = useState<string | null>(null)
 
   async function add() {
     if (medicine.trim().length < 2) {
-      setProblem('Type the medicine.')
+      setProblem('Choose the medicine.')
       return
     }
     const result = await addLine(client, 'medications_given', {
       patient_id: patientId,
-      medicine: medicine.trim(),
+      medicine: medicineWords(medicine.trim(), strength.trim()),
       dose: dose.trim() || null,
       given_at: new Date(givenAt).toISOString(),
       given_by: staffId,
@@ -429,6 +439,7 @@ export function DosesSection({ client, staffId, patientId, record, reload }: Pro
     else {
       setAdding(false)
       setMedicine('')
+      setStrength('')
       setDose('')
       setProblem(null)
       reload()
@@ -457,12 +468,16 @@ export function DosesSection({ client, staffId, patientId, record, reload }: Pro
           <div className={styles.fields}>
             <div className={`${styles.field} ${styles.fieldWide}`}>
               <label htmlFor="given-name">Medicine</label>
-              <input
+              <MedicinePicker
+                client={client}
+                staffId={staffId}
                 id="given-name"
-                className={styles.input}
-                placeholder="e.g. Paracetamol"
-                value={medicine}
-                onChange={(e) => setMedicine(e.target.value)}
+                name={medicine}
+                strength={strength}
+                onChange={(name, picked) => {
+                  setMedicine(name)
+                  setStrength(picked)
+                }}
               />
             </div>
             <div className={styles.field}>

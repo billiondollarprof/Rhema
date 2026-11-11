@@ -54,6 +54,7 @@ import {
 } from '../pharmacy/pharmacy'
 import { when } from '../record/record'
 import { loadOpenQueue } from '../queue/queue'
+import { knownMedicines, loadMedicines } from '../medicines/medicines'
 import { worksWithPatients } from '../auth/roles'
 import { recall, remember } from '../cache/memory'
 
@@ -126,6 +127,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     toDispense,
     dispensed,
     queue,
+    medicines,
   ] = await Promise.all([
     staff.room_id ? loadMessages(client) : empty,
     staff.room_id ? loadRooms(client) : empty,
@@ -138,6 +140,9 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
     staff.role === 'doctor' ? listMyDispensed(client, staff.id) : empty,
     watchesQueue ? loadOpenQueue(client) : empty,
+    staff.role === 'pharmacy'
+      ? loadMedicines(client, staff.id).then((lines) => lines ?? knownMedicines(staff.id))
+      : empty,
   ])
   const notices: Notice[] = []
 
@@ -266,6 +271,23 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   // Only tests that are paid: an unpaid one waits at the Front Desk.
   const paidTests = testsToDo.filter((request) => request.status === 'awaiting_test')
   const paidDrugs = toDispense.filter((prescription) => prescription.status === 'awaiting_dispense')
+
+  // ----- d00. Medicines doctors and nurses added, waiting for the Pharmacy -----
+  const toConfirm = medicines.filter((line) => line.status === 'pending' && line.is_active)
+  if (toConfirm.length) {
+    notices.push({
+      key: 'confirm-medicines',
+      count: toConfirm.length,
+      words: `${many(toConfirm.length, 'medicine added by staff is', 'medicines added by staff are')} waiting for you to confirm.`,
+      items: toConfirm.map((line) => ({
+        key: `medicine-${line.id}`,
+        title: line.strength ? `${line.name} · ${line.strength}` : line.name,
+        detail: `Added by ${line.adder?.full_name ?? 'staff'}`,
+        time: when(line.created_at),
+        action: { label: 'Open the list', href: '/pharmacy/list/' },
+      })),
+    })
+  }
 
   // ----- d0. Patients waiting in my room -----
   const mine = queue.filter((entry) => {

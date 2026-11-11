@@ -100,6 +100,21 @@ export type Consultation = Voidable & {
   author: { full_name: string } | null
 }
 
+// An "Other" vital sign: a measure that has no box of its own (Anthony,
+// 2026-11-11), such as blood sugar.
+export type VitalExtra = Voidable & {
+  measure_id: number
+  name: string
+  unit: string | null
+  value: number
+  recorded_at: string
+  recorder: { full_name: string } | null
+}
+
+// A measure this person can type a reading for: their own, and the standard
+// ones (a second person typed it, so everybody has it).
+export type VitalMeasure = { id: number; name: string; unit: string | null; standard: boolean }
+
 export type MedicalRecord = {
   profile: Profile | null
   allergies: Allergy[]
@@ -108,6 +123,7 @@ export type MedicalRecord = {
   statusChanges: StatusChange[]
   doses: DoseGiven[]
   vitals: Vitals[]
+  vitalExtras: VitalExtra[]
   nursingNotes: Note[]
   consultations: Consultation[]
 }
@@ -119,6 +135,7 @@ export type VoidableTable =
   | 'patient_medications'
   | 'medications_given'
   | 'vital_signs'
+  | 'vital_extras'
   | 'nursing_notes'
   | 'consultation_notes'
   // The antenatal booking and the operation consent (request 170).
@@ -156,6 +173,7 @@ export async function loadRecord(
     vitals,
     nursing,
     consultations,
+    vitalExtras,
   ] = await Promise.all([
     client
       .from('medical_profiles')
@@ -204,6 +222,11 @@ export async function loadRecord(
       `${VOID}, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name)`,
       'created_at',
     ).limit(30),
+    byPatient(
+      'vital_extras',
+      `${VOID}, measure_id, name, unit, value, recorded_at, recorder:staff!recorded_by(full_name)`,
+      'recorded_at',
+    ).limit(60),
   ])
 
   // Any part that could not be read (no network): nothing, so a screen
@@ -231,6 +254,9 @@ export async function loadRecord(
     statusChanges: list<StatusChange>(statusChanges),
     doses: list<DoseGiven>(doses),
     vitals: list<Vitals>(vitals),
+    // Not part of the all-or-nothing check above: if this part is not set up
+    // yet, the rest of the record still opens.
+    vitalExtras: list<VitalExtra>(vitalExtras),
     nursingNotes: list<Note>(nursing),
     consultations: list<Consultation>(consultations),
   }
@@ -243,6 +269,7 @@ const ENTRY_WORDS: Record<string, string> = {
   patient_medications: 'Medicine',
   medications_given: 'Dose given',
   vital_signs: 'Vital signs',
+  vital_extras: 'Other vital sign',
   nursing_notes: 'Nursing note',
   consultation_notes: 'Consultation note',
   antenatal_tests: 'Antenatal test',
@@ -394,4 +421,27 @@ export function when(isoTime: string): string {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+// ===== 9. "Other" vital signs: my measures, and typing a new one =====
+// Typed once, they stay on this person's own screen; when a second person
+// types the same one it becomes standard for everybody (in the database).
+export async function loadVitalMeasures(client: SupabaseClient): Promise<VitalMeasure[] | null> {
+  const { data, error } = await client
+    .from('vital_measures')
+    .select('id, name, unit, standard')
+    .order('name')
+  if (error || !data) return null
+  return data as unknown as VitalMeasure[]
+}
+
+// Returns the measure's number, or null when it could not be saved.
+export async function saveVitalMeasure(
+  client: SupabaseClient,
+  name: string,
+  unit: string | null,
+): Promise<number | null> {
+  const { data, error } = await client.rpc('use_vital_measure', { p_name: name, p_unit: unit })
+  if (error || typeof data !== 'number') return null
+  return data
 }

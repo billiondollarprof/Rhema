@@ -16,12 +16,21 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
-import { addLine, when, type MedicalRecord, type Vitals } from '@/lib/record/record'
+import {
+  addLine,
+  loadVitalMeasures,
+  saveVitalMeasure,
+  when,
+  type MedicalRecord,
+  type VitalMeasure,
+  type Vitals,
+} from '@/lib/record/record'
+import { recall, remember } from '@/lib/cache/memory'
 
 type Props = {
   client: SupabaseClient
@@ -84,6 +93,48 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
   const [adding, setAdding] = useState(false)
   const [values, setValues] = useState<Record<string, string>>(empty)
   const [problem, setProblem] = useState<string | null>(null)
+  // "Other" vital signs: the measures this person has typed before, and the
+  // standard ones, each with a box (Anthony, 2026-11-11).
+  const [measures, setMeasures] = useState<VitalMeasure[]>(
+    () => recall<VitalMeasure[]>(staffId, 'vital-measures') ?? [],
+  )
+  const [extraValues, setExtraValues] = useState<Record<number, string>>({})
+  const [addingOther, setAddingOther] = useState(false)
+  const [otherName, setOtherName] = useState('')
+  const [otherUnit, setOtherUnit] = useState('')
+
+  useEffect(() => {
+    let current = true
+    loadVitalMeasures(client).then((fresh) => {
+      if (!current || !fresh) return
+      remember(staffId, 'vital-measures', fresh)
+      setMeasures(fresh)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, staffId])
+
+  async function addOther() {
+    if (otherName.trim().length < 2) {
+      setProblem('Type the name of the vital sign.')
+      return
+    }
+    const id = await saveVitalMeasure(client, otherName.trim(), otherUnit.trim() || null)
+    if (id === null) {
+      setProblem('It could not be added. Check the internet and try again.')
+      return
+    }
+    const fresh = await loadVitalMeasures(client)
+    if (fresh) {
+      remember(staffId, 'vital-measures', fresh)
+      setMeasures(fresh)
+    }
+    setAddingOther(false)
+    setOtherName('')
+    setOtherUnit('')
+    setProblem(null)
+  }
 
   async function add() {
     // Turn each box into a number, or leave it out when it is empty.
@@ -95,22 +146,52 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
         return
       }
     }
-    if (Object.values(numbers).every((n) => n === null)) {
+    const extras: { measure: VitalMeasure; value: number }[] = []
+    for (const measure of measures) {
+      const text = (extraValues[measure.id] ?? '').trim()
+      if (text === '') continue
+      const value = Number(text)
+      if (Number.isNaN(value) || Math.abs(value) > 100000) {
+        setProblem('Use numbers only.')
+        return
+      }
+      extras.push({ measure, value })
+    }
+    const hasFixed = Object.values(numbers).some((n) => n !== null)
+    if (!hasFixed && extras.length === 0) {
       setProblem('Fill in at least one reading.')
       return
     }
-    const result = await addLine(client, 'vital_signs', {
-      patient_id: patientId,
-      ...numbers,
-      recorded_by: staffId,
-    })
-    if (result) setProblem(result)
-    else {
-      setAdding(false)
-      setValues(empty)
-      setProblem(null)
-      reload()
+    if (hasFixed) {
+      const result = await addLine(client, 'vital_signs', {
+        patient_id: patientId,
+        ...numbers,
+        recorded_by: staffId,
+      })
+      if (result) {
+        setProblem(result)
+        return
+      }
     }
+    for (const { measure, value } of extras) {
+      const result = await addLine(client, 'vital_extras', {
+        patient_id: patientId,
+        measure_id: measure.id,
+        name: measure.name,
+        unit: measure.unit,
+        value,
+        recorded_by: staffId,
+      })
+      if (result) {
+        setProblem(result)
+        return
+      }
+    }
+    setAdding(false)
+    setValues(empty)
+    setExtraValues({})
+    setProblem(null)
+    reload()
   }
 
   const box = (key: string, label: string, placeholder: string) => (
@@ -128,8 +209,17 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
   )
 
   return (
-    <Section title="Vital signs" count={record.vitals.filter((v) => !v.voided_at).length} open>
-      {record.vitals.length === 0 ? <EmptyLine text="No readings taken yet." /> : null}
+    <Section
+      title="Vital signs"
+      count={
+        record.vitals.filter((v) => !v.voided_at).length +
+        record.vitalExtras.filter((v) => !v.voided_at).length
+      }
+      open
+    >
+      {record.vitals.length === 0 && record.vitalExtras.length === 0 ? (
+        <EmptyLine text="No readings taken yet." />
+      ) : null}
       {record.vitals.map((vitals) => (
         <Line
           key={vitals.id}
@@ -140,6 +230,20 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
         >
           <VitalsReadings vitals={vitals} />
         </Line>
+      ))}
+      {record.vitalExtras.map((extra) => (
+        <Line
+          key={`extra-${extra.id}`}
+          what={
+            <b>
+              {extra.name}: {extra.value}
+              {extra.unit ? ` ${extra.unit}` : ''}
+            </b>
+          }
+          meta={`Taken by ${extra.recorder?.full_name ?? 'staff'}, ${when(extra.recorded_at)}`}
+          voided={voidedOf(extra)}
+          voidable={{ client, table: 'vital_extras', id: extra.id, staffId, onDone: reload }}
+        />
       ))}
       {adding ? (
         <div className={styles.form}>
@@ -152,7 +256,65 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
             {box('spo2', 'Oxygen SpO2 (%)', 'e.g. 98')}
             {box('weight_kg', 'Weight (kg)', 'e.g. 68')}
             {box('height_cm', 'Height (cm)', 'e.g. 170')}
+            {measures.map((measure) => (
+              <div className={styles.field} key={`measure-${measure.id}`}>
+                <label htmlFor={`vit-x-${measure.id}`}>
+                  {measure.name}
+                  {measure.unit ? ` (${measure.unit})` : ''}
+                </label>
+                <input
+                  id={`vit-x-${measure.id}`}
+                  className={styles.input}
+                  inputMode="decimal"
+                  placeholder="Number"
+                  value={extraValues[measure.id] ?? ''}
+                  onChange={(e) => setExtraValues({ ...extraValues, [measure.id]: e.target.value })}
+                />
+              </div>
+            ))}
           </div>
+          {/* A vital sign that has no box: type its name once; it stays here
+              for next time. */}
+          {addingOther ? (
+            <div className={styles.fields}>
+              <div className={styles.field}>
+                <label htmlFor="vit-other-name">Name of the vital sign</label>
+                <input
+                  id="vit-other-name"
+                  className={styles.input}
+                  placeholder="e.g. Blood sugar"
+                  maxLength={60}
+                  value={otherName}
+                  onChange={(e) => setOtherName(e.target.value)}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="vit-other-unit">Unit (optional)</label>
+                <input
+                  id="vit-other-unit"
+                  className={styles.input}
+                  placeholder="e.g. mmol/L"
+                  maxLength={20}
+                  value={otherUnit}
+                  onChange={(e) => setOtherUnit(e.target.value)}
+                />
+              </div>
+              <div className={styles.actions}>
+                <button className={`${styles.small} ${styles.primary}`} onClick={addOther}>
+                  Add vital sign
+                </button>
+                <button className={styles.small} onClick={() => setAddingOther(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.actions}>
+              <button className={styles.small} onClick={() => setAddingOther(true)}>
+                + Other vital sign
+              </button>
+            </div>
+          )}
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.actions}>
             <button className={`${styles.small} ${styles.primary}`} onClick={add}>

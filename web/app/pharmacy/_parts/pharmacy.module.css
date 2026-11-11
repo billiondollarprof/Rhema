@@ -256,3 +256,55 @@ textarea.input {
   border-color: #dfe5ee;
   color: #3b4a5e;
 }
+
+/* ===== 7. The medicine list (Anthony, 2026-11-11) ===== */
+.listName {
+  display: grid;
+  gap: 4px;
+}
+
+.listName > b {
+  font-size: 16px;
+}
+
+.lineRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.lineRow > span:first-child {
+  flex: 1 1 140px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #e3f2fd;
+  color: var(--bl);
+  white-space: nowrap;
+}
+
+.tagWarn {
+  background: #fff1de;
+  color: var(--amb);
+}
+
+.tagOff {
+  background: #eef2f7;
+  color: #5b6b80;
+}
+
+.editRow {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}

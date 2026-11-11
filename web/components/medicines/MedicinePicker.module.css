@@ -1,0 +1,149 @@
+/*
+ * components/medicines/MedicinePicker.module.css: the medicine picker.
+ * Looks like the app's other boxes; the list opens under the search box.
+ */
+.picker {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.box {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.box:focus {
+  outline: 2px solid #8fb4f0;
+  border-color: #1f5fd0;
+}
+
+.chosen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border: 1px solid #8fb4f0;
+  border-radius: 12px;
+  background: #f4f8ff;
+}
+
+.chosen b {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.list {
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 34, 56, 0.12);
+}
+
+.row {
+  font: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.row:hover,
+.row:focus-visible {
+  background: #f4f8ff;
+}
+
+.strengths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.strength {
+  font: inherit;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1.5px solid #1f5fd0;
+  border-radius: 12px;
+  background: #fff;
+  color: #1f5fd0;
+  cursor: pointer;
+}
+
+.strength:hover,
+.strength[aria-pressed='true'] {
+  background: #1f5fd0;
+  color: #fff;
+}
+
+.mark {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #fff1de;
+  color: var(--amb);
+  white-space: nowrap;
+}
+
+.other {
+  color: #1f5fd0;
+  font-weight: 700;
+}
+
+.small {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1.5px solid #1f5fd0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f5fd0;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.hint {
+  margin: 0;
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.error {
+  margin: 0;
+  color: var(--red);
+  font-size: 14px;
+}

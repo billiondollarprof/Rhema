@@ -333,13 +333,15 @@ try {
   await page.getByRole('button', { name: 'Add allergy' }).click()
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
 
-  step('She adds a medicine, suspends it with a reason, and resumes it')
+  step('She picks a medicine from the list, suspends it with a reason, and resumes it')
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
-  await page.getByLabel('Medicine', { exact: true }).fill('Amlodipine')
-  await page.getByLabel('Dose', { exact: true }).fill('5 mg')
+  await page.getByPlaceholder('Type the first letters').fill('Amlo')
+  await page.getByRole('option', { name: 'Amlodipine' }).click()
+  await page.getByRole('button', { name: '5 mg tablet' }).click()
+  await page.getByLabel('Dose', { exact: true }).fill('1 tablet')
   await page.getByLabel('How often').fill('Once daily')
   await page.getByRole('button', { name: 'Add medicine' }).click()
-  await page.getByText('Amlodipine', { exact: true }).waitFor()
+  await page.getByText('Amlodipine 5 mg tablet', { exact: true }).waitFor()
   await page.getByRole('button', { name: 'Suspend', exact: true }).click()
   await page.getByRole('button', { name: 'Suspend', exact: true }).last().click()
   await page.getByText('Give a short reason.').waitFor()
@@ -350,6 +352,23 @@ try {
   await page.getByRole('button', { name: 'Doctor said to resume' }).click()
   await page.getByRole('button', { name: 'Resume' }).last().click()
   await page.getByText(/Active by Test Nurse One/).waitFor()
+
+  // A medicine that is not in the list: typed once with Other, kept for her
+  // as pending, and found again from its first letters.
+  step('A medicine not in the list is added with Other, and is remembered for her')
+  await page.getByRole('button', { name: '+ Add a medicine' }).click()
+  await page.getByPlaceholder('Type the first letters').fill('Zorbex')
+  await page.getByRole('option', { name: /Other: add/ }).click()
+  await page.getByLabel('Strength or size (optional)').fill('5 mg tablet')
+  await page.getByRole('button', { name: 'Add and use' }).click()
+  await page.getByText('Zorbex 5 mg tablet', { exact: true }).waitFor()
+  await page.getByRole('button', { name: 'Change' }).click()
+  await page.getByPlaceholder('Type the first letters').fill('Zor')
+  await page
+    .getByRole('option', { name: /Zorbex/ })
+    .getByText('Yours, waiting for the Pharmacy')
+    .waitFor()
+  await page.getByRole('button', { name: 'Cancel' }).last().click()
 
   step('She gives a dose; it shows with her name')
   await page.getByRole('button', { name: 'Give dose' }).click()
@@ -364,6 +383,17 @@ try {
   await page.getByLabel('Temperature °C').fill('36.8')
   await page.getByRole('button', { name: 'Save readings' }).click()
   await page.getByText('Taken by Test Nurse One').waitFor()
+
+  // A vital sign with no box: typed once with Other, saved as a reading.
+  step('She records an Other vital sign, and it shows')
+  await page.getByRole('button', { name: '+ Take new readings' }).click()
+  await page.getByRole('button', { name: '+ Other vital sign' }).click()
+  await page.getByLabel('Name of the vital sign').fill('Blood sugar')
+  await page.getByLabel('Unit (optional)').fill('mmol/L')
+  await page.getByRole('button', { name: 'Add vital sign' }).click()
+  await page.getByLabel('Blood sugar (mmol/L)').fill('5.4')
+  await page.getByRole('button', { name: 'Save readings' }).click()
+  await page.getByText('Blood sugar: 5.4 mmol/L').waitFor()
 
   step('She voids the dose with a reason; it stays, crossed out')
   const dose = page.locator('details', { hasText: 'Doses given' })

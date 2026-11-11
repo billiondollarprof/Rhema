@@ -14,6 +14,7 @@
 import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import MedicinePicker from '@/components/medicines/MedicinePicker'
 import styles from '../_parts/pharmacy.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
@@ -205,28 +206,21 @@ function Prescribe() {
                 <div className={styles.grid}>
                   <div className={styles.wide}>
                     <label className={styles.label} htmlFor={`drug-${index}`}>
-                      Drug name
+                      Drug and strength
                     </label>
-                    <input
+                    <MedicinePicker
+                      client={client}
+                      staffId={staff.id}
                       id={`drug-${index}`}
-                      className={styles.input}
-                      placeholder="e.g. Paracetamol"
-                      maxLength={160}
-                      value={draft.drug}
-                      onChange={(event) => change(index, 'drug', event.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className={styles.label} htmlFor={`strength-${index}`}>
-                      Strength
-                    </label>
-                    <input
-                      id={`strength-${index}`}
-                      className={styles.input}
-                      placeholder="500 mg"
-                      maxLength={60}
-                      value={draft.strength}
-                      onChange={(event) => change(index, 'strength', event.target.value)}
+                      name={draft.drug}
+                      strength={draft.strength}
+                      onChange={(name, picked) =>
+                        setDrafts((all) =>
+                          all.map((one, at) =>
+                            at === index ? { ...one, drug: name, strength: picked } : one,
+                          ),
+                        )
+                      }
                     />
                   </div>
                   <div>
