@@ -284,14 +284,14 @@ try {
   await shot(desk, 'register-form')
   await desk.getByRole('button', { name: 'Save patient' }).click()
   await desk.getByText('Patient registered').waitFor()
-  const number = await page
+  const number = await desk
     .locator('b', { hasText: /^RMC-\d{6}$/ })
     .first()
     .innerText()
   if (!/^RMC-\d{6}$/.test(number)) throw new Error('No RMC number after registering')
   await shot(desk, 'registered')
 
-  step('She sends the new patient to her room')
+  step("The front desk sends the new patient to the nurse's room")
   await desk.getByRole('button', { name: 'Send to room' }).click()
   await desk.getByLabel('Room', { exact: true }).selectOption({ label: 'Consultant Room 1' })
   await desk.getByLabel('Note for the staff there (optional)').fill('New today')
