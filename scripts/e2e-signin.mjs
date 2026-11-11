@@ -262,6 +262,13 @@ try {
   await signInWithCode(desk, 'desk1@test.rhema')
   await choosePin(desk, '2468')
   await expectHome(desk, 'Test Desk One')
+  // Request 129: her Call in earlier raised a green Call patient card here.
+  // It is checked and closed now, so it is not over the register form.
+  step('The front desk has the Call patient card from her Call in, and closes it')
+  const patientCard = desk.getByRole('status').filter({ hasText: 'Call patient' })
+  await patientCard.getByText(/ to Consultant Room 1$/).waitFor()
+  await shot(desk, 'attention-card')
+  await patientCard.getByRole('button', { name: 'Close' }).click()
   // The menu link, which does not redraw while Home loads.
   await desk.locator('nav a[href="/patients/"]').click()
   await desk.getByRole('heading', { name: 'Find patient' }).waitFor()
@@ -383,21 +390,14 @@ try {
   const attentionCard = desk.getByRole('status').filter({ hasText: 'needs Front Desk' })
   await attentionCard.getByText(/Test Nurse One · \d\d:\d\d/).waitFor()
 
-  // Request 129: her Call in earlier raised a green Call patient card here.
-  step('The front desk also has the Call patient card from her Call in')
-  const patientCard = desk.getByRole('status').filter({ hasText: 'Call patient' })
-  await patientCard.getByText(/ to Consultant Room 1$/).waitFor()
-  await shot(desk, 'attention-card')
-
   step('A second tap at once sends nothing new')
   await page.waitForTimeout(3500)
   await page.getByRole('button', { name: /^Front Desk/ }).click()
   await page.getByText('Already sent').waitFor()
   await page.keyboard.press('Escape')
 
-  step('The front desk closes both cards with X, and they stay closed')
+  step('The front desk closes the card with X, and both stay closed after a refresh')
   await attentionCard.getByRole('button', { name: 'Close' }).click()
-  await patientCard.getByRole('button', { name: 'Close' }).click()
   await desk.reload()
   await expectHome(desk, 'Test Desk One')
   await desk.waitForTimeout(1500)
