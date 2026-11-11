@@ -256,7 +256,7 @@ try {
   if (registerButtons > 0) throw new Error('A nurse can see a Register button')
 
   step('The front desk signs in on a second screen and registers a new made up patient')
-  const desk = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+  const desk = await browser.newPage({ viewport: { width: 1280, height: 1400 } })
   desk.on('pageerror', (error) => problems.push(`desk: ${error.message}`))
   await desk.goto(`${APP}/sign-in/`)
   await signInWithCode(desk, 'desk1@test.rhema')
