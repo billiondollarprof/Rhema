@@ -808,7 +808,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     everybody only when the Pharmacy confirms it. Yes to the starter list
     ("I concur"). Extra vital signs: typed once, kept for that person, and
     made standard automatically when a second person types the same one.
-    BUILT (branch only, NOT on testing or live; waits for his yes to the SQL):
+    His yes: "okay, go on with both SQLs, I'll do the necessary parts"
+    (2026-11-11). BUILT; shipped with request 178's database rule:
     migration 20261111160406_medicine_list (112 starter lines, marked
     "starter" until the Pharmacy confirms), migration 20261111160643_vital_
     extras; the picker (components/medicines), Pharmacy page /pharmacy/list/
@@ -822,8 +823,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     the doctor, the pharmacist, the lab, they should not be able. It's only
     front desk that can register a patient and edit patient details."
     LIVE (screen): the Edit details button and the Edit page are Front Desk
-    only. NOT YET in the database (patients_update still allows anybody who
-    may see patients): needs his yes to a small SQL change.
+    only. Database: migration 20261111175805_patients_edit_front_desk (his yes,
+    2026-11-11: "go on with both SQLs"), shipped with the medicine list and
+    the Other vital signs.
 179. **Vital signs: "Other" for a measure that has no box.** (2026-11-11)
     "What about a vital sign that is not among those boxes? Put something
     like 'other', so they can enter the vital sign and add it manually."
