@@ -51,6 +51,7 @@ import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { emailRecord } from '@/lib/record/emailRecord'
+import { recall, remember } from '@/lib/cache/memory'
 
 // ===== 1. The allergy banner =====
 // Red: allergies on file. Green: asked, and none. Amber: nobody has asked yet.
@@ -69,8 +70,7 @@ function AllergyBanner({ record }: { record: MedicalRecord }) {
   }
   return (
     <div className={`${styles.banner} ${styles.bannerAmber}`}>
-      Allergies not recorded yet. Ask the patient, then add them or tick &quot;No known
-      allergies&quot;.
+      Allergies not recorded yet. Remember to ask the patient about allergies.
     </div>
   )
 }
@@ -83,8 +83,15 @@ function PatientRecord() {
   const allowed = Boolean(staff?.can_medical)
   const staffId = staff?.id ?? null
 
-  const [patient, setPatient] = useState<PatientResult | null | undefined>(undefined)
-  const [record, setRecord] = useState<MedicalRecord | null>(null)
+  // What this person already loaded stays in memory, so the record shows at
+  // once and stays if the network drops (Anthony, 2026-11-11). Memory only:
+  // closing the app or signing out empties it.
+  const [patient, setPatient] = useState<PatientResult | null | undefined>(
+    () => recall<PatientResult>(auth.staff?.id, `patient:${id}`) ?? undefined,
+  )
+  const [record, setRecord] = useState<MedicalRecord | null>(() =>
+    recall<MedicalRecord>(auth.staff?.id, `record:${id}`),
+  )
   const [refused, setRefused] = useState(false)
   // The files on the record, for Download (Files section tells us).
   const [files, setFiles] = useState<PatientFile[]>([])
@@ -101,15 +108,24 @@ function PatientRecord() {
     ;(async () => {
       const found = await getPatient(client, id)
       if (!current) return
-      setPatient(found)
+      // A patient not found while one is already showing (no network) keeps
+      // what is showing.
+      if (found || !recall(staffId ?? undefined, `patient:${id}`)) setPatient(found)
       if (!found) return
       const opened = await openRecord(client, id)
       if (!current) return
       if (!opened) {
-        setRefused(true)
+        // Not opened, and nothing loaded before: the screen says so. If the
+        // record is already showing, it stays.
+        if (!recall(staffId ?? undefined, `record:${id}`)) setRefused(true)
         return
       }
       const loaded = await loadRecord(client, id)
+      if (!loaded) {
+        if (!recall(staffId ?? undefined, `record:${id}`)) setRefused(true)
+        return
+      }
+      if (staffId) remember(staffId, `record:${id}`, loaded)
       if (current) setRecord(loaded)
       // Opening the record clears this doctor's "dispensed" notices for
       // this patient (request 171c).
@@ -122,8 +138,13 @@ function PatientRecord() {
 
   // Read again after a change. The opening is still fresh, so no new one.
   const reload = useCallback(() => {
-    if (client && id) loadRecord(client, id).then(setRecord)
-  }, [client, id])
+    if (client && id)
+      loadRecord(client, id).then((loaded) => {
+        if (!loaded) return
+        if (staffId) remember(staffId, `record:${id}`, loaded)
+        setRecord(loaded)
+      })
+  }, [client, id, staffId])
 
   // Something saved by anybody (a nurse's vitals, a lab result): show it at
   // once, without leaving the record (request 157).

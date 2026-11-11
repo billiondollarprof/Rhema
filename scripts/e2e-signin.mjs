@@ -153,6 +153,9 @@ page.on('console', (message) => {
   }
 })
 
+// The Front Desk's screen, opened part way through, so a failure can show it too.
+let desk = null
+
 try {
   step('A new device opens the app and lands on the email step')
   await page.goto(`${APP}/`)
@@ -256,12 +259,19 @@ try {
   if (registerButtons > 0) throw new Error('A nurse can see a Register button')
 
   step('The front desk signs in on a second screen and registers a new made up patient')
-  const desk = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+  desk = await browser.newPage({ viewport: { width: 1280, height: 1400 } })
   desk.on('pageerror', (error) => problems.push(`desk: ${error.message}`))
   await desk.goto(`${APP}/sign-in/`)
   await signInWithCode(desk, 'desk1@test.rhema')
   await choosePin(desk, '2468')
   await expectHome(desk, 'Test Desk One')
+  // Request 129: her Call in earlier raised a green Call patient card here.
+  // It is checked and closed now, so it is not over the register form.
+  step('The front desk has the Call patient card from her Call in, and closes it')
+  const patientCard = desk.getByRole('status').filter({ hasText: 'Call patient' })
+  await patientCard.getByText(/ to Consultant Room 1$/).waitFor()
+  await shot(desk, 'attention-card')
+  await patientCard.getByRole('button', { name: 'Close' }).click()
   // The menu link, which does not redraw while Home loads.
   await desk.locator('nav a[href="/patients/"]').click()
   await desk.getByRole('heading', { name: 'Find patient' }).waitFor()
@@ -274,14 +284,14 @@ try {
   await shot(desk, 'register-form')
   await desk.getByRole('button', { name: 'Save patient' }).click()
   await desk.getByText('Patient registered').waitFor()
-  const number = await page
+  const number = await desk
     .locator('b', { hasText: /^RMC-\d{6}$/ })
     .first()
     .innerText()
   if (!/^RMC-\d{6}$/.test(number)) throw new Error('No RMC number after registering')
   await shot(desk, 'registered')
 
-  step('She sends the new patient to her room')
+  step("The front desk sends the new patient to the nurse's room")
   await desk.getByRole('button', { name: 'Send to room' }).click()
   await desk.getByLabel('Room', { exact: true }).selectOption({ label: 'Consultant Room 1' })
   await desk.getByLabel('Note for the staff there (optional)').fill('New today')
@@ -383,22 +393,16 @@ try {
   const attentionCard = desk.getByRole('status').filter({ hasText: 'needs Front Desk' })
   await attentionCard.getByText(/Test Nurse One · \d\d:\d\d/).waitFor()
 
-  // Request 129: her Call in earlier raised a green Call patient card here.
-  step('The front desk also has the Call patient card from her Call in')
-  const patientCard = desk.getByRole('status').filter({ hasText: 'Call patient' })
-  await patientCard.getByText(/ to Consultant Room 1$/).waitFor()
-  await shot(desk, 'attention-card')
-
   step('A second tap at once sends nothing new')
   await page.waitForTimeout(3500)
   await page.getByRole('button', { name: /^Front Desk/ }).click()
   await page.getByText('Already sent').waitFor()
   await page.keyboard.press('Escape')
 
-  step('The front desk closes both cards with X, and they stay closed')
+  step('The front desk closes the card with X, and both stay closed after a refresh')
   await attentionCard.getByRole('button', { name: 'Close' }).click()
-  await patientCard.getByRole('button', { name: 'Close' }).click()
-  await desk.reload()
+  // A fresh load of Home (the desk is on the patient's screen by now).
+  await desk.goto(`${APP}/`)
   await expectHome(desk, 'Test Desk One')
   await desk.waitForTimeout(1500)
   if (await desk.getByText('Consultant Room 1 needs Front Desk').count()) {
@@ -515,6 +519,11 @@ try {
 } catch (error) {
   await page.screenshot({ path: `${SHOTS}/zz-failure.png`, fullPage: true }).catch(() => {})
   console.error('E2E SIGN IN FAILED:', error.message)
+  if (desk) {
+    await desk.screenshot({ path: `${SHOTS}/zz-failure-desk.png`, fullPage: true }).catch(() => {})
+    const deskScreen = await desk.innerText('body').catch(() => '')
+    console.error('On the Front Desk screen at the time:\n' + deskScreen.slice(0, 1500))
+  }
   const onScreen = await page.innerText('body').catch(() => '')
   console.error('On screen at the time:\n' + onScreen.slice(0, 1500))
   process.exitCode = 1

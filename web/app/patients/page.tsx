@@ -24,7 +24,14 @@ import SendToRoom from './_parts/SendToRoom'
 import PatientDetail, { lastSeenWords } from './_parts/PatientDetail'
 import styles from './_parts/patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
-import { getPatient, searchPatients, type PatientResult } from '@/lib/patients/patients'
+import {
+  getPatient,
+  knownPatient,
+  knownSearch,
+  searchPatients,
+  type PatientResult,
+} from '@/lib/patients/patients'
+import { recall, remember } from '@/lib/cache/memory'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
@@ -37,8 +44,15 @@ function FindPatient() {
   const chosenId = Number(params.get('p')) || null
   const { client, staff } = auth
 
-  const [typed, setTyped] = useState('')
-  const [results, setResults] = useState<PatientResult[] | null>(null)
+  // What was typed and found last time is kept in memory, so coming back to
+  // Find patient shows it at once (Anthony, 2026-11-11).
+  const [typed, setTyped] = useState(() => recall<string>(auth.staff?.id, 'find:typed') ?? '')
+  const [results, setResults] = useState<PatientResult[] | null>(() =>
+    recall<PatientResult[]>(
+      auth.staff?.id,
+      `find:${recall<string>(auth.staff?.id, 'find:typed') ?? ''}`,
+    ),
+  )
   const [chosen, setChosen] = useState<PatientResult | null>(null)
   // Whether the chosen patient was picked from the results on this screen.
   const cameFromList = useRef(false)
@@ -49,24 +63,31 @@ function FindPatient() {
 
   // ===== 1. Search as the person types (after a short pause) =====
   useEffect(() => {
-    if (!client || auth.status !== 'ready') return
+    if (!client || auth.status !== 'ready' || !staff) return
     let current = true
+    const staffId = staff.id
+    remember(staffId, 'find:typed', typed)
     const timer = window.setTimeout(() => {
       searchPatients(client, typed).then((found) => {
-        if (current) setResults(found)
+        if (!current) return
+        remember(staffId, `find:${typed}`, found)
+        for (const patient of found) remember(staffId, `patient:${patient.id}`, patient)
+        setResults(found)
       })
     }, 250)
     return () => {
       current = false
       window.clearTimeout(timer)
     }
-  }, [client, auth.status, typed])
+  }, [client, auth.status, typed, staff])
 
   // ===== 2. The chosen patient, from the address =====
   const loadChosen = useCallback(async () => {
     if (!client || !chosenId) return
-    setChosen(await getPatient(client, chosenId))
-  }, [client, chosenId])
+    const fresh = await getPatient(client, chosenId)
+    if (fresh && staff) remember(staff.id, `patient:${chosenId}`, fresh)
+    setChosen(fresh)
+  }, [client, chosenId, staff])
 
   useEffect(() => {
     if (auth.status !== 'ready' || !chosenId) return
@@ -85,6 +106,20 @@ function FindPatient() {
   }, [client, auth.status, typed, loadChosen])
 
   if (auth.status !== 'ready' || !client || !staff) return null
+
+  // What is shown is never empty while the database is asked: the last
+  // answer, or what this device already knows. The fresh answer replaces it
+  // (Anthony, 2026-11-11: "details already loaded just remain").
+  const shownResults =
+    results ?? recall<PatientResult[]>(staff.id, `find:${typed}`) ?? knownSearch(staff.id, typed)
+  const shownChosen =
+    chosen && chosen.id === chosenId
+      ? chosen
+      : chosenId
+        ? (shownResults.find((patient) => patient.id === chosenId) ??
+          recall<PatientResult>(staff.id, `patient:${chosenId}`) ??
+          knownPatient(staff.id, chosenId))
+        : null
 
   return (
     <AppShell>
@@ -123,12 +158,12 @@ function FindPatient() {
               <small className={styles.muted}>
                 Same name as another patient? Use the number or phone.
               </small>
-              {results && results.length === 0 ? (
+              {results && shownResults.length === 0 ? (
                 <p className={styles.muted}>
                   {typed ? 'No patient found.' : 'No patients registered yet.'}
                 </p>
               ) : null}
-              {(results ?? []).map((patient) => (
+              {shownResults.map((patient) => (
                 <div key={patient.id} className={styles.resultBox}>
                   <div className={styles.resultRow}>
                     <button
@@ -217,10 +252,10 @@ function FindPatient() {
                 ← Back to search
               </button>
             ) : null}
-            {chosen && chosen.id === chosenId ? (
+            {shownChosen ? (
               <>
                 <PatientDetail
-                  key={chosen.id}
+                  key={shownChosen.id}
                   client={client}
                   staffId={staff.id}
                   canMedical={staff.can_medical}
@@ -228,7 +263,7 @@ function FindPatient() {
                   canPay={staff.role === 'front_desk' || staff.can_admin}
                   // Only the Front Desk registers patients (Anthony, 2026-11-10).
                   canRegister={staff.role === 'front_desk'}
-                  patient={chosen}
+                  patient={shownChosen}
                   onChanged={() => {
                     loadChosen()
                     searchPatients(client, typed).then(setResults)
@@ -240,8 +275,8 @@ function FindPatient() {
                 <PatientFilesCard
                   client={client}
                   staffId={staff.id}
-                  patientId={chosen.id}
-                  fromOldFile={chosen.from_old_file}
+                  patientId={shownChosen.id}
+                  fromOldFile={shownChosen.from_old_file}
                 />
               </>
             ) : chosenId ? (

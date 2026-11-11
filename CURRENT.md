@@ -764,6 +764,63 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     vitals, nursing and consultation notes, lab results. Not the files.
     Anybody with medical record access can send it (doctor, nurse, matron).
 
+181. **Check Refresh; keep what is loaded so it works on a shaky network.**
+    (2026-11-11) "Check that refresh button if it actually refreshes the page...
+    when the system has already loaded, if you click on find patient... open
+    that patient... click back, the system loads details again. I thought
+    details already loaded just remain. That's what we agreed, so they can
+    work offline even if the network is unstable."
+    FOUND: Refresh does fetch on every screen with live data and never
+    reloads the page; the Admin staff and invitation lists did not re-read
+    (fixed). Find patient, the patient's screen and the medical record kept
+    nothing in memory, so a slow network meant a blank wait (3 s on a 1.5 s
+    network; never visible when returning by the menu).
+    DONE: Find patient keeps what was typed and found (per person, memory
+    only) and falls back to the device copy of recent patients; a patient
+    opens at once from the list or the copy; a loaded medical record stays in
+    memory and stays on screen if the network drops (loadRecord now returns
+    nothing when any part fails, so a refresh offline cannot blank it). Each
+    screen still asks the database straight after and replaces what it
+    showed. Measured (1.5 s network): open patient 3063 ms to 66 ms; menu back
+    to Find patient never to 67 ms. Offline: record, patient and list all stay.
+    Memory is emptied on sign out and on closing the app (his rule: nothing
+    medical on disk; the 30 day patient copy on disk is unchanged).
+
+177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
+    (2026-11-11, after a day at the hospital) "They said it would be nice if
+    they uploaded all the medicine that they normally give. Instead of
+    typing, they will just tick the medicine. When they click on that place,
+    it gives a drop down with a search. They press the first letter of the
+    medicine, tick which medicine, then tick the milligram associated with
+    it (500, 100, 200 depending). Same for the nurse wherever they put in
+    medications: select it. In case it is not in the list they click
+    'other' and add it. If a nurse types a medicine by hand, the system
+    should remember it, so next time a letter finds it. The pharmacy can
+    also enter all the medicine they have, plus syringe and the like, by
+    hand. Same thing with the doctor. In almost all the cases: only notes are
+    typed; when an option does not exist, click 'other' to add it manually.
+    The pharmacy will send their list, like the lab will send theirs; for
+    now I can populate the regular ones (paracetamol, cimetidine,
+    omeprazole...) with their milligrams, from the internet."
+    NOT BUILT. Said back to him; waiting for his answers.
+178. **Only the Front Desk edits patient details.** (2026-11-11) "The nurse,
+    the doctor, the pharmacist, the lab, they should not be able. It's only
+    front desk that can register a patient and edit patient details."
+    LIVE (screen): the Edit details button and the Edit page are Front Desk
+    only. NOT YET in the database (patients_update still allows anybody who
+    may see patients): needs his yes to a small SQL change.
+179. **Vital signs: "Other" for a measure that has no box.** (2026-11-11)
+    "What about a vital sign that is not among those boxes? Put something
+    like 'other', so they can enter the vital sign and add it manually."
+    NOT BUILT. Needs a design question first.
+180. **Allergy reminder.** (2026-11-11) "The statement to click no allergies
+    should be removed, but the warning leave it there, because it is
+    important. Tell them: remember to ask patients for allergies." LIVE: the
+    amber banner now reads "Allergies not recorded yet. Remember to ask the
+    patient about allergies." The tick "No known allergies" is still inside
+    Blood group and profile > Edit (Background.tsx), where he could not see
+    it.
+
 176. **Lab result entry: choices and numbers, from the lab's template.**
     (2026-11-10) "The lab also said the lab results for entering results is
     not fully built, that there are certain things he doesn't have to type

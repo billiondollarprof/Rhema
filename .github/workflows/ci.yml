@@ -91,8 +91,22 @@ jobs:
         with:
           version: 2.122.0
       - run: npm ci
+      # The test machine's package servers sometimes cannot be reached (on
+      # 2026-11-11 azure.archive.ubuntu.com did not resolve, and the install
+      # hung, four runs in a row, before any test ran). So the browser is
+      # downloaded first, from Playwright's own server, and checked by
+      # starting it. Only if it will not start are the system libraries
+      # installed, as before. Nothing is skipped: the same browser, the same
+      # test.
       - name: Install the test browser
-        run: npm install --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install chromium
+          if ! node -e "require('playwright').chromium.launch().then((b) => b.close())"; then
+            echo "The browser would not start. Installing the system libraries."
+            npx playwright install --with-deps chromium
+          fi
       - name: Sign in, used for real
         run: scripts/e2e-signin.sh
       # The pictures are for finding out why the sign in test failed, so they

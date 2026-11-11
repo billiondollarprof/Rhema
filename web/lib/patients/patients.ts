@@ -101,6 +101,18 @@ const offline = (patient: PatientCard): PatientResult => ({
   today: [],
 })
 
+// What this device already knows, to show at once while the database is
+// asked (Anthony, 2026-11-11: "details that are already loaded just remain,
+// so they can easily work offline"). Nothing here waits for the network.
+export function knownSearch(staffId: string, typed: string): PatientResult[] {
+  return searchCopy(staffId, typed).map(offline)
+}
+
+export function knownPatient(staffId: string, id: number): PatientResult | null {
+  const copied = readCopy(staffId).find((patient) => patient.id === id)
+  return copied ? offline(copied) : null
+}
+
 // ===== 2. Phone numbers: one way of writing them =====
 // The database keeps 11 digits starting with 0, like 08035550126. People
 // type spaces, dashes or +234, so this turns all of those into that form.
