@@ -78,6 +78,8 @@ export type RecordData = {
     weight_kg: number | null
     height_cm: number | null
   }[]
+  // "Other" vital signs, such as blood sugar.
+  vitalExtras: { name: string; unit: string | null; value: number; recorded_at: string }[]
   nursing: { note: string; created_at: string; author: Who }[]
   consultations: {
     complaint: string | null
@@ -190,10 +192,15 @@ export function recordSections(data: RecordData): Section[] {
         (d) => `${when(d.given_at)}: ${d.medicine}${d.dose ? ` ${d.dose}` : ''}`,
       ),
     })
-  if (data.vitals.length)
+  if (data.vitals.length || data.vitalExtras.length)
     sections.push({
       title: 'Vital signs',
-      lines: data.vitals.map((v) => `${when(v.recorded_at)}: ${vitalsLine(v)}`),
+      lines: [
+        ...data.vitals.map((v) => `${when(v.recorded_at)}: ${vitalsLine(v)}`),
+        ...data.vitalExtras.map(
+          (v) => `${when(v.recorded_at)}: ${v.name} ${v.value}${v.unit ? ` ${v.unit}` : ''}`,
+        ),
+      ],
     })
   if (data.labs.length)
     sections.push({
@@ -323,6 +330,7 @@ export async function emailRecord(
       'recorded_at',
       30,
     ),
+    ask('vital_extras', 'name,unit,value,recorded_at', 'recorded_at', 60),
     ask('nursing_notes', `note,created_at,${who('written_by')}`, 'created_at', 50),
     ask(
       'consultation_notes',
@@ -332,9 +340,21 @@ export async function emailRecord(
     ),
     ask('lab_results', 'test,result,recorded_at', 'recorded_at', 50),
   ])
-  if (answers.some((answer) => !answer.ok)) return no(403, 'Not allowed')
-  const [profile, allergies, conditions, medications, doses, vitals, nursing, consultations, labs] =
-    (await Promise.all(answers.map((answer) => answer.json()))) as unknown[][]
+  // The "Other" vital signs (6th) are not required: if that part is not there
+  // yet, the rest still goes.
+  if (answers.some((answer, at) => !answer.ok && at !== 6)) return no(403, 'Not allowed')
+  const [
+    profile,
+    allergies,
+    conditions,
+    medications,
+    doses,
+    vitals,
+    vitalExtras,
+    nursing,
+    consultations,
+    labs,
+  ] = (await Promise.all(answers.map((answer) => answer.json()))) as unknown[][]
   const data: RecordData = {
     patient,
     profile: (profile[0] as RecordData['profile']) ?? null,
@@ -343,6 +363,7 @@ export async function emailRecord(
     medications: medications as RecordData['medications'],
     doses: doses as RecordData['doses'],
     vitals: vitals as RecordData['vitals'],
+    vitalExtras: (Array.isArray(vitalExtras) ? vitalExtras : []) as RecordData['vitalExtras'],
     nursing: nursing as RecordData['nursing'],
     consultations: consultations as RecordData['consultations'],
     labs: labs as RecordData['labs'],

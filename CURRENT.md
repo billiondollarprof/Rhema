@@ -802,7 +802,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     The pharmacy will send their list, like the lab will send theirs; for
     now I can populate the regular ones (paracetamol, cimetidine,
     omeprazole...) with their milligrams, from the internet."
-    NOT BUILT. Said back to him; waiting for his answers.
+    HIS ANSWERS (2026-11-11): only the Pharmacist (role) adds and edits the
+    list. A doctor or nurse can add one that is missing: it is PENDING, usable
+    at once, seen only by them and the Pharmacy, and becomes standard for
+    everybody only when the Pharmacy confirms it. Yes to the starter list
+    ("I concur"). Extra vital signs: typed once, kept for that person, and
+    made standard automatically when a second person types the same one.
+    BUILT (branch only, NOT on testing or live; waits for his yes to the SQL):
+    migration 20261111160406_medicine_list (112 starter lines, marked
+    "starter" until the Pharmacy confirms), migration 20261111160643_vital_
+    extras; the picker (components/medicines), Pharmacy page /pharmacy/list/
+    (confirm, confirm the starter list, add with several strengths, edit,
+    switch off), a notification for the Pharmacy, the Home button (replaces
+    Messages for the Pharmacy), the picker in Prescribe, the nurse's Add a
+    medicine and Record a dose, "+ Other vital sign", and the extras in the
+    emailed record. "Same" for a vital sign = same words ignoring capitals,
+    spaces and punctuation.
 178. **Only the Front Desk edits patient details.** (2026-11-11) "The nurse,
     the doctor, the pharmacist, the lab, they should not be able. It's only
     front desk that can register a patient and edit patient details."

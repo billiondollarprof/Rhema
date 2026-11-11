@@ -51,7 +51,8 @@ const NURSE: Action[] = [
 const PHARMACY: Action[] = [
   { icon: 'pill', label: 'Prescriptions', colour: '#00897b', ready: true, job: PHARMACY_CARD },
   { icon: 'find', label: 'Find patient', colour: '#1976d2', ready: true, job: FIND },
-  { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: true, job: '/messages/' },
+  // Messages is in the menu; this place is for the medicine list (2026-11-11).
+  { icon: 'pill', label: 'Medicine list', colour: '#7e57c2', ready: true, job: '/pharmacy/list/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const LABORATORY: Action[] = [
