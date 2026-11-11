@@ -401,7 +401,8 @@ try {
 
   step('The front desk closes the card with X, and both stay closed after a refresh')
   await attentionCard.getByRole('button', { name: 'Close' }).click()
-  await desk.reload()
+  // A fresh load of Home (the desk is on the patient's screen by now).
+  await desk.goto(`${APP}/`)
   await expectHome(desk, 'Test Desk One')
   await desk.waitForTimeout(1500)
   if (await desk.getByText('Consultant Room 1 needs Front Desk').count()) {
