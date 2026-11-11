@@ -764,6 +764,28 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     vitals, nursing and consultation notes, lab results. Not the files.
     Anybody with medical record access can send it (doctor, nurse, matron).
 
+181. **Check Refresh; keep what is loaded so it works on a shaky network.**
+    (2026-11-11) "Check that refresh button if it actually refreshes the page...
+    when the system has already loaded, if you click on find patient... open
+    that patient... click back, the system loads details again. I thought
+    details already loaded just remain. That's what we agreed, so they can
+    work offline even if the network is unstable."
+    FOUND: Refresh does fetch on every screen with live data and never
+    reloads the page; the Admin staff and invitation lists did not re-read
+    (fixed). Find patient, the patient's screen and the medical record kept
+    nothing in memory, so a slow network meant a blank wait (3 s on a 1.5 s
+    network; never visible when returning by the menu).
+    DONE: Find patient keeps what was typed and found (per person, memory
+    only) and falls back to the device copy of recent patients; a patient
+    opens at once from the list or the copy; a loaded medical record stays in
+    memory and stays on screen if the network drops (loadRecord now returns
+    nothing when any part fails, so a refresh offline cannot blank it). Each
+    screen still asks the database straight after and replaces what it
+    showed. Measured (1.5 s network): open patient 3063 ms to 66 ms; menu back
+    to Find patient never to 67 ms. Offline: record, patient and list all stay.
+    Memory is emptied on sign out and on closing the app (his rule: nothing
+    medical on disk; the 30 day patient copy on disk is unchanged).
+
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
     they uploaded all the medicine that they normally give. Instead of

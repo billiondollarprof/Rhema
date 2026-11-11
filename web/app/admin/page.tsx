@@ -31,6 +31,7 @@ import {
   type RoomRow,
   type StaffRow,
 } from '@/lib/admin/admin'
+import { onChange } from '@/lib/live/changes'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -72,8 +73,14 @@ function Admin() {
   useEffect(() => {
     if (auth.status !== 'ready' || !me?.can_admin) return
     const timer = window.setTimeout(reload, 0)
-    return () => window.clearTimeout(timer)
-  }, [auth.status, me?.can_admin, reload])
+    // The Refresh button, and anybody's change (an invitation, an access
+    // change), read the lists again without leaving the page.
+    const stop = client ? onChange(client, 'records', () => void reload()) : undefined
+    return () => {
+      window.clearTimeout(timer)
+      stop?.()
+    }
+  }, [auth.status, me?.can_admin, reload, client])
 
   if (auth.status !== 'ready' || !client || !me) return null
 

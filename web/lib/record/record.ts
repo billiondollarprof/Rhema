@@ -138,7 +138,7 @@ export async function openRecord(client: SupabaseClient, patientId: number): Pro
 export async function loadRecord(
   client: SupabaseClient,
   patientId: number,
-): Promise<MedicalRecord> {
+): Promise<MedicalRecord | null> {
   const byPatient = (table: string, columns: string, order: string) =>
     client
       .from(table)
@@ -206,6 +206,22 @@ export async function loadRecord(
     ).limit(30),
   ])
 
+  // Any part that could not be read (no network): nothing, so a screen
+  // keeps what it already shows instead of going empty.
+  if (
+    [
+      profile,
+      allergies,
+      conditions,
+      medications,
+      statusChanges,
+      doses,
+      vitals,
+      nursing,
+      consultations,
+    ].some((result) => result.error)
+  )
+    return null
   const list = <T>(result: { data: unknown }) => (result.data as T[] | null) ?? []
   return {
     profile: (profile.data as Profile | null) ?? null,
