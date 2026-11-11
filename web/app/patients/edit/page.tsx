@@ -66,6 +66,21 @@ function EditPatient() {
 
   if (auth.status !== 'ready' || !client) return null
 
+  // Only the Front Desk edits a patient's details (Anthony, 2026-11-11: "it's
+  // the job of the front desk"). Everybody else does their own duty.
+  if (staff && staff.role !== 'front_desk') {
+    return (
+      <AppShell>
+        <div className={styles.page}>
+          <p className={styles.muted}>Only the Front Desk edits patient details.</p>
+          <Link className={styles.button} href="/patients/">
+            Find patient
+          </Link>
+        </div>
+      </AppShell>
+    )
+  }
+
   // ===== 2. Save, then back to the patient =====
   async function save(details: PatientDetails, cardFee: CardFee) {
     if (!client || !id) return

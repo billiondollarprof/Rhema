@@ -69,8 +69,7 @@ function AllergyBanner({ record }: { record: MedicalRecord }) {
   }
   return (
     <div className={`${styles.banner} ${styles.bannerAmber}`}>
-      Allergies not recorded yet. Ask the patient, then add them or tick &quot;No known
-      allergies&quot;.
+      Allergies not recorded yet. Remember to ask the patient about allergies.
     </div>
   )
 }

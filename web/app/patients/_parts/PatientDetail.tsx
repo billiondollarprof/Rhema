@@ -231,9 +231,11 @@ export default function PatientDetail({
               Medical record
             </Link>
           ) : null}
-          <Link className={styles.button} href={`/patients/edit/?p=${patient.id}`}>
-            Edit details
-          </Link>
+          {canRegister ? (
+            <Link className={styles.button} href={`/patients/edit/?p=${patient.id}`}>
+              Edit details
+            </Link>
+          ) : null}
         </div>
       )}
       {leaveProblem ? <p className={styles.error}>{leaveProblem}</p> : null}
