@@ -330,3 +330,76 @@
   color: #1f5fd0;
   font-weight: 600;
 }
+
+/* ===== The email box with its drop down of remembered emails ===== */
+.combo {
+  display: grid;
+  gap: 6px;
+}
+
+.comboRow {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.comboArrow {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 18px;
+  min-width: 46px;
+  border: 1.5px solid #1f5fd0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f5fd0;
+  cursor: pointer;
+}
+
+.comboList {
+  display: grid;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 34, 56, 0.12);
+}
+
+.comboItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.comboPick {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  text-align: left;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.comboPick:hover,
+.comboPick[aria-selected='true'] {
+  background: #f4f8ff;
+}
+
+.comboForget {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 12px;
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #5b6b80;
+  cursor: pointer;
+}

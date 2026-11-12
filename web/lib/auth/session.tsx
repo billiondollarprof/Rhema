@@ -34,6 +34,7 @@ import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
 import { wipeOutbox } from '@/lib/offline/outbox'
 import { wipeCopy } from '@/lib/offline/patientCopy'
+import { rememberEmail } from '@/lib/auth/known-emails'
 import { forgetAll } from '@/lib/cache/memory'
 import { adoptSession, clientFor, dropClient, pendingClient } from './clients'
 import { forgetThisDevice } from '@/lib/attention/push'
@@ -221,6 +222,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await signOutHere(session.user.id, null)
         return 'This email is not set up as hospital staff. Ask your administrator.'
       }
+      // This computer remembers the email for next time (Anthony, 2026-11-12).
+      rememberEmail(session.user.email ?? '')
       saveAccount({
         id: member.id,
         name: member.full_name,

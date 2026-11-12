@@ -27,12 +27,14 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import CodeBoxes from '@/components/auth/CodeBoxes'
+import EmailPicker from '@/components/auth/EmailPicker'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Logo from '@/components/brand/Logo'
 import SignInPhotos from '@/components/auth/SignInPhotos'
 import styles from '@/components/auth/Auth.module.css'
 import { CODE_LENGTH, PIN_LENGTH } from '@/lib/auth/config'
 import { listAccounts, type DeviceAccount } from '@/lib/auth/device-accounts'
+import { forgetEmail, knownEmails } from '@/lib/auth/known-emails'
 import { roleLabel } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
@@ -53,8 +55,11 @@ export default function SignInPage() {
   useRightPage(auth.status, '/sign-in/')
 
   const [linkEmail] = useState(emailFromLink)
+  // The emails that have signed in on this device: the newest fills the box,
+  // and with more than one a drop down lists them all (2026-11-12).
+  const [remembered, setRemembered] = useState<string[]>(knownEmails)
   const [chosenStep, setStep] = useState<Step>(linkEmail ? 'email' : 'choose')
-  const [email, setEmail] = useState(linkEmail)
+  const [email, setEmail] = useState(() => linkEmail || knownEmails()[0] || '')
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -143,16 +148,16 @@ export default function SignInPage() {
         <label className={styles.label} htmlFor="email">
           Work email
         </label>
-        <input
+        <EmailPicker
           id="email"
-          className={styles.input}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          placeholder="name@example.com"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          onKeyDown={(event) => event.key === 'Enter' && looksRight && !busy && sendCode()}
+          onChange={setEmail}
+          onEnter={() => looksRight && !busy && sendCode()}
+          emails={remembered}
+          onForget={(gone) => {
+            forgetEmail(gone)
+            setRemembered(knownEmails())
+          }}
         />
         {error ? <p className={styles.error}>{error}</p> : null}
         <button
