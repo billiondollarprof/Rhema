@@ -263,6 +263,7 @@ function FindPatient() {
                   canPay={staff.role === 'front_desk' || staff.can_admin}
                   // Only the Front Desk registers patients (Anthony, 2026-11-10).
                   canRegister={staff.role === 'front_desk'}
+                  showMedicines={staff.role === 'pharmacy'}
                   patient={shownChosen}
                   onChanged={() => {
                     loadChosen()

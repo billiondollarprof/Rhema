@@ -24,6 +24,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import FamilyCard from './FamilyCard'
+import PharmacyMedicines from './PharmacyMedicines'
 import PaymentsCard from './PaymentsCard'
 import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
@@ -45,6 +46,8 @@ type DetailProps = {
   canMedical: boolean
   canPay: boolean
   canRegister: boolean
+  // The Pharmacy sees the medicines this patient has taken (2026-11-12).
+  showMedicines: boolean
   patient: PatientResult
   onChanged: () => void
 }
@@ -69,6 +72,7 @@ export default function PatientDetail({
   canMedical,
   canPay,
   canRegister,
+  showMedicines,
   patient,
   onChanged,
 }: DetailProps) {
@@ -187,6 +191,11 @@ export default function PatientDetail({
             ))}
           </ol>
         </div>
+      ) : null}
+
+      {/* The Pharmacy: what this patient has taken, current, suspended or stopped. */}
+      {showMedicines ? (
+        <PharmacyMedicines client={client} staffId={staffId} patientId={patient.id} />
       ) : null}
 
       {/* The family: its number, the other members, Add family member. */}

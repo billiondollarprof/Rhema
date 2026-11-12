@@ -798,8 +798,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     "Patients do not remember their drugs... I want the pharmacist to be able
     to see somebody's medical records of their medication: the ones they are
     taking, suspended, stopped." Today the Pharmacy cannot open the medical
-    record (doctors, nurses, matron only) and still cannot. BUILT, NOT LIVE
-    (needs his yes to the SQL): migration 20261112053852_pharmacy_sees_patient_
+    record (doctors, nurses, matron only) and still cannot. His yes: "pharmacy,
+    run the SQL" (2026-11-12). Shipped with: migration 20261112053852_pharmacy_sees_patient_
     medicines (a function that returns the medicines only, Pharmacy role only,
     each look written to the activity log) and a "Medicines this patient has
     taken" card on the patient's screen for the Pharmacy. Not built: "dispense
@@ -808,6 +808,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     about antenatal patients... I believe you've added those." Already LIVE
     since request 170 (migration 20261109170525): the antenatal booking card,
     tests, previous pregnancies, and the operation consent for every patient.
+
+185. **Master account admin again; testing without install cards; pitch names.**
+    (2026-11-12) "I mistakenly made myself a front desk without admin access...
+    make me an admin from the database, rhemamedical7@gmail.com, the director
+    is not around." Migration 20261112105211_master_account_admin (that one
+    email: role admin and the admin ticks). Testing was switched with
+    testing-role.yml. Also: the testing address no longer shows the install or
+    alerts cards (lib/brand/site.ts); live unchanged. Pitch names ready on
+    testing for his "go": MASCAP, then LANA (ops/pitch.json), then Rhema back.
+    Emergency: nurses swap with Nursing Station nurses, so he will add two rooms
+    in Admin > Rooms: "Nursing Station Emergency" (nursing) and "Consultant Room
+    Emergency" (consultation, so its doctor writes consultation notes). A person
+    has one room at a time; an admin moves them when they swap. Asked whether
+    nurses should switch their own room. MASCAP pitch: "forget mascap for now"
+    (testing stays Rhema).
 
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
