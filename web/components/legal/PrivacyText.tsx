@@ -20,6 +20,8 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 12 November: this device remembers the work emails that signed in on it
+// (request 182). A smaller note in section 3; LEGAL_VERSION stays.
 // 10 November: a doctor or nurse can email a patient their medical record,
 // to the email the patient gave (request 174). Section 6 says so. This is a
 // new promise to patients, not a new term for staff, so LEGAL_VERSION stays
@@ -28,7 +30,7 @@ import { BRAND } from '@/lib/brand/brand'
 export const LEGAL_EFFECTIVE = '9 November 2026'
 // 9 November: the providers are no longer named (his decision below). The
 // promises did not change, so LEGAL_VERSION stays and nobody re-agrees.
-export const LEGAL_UPDATED = '10 November 2026'
+export const LEGAL_UPDATED = '12 November 2026'
 // Saved with each staff agreement, so we know which words they agreed to.
 export const LEGAL_VERSION = '2026-11-08'
 
@@ -85,6 +87,11 @@ export default function PrivacyText() {
           which record).
         </li>
         <li>Messages between staff, and the devices that receive call alerts.</li>
+        <li>
+          A computer or phone remembers the work email addresses that signed in on it, so people do
+          not retype them. They stay on that device only, and anybody can remove one on the sign in
+          screen.
+        </li>
       </ul>
 
       <h2>4. Why we keep it, and on what lawful basis</h2>

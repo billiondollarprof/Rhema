@@ -786,6 +786,29 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Memory is emptied on sign out and on closing the app (his rule: nothing
     medical on disk; the 30 day patient copy on disk is unchanged).
 
+182. **The sign in screen remembers emails.** (2026-11-12) "On any computer,
+    make sure the system remembers the email addresses that have logged into
+    that computer... one person: it is already there. Three: a drop down...
+    so the person can choose their own email and log in." DONE: this device
+    keeps the work emails that signed in (lib/auth/known-emails.ts, emails
+    only, newest first, 10 at most, kept after sign out). The newest fills the
+    box; with two or more a drop down arrow lists them, each with Remove.
+    Privacy Policy section 3 says so (LEGAL_UPDATED 12 November).
+183. **The Pharmacy sees the medicines a patient has taken.** (2026-11-12)
+    "Patients do not remember their drugs... I want the pharmacist to be able
+    to see somebody's medical records of their medication: the ones they are
+    taking, suspended, stopped." Today the Pharmacy cannot open the medical
+    record (doctors, nurses, matron only) and still cannot. BUILT, NOT LIVE
+    (needs his yes to the SQL): migration 20261112053852_pharmacy_sees_patient_
+    medicines (a function that returns the medicines only, Pharmacy role only,
+    each look written to the activity log) and a "Medicines this patient has
+    taken" card on the patient's screen for the Pharmacy. Not built: "dispense
+    again" (a dispense needs a doctor's prescription).
+184. **Antenatal consent and extras.** (2026-11-12) "What the matron told me
+    about antenatal patients... I believe you've added those." Already LIVE
+    since request 170 (migration 20261109170525): the antenatal booking card,
+    tests, previous pregnancies, and the operation consent for every patient.
+
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
     they uploaded all the medicine that they normally give. Instead of
