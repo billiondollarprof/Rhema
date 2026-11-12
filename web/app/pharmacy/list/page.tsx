@@ -10,7 +10,8 @@
  * What is here, in order:
  *   1. lines doctors and nurses added, waiting for the Pharmacy to confirm;
  *   2. the starter list, to be checked once (confirm all, or one by one);
- *   3. add a medicine or supply, with one or more strengths;
+ *   3. add a medicine (or, on the Supplies tab, a supply such as a syringe or
+ *      plaster), with one or more strengths or sizes;
  *   4. the whole list, searched by the first letters, each line editable or
  *      switched off (never deleted).
  *
@@ -47,7 +48,9 @@ export default function MedicineListPage() {
   // The add form.
   const [newName, setNewName] = useState('')
   const [newStrengths, setNewStrengths] = useState('')
-  const [isSupply, setIsSupply] = useState(false)
+  // Medicines and supplies are two lists (Anthony, 2026-11-12: "anything
+  // that's not medicine should have its own list").
+  const [tab, setTab] = useState<'medicine' | 'item'>('medicine')
   // One line being corrected.
   const [editing, setEditing] = useState<number | null>(null)
   const [editName, setEditName] = useState('')
@@ -66,17 +69,18 @@ export default function MedicineListPage() {
     return () => window.clearTimeout(timer)
   }, [auth.status, reload])
 
+  const mine = useMemo(() => lines.filter((line) => line.kind === tab), [lines, tab])
   const pending = useMemo(
-    () => lines.filter((line) => line.status === 'pending' && line.is_active),
-    [lines],
+    () => mine.filter((line) => line.status === 'pending' && line.is_active),
+    [mine],
   )
   const starter = useMemo(() => lines.filter((line) => line.source === 'starter'), [lines])
-  const names = useMemo(() => groupMedicines(lines.filter((l) => l.status === 'standard')), [lines])
+  const names = useMemo(() => groupMedicines(mine.filter((l) => l.status === 'standard')), [mine])
   const shown = useMemo(() => findMedicines(names, search, 60), [names, search])
   // Switched off lines, shown to the Pharmacy only, to switch back on.
   const off = useMemo(
-    () => lines.filter((line) => line.status === 'standard' && !line.is_active),
-    [lines],
+    () => mine.filter((line) => line.status === 'standard' && !line.is_active),
+    [mine],
   )
 
   if (auth.status !== 'ready' || !client || !staff) return null
@@ -114,17 +118,11 @@ export default function MedicineListPage() {
       .filter(Boolean)
     await run(async () => {
       for (const strength of strengths.length ? strengths : [null]) {
-        const result = await addMedicine(
-          client,
-          newName.trim(),
-          strength,
-          isSupply ? 'item' : 'medicine',
-        )
+        const result = await addMedicine(client, newName.trim(), strength, tab)
         if (result) return result
       }
       setNewName('')
       setNewStrengths('')
-      setIsSupply(false)
       return null
     })
   }
@@ -133,9 +131,19 @@ export default function MedicineListPage() {
     <AppShell>
       <div className={styles.page}>
         <h2>Medicine list</h2>
+        {/* Two lists: medicines, and supplies such as syringes and plaster. */}
+        <div className={styles.segments} role="group" aria-label="Which list">
+          <button aria-pressed={tab === 'medicine'} onClick={() => setTab('medicine')}>
+            Medicines
+          </button>
+          <button aria-pressed={tab === 'item'} onClick={() => setTab('item')}>
+            Supplies
+          </button>
+        </div>
         <p className={styles.muted}>
-          Doctors and nurses pick from this list instead of typing. What you add here is standard
-          for everybody.
+          {tab === 'medicine'
+            ? 'Doctors and nurses pick from this list instead of typing. What you add here is standard for everybody.'
+            : 'Syringes, plaster and other things that are not drugs. Only the Pharmacy sees this list.'}
         </p>
         {problem ? <p className={styles.error}>{problem}</p> : null}
 
@@ -201,7 +209,7 @@ export default function MedicineListPage() {
         {/* ----- Add ----- */}
         <div className={styles.card}>
           <div className={styles.sectionHead}>
-            <b>Add a medicine or supply</b>
+            <b>{tab === 'medicine' ? 'Add a medicine' : 'Add a supply'}</b>
           </div>
           <div>
             <label className={styles.label} htmlFor="new-name">
@@ -218,7 +226,9 @@ export default function MedicineListPage() {
           </div>
           <div>
             <label className={styles.label} htmlFor="new-strengths">
-              Strengths (separate with commas)
+              {tab === 'medicine'
+                ? 'Strengths (separate with commas)'
+                : 'Sizes (separate with commas)'}
             </label>
             <input
               id="new-strengths"
@@ -228,14 +238,6 @@ export default function MedicineListPage() {
               onChange={(event) => setNewStrengths(event.target.value)}
             />
           </div>
-          <label>
-            <input
-              type="checkbox"
-              checked={isSupply}
-              onChange={(event) => setIsSupply(event.target.checked)}
-            />{' '}
-            This is a supply (syringe, gloves, and so on)
-          </label>
           <div className={styles.buttons}>
             <button
               className={`${styles.button} ${styles.primary}`}
