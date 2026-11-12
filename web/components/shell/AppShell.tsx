@@ -38,6 +38,7 @@ import { AttentionMenuContext } from '@/components/attention/AttentionContext'
 import AttentionMenu from '@/components/attention/AttentionMenu'
 import AgreementGate from '@/components/legal/AgreementGate'
 import OnboardingGate from '@/components/onboarding/OnboardingGate'
+import { onTestingSite } from '@/lib/brand/site'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Logo from '@/components/brand/Logo'
 import styles from './AppShell.module.css'
@@ -254,7 +255,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <AgreementGate client={client} staffId={staff.id} onDone={() => setAgreementDone(true)} />
 
         {/* ===== 6. Install and alerts, once per device (must-do cards) ===== */}
-        {agreementDone ? <OnboardingGate client={client} staffId={staff.id} /> : null}
+        {/* Not on the testing site: nobody is made to install it or turn on
+            alerts there (Anthony, 2026-11-12). */}
+        {agreementDone && !onTestingSite() ? (
+          <OnboardingGate client={client} staffId={staff.id} />
+        ) : null}
       </div>
     </AttentionMenuContext.Provider>
   )
