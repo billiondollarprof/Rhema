@@ -17,6 +17,7 @@
  */
 'use client'
 
+import OptionSelect from '@/components/options/OptionSelect'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -105,22 +106,28 @@ export function AllergiesSection({ client, staffId, patientId, record, reload }:
           <div className={styles.fields}>
             <div className={styles.field}>
               <label htmlFor="allergy-name">Allergic to</label>
-              <input
+              <OptionSelect
+                client={client}
+                staffId={staffId}
+                list="allergen"
                 id="allergy-name"
-                className={styles.input}
-                placeholder="e.g. Penicillin"
                 value={allergen}
-                onChange={(e) => setAllergen(e.target.value)}
+                onChange={setAllergen}
+                placeholder="Choose what it is"
+                otherLabel="Type what the patient is allergic to"
               />
             </div>
             <div className={styles.field}>
               <label htmlFor="allergy-reaction">Reaction</label>
-              <input
+              <OptionSelect
+                client={client}
+                staffId={staffId}
+                list="reaction"
                 id="allergy-reaction"
-                className={styles.input}
-                placeholder="e.g. Rash"
                 value={reaction}
-                onChange={(e) => setReaction(e.target.value)}
+                onChange={setReaction}
+                placeholder="Choose the reaction (optional)"
+                otherLabel="Type the reaction"
               />
             </div>
           </div>
@@ -220,12 +227,15 @@ export function ConditionsSection({ client, staffId, patientId, record, reload }
         <div className={styles.form}>
           <div className={styles.field}>
             <label htmlFor="condition-name">Condition</label>
-            <input
+            <OptionSelect
+              client={client}
+              staffId={staffId}
+              list="condition"
               id="condition-name"
-              className={styles.input}
-              placeholder="e.g. Hypertension"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={setName}
+              placeholder="Choose the condition"
+              otherLabel="Type the condition"
             />
           </div>
           {problem ? <p className={styles.error}>{problem}</p> : null}

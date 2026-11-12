@@ -15,11 +15,12 @@ import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
+import OptionSelect from '@/components/options/OptionSelect'
 import styles from '../_parts/pharmacy.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import { getPatient, type PatientResult } from '@/lib/patients/patients'
-import { HOW_OFTEN, prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
+import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -227,31 +228,31 @@ function Prescribe() {
                     <label className={styles.label} htmlFor={`dose-${index}`}>
                       Dose
                     </label>
-                    <input
+                    <OptionSelect
+                      client={client}
+                      staffId={staff.id}
+                      list="dose"
                       id={`dose-${index}`}
-                      className={styles.input}
-                      placeholder="2 tablets"
-                      maxLength={120}
                       value={draft.dose}
-                      onChange={(event) => change(index, 'dose', event.target.value)}
+                      onChange={(value) => change(index, 'dose', value)}
+                      placeholder="Choose the dose"
+                      otherLabel="Type the dose"
                     />
                   </div>
                   <div className={styles.wide}>
-                    <span className={styles.label}>How often</span>
-                    <div className={styles.chips}>
-                      {HOW_OFTEN.map((words) => (
-                        <button
-                          key={words}
-                          className={styles.chip}
-                          aria-pressed={draft.how_often === words}
-                          onClick={() =>
-                            change(index, 'how_often', draft.how_often === words ? '' : words)
-                          }
-                        >
-                          {words}
-                        </button>
-                      ))}
-                    </div>
+                    <label className={styles.label} htmlFor={`often-${index}`}>
+                      How often
+                    </label>
+                    <OptionSelect
+                      client={client}
+                      staffId={staff.id}
+                      list="frequency"
+                      id={`often-${index}`}
+                      value={draft.how_often}
+                      onChange={(value) => change(index, 'how_often', value)}
+                      placeholder="Choose how often"
+                      otherLabel="Type how often"
+                    />
                   </div>
                   <div>
                     <label className={styles.label} htmlFor={`days-${index}`}>

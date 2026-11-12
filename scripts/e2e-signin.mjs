@@ -327,8 +327,9 @@ try {
 
   step('She adds a severe allergy; the banner turns red')
   await page.getByRole('button', { name: '+ Add an allergy' }).click()
-  await page.getByLabel('Allergic to', { exact: true }).fill('Penicillin')
-  await page.getByLabel('Reaction', { exact: true }).fill('Rash')
+  // Picked from the lists (2026-11-12), not typed.
+  await page.getByLabel('Allergic to', { exact: true }).selectOption('Penicillin')
+  await page.getByLabel('Reaction', { exact: true }).selectOption('Rash')
   await page.getByLabel('Severe reaction').check()
   await page.getByRole('button', { name: 'Add allergy' }).click()
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
@@ -338,8 +339,8 @@ try {
   await page.getByPlaceholder('Type the first letters').fill('Amlo')
   await page.getByRole('option', { name: 'Amlodipine' }).click()
   await page.getByRole('button', { name: '5 mg tablet' }).click()
-  await page.getByLabel('Dose', { exact: true }).fill('1 tablet')
-  await page.getByLabel('How often').fill('Once daily')
+  await page.getByLabel('Dose', { exact: true }).selectOption('1 tablet')
+  await page.getByLabel('How often').selectOption('Once daily')
   await page.getByRole('button', { name: 'Add medicine' }).click()
   await page.getByText('Amlodipine 5 mg tablet', { exact: true }).waitFor()
   await page.getByRole('button', { name: 'Suspend', exact: true }).click()
@@ -368,6 +369,15 @@ try {
     .getByRole('option', { name: /Zorbex/ })
     .getByText('Yours, waiting for the Pharmacy')
     .waitFor()
+  await page.getByRole('button', { name: 'Cancel' }).last().click()
+
+  // The Other way for a dose: typed once, kept in her own list.
+  step('A dose not in the list is added with Other, and is in her list after')
+  await page.getByRole('button', { name: '+ Record a dose not on the list' }).click()
+  await page.getByLabel('Dose', { exact: true }).selectOption({ label: 'Other…' })
+  await page.getByPlaceholder('Type the dose').fill('7 ml')
+  await page.getByRole('button', { name: 'Add and use' }).click()
+  await page.getByLabel('Dose', { exact: true }).selectOption('7 ml')
   await page.getByRole('button', { name: 'Cancel' }).last().click()
 
   step('She gives a dose; it shows with her name')

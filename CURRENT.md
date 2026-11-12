@@ -824,6 +824,28 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     nurses should switch their own room. MASCAP pitch: "forget mascap for now"
     (testing stays Rhema).
 
+186. **Pick lists for almost everything repetitive.** (2026-11-12) "The
+    medication samples aren't up to 112... you didn't add the picker for dosage...
+    plaster and syringes are not drugs, they should have their own list...
+    doses should have a list to pick from and others, just like strength; same
+    with frequency; the allergies should follow the same pattern... virtually
+    everything repetitive, so they will have just little to write; when they
+    choose other, they can type by hand, and notes by hand. The aim is to
+    reduce what they type by hand."
+    SUPPLIES: LIVE-ready (no database change): the medicine picker shows
+    medicines only; the Pharmacy page has Medicines and Supplies tabs.
+    ON THE 112: the starter list is 112 LINES (a name and a strength each) but
+    70 names (64 medicines, 6 supplies); the picker shows names.
+    PICK LISTS BUILT, NOT LIVE (needs his yes to the SQL): migration
+    20261112114324_pick_options (93 starter lines: dose 24, how often 13,
+    allergen 24, reaction 12, condition 20; typed lines kept per person, standard
+    when a second person types the same; a person can remove their own), the
+    drop down with Other (components/options), used for dose and how often on
+    Prescribe, Add a medicine, Give dose, Edit medicine, Record a dose; allergen,
+    reaction and condition on the record. NEXT, not built: next of kin
+    relationship and the State on the registration card; other repetitive
+    fields he may name.
+
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
     they uploaded all the medicine that they normally give. Instead of
