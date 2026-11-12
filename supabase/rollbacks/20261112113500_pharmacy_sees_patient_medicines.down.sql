@@ -1,5 +1,5 @@
 -- =============================================================================
--- Undo for 20261112053852_pharmacy_sees_patient_medicines.sql
+-- Undo for 20261112113500_pharmacy_sees_patient_medicines.sql
 --
 -- Takes the Pharmacy's view of a patient's medicines away. Nothing saved is
 -- lost; the lines already written to the activity log stay.
