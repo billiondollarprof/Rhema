@@ -44,6 +44,9 @@ type Props = {
   strength: string
   onChange: (name: string, strength: string) => void
   placeholder?: string
+  // Medicines and supplies (syringes, plaster) are two lists (Anthony,
+  // 2026-11-12: "anything that's not medicine should have its own list").
+  kind?: 'medicine' | 'item'
 }
 
 export default function MedicinePicker({
@@ -54,13 +57,13 @@ export default function MedicinePicker({
   strength,
   onChange,
   placeholder = 'Type the first letters',
+  kind = 'medicine',
 }: Props) {
   const [lines, setLines] = useState<MedicineLine[]>(() => knownMedicines(staffId))
   const [typed, setTyped] = useState('')
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [newStrength, setNewStrength] = useState('')
-  const [isSupply, setIsSupply] = useState(false)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
 
@@ -75,7 +78,10 @@ export default function MedicinePicker({
     }
   }, [client, staffId])
 
-  const names = useMemo(() => groupMedicines(lines), [lines])
+  const names = useMemo(
+    () => groupMedicines(lines.filter((line) => line.kind === kind)),
+    [lines, kind],
+  )
   const matches = useMemo(() => findMedicines(names, typed), [names, typed])
   const picked = names.find((entry) => entry.name.toLowerCase() === name.toLowerCase())
 
@@ -86,12 +92,7 @@ export default function MedicinePicker({
     }
     setBusy(true)
     setProblem(null)
-    const result = await addMedicine(
-      client,
-      newName.trim(),
-      newStrength.trim() || null,
-      isSupply ? 'item' : 'medicine',
-    )
+    const result = await addMedicine(client, newName.trim(), newStrength.trim() || null, kind)
     const fresh = await loadMedicines(client, staffId)
     if (fresh) setLines(fresh)
     setBusy(false)
@@ -132,14 +133,6 @@ export default function MedicinePicker({
           value={newStrength}
           onChange={(event) => setNewStrength(event.target.value)}
         />
-        <label>
-          <input
-            type="checkbox"
-            checked={isSupply}
-            onChange={(event) => setIsSupply(event.target.checked)}
-          />{' '}
-          This is a supply (syringe, gloves, and so on)
-        </label>
         <p className={styles.hint}>
           It goes in the list for you. The Pharmacy confirms it for everybody.
         </p>
