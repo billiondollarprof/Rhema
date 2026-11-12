@@ -809,6 +809,16 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     since request 170 (migration 20261109170525): the antenatal booking card,
     tests, previous pregnancies, and the operation consent for every patient.
 
+185. **Master account admin again; testing without install cards; pitch names.**
+    (2026-11-12) "I mistakenly made myself a front desk without admin access...
+    make me an admin from the database, rhemamedical7@gmail.com, the director
+    is not around." Migration 20261112105211_master_account_admin (that one
+    email: role admin and the admin ticks). Testing was switched with
+    testing-role.yml. Also: the testing address no longer shows the install or
+    alerts cards (lib/brand/site.ts); live unchanged. Pitch names ready on
+    testing for his "go": MASCAP, then LANA (ops/pitch.json), then Rhema back.
+    Asked: should the Emergency Room be a nursing station or a consultant room?
+
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
     they uploaded all the medicine that they normally give. Instead of
