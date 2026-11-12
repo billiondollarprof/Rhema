@@ -836,7 +836,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     medicines only; the Pharmacy page has Medicines and Supplies tabs.
     ON THE 112: the starter list is 112 LINES (a name and a strength each) but
     70 names (64 medicines, 6 supplies); the picker shows names.
-    PICK LISTS BUILT, NOT LIVE (needs his yes to the SQL): migration
+    His yes (2026-11-12): "it's run the SQL, and the same for the registration,
+    the front desk. For the lab, the same as well. The pharmacy, find more drugs
+    ... software like Swift comes already populated... go online and search."
+    PICK LISTS shipped with migration
     20261112114324_pick_options (93 starter lines: dose 24, how often 13,
     allergen 24, reaction 12, condition 20; typed lines kept per person, standard
     when a second person types the same; a person can remove their own), the
