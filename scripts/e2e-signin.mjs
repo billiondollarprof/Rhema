@@ -377,7 +377,9 @@ try {
   await page.getByLabel('Dose', { exact: true }).selectOption({ label: 'Other…' })
   await page.getByPlaceholder('Type the dose').fill('7 ml')
   await page.getByRole('button', { name: 'Add and use' }).click()
-  await page.getByLabel('Dose', { exact: true }).selectOption('7 ml')
+  // Saved to her list, then the drop down is back with it chosen.
+  await page.locator('select#given-dose').waitFor()
+  await page.waitForFunction(() => document.querySelector('select#given-dose')?.value === '7 ml')
   await page.getByRole('button', { name: 'Cancel' }).last().click()
 
   step('She gives a dose; it shows with her name')
