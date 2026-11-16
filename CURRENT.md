@@ -849,6 +849,32 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+217. **Download our data, a review of today, then simplicity.** (2026-11-16)
+    a. "Download our data: if you've checked it and everything checks out,
+       then you go on with it."
+    b. "Go through what you've done today in the last 24 hours... one after
+       the other. Check anything that is not in order, anything that drifted...
+       anything we've not run the SQL, then correct it."
+    c. Simplicity: "when it comes to inputting data, the steps they follow, the
+       arrangement seems to be a little bit cumbersome... look at how other
+       tools designed it (Swift, Helium, Neon, the US and India ones)... profile
+       a restructuring... so that the consultation notes, every section they
+       are working on... how they enter patient data, how they check patient
+       medical history, everything is seamless... both the doctors and the
+       nurses. After we do it now, it becomes easier to sell to other
+       hospitals."
+    The director's voice note (transcribed by Anthony): in his consulting room
+    "there is no proper place where I can write my medical findings... where I
+    can write the patient's symptoms, examination findings, then diagnosis,
+    then treatment plan... The only place I saw there is notes... my clinical
+    patient history... a place for patient's review, another for treatment
+    plan, so that when I forward it to the nurses... they will follow the
+    treatment plan." Nurses: "medication, the time given, the nurse that gave
+    it, the dose... like a column... something like a spreadsheet where they can
+    record... so-so drug given at so-so time, so-so dose by so-so person. So
+    that any person that comes around will see it." Picking drug, then
+    milligram, then dosage to record a dose "will more difficult".
+
 216. **History: his answers and the front desk's real need.** (2026-11-16)
     "Yes, admin 3 card fees." "The front desk... when they click history,
     they are seeing the payments. The admin is seeing the same thing... all
