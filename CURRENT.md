@@ -849,6 +849,29 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+196. **Big batch, 2026-11-16 (his permission: "when you are done and you see that
+    everything is okay, run the SQL that is needed to lock it in").**
+    a. Lab: "take what is in Swift practice EMR and add it... later when I bring
+       the list, check if any is missing... rewrite it the way our list is."
+    b. Pharmacy: "add them, the starter list, all of it... add the milligram for
+       picker... the dosage as well."
+    c. Register from old file: "add the other fields but collapse them (address,
+       next of kin and the others)." And: "a doctor can still view and add medical
+       records to old patients, the way a normally registered patient would be."
+    d. "Check every other section for where we would add pickers... organize each
+       section... let every other page be as simple and well organized as Home, in
+       landscape or portrait."
+    e. Home buttons: "an admin who is also front desk or doctor: if a button could
+       repeat itself, just one button... no point having that Invite staff big
+       button anymore (it is in the sidebar)... announcements: put it inside
+       Messages, an Announce button at the top for those who can announce... the
+       front page will not have more than four buttons."
+    f. Old files from photos: "we upload into Google Drive, then you look at the
+       Google Drive and pick the major information and attach the file to each."
+       Typed records from another hospital's software are easier (a file).
+    g. Dark mode: "some of the nurses are complaining that it's too bright."
+    h. "Every picker with a long list: a search where they type the first letter."
+
 187. **Open a patient from the queue.** (2026-11-16) "After calling in a
     patient, at the patient queue they should be able to click on the patient
     and open the profile." LIVE 2026-11-16: an Open patient button on each
