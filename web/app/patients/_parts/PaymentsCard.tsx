@@ -13,6 +13,7 @@
 'use client'
 
 import Link from 'next/link'
+import { CARD_ITEM, CONSULTATION_ITEM, loadPrices, priceOf, type Price } from '@/lib/prices/prices'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
@@ -68,6 +69,29 @@ export default function PaymentsCard({
     }
   }, [client, patientId])
 
+  // The price list (Settings, 2026-11-16): a card or consultation line
+  // starts with its listed price, which the Front Desk can still change.
+  const [prices, setPrices] = useState<Price[]>([])
+  useEffect(() => {
+    let current = true
+    loadPrices(client).then((found) => {
+      if (current && found) setPrices(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client])
+
+  function listedPrice(purpose: PaymentPurpose): string {
+    const amount =
+      purpose === 'consultation'
+        ? priceOf(prices, 'consultation', CONSULTATION_ITEM)
+        : purpose === 'registration_card'
+          ? priceOf(prices, 'card', CARD_ITEM)
+          : undefined
+    return amount ? String(amount) : ''
+  }
+
   // ===== 2. Take a payment =====
   const amounts = lines.map((line) => readNaira(line.price))
   const total = amounts.reduce((sum, amount) => sum + amount, 0)
@@ -78,7 +102,9 @@ export default function PaymentsCard({
     setPurpose(next)
     // A first line named after what is being paid for, if none is typed yet.
     setLines((all) =>
-      all.length === 1 && !all[0].price ? [{ label: PURPOSE_WORDS[next], price: '' }] : all,
+      all.length === 1 && (!all[0].price || all[0].price === listedPrice(purpose))
+        ? [{ label: PURPOSE_WORDS[next], price: listedPrice(next) }]
+        : all,
     )
   }
 
@@ -219,6 +245,12 @@ export default function PaymentsCard({
             onClick={() => {
               setJustTaken(null)
               setTaking(true)
+              // Start with the listed price, if the line is still empty.
+              setLines((all) =>
+                all.length === 1 && !all[0].price
+                  ? [{ ...all[0], price: listedPrice(purpose) }]
+                  : all,
+              )
             }}
           >
             Take payment

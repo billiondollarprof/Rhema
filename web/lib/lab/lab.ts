@@ -13,6 +13,7 @@
  * list. Never decide here who may do what.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { COMMON_LAB_TESTS } from './catalogue'
 
 // ===== 1. Shapes and words =====
 export type LabStatus = 'awaiting_payment' | 'awaiting_test' | 'completed' | 'voided'
@@ -43,14 +44,8 @@ export type LabResult = {
   recorder: { full_name: string } | null
 }
 
-// The demo's common tests, in its order.
-export const COMMON_TESTS = [
-  'Full Blood Count',
-  'Malaria test',
-  'Urinalysis',
-  'Blood sugar',
-  'Pregnancy scan',
-]
+// The Laboratory's most asked tests, one tap away (request 202, 2026-11-16).
+export const COMMON_TESTS = COMMON_LAB_TESTS
 
 export const STATUS_WORDS: Record<LabStatus, string> = {
   awaiting_payment: 'Waiting for payment',

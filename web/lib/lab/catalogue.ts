@@ -1,41 +1,47 @@
 /*
- * lib/lab/catalogue.ts: every lab test the hospital usually does, by
- * section, with the boxes the Laboratory fills in for each one.
+ * lib/lab/catalogue.ts: every lab test the Laboratory does, by section, with
+ * the boxes the Laboratory fills in for each one.
  *
- * Why: Anthony, 2026-11-16 (request 196a): "take what is in Swift practice
- * EMR and add it... later when I bring the list, check if anyone is
- * missing... rewrite it the way our list is." This is a standard test menu
- * for a Nigerian hospital laboratory, written from general knowledge, until
- * the hospital's own list arrives. Then this file is changed to match it.
+ * Why: Anthony, 2026-11-16. First (request 196a) a standard menu from
+ * general knowledge, "later when I bring the list, check if anyone is
+ * missing... rewrite it the way our list is." Then (request 202) he sent the
+ * Laboratory's own past reports. This file now follows that list: the
+ * Laboratory's tests, its own order of fields, its units (mg/dl for the
+ * chemistry) and its normal ranges, and its own result words (for example
+ * "Trophozoites of P. falciparum seen (+)" and "Non reactive for HIV 1 & 2").
+ * Tests the reports did not show are kept further down each section, so a
+ * test the Laboratory adds later is already there.
  *
  * How it is used:
- *   - Request lab: search every test by its first letters, or browse a
- *     section. A test that is not here can still be typed and added.
+ *   - Request lab: the Laboratory's most asked tests are one tap away
+ *     (COMMON_LAB_TESTS); every other test is in one drop down with a search
+ *     box. A test that is not here is typed with Other.
  *   - Enter results: a test found here shows its own boxes (a number with
- *     its unit and usual range, or a pick such as Negative or +). What is
- *     filled in is written as plain lines of text, which is what the record
- *     already shows. A test not found here keeps the one free text box.
- *
- * The usual ranges are a guide for adults. Each laboratory's own ranges win,
- * and they come with the hospital's list.
+ *     its unit and normal range, or a pick such as Negative or +, always with
+ *     Other to type something else). What is filled in is written as plain
+ *     lines of text, which is what the record already shows. A test not found
+ *     here keeps the one free text box.
  *
  * Never: decide a diagnosis, or mark a value as good or bad. It only writes
- * what the Laboratory entered, with the unit and the usual range beside it.
+ * what the Laboratory entered, with the unit and the normal range beside it.
+ * Never: put anything about a real patient in this file.
  */
 
 // ===== 1. Shapes =====
 // A box for one value. A number has a unit; a pick has choices; anything
-// else is a short line of text.
+// else is a short line of text. A heading starts a group of boxes, such as
+// "Sensitivity" or "Urinalysis", on the screen and in the result.
 export type LabField = {
   name: string
   unit?: string
   range?: string
   choices?: string[]
+  heading?: string
 }
 
 export type LabTest = {
   name: string
-  // Other names people search by, such as FBC or E/U/Cr.
+  // Other names people search by, such as FBC or E/U/Cr, and old names.
   also?: string[]
   fields: LabField[]
 }
@@ -45,35 +51,125 @@ export type LabSection = {
   tests: LabTest[]
 }
 
-// ===== 2. Words used by many tests =====
+// ===== 2. Words the Laboratory uses on many reports =====
 const POS_NEG = ['Negative', 'Positive']
+const PREGNANCY = ['Negative', 'Positive', 'Faintly positive']
+const HIV = [
+  'Non reactive for HIV 1 & 2',
+  'Reactive for HIV 1',
+  'Reactive for HIV 2',
+  'Reactive for HIV 1 & 2',
+]
 const REACTIVE = ['Non reactive', 'Reactive']
-const DIPSTICK = ['Nil', 'Trace', '+', '++', '+++']
-const GROWTH = ['No growth after 48 hours', 'Growth seen']
-const TITRE = ['Below 1/20', '1/20', '1/40', '1/80', '1/160', '1/320']
+const BLOOD_GROUPS = [
+  'A Rh D positive',
+  'A Rh D negative',
+  'B Rh D positive',
+  'B Rh D negative',
+  'AB Rh D positive',
+  'AB Rh D negative',
+  'O Rh D positive',
+  'O Rh D negative',
+]
+const GENOTYPES = ['AA', 'AS', 'AC', 'SS', 'SC', 'CC']
+const MALARIA = [
+  'No malaria parasite seen',
+  'Trophozoites of P. falciparum seen (+)',
+  'Trophozoites of P. falciparum seen (++)',
+  'Trophozoites of P. falciparum seen (+++)',
+  'Trophozoites of P. falciparum seen (++++)',
+]
+const DIPSTICK = ['Nil', 'Negative', 'Trace', 'Small', '+', '++', '+++', '++++']
+const PER_HPF = ['Nil', '0-1/hpf', '1-2/hpf', '2-3/hpf', '3-4/hpf', '4-5/hpf', '5-10/hpf', 'Many']
+const AMOUNT = ['Nil', '+', '++', '+++', 'Many']
+const GROWTH = [
+  'No growth after 24 hours of incubation',
+  'No growth after 48 hours of incubation',
+  'Scanty growth',
+  'Moderate growth',
+  'Heavy growth',
+]
+const ORGANISMS = [
+  'Staphylococcus spp',
+  'Candida albicans',
+  'Proteus spp',
+  'E. coli',
+  'Klebsiella spp',
+  'Pseudomonas spp',
+  'Streptococcus spp',
+]
+const SENSITIVITY = ['3+', '2+', '+', 'R']
+// The antibiotics on the Laboratory's sensitivity panel, in its order.
+const ANTIBIOTICS = [
+  'Ciprofloxacin',
+  'Norfloxacin',
+  'Gentamicin',
+  'Amoxicillin (Amoxil)',
+  'Streptomycin',
+  'Rifampicin',
+  'Erythromycin',
+  'Chloramphenicol',
+  'Ampiclox',
+  'Levofloxacin',
+  'Pefloxacin',
+]
+const TITRE = ['1/20', '1/40', '1/80', '1/160', '1/320']
+const WIDAL_COMMENTS = [
+  'Insignificant titre obtained.',
+  'Titres above 1/160 are considered significant for possible enteric fever and would require stool or blood culture for confirmatory diagnosis.',
+]
 
-// One culture test: what was seen, what grew, and what works against it.
+// The boxes shared by tests.
+const PCV_BOX: LabField = { name: 'PCV', unit: '%', range: 'M 40 to 54, F 36 to 46' }
+const URINALYSIS_BOXES: LabField[] = [
+  { name: 'Appearance', choices: ['Clear', 'Slightly turbid', 'Turbid', 'Cloudy'] },
+  { name: 'Colour', choices: ['Straw', 'Pale yellow', 'Amber', 'Dark yellow', 'Red', 'Whitish'] },
+  { name: 'pH', range: '4.5 to 8.0' },
+  { name: 'Specific gravity (S.G)', range: '1.005 to 1.030' },
+  { name: 'Protein', choices: DIPSTICK },
+  { name: 'Glucose', choices: DIPSTICK },
+  { name: 'Ketones', choices: DIPSTICK },
+  { name: 'Blood', choices: DIPSTICK },
+  { name: 'Bilirubin', choices: DIPSTICK },
+  { name: 'Urobilinogen', choices: ['Normal', '+', '++', '+++'] },
+  { name: 'Nitrite', choices: POS_NEG },
+  { name: 'Leukocytes', choices: DIPSTICK },
+  { name: 'Others', choices: ['Nil'] },
+]
+
+// The sensitivity panel: one pick per antibiotic, under one heading.
+function sensitivityBoxes(): LabField[] {
+  return ANTIBIOTICS.map((name, at) => ({
+    name,
+    choices: SENSITIVITY,
+    heading: at === 0 ? 'Sensitivity' : undefined,
+  }))
+}
+
+// A culture (M/C/S): microscopy, what grew, and the sensitivity panel.
 function culture(name: string, also: string[] = []): LabTest {
   return {
     name,
     also,
     fields: [
-      { name: 'Appearance' },
-      { name: 'Microscopy' },
-      { name: 'Culture', choices: GROWTH },
-      { name: 'Organism' },
-      { name: 'Sensitive to' },
-      { name: 'Resistant to' },
+      { name: 'Pus cells', choices: PER_HPF, heading: 'Microscopy' },
+      { name: 'Epithelial cells', choices: PER_HPF },
+      { name: 'Red cells', choices: PER_HPF },
+      { name: 'Yeast cells', choices: AMOUNT },
+      { name: 'Growth', choices: GROWTH, heading: 'Isolation' },
+      { name: 'Organism', choices: ORGANISMS },
+      { name: 'Second organism', choices: ORGANISMS },
+      ...sensitivityBoxes(),
     ],
   }
 }
 
-// One hormone or single value test.
+// One value with its unit.
 function single(name: string, unit: string, range?: string, also: string[] = []): LabTest {
   return { name, also, fields: [{ name: 'Result', unit, range }] }
 }
 
-// One positive or negative test.
+// One pick, such as Negative or Positive.
 function screen(name: string, choices: string[], also: string[] = []): LabTest {
   return { name, also, fields: [{ name: 'Result', choices }] }
 }
@@ -84,73 +180,88 @@ function report(name: string, also: string[] = []): LabTest {
 }
 
 // ===== 3. The sections and their tests =====
+// The Laboratory's own tests come first in each section, most asked first.
 export const LAB_SECTIONS: LabSection[] = [
   {
-    name: 'Haematology',
+    name: 'Screening panels',
     tests: [
       {
-        name: 'Full Blood Count',
-        also: ['FBC', 'CBC', 'Complete blood count', 'Blood count'],
+        // The antenatal booking tests, as one request (asked most of all).
+        name: 'Antenatal Screening (ANC)',
+        also: ['ANC', 'Antenatal', 'Booking tests'],
         fields: [
-          { name: 'Haemoglobin (Hb)', unit: 'g/dL', range: '11.5 to 16.5' },
-          { name: 'Packed cell volume (PCV)', unit: '%', range: '35 to 50' },
-          { name: 'White cells (WBC)', unit: 'x10⁹/L', range: '4.0 to 11.0' },
-          { name: 'Neutrophils', unit: '%', range: '40 to 75' },
-          { name: 'Lymphocytes', unit: '%', range: '20 to 45' },
-          { name: 'Monocytes', unit: '%', range: '2 to 10' },
-          { name: 'Eosinophils', unit: '%', range: '1 to 6' },
-          { name: 'Basophils', unit: '%', range: '0 to 1' },
-          { name: 'Platelets', unit: 'x10⁹/L', range: '150 to 400' },
-          { name: 'Red cells (RBC)', unit: 'x10¹²/L', range: '3.8 to 5.8' },
-          { name: 'MCV', unit: 'fL', range: '80 to 100' },
-          { name: 'MCH', unit: 'pg', range: '27 to 32' },
-          { name: 'MCHC', unit: 'g/dL', range: '32 to 36' },
+          PCV_BOX,
+          { name: 'RVS', choices: HIV },
+          { name: 'Hepatitis B (HBsAg)', choices: POS_NEG },
+          { name: 'Hepatitis C (HCV)', choices: POS_NEG },
+          { name: 'Blood group', choices: BLOOD_GROUPS },
+          { name: 'Genotype', choices: GENOTYPES },
+          { name: 'VDRL', choices: POS_NEG },
+          ...URINALYSIS_BOXES.map((box, at) =>
+            at === 0 ? { ...box, heading: 'Urinalysis' } : box,
+          ),
         ],
       },
-      single('Packed Cell Volume', '%', '35 to 50', ['PCV', 'Haematocrit']),
-      single('Haemoglobin', 'g/dL', '11.5 to 16.5', ['Hb']),
-      single('White Blood Cell Count', 'x10⁹/L', '4.0 to 11.0', ['WBC', 'Total white count']),
       {
-        name: 'White Cell Differential',
-        also: ['Differential count'],
+        name: 'Medical Screening',
+        also: ['Screening', 'Pre employment', 'Fitness'],
         fields: [
-          { name: 'Neutrophils', unit: '%', range: '40 to 75' },
-          { name: 'Lymphocytes', unit: '%', range: '20 to 45' },
-          { name: 'Monocytes', unit: '%', range: '2 to 10' },
-          { name: 'Eosinophils', unit: '%', range: '1 to 6' },
-          { name: 'Basophils', unit: '%', range: '0 to 1' },
+          PCV_BOX,
+          { name: 'RVS', choices: HIV },
+          { name: 'Hepatitis B (HBsAg)', choices: POS_NEG },
+          { name: 'Hepatitis C (HCV)', choices: POS_NEG },
         ],
       },
-      single('Platelet Count', 'x10⁹/L', '150 to 400', ['Platelets']),
+    ],
+  },
+  {
+    name: 'Blood (haematology)',
+    tests: [
+      single('PCV', '%', 'M 40 to 54, F 36 to 46', [
+        'Packed Cell Volume',
+        'PCV test',
+        'Haematocrit',
+      ]),
+      screen('Malaria Parasite (MP)', MALARIA, [
+        'MP',
+        'Malaria test',
+        'Malaria',
+        'Blood film for malaria',
+      ]),
+      {
+        name: 'Full Blood Count (FBC)',
+        also: ['FBC', 'Full Blood Count', 'CBC', 'Complete blood count', 'FBC test'],
+        fields: [
+          { name: 'WBC', unit: 'x10³/mm³', range: '4 to 10' },
+          { name: 'Lymphocytes', unit: '%', range: '20 to 40' },
+          { name: 'Neutrophils', unit: '%', range: '50 to 70' },
+          PCV_BOX,
+          { name: 'HB', unit: 'g/dl', range: 'M 14 to 18, F 12 to 14' },
+          { name: 'MID', unit: '%', range: '1 to 15' },
+          { name: 'MCV', unit: 'fl', range: '80 to 99' },
+          { name: 'MCH', unit: 'pg', range: '26 to 32' },
+          { name: 'MCHC', unit: 'g/dl', range: '32 to 36' },
+          { name: 'Platelets', unit: 'x10³/mm³', range: '100 to 300' },
+          { name: 'RBC', unit: 'x10⁶/mcl', range: '4.2 to 6.1' },
+        ],
+      },
+      screen('Blood Group', BLOOD_GROUPS, ['Bloodgroup', 'Blood grouping', 'Rhesus', 'BG']),
+      screen('Genotype', GENOTYPES, ['Haemoglobin Genotype', 'Hb genotype', 'Hb electrophoresis']),
+      single('Haemoglobin (HB)', 'g/dl', 'M 14 to 18, F 12 to 14', ['Hb', 'Haemoglobin']),
       single('ESR', 'mm/hour', '0 to 20', ['Erythrocyte sedimentation rate']),
-      single('Reticulocyte Count', '%', '0.5 to 2.5', ['Retic']),
-      {
-        name: 'Blood Group and Rhesus',
-        also: ['Blood group', 'Grouping', 'Rhesus'],
-        fields: [
-          { name: 'Blood group', choices: ['A', 'B', 'AB', 'O'] },
-          { name: 'Rhesus', choices: ['Positive', 'Negative'] },
-        ],
-      },
-      screen(
-        'Haemoglobin Genotype',
-        ['AA', 'AS', 'AC', 'SS', 'SC', 'CC'],
-        ['Genotype', 'Hb electrophoresis'],
-      ),
       screen('Sickling Test', POS_NEG, ['Sickle cell test']),
       {
         name: 'Grouping and Cross Matching',
         also: ['Cross match', 'Crossmatch', 'Blood transfusion'],
         fields: [
-          { name: 'Blood group', choices: ['A', 'B', 'AB', 'O'] },
-          { name: 'Rhesus', choices: ['Positive', 'Negative'] },
+          { name: 'Blood group', choices: BLOOD_GROUPS },
           { name: 'Cross match', choices: ['Compatible', 'Not compatible'] },
           { name: 'Units ready' },
         ],
       },
       {
         name: 'Clotting Profile',
-        also: ['PT', 'INR', 'APTT', 'Coagulation'],
+        also: ['PT INR', 'INR', 'APTT', 'Coagulation', 'Prothrombin time'],
         fields: [
           { name: 'Prothrombin time (PT)', unit: 'seconds', range: '11 to 15' },
           { name: 'INR', range: '0.8 to 1.2' },
@@ -169,42 +280,47 @@ export const LAB_SECTIONS: LabSection[] = [
     ],
   },
   {
-    name: 'Parasitology',
+    name: 'Serology (rapid tests)',
     tests: [
       {
-        name: 'Malaria test',
-        also: ['Malaria parasite', 'MP', 'Blood film for malaria', 'Thick and thin film'],
+        name: 'Widal Test',
+        also: ['Widal', 'Typhoid test'],
         fields: [
-          { name: 'Malaria parasite', choices: ['Not seen', '+', '++', '+++', '++++'] },
-          {
-            name: 'Species',
-            choices: [
-              'Plasmodium falciparum',
-              'Plasmodium malariae',
-              'Plasmodium ovale',
-              'Plasmodium vivax',
-              'Mixed',
-            ],
-          },
+          { name: 'S. typhi D, O antigen', choices: TITRE, heading: 'Agglutination titres' },
+          { name: 'S. typhi D, H antigen', choices: TITRE },
+          { name: 'Paratyphi A, O antigen', choices: TITRE },
+          { name: 'Paratyphi A, H antigen', choices: TITRE },
+          { name: 'Paratyphi B, O antigen', choices: TITRE },
+          { name: 'Paratyphi B, H antigen', choices: TITRE },
+          { name: 'Paratyphi C, O antigen', choices: TITRE },
+          { name: 'Paratyphi C, H antigen', choices: TITRE },
+          { name: 'Comment on titres', choices: WIDAL_COMMENTS },
         ],
       },
-      screen('Malaria Rapid Test', POS_NEG, ['RDT', 'mRDT']),
-      {
-        name: 'Stool Microscopy',
-        also: ['Stool analysis', 'Stool for ova and cysts', 'Stool O/C'],
-        fields: [
-          {
-            name: 'Appearance',
-            choices: ['Formed', 'Semi formed', 'Loose', 'Watery', 'Mucoid', 'Bloody'],
-          },
-          { name: 'Ova or cysts' },
-          { name: 'Pus cells' },
-          { name: 'Red cells' },
-        ],
-      },
-      screen('Stool Occult Blood', POS_NEG, ['FOBT', 'Faecal occult blood']),
-      screen('Skin Snip for Microfilaria', ['Not seen', 'Seen'], ['Microfilaria']),
-      screen('Urine for Schistosoma', ['Not seen', 'Seen'], ['Schistosomiasis', 'Bilharzia']),
+      screen('RVS (HIV 1 & 2)', HIV, [
+        'RVS',
+        'HIV',
+        'Retroviral screening',
+        'RVS test',
+        'HIV screening',
+      ]),
+      screen('Pregnancy Test', PREGNANCY, ['PT', 'P.T', 'Urine pregnancy test', 'Urine hCG']),
+      screen('H. pylori', POS_NEG, ['H pylori', 'Helicobacter pylori', 'H. pylori test']),
+      screen('Hepatitis B (HBsAg)', POS_NEG, ['HBsAg', 'Hepatitis B', 'HBV']),
+      screen('Hepatitis C (HCV)', POS_NEG, ['HCV', 'Hepatitis C']),
+      screen('VDRL (Syphilis)', POS_NEG, ['VDRL', 'Syphilis', 'RPR']),
+      screen('Herpes Simplex Virus 1 & 2', REACTIVE, ['HSV', 'Herpes', 'Herpes simplex 1 & 2']),
+      screen('Typhoid Rapid Test', POS_NEG, ['Typhidot']),
+      screen('Pregnancy Test (Blood)', PREGNANCY, ['Serum pregnancy test', 'Serum hCG']),
+      single('Beta hCG (Quantitative)', 'mIU/ml', undefined, ['Beta hCG', 'Quantitative hCG']),
+      screen('Rheumatoid Factor', POS_NEG, ['RF']),
+      single('ASO Titre', 'IU/ml', 'Below 200', ['ASO', 'Antistreptolysin O']),
+      screen('Chlamydia', POS_NEG),
+      screen('Gonorrhoea', POS_NEG),
+      screen('Toxoplasma', POS_NEG, ['Toxoplasmosis']),
+      screen('Hepatitis B Profile', ['See the comment'], ['HBV profile', 'HBeAg']),
+      single('HIV Viral Load', 'copies/ml', undefined, ['Viral load']),
+      single('CD4 Count', 'cells/µl', '500 to 1500', ['CD4']),
     ],
   },
   {
@@ -212,164 +328,26 @@ export const LAB_SECTIONS: LabSection[] = [
     tests: [
       {
         name: 'Urinalysis',
-        also: ['Urine test', 'Dipstick', 'Urine routine'],
-        fields: [
-          { name: 'Colour', choices: ['Pale yellow', 'Yellow', 'Amber', 'Dark', 'Red', 'Cloudy'] },
-          { name: 'Appearance', choices: ['Clear', 'Slightly cloudy', 'Cloudy'] },
-          { name: 'pH', range: '4.5 to 8.0' },
-          { name: 'Specific gravity', range: '1.005 to 1.030' },
-          { name: 'Protein', choices: DIPSTICK },
-          { name: 'Glucose', choices: DIPSTICK },
-          { name: 'Ketones', choices: DIPSTICK },
-          { name: 'Blood', choices: DIPSTICK },
-          { name: 'Bilirubin', choices: DIPSTICK },
-          { name: 'Urobilinogen', choices: ['Normal', '+', '++', '+++'] },
-          { name: 'Nitrite', choices: POS_NEG },
-          { name: 'Leucocytes', choices: DIPSTICK },
-        ],
+        also: ['Urine test', 'Dipstick', 'Urine routine', 'Urinalyis'],
+        fields: URINALYSIS_BOXES,
       },
-      {
-        name: 'Urine Microscopy',
-        also: ['Urine deposits'],
-        fields: [
-          { name: 'Pus cells', unit: 'per high power field' },
-          { name: 'Red cells', unit: 'per high power field' },
-          { name: 'Epithelial cells' },
-          { name: 'Casts' },
-          { name: 'Crystals' },
-          { name: 'Others' },
-        ],
-      },
-      screen('Pregnancy Test (Urine)', POS_NEG, ['Urine hCG', 'Pregnancy test']),
       single('Urine Protein (24 hours)', 'g/24 hours', 'Below 0.15', ['24 hour urine protein']),
-      single('Urine Albumin to Creatinine Ratio', 'mg/mmol', 'Below 3', ['ACR', 'Microalbumin']),
     ],
   },
   {
-    name: 'Chemistry',
+    name: 'Swabs and cultures (M/C/S)',
     tests: [
-      {
-        name: 'Blood sugar',
-        also: ['Glucose', 'FBS', 'RBS', 'Fasting blood sugar', 'Random blood sugar', 'Sugar'],
-        fields: [
-          { name: 'Type', choices: ['Fasting', 'Random', '2 hours after a meal'] },
-          { name: 'Blood glucose', unit: 'mg/dL', range: 'fasting 70 to 110, random below 140' },
-        ],
-      },
-      single('Fasting Blood Sugar', 'mg/dL', '70 to 110', ['FBS', 'Fasting glucose']),
-      single('Random Blood Sugar', 'mg/dL', 'Below 140', ['RBS', 'Random glucose']),
-      {
-        name: 'Oral Glucose Tolerance Test',
-        also: ['OGTT', 'GTT'],
-        fields: [
-          { name: 'Fasting', unit: 'mg/dL', range: 'Below 92 in pregnancy, below 110 otherwise' },
-          { name: 'After 1 hour', unit: 'mg/dL', range: 'Below 180' },
-          { name: 'After 2 hours', unit: 'mg/dL', range: 'Below 140' },
-        ],
-      },
-      single('HbA1c', '%', '4.0 to 5.6', ['Glycated haemoglobin', 'A1c']),
-      {
-        name: 'Electrolytes, Urea and Creatinine',
-        also: ['E/U/Cr', 'EUCr', 'U&E', 'Electrolytes', 'Kidney function', 'Renal function'],
-        fields: [
-          { name: 'Sodium', unit: 'mmol/L', range: '135 to 145' },
-          { name: 'Potassium', unit: 'mmol/L', range: '3.5 to 5.0' },
-          { name: 'Chloride', unit: 'mmol/L', range: '96 to 106' },
-          { name: 'Bicarbonate', unit: 'mmol/L', range: '22 to 29' },
-          { name: 'Urea', unit: 'mmol/L', range: '2.5 to 7.1' },
-          { name: 'Creatinine', unit: 'µmol/L', range: '53 to 115' },
-        ],
-      },
-      {
-        name: 'Liver Function Test',
-        also: ['LFT', 'Liver tests'],
-        fields: [
-          { name: 'Total bilirubin', unit: 'µmol/L', range: '3 to 21' },
-          { name: 'Direct bilirubin', unit: 'µmol/L', range: '0 to 5' },
-          { name: 'ALT', unit: 'U/L', range: '7 to 56' },
-          { name: 'AST', unit: 'U/L', range: '5 to 40' },
-          { name: 'ALP', unit: 'U/L', range: '44 to 147' },
-          { name: 'GGT', unit: 'U/L', range: '9 to 48' },
-          { name: 'Total protein', unit: 'g/L', range: '60 to 83' },
-          { name: 'Albumin', unit: 'g/L', range: '35 to 50' },
-        ],
-      },
-      {
-        name: 'Lipid Profile',
-        also: ['Cholesterol', 'Lipids', 'Fasting lipid profile'],
-        fields: [
-          { name: 'Total cholesterol', unit: 'mmol/L', range: 'Below 5.2' },
-          { name: 'Triglycerides', unit: 'mmol/L', range: 'Below 1.7' },
-          { name: 'HDL cholesterol', unit: 'mmol/L', range: 'Above 1.0' },
-          { name: 'LDL cholesterol', unit: 'mmol/L', range: 'Below 3.4' },
-        ],
-      },
-      single('Uric Acid', 'µmol/L', '150 to 420', ['Serum uric acid']),
-      single('Serum Calcium', 'mmol/L', '2.2 to 2.6', ['Calcium']),
-      single('Serum Magnesium', 'mmol/L', '0.7 to 1.0', ['Magnesium']),
-      single('Serum Phosphate', 'mmol/L', '0.8 to 1.5', ['Phosphate']),
-      single('Serum Amylase', 'U/L', '30 to 110', ['Amylase']),
-      single('C Reactive Protein', 'mg/L', 'Below 10', ['CRP']),
-      single('Serum Iron', 'µmol/L', '10 to 30', ['Iron']),
-      single('Serum Ferritin', 'ng/mL', '20 to 300', ['Ferritin']),
-      single('Total Protein', 'g/L', '60 to 83'),
-      single('Serum Albumin', 'g/L', '35 to 50', ['Albumin']),
-      single('CSF Glucose', 'mg/dL', '40 to 70'),
-      single('Troponin', 'ng/L', 'Below 14', ['Troponin I', 'Troponin T']),
-    ],
-  },
-  {
-    name: 'Serology',
-    tests: [
-      screen('HIV Screening', REACTIVE, ['HIV', 'RVS', 'Retroviral screening', 'HIV 1 and 2']),
-      screen('Hepatitis B (HBsAg)', POS_NEG, ['HBsAg', 'Hepatitis B']),
-      screen('Hepatitis C (HCV)', POS_NEG, ['HCV', 'Hepatitis C']),
-      screen('Syphilis (VDRL)', REACTIVE, ['VDRL', 'RPR', 'Syphilis']),
-      {
-        name: 'Widal Test',
-        also: ['Widal', 'Typhoid test'],
-        fields: [
-          { name: 'S. typhi O', choices: TITRE },
-          { name: 'S. typhi H', choices: TITRE },
-          { name: 'S. paratyphi A O', choices: TITRE },
-          { name: 'S. paratyphi A H', choices: TITRE },
-          { name: 'S. paratyphi B O', choices: TITRE },
-          { name: 'S. paratyphi B H', choices: TITRE },
-        ],
-      },
-      screen('Typhoid Rapid Test', POS_NEG, ['Typhidot']),
-      screen('H. pylori', POS_NEG, ['Helicobacter pylori', 'H pylori']),
-      screen('Pregnancy Test (Blood)', POS_NEG, ['Serum pregnancy test', 'Serum hCG']),
-      single('Beta hCG (Quantitative)', 'mIU/mL', undefined, ['Beta hCG', 'Quantitative hCG']),
-      screen('Rheumatoid Factor', POS_NEG, ['RF']),
-      single('ASO Titre', 'IU/mL', 'Below 200', ['ASO', 'Antistreptolysin O']),
-      screen('Chlamydia', POS_NEG),
-      screen('Gonorrhoea', POS_NEG),
-      screen('Toxoplasma', POS_NEG, ['Toxoplasmosis']),
-      screen('Rubella', POS_NEG),
-      screen('COVID 19 Rapid Test', POS_NEG, ['COVID', 'Coronavirus']),
-      screen('Hepatitis B Profile', ['See the comment'], ['HBV profile', 'HBeAg']),
-      single('Hepatitis B Viral Load', 'copies/mL', undefined, ['HBV DNA']),
-      single('HIV Viral Load', 'copies/mL', undefined, ['Viral load']),
-      single('CD4 Count', 'cells/µL', '500 to 1500', ['CD4']),
-    ],
-  },
-  {
-    name: 'Microbiology',
-    tests: [
-      culture('Urine Culture', ['Urine MCS', 'Urine M/C/S']),
-      culture('Stool Culture', ['Stool MCS', 'Stool M/C/S']),
-      culture('High Vaginal Swab', ['HVS', 'HVS MCS']),
-      culture('Endocervical Swab', ['ECS', 'ECS MCS']),
-      culture('Urethral Swab', ['Urethral MCS']),
-      culture('Wound Swab', ['Wound MCS', 'Wound culture']),
-      culture('Ear Swab', ['Ear MCS']),
-      culture('Throat Swab', ['Throat MCS']),
-      culture('Eye Swab', ['Eye MCS']),
-      culture('Sputum Culture', ['Sputum MCS']),
+      culture('Urine M/C/S', ['Urine MCS', 'Urine MC/S', 'Urine culture']),
+      culture('High Vaginal Swab M/C/S', ['HVS', 'HVS MCS', 'HVS MC/S']),
+      culture('Urethral Swab M/C/S', ['US', 'Urethral swab', 'US MC/S']),
+      culture('Endocervical Swab M/C/S', ['ECS', 'ECS MCS', 'ECS MC/S']),
+      culture('Wound Swab M/C/S', ['Wound MCS', 'Wound MC/S', 'Wound culture']),
+      culture('Throat Swab M/C/S', ['Throat MCS', 'Throat MC/S']),
+      culture('Sputum M/C/S', ['Sputum', 'Sputum MCS', 'Sputum culture']),
+      culture('Stool M/C/S', ['Stool MCS', 'Stool culture']),
+      culture('Ear Swab M/C/S', ['Ear MCS']),
+      culture('Eye Swab M/C/S', ['Eye MCS']),
       culture('Blood Culture'),
-      culture('CSF Analysis', ['Cerebrospinal fluid', 'Lumbar puncture']),
-      culture('Semen Culture', ['Semen MCS']),
       screen(
         'Sputum AFB',
         ['No AFB seen', 'Scanty', '+', '++', '+++'],
@@ -385,50 +363,176 @@ export const LAB_SECTIONS: LabSection[] = [
         ['GeneXpert', 'TB test'],
       ),
       {
-        name: 'Semen Analysis',
-        also: ['Seminal fluid analysis', 'SFA', 'Sperm count'],
+        name: 'Stool Microscopy',
+        also: ['Stool analysis', 'Stool for ova and cysts', 'Stool O/C'],
         fields: [
-          { name: 'Volume', unit: 'ml', range: '1.5 or more' },
-          { name: 'Sperm count', unit: 'million/ml', range: '15 or more' },
-          { name: 'Motility (moving)', unit: '%', range: '40 or more' },
-          { name: 'Normal forms', unit: '%', range: '4 or more' },
-          { name: 'Pus cells' },
-          { name: 'Liquefaction time', unit: 'minutes', range: 'Within 60' },
+          {
+            name: 'Appearance',
+            choices: ['Formed', 'Semi formed', 'Loose', 'Watery', 'Mucoid', 'Bloody'],
+          },
+          { name: 'Ova or cysts' },
+          { name: 'Pus cells', choices: PER_HPF },
+          { name: 'Red cells', choices: PER_HPF },
         ],
       },
+    ],
+  },
+  {
+    name: 'Chemistry',
+    tests: [
+      {
+        name: 'Electrolytes, Urea and Creatinine (E/U/Cr)',
+        also: [
+          'E/U/Cr',
+          'EUCr',
+          'E/U/CR',
+          'U&E',
+          'Electrolytes',
+          'Kidney function',
+          'Electrolytes, Urea and Creatinine',
+        ],
+        fields: [
+          { name: 'Urea', unit: 'mg/dl', range: '10 to 50' },
+          { name: 'Creatinine', unit: 'mg/dl', range: '0.6 to 1.3' },
+          { name: 'Sodium', unit: 'mmol/l', range: '135 to 145' },
+          { name: 'Potassium', unit: 'mmol/l', range: '3.6 to 5.5' },
+          { name: 'Chloride', unit: 'mmol/l', range: '98 to 107' },
+          { name: 'Bicarbonate', unit: 'mmol/l', range: '22 to 29' },
+        ],
+      },
+      {
+        name: 'Liver Function Test (LFT)',
+        also: ['LFT', 'Liver Function Test', 'Liver tests'],
+        fields: [
+          { name: 'Total bilirubin (T.B)', unit: 'mg/dl', range: '0.1 to 1.2' },
+          { name: 'Direct bilirubin (D.B)', unit: 'mg/dl', range: '0 to 0.3' },
+          { name: 'ALT', unit: 'u/l', range: '0 to 45' },
+          { name: 'AST', unit: 'u/l', range: '0 to 35' },
+          { name: 'ALP', unit: 'u/l', range: '80 to 306' },
+          { name: 'Total protein (T.P)', unit: 'g/dl', range: '6 to 8' },
+          { name: 'Albumin (ALB)', unit: 'g/dl', range: '3.5 to 5.2' },
+        ],
+      },
+      {
+        name: 'Lipid Profile',
+        also: ['Fasting lipid profile', 'Cholesterol', 'Cholesterol test', 'Lipids'],
+        fields: [
+          { name: 'Cholesterol', unit: 'mg/dl', range: 'below 200' },
+          { name: 'Triglycerides', unit: 'mg/dl', range: '60 to 165' },
+          { name: 'HDL-C', unit: 'mg/dl', range: '33 to 63' },
+          { name: 'LDL-C', unit: 'mg/dl', range: 'below 100' },
+        ],
+      },
+      {
+        name: 'Blood Sugar',
+        also: [
+          'Blood sugar',
+          'Glucose',
+          'FBS',
+          'RBS',
+          'Fasting blood sugar',
+          'Random blood sugar',
+          'Sugar',
+        ],
+        fields: [
+          { name: 'Type', choices: ['Fasting', 'Random', '2 hours after a meal'] },
+          { name: 'Blood glucose', unit: 'mg/dl', range: 'fasting 70 to 110, random below 140' },
+        ],
+      },
+      {
+        name: 'Oral Glucose Tolerance Test',
+        also: ['OGTT', 'GTT'],
+        fields: [
+          { name: 'Fasting', unit: 'mg/dl', range: 'below 92 in pregnancy, below 110 otherwise' },
+          { name: 'After 1 hour', unit: 'mg/dl', range: 'below 180' },
+          { name: 'After 2 hours', unit: 'mg/dl', range: 'below 140' },
+        ],
+      },
+      single('HbA1c', '%', '4.0 to 5.6', ['Glycated haemoglobin', 'A1c']),
+      single('Uric Acid', 'mg/dl', '3.5 to 7.2', ['Serum uric acid']),
+      single('Serum Calcium', 'mg/dl', '8.5 to 10.5', ['Calcium']),
+      single('Serum Amylase', 'u/l', '30 to 110', ['Amylase']),
+      single('C Reactive Protein', 'mg/l', 'below 10', ['CRP']),
+      single('Serum Ferritin', 'ng/ml', '20 to 300', ['Ferritin']),
+      single('Troponin', 'ng/l', 'below 14', ['Troponin I', 'Troponin T']),
     ],
   },
   {
     name: 'Hormones',
     tests: [
       {
+        name: 'Hormone Profile',
+        also: ['Hormonal profile', 'Female hormone profile', 'Fertility hormone profile'],
+        fields: [
+          { name: 'Prolactin', unit: 'ng/ml', range: 'men 3.45 to 17.42, women 4.60 to 25.07' },
+          {
+            name: 'LH',
+            unit: 'mIU/ml',
+            range:
+              'men 1.81 to 8.16; women follicular 2.95 to 13.65, ovulation 13.65 to 95.75, luteal 1.25 to 11.00, menopause 8.74 to 55.00',
+          },
+          {
+            name: 'FSH',
+            unit: 'mIU/ml',
+            range:
+              'men 1.50 to 12.40; women follicular 4.46 to 12.43, ovulation 4.88 to 20.96, luteal 1.95 to 8.04, menopause 20.00 to 98.62',
+          },
+          {
+            name: 'Estradiol (E2)',
+            unit: 'pg/ml',
+            range:
+              'men below 9.0 to 85; women follicular 12 to 262, ovulation 40 to 396, luteal 21 to 381, menopause below 9.0 to 190',
+          },
+          {
+            name: 'Progesterone',
+            unit: 'ng/ml',
+            range:
+              'men below 1.4 to 1.5; women follicular below 1.4 to 1.9, ovulation below 1.4 to 12.0, luteal 1.7 to 28.7, menopause below 1.4',
+          },
+        ],
+      },
+      {
         name: 'Thyroid Function Test',
         also: ['TFT', 'Thyroid'],
         fields: [
-          { name: 'TSH', unit: 'mIU/L', range: '0.4 to 4.0' },
-          { name: 'Free T4', unit: 'pmol/L', range: '12 to 22' },
-          { name: 'Free T3', unit: 'pmol/L', range: '3.1 to 6.8' },
+          { name: 'TSH', unit: 'mIU/l', range: '0.4 to 4.0' },
+          { name: 'Free T4', unit: 'pmol/l', range: '12 to 22' },
+          { name: 'Free T3', unit: 'pmol/l', range: '3.1 to 6.8' },
         ],
       },
-      single('TSH', 'mIU/L', '0.4 to 4.0', ['Thyroid stimulating hormone']),
-      single('FSH', 'IU/L', undefined, ['Follicle stimulating hormone']),
-      single('LH', 'IU/L', undefined, ['Luteinising hormone']),
-      single('Prolactin', 'ng/mL', undefined),
-      single('Progesterone', 'nmol/L', undefined, ['Day 21 progesterone']),
-      single('Oestradiol', 'pmol/L', undefined, ['Estradiol', 'E2']),
-      single('Testosterone', 'nmol/L', undefined),
-      single('AMH', 'ng/mL', undefined, ['Anti Mullerian hormone']),
-      single('PSA', 'ng/mL', 'Below 4.0', ['Prostate specific antigen']),
-      single('Cortisol', 'nmol/L', undefined),
+      single('Testosterone', 'ng/ml', undefined),
+      single('AMH', 'ng/ml', undefined, ['Anti Mullerian hormone']),
+      single('PSA', 'ng/ml', 'below 4.0', ['Prostate specific antigen']),
+    ],
+  },
+  {
+    name: 'Semen',
+    tests: [
       {
-        name: 'Fertility Hormone Profile',
-        also: ['Hormonal profile', 'Female hormone profile'],
+        name: 'Seminal Fluid Analysis (SFA)',
+        also: ['SFA', 'Semen analysis', 'Seminal fluid analysis', 'Sperm count'],
         fields: [
-          { name: 'FSH', unit: 'IU/L' },
-          { name: 'LH', unit: 'IU/L' },
-          { name: 'Prolactin', unit: 'ng/mL' },
-          { name: 'Progesterone', unit: 'nmol/L' },
-          { name: 'Oestradiol', unit: 'pmol/L' },
+          { name: 'Time ejaculated' },
+          { name: 'Time received' },
+          { name: 'Time examined' },
+          { name: 'Appearance', choices: ['Normal', 'Abnormal'] },
+          { name: 'Colour', choices: ['Whitish grey', 'Yellowish', 'Brownish'] },
+          { name: 'Volume', unit: 'ml', range: '1.5 to 7.6' },
+          { name: 'Viscosity', choices: ['Low', 'Normal', 'High'] },
+          { name: 'pH', range: '7.2 to 8.0' },
+          { name: 'Sperm count', unit: 'million/total ejaculate', range: '39 to 928' },
+          { name: 'Total motility', unit: '%', range: '40 to 81' },
+          { name: 'Active progressive motility', unit: '%', range: '32 to 75' },
+          { name: 'Sluggish progressive motility', unit: '%' },
+          { name: 'Non progressive motility', unit: '%' },
+          { name: 'Immotile', unit: '%' },
+          { name: 'Normal forms', unit: '%', range: '4 or more' },
+          { name: 'Abnormal forms (bent tails, no tails, double head, defective head)' },
+          { name: 'Pus cells', choices: PER_HPF },
+          { name: 'Epithelial cells', choices: PER_HPF },
+          { name: 'Growth', choices: GROWTH, heading: 'Isolation' },
+          { name: 'Organism', choices: ORGANISMS },
+          ...sensitivityBoxes(),
         ],
       },
     ],
@@ -437,8 +541,8 @@ export const LAB_SECTIONS: LabSection[] = [
     name: 'Scans and tracings',
     tests: [
       {
-        name: 'Pregnancy scan',
-        also: ['Obstetric scan', 'Obstetric ultrasound', 'Pregnancy ultrasound'],
+        name: 'Pregnancy Scan',
+        also: ['Pregnancy scan', 'Obstetric scan', 'Obstetric ultrasound'],
         fields: [
           { name: 'Number of babies', choices: ['1', '2', '3 or more'] },
           { name: 'Gestational age', unit: 'weeks' },
@@ -453,13 +557,28 @@ export const LAB_SECTIONS: LabSection[] = [
       report('Pelvic Scan', ['Pelvic ultrasound', 'TVS', 'Transvaginal scan']),
       report('Abdominal Scan', ['Abdominal ultrasound', 'Abdominopelvic scan']),
       report('Breast Scan', ['Breast ultrasound']),
-      report('Thyroid Scan', ['Neck ultrasound']),
       report('Prostate Scan', ['Prostate ultrasound']),
       report('Chest X-ray', ['CXR', 'X-ray']),
       report('ECG', ['Electrocardiogram']),
-      report('Echocardiogram', ['Echo']),
     ],
   },
+]
+
+// The Laboratory's most asked tests, most asked first, one tap away on
+// Request lab (counted from its own reports, 2026-11-16).
+export const COMMON_LAB_TESTS = [
+  'Antenatal Screening (ANC)',
+  'PCV',
+  'Malaria Parasite (MP)',
+  'Widal Test',
+  'Full Blood Count (FBC)',
+  'RVS (HIV 1 & 2)',
+  'Pregnancy Test',
+  'Blood Group',
+  'Urine M/C/S',
+  'Urinalysis',
+  'H. pylori',
+  'Genotype',
 ]
 
 // ===== 4. Finding a test =====
@@ -493,20 +612,31 @@ export function searchLabTests(typed: string, limit = 12): LabTest[] {
 }
 
 // ===== 5. Writing the boxes as the result text =====
-// One line per filled box: "Haemoglobin (Hb): 12.5 g/dL (usual 11.5 to 16.5)".
-// Then the comment, if there is one.
+// One line per filled box: "HB: 12.5 g/dl (normal M 14 to 18, F 12 to 14)".
+// A heading ("Sensitivity:") goes before its group when the group has a
+// filled box. Then the comment, if there is one.
 export function composeResult(
   test: LabTest,
   values: Record<string, string>,
   comment: string,
 ): string {
   const lines: string[] = []
+  let heading: string | null = null
+  let headingWritten = false
   for (const field of test.fields) {
+    if (field.heading) {
+      heading = field.heading
+      headingWritten = false
+    }
     const value = (values[field.name] ?? '').trim()
     if (!value) continue
+    if (heading && !headingWritten) {
+      lines.push(`${heading}:`)
+      headingWritten = true
+    }
     let line = `${field.name}: ${value}`
     if (field.unit && !field.choices) line += ` ${field.unit}`
-    if (field.range) line += ` (usual ${field.range})`
+    if (field.range) line += ` (normal ${field.range})`
     lines.push(line)
   }
   if (comment.trim()) lines.push(`Comment: ${comment.trim()}`)

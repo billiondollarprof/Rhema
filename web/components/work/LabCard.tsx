@@ -24,6 +24,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
+import { loadPrices, priceOf, type Price } from '@/lib/prices/prices'
 import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { recall, remember } from '@/lib/cache/memory'
@@ -164,6 +165,14 @@ function LabEntry({
   onPaid: (patientId: number) => void
 }) {
   const [paying, setPaying] = useState(false)
+  // The price list, read when the form opens, so each test's price is
+  // filled in (Settings, 2026-11-16). Empty when there is none or no network.
+  const [prices, setPrices] = useState<Price[] | null>(null)
+
+  function startPaying() {
+    setPaying(true)
+    loadPrices(client).then((found) => setPrices(found ?? []))
+  }
 
   return (
     <div className={styles.entry}>
@@ -185,7 +194,7 @@ function LabEntry({
 
       <div className={styles.entryButtons}>
         {view === 'pay' && !paying ? (
-          <button className={`${styles.button} ${styles.primary}`} onClick={() => setPaying(true)}>
+          <button className={`${styles.button} ${styles.primary}`} onClick={() => startPaying()}>
             Take payment
           </button>
         ) : null}
@@ -211,11 +220,13 @@ function LabEntry({
         ) : null}
       </div>
 
-      {paying ? (
+      {paying && prices === null ? <p className={styles.muted}>Loading the prices…</p> : null}
+      {paying && prices !== null ? (
         // A price for each test; the app adds them up (2026-10-31).
         <PriceForm
           formId={`lab-${request.id}`}
           labels={request.tests}
+          prices={request.tests.map((test) => priceOf(prices, 'lab_test', test))}
           save={(lines, mode) => payLabRequestLines(client, request.id, lines, mode)}
           onCancel={() => setPaying(false)}
           onDone={() => onPaid(request.patient_id)}

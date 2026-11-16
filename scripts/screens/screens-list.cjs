@@ -72,4 +72,17 @@ module.exports.SCREENS = [
   { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
   { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },
   { path: '/admin/?tab=activity', waitFor: 'activities today', admin: true },
+  // Settings part 1 (2026-11-16): the price list, with made up prices.
+  {
+    path: '/admin/?tab=prices',
+    waitFor: 'Lab test prices',
+    admin: true,
+    extra: {
+      'rest/v1/price_list': [
+        { id: 1, kind: 'card', item: 'Registration card', amount: 2000 },
+        { id: 2, kind: 'lab_test', item: 'Full Blood Count', amount: 3500 },
+        { id: 3, kind: 'lab_test', item: 'Malaria test', amount: 1500 },
+      ],
+    },
+  },
 ]

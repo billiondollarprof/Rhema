@@ -1,9 +1,9 @@
 /*
- * app/admin/page.tsx: Admin. Staff, invitations, rooms and the activity
- * log, in four tabs.
+ * app/admin/page.tsx: Admin. Staff, invitations, rooms, prices and the
+ * activity log, in five tabs (Prices added 2026-11-16, Settings part 1).
  *
  * Why: build step 7 and request 112 (Anthony, 2026-10-30). "Super simple
- * system to use... easy flow." So one page, four tabs, and the tab is kept
+ * system to use... easy flow." So one page, a few tabs, and the tab is kept
  * in the address (?tab=invite), so a refresh or the Home button "Invite
  * staff" opens the right one.
  *
@@ -19,6 +19,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ActivityTab from './_parts/ActivityTab'
 import InviteTab from './_parts/InviteTab'
+import PricesTab from './_parts/PricesTab'
 import RoomsTab from './_parts/RoomsTab'
 import StaffTab from './_parts/StaffTab'
 import styles from './_parts/admin.module.css'
@@ -40,6 +41,8 @@ const TABS = [
   ['staff', 'Staff'],
   ['invite', 'Invite'],
   ['rooms', 'Rooms'],
+  // Settings part 1 (2026-11-16): the price list.
+  ['prices', 'Prices'],
   ['activity', 'Activity'],
 ] as const
 type Tab = (typeof TABS)[number][0]
@@ -116,6 +119,7 @@ function Admin() {
             {staff && tab === 'rooms' ? (
               <RoomsTab client={client} rooms={rooms} reload={reload} />
             ) : null}
+            {staff && tab === 'prices' ? <PricesTab client={client} /> : null}
             {staff && tab === 'activity' ? <ActivityTab client={client} staff={staff} /> : null}
           </>
         )}

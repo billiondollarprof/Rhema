@@ -70,6 +70,9 @@ type FormProps = {
   // individual"): when this answers true for what is on the form, the
   // Payment section shows and the card fee must be paid before saving.
   feeRequiredIf?: (details: PatientDetails) => boolean
+  // The card fee from the price list, offered with a "Use it" button
+  // (Settings, 2026-11-16). Never filled in by itself: the fee is optional.
+  cardFee?: number
   // Adding a member to a family (request 165, 2026-11-09): the family's
   // card number. The category shows as that family, with Change category.
   // Changing it to Individual or Antenatal starts a fresh registration
@@ -137,6 +140,7 @@ export default function PatientForm({
   withPayment = false,
   familyPaid,
   feeRequiredIf,
+  cardFee,
   familyCard,
   onSave,
   client,
@@ -458,6 +462,15 @@ export default function PatientForm({
                 />
               </div>
               {shown.fee ? <small className={styles.error}>{shown.fee}</small> : null}
+              {cardFee && !(familyPaid && details.category === 'family' && !feeNeededNow) ? (
+                <button
+                  type="button"
+                  className={styles.useFee}
+                  onClick={() => setFee(String(cardFee))}
+                >
+                  Card fee on the price list: ₦{cardFee.toLocaleString('en-GB')}. Use it
+                </button>
+              ) : null}
             </div>
             <div className={styles.field}>
               <span className={styles.fieldTitle}>Paid by</span>

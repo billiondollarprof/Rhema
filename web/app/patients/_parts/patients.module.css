@@ -1051,3 +1051,19 @@
 .more[open] > summary {
   margin-bottom: 4px;
 }
+
+/* "Card fee on the price list: ... Use it" under the fee box (2026-11-16). */
+.useFee {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  justify-self: start;
+  text-align: left;
+  min-height: 36px;
+  padding: 4px 10px;
+  border: 1.5px solid var(--link);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--link);
+  cursor: pointer;
+}
