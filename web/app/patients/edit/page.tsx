@@ -126,6 +126,8 @@ function EditPatient() {
           <>
             <p className={styles.muted}>{patient.patient_number}</p>
             <PatientForm
+              client={client}
+              staffId={staff?.id}
               initial={{
                 full_name: patient.full_name,
                 // An old file patient has neither yet; the form asks for

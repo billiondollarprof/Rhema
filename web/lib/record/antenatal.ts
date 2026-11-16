@@ -48,7 +48,89 @@ export type Booking = {
   documented_delivery: boolean | null
   documented_answered_at: string | null
   answerer: { full_name: string } | null
+  // The woman herself (2026-11-16, the card's "client details").
+  client_marital_status: string | null
+  client_religion: string | null
+  client_education: string | null
+  client_occupation: string | null
+  client_tribe: string | null
+  // The medical history ticklist: asked, and which ones were yes.
+  history_asked: boolean
+  history_yes: string[]
+  surgery_type: string | null
+  surgery_reason: string | null
 }
+
+// One antenatal visit, a row of the card's "Anti-natal record" table.
+export type Visit = Voided & {
+  id: number
+  visit_on: string
+  fundal_height: number | null
+  presentation: string | null
+  position: string | null
+  foetal_heart: number | null
+  urine_protein: string | null
+  urine_sugar: string | null
+  systolic: number | null
+  diastolic: number | null
+  pulse: number | null
+  respiration: number | null
+  weight_kg: number | null
+  hb: number | null
+  oedema: string | null
+  drugs_given: string[]
+  remark: string | null
+  return_on: string | null
+  created_at: string
+  recorder: { full_name: string } | null
+}
+
+// The choices on the card, picked not typed (Anthony, 2026-11-16).
+export const PRESENTATIONS = ['Cephalic', 'Breech', 'Transverse', 'Oblique', 'Not yet palpable']
+export const POSITIONS = ['LOA', 'ROA', 'LOT', 'ROT', 'LOP', 'ROP', 'Not determined']
+export const DIPSTICK = ['Nil', 'Trace', '+', '++', '+++']
+export const OEDEMA = ['Nil', '+', '++', '+++']
+export const ROUTINE_DRUGS = [
+  'Ferrous sulphate',
+  'Folic acid',
+  'Vitamin B complex',
+  'Calcium',
+  'Multivitamin',
+  'Sulfadoxine and pyrimethamine (IPT)',
+  'Tetanus toxoid',
+]
+export const MARITAL = ['Single', 'Married', 'Divorced', 'Widowed', 'Separated']
+export const RELIGIONS = ['Christian', 'Muslim', 'Traditional', 'Other']
+export const EDUCATION = [
+  'None',
+  'Primary',
+  'Secondary',
+  'OND',
+  'NCE',
+  'HND',
+  'BSc',
+  'Postgraduate',
+]
+export const HISTORY = [
+  'Diabetes mellitus',
+  'Chronic nephritis',
+  'Previous accident',
+  'Rickets',
+  'Tuberculosis',
+  'Epilepsy',
+  'Asthma',
+  'Anaemia',
+  'Sickle cell anaemia',
+  'Hypertension',
+]
+export const SURGERIES = [
+  'Caesarean section',
+  'Myomectomy',
+  'Appendicectomy',
+  'Hernia repair',
+  'D and C',
+  'Ectopic pregnancy surgery',
+]
 
 export type AntenatalTest = Voided & {
   id: number
@@ -90,11 +172,11 @@ const VOID = 'voided_at, void_reason, voider:staff!voided_by(full_name)'
 
 // ===== 2. Read =====
 export async function loadAntenatal(client: SupabaseClient, patientId: number) {
-  const [booking, tests, pregnancies] = await Promise.all([
+  const [booking, tests, pregnancies, visits] = await Promise.all([
     client
       .from('antenatal_bookings')
       .select(
-        'patient_id, kin_occupation, kin_religion, kin_education, kin_age, kin_tribe, abortions, miscarriages, total_pregnancies, parity, documented_delivery, documented_answered_at, answerer:staff!documented_answered_by(full_name)',
+        'patient_id, kin_occupation, kin_religion, kin_education, kin_age, kin_tribe, abortions, miscarriages, total_pregnancies, parity, documented_delivery, documented_answered_at, answerer:staff!documented_answered_by(full_name), client_marital_status, client_religion, client_education, client_occupation, client_tribe, history_asked, history_yes, surgery_type, surgery_reason',
       )
       .eq('patient_id', patientId)
       .maybeSingle(),
@@ -112,11 +194,20 @@ export async function loadAntenatal(client: SupabaseClient, patientId: number) {
       )
       .eq('patient_id', patientId)
       .order('born_on', { nullsFirst: false }),
+    client
+      .from('antenatal_visits')
+      .select(
+        `id, visit_on, fundal_height, presentation, position, foetal_heart, urine_protein, urine_sugar, systolic, diastolic, pulse, respiration, weight_kg, hb, oedema, drugs_given, remark, return_on, created_at, recorder:staff!recorded_by(full_name), ${VOID}`,
+      )
+      .eq('patient_id', patientId)
+      .order('visit_on', { ascending: false })
+      .order('created_at', { ascending: false }),
   ])
   return {
     booking: (booking.data as unknown as Booking | null) ?? null,
     tests: (tests.data as unknown as AntenatalTest[] | null) ?? [],
     pregnancies: (pregnancies.data as unknown as Pregnancy[] | null) ?? [],
+    visits: (visits.data as unknown as Visit[] | null) ?? [],
   }
 }
 

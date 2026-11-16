@@ -142,6 +142,8 @@ export type VoidableTable =
   | 'antenatal_tests'
   | 'previous_pregnancies'
   | 'operation_consents'
+  // The antenatal visit table (2026-11-16).
+  | 'antenatal_visits'
 
 const VOID = 'id, voided_at, void_reason, voider:staff!voided_by(full_name)'
 
@@ -275,6 +277,7 @@ const ENTRY_WORDS: Record<string, string> = {
   antenatal_tests: 'Antenatal test',
   previous_pregnancies: 'Previous pregnancy',
   operation_consents: 'Operation consent',
+  antenatal_visits: 'Antenatal visit',
 }
 
 // ===== 3. Adding a line =====

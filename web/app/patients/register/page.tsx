@@ -427,6 +427,8 @@ function RegisterPatient() {
           <p className={styles.muted}>Loading the family…</p>
         ) : (
           <PatientForm
+            client={client}
+            staffId={staff?.id}
             key={`${formKey}-${familyId ?? 'none'}-${familyStart ? 'family' : 'new'}`}
             initial={familyId && familyStart ? familyStart.details : EMPTY_DETAILS}
             saveLabel="Save patient"

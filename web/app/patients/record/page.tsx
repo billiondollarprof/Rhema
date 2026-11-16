@@ -369,6 +369,7 @@ function PatientRecord() {
                     client={client}
                     staffId={staff.id}
                     patientId={props.patientId}
+                    lmp={props.record.profile?.last_menstrual_period ?? null}
                   />
                 ) : null}
                 <ConsentSection client={client} staffId={staff.id} patientId={props.patientId} />
