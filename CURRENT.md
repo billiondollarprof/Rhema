@@ -880,7 +880,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     mistake and discover later and go to edit or cancel... If they mistakenly
     mark finished at the lab without adding the test, refuse and add warnings
     that they should add test details."
-    BUILT 2026-11-16, held for his SQL yes (migration 20261116145838, test
+    LIVE 2026-11-16 after his yes (migration 20261116145838, test
     044, 10 breaks caught; test 031 kept, 009 caught a doctor read gap that
     was fixed): Front Desk Send to the Laboratory / Pharmacy after a lab or
     drug payment, with an optional doctor; stock (unit, warn level, restock,
