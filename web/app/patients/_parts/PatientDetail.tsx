@@ -31,7 +31,7 @@ import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
-import { sexWords, type PatientResult } from '@/lib/patients/patients'
+import { firstRegisteredWords, sexWords, type PatientResult } from '@/lib/patients/patients'
 import {
   CATEGORY_LABELS,
   FINISH_WORDS,
@@ -111,6 +111,9 @@ export default function PatientDetail({
         ['Sex', sexWords(patient.sex)],
         ['Category', CATEGORY_LABELS[patient.category] ?? patient.category],
         ['Last seen', lastSeenWords(patient.last_seen)],
+        // When the patient first registered (request 211): the month from the
+        // old file, or the day they were added here.
+        ['First registered', firstRegisteredWords(patient)],
       ],
     },
     {
@@ -202,7 +205,7 @@ export default function PatientDetail({
       <FamilyCard client={client} patient={patient} canAdd={canRegister} />
 
       {/* Payments and receipts, for the Front Desk and admins. */}
-      {canPay ? <PaymentsCard client={client} patientId={patient.id} /> : null}
+      {canPay ? <PaymentsCard client={client} patientId={patient.id} staffId={staffId} /> : null}
 
       {/* ===== 2. What can be done from here ===== */}
       {sending ? (

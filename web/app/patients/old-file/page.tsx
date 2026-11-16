@@ -67,6 +67,10 @@ export default function OldFilePage() {
   const [sex, setSex] = useState<Sex | null>(null)
   // The front desk asked for it (2026-11-16): individual, family or antenatal.
   const [category, setCategory] = useState<Category>('individual')
+  // The month the old file was first opened (Anthony, 2026-11-16: "they're
+  // registering the patients month by month"). Kept after Register another,
+  // because the next file is usually from the same month.
+  const [month, setMonth] = useState('')
   // The rest of the card, folded away until somebody opens it (2026-11-16).
   const [more, setMore] = useState({
     email: '',
@@ -171,6 +175,7 @@ export default function OldFilePage() {
         next_of_kin_name: more.kinName.trim() || null,
         next_of_kin_relationship: more.kinRelationship || null,
         next_of_kin_phone: kinPhone || null,
+        first_registered_on: month ? `${month}-01` : null,
       },
     )
     if (result.problem || !result.patient) {
@@ -313,6 +318,23 @@ export default function OldFilePage() {
 
         {/* ===== 6. Name, phone, and the old file ===== */}
         <div className={styles.card}>
+          {/* The month the file was first opened, first, because files are
+              entered a month at a time (request 211). */}
+          <div className={styles.field}>
+            <label htmlFor="old-month">Month first registered (optional)</label>
+            <input
+              id="old-month"
+              className={styles.input}
+              type="month"
+              min="1950-01"
+              max={new Date().toISOString().slice(0, 7)}
+              value={month}
+              onChange={(event) => setMonth(event.target.value)}
+            />
+            <small className={styles.muted}>
+              Stays the same for the next file, until you change it.
+            </small>
+          </div>
           <div className={styles.field}>
             <label htmlFor="old-name">Full name</label>
             <input

@@ -205,13 +205,15 @@ reset role;
 \echo 'PASS 6: only the Pharmacy edits and switches off; nobody deletes'
 
 
--- ===== 7. The Front Desk sees nothing and adds nothing =====
+-- ===== 7. The Front Desk reads only standard lines, and adds nothing =====
+-- Since 2026-11-16 (request 211) the Front Desk reads the standard, active
+-- lines to pick what a payment is for; never a waiting or switched off line.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000314"}', true);
 set local role authenticated;
 do $$
 begin
-  if (select count(*) from public.medicine_list) <> 0 then
-    raise exception 'FAIL 7: the Front Desk can read the list';
+  if exists (select 1 from public.medicine_list where status <> 'standard' or not is_active) then
+    raise exception 'FAIL 7: the Front Desk can read a waiting or switched off line';
   end if;
   begin
     perform public.add_medicine('Nope', '1 mg', 'medicine');
@@ -220,7 +222,7 @@ begin
   end;
 end $$;
 reset role;
-\echo 'PASS 7: the Front Desk sees and adds nothing'
+\echo 'PASS 7: the Front Desk reads only standard lines, and adds nothing'
 
 
 -- ===== 8. Confirming the starter list =====

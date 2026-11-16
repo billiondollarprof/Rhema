@@ -166,7 +166,7 @@ function EditPatient() {
               />
             ) : null}
             {staff && (staff.role === 'front_desk' || staff.can_admin) ? (
-              <PaymentsCard client={client} patientId={patient.id} />
+              <PaymentsCard client={client} patientId={patient.id} staffId={staff?.id} />
             ) : null}
           </>
         ) : null}
