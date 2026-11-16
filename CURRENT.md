@@ -849,6 +849,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+207. **Lab test list for the lab scientists.** (2026-11-16) "Can the lab
+    scientists see the list of test without any patient data, if not please
+    fix." They could not (tests only showed inside a request). BUILT: page
+    /lab/tests/ (every test by section, its boxes, units, normal ranges and
+    picks, plus tests added with Other), linked from the lab's card on Home.
+
 206. **Backup: a copy of everything, all the time.** (2026-11-16) "Does it take
     duplicate files?... the backup is duplicating the patient data immediately,
     or the backup only takes raw files?... I want a system whereby the backup is
@@ -861,6 +867,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     demo later." DONE: testing back to Rhema.
     DECIDED 2026-11-16: "1 and 3 is great": (1) backup every 2 hours, free;
     (3) a Download our data button in Admin. Point in time recovery (paid) later.
+    (1) LIVE 2026-11-16: backup.yml every 2 hours (recent/ kept 2 days, daily/
+    35 days, monthly/ for good); record/ files now backed up with lab/. Run by
+    hand after the merge: success, copy checked and opened, both file kinds read.
+    (3) Plan read back to him 2026-11-16, waits for his yes.
 
 205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
     "Let's remove all the test patients added before today. But if there is any

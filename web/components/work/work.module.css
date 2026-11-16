@@ -292,3 +292,16 @@ a.button {
   border-radius: 999px;
   padding: 6px 10px;
 }
+
+/* The Laboratory's two links at the top of its card (2026-11-16). */
+.labLinks {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 560px) {
+  .labLinks {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

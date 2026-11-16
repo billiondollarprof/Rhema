@@ -116,9 +116,15 @@ export default function LabCard({
         </h3>
       )}
       {view === 'lab' ? (
-        <Link className={`${styles.button} ${styles.wide}`} href="/lab/result/">
-          Add a result without a request
-        </Link>
+        <div className={styles.labLinks}>
+          <Link className={`${styles.button} ${styles.wide}`} href="/lab/result/">
+            Add a result without a request
+          </Link>
+          {/* Every test, with no patient on it (Anthony, 2026-11-16). */}
+          <Link className={`${styles.button} ${styles.wide}`} href="/lab/tests/">
+            Lab test list
+          </Link>
+        </div>
       ) : null}
       {requests === null ? <p className={styles.muted}>Loading…</p> : null}
       {requests && requests.length === 0 ? <p className={styles.muted}>{empty}</p> : null}

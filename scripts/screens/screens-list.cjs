@@ -33,6 +33,8 @@ module.exports.SCREENS = [
   { path: '/terms/', waitFor: 'Your account is yours alone' },
   { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
   { path: '/lab/result/', waitFor: 'Add a lab result' },
+  // Every test, no patient (2026-11-16).
+  { path: '/lab/tests/', waitFor: 'Lab test list', role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
   { path: '/pharmacy/list/', waitFor: 'Medicine list', role: 'pharmacy' },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },
