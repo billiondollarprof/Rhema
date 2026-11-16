@@ -849,6 +849,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+218. **Go ahead with the proposal, Next.js, backups, and the whole flow.** (2026-11-16)
+    a. Live read allowed: "you have my permission to check the live database"
+       for why the doctor cannot write in consultation notes. He thinks the
+       doctor can see them in a consulting room, "it's just that... I can't
+       write freely normally."
+    b. "Your proposal is good. I think you should go ahead with this." (217c,
+       points 1 to 6.)
+    c. Next.js: "check and make your plan on what update you want to do...
+       whatever fix that we need to make to keep everything running smoothly
+       and not to get any error messages and not to allow the system to break
+       at usage. So let's make those fixes."
+    d. Backups: "check it again... that nothing goes away, nothing misses,
+       nothing is lost."
+    e. The whole flow: "how the front desk enters data, others send to room,
+       others get it, like the entire flow from one department to another...
+       look into those platforms (OpenMRS, Bahmni, Epic)... the pharmacy as
+       well, the population of the medicine, the arrangement, the lab as well
+       ... areas where our own look simpler and better, we keep. Where their
+       own seems better, we make adjustments... put all the plans together."
+
 217. **Download our data, a review of today, then simplicity.** (2026-11-16)
     a. "Download our data: if you've checked it and everything checks out,
        then you go on with it."
@@ -874,6 +894,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     record... so-so drug given at so-so time, so-so dose by so-so person. So
     that any person that comes around will see it." Picking drug, then
     milligram, then dosage to record a dose "will more difficult".
+    STATUS: a. LIVE 2026-11-16 (Admin, Data tab; migration 20261116201525,
+    test 046; checked with made up data, ZIP opened, wrong PIN and cancel
+    checked). b. Done: all 13 of today's migrations on both databases, 0 new
+    warnings; fixed the emailed record missing note titles (LIVE). c. Research
+    done, proposal sent to him, WAITING FOR HIS YES before building.
+    Also asked: Next.js shows a moderate security notice (16.4.3, fix is a
+    small version bump; does not touch this app, which is static). Waiting
+    for his yes to bump it.
 
 216. **History: his answers and the front desk's real need.** (2026-11-16)
     "Yes, admin 3 card fees." "The front desk... when they click history,

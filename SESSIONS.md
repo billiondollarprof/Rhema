@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-16 (night): request 217a LIVE: Download our data (Admin, Data
+  tab, PIN again, one ZIP of spreadsheets and files, logged). 217b review:
+  every migration of the day on both databases; the emailed record now shows
+  note titles. 217c: research done, restructure proposal waits for his yes.
+
 - 2026-11-16 (evening): requests 202 to 216 LIVE. Lab menu from the
   Laboratory's own reports; lab prices with admin approval (72 hours); Other
   saved for everybody; payment kinds with pickers; First registered and the old

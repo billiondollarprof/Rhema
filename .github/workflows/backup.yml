@@ -15,8 +15,10 @@
 #      scrambled file.
 #   3. Uploads it to the rhema-backup bucket in the separate backup account.
 #   4. Checks it: downloads it again, compares the fingerprint, unlocks it,
-#      and lists what is inside, so a broken backup fails loudly here instead
-#      of being found broken on the day it is needed.
+#      lists what is inside, and checks the main tables hold at least the
+#      rows counted just before the copy (2026-11-16, request 218), so a
+#      broken backup fails loudly here instead of being found broken on the
+#      day it is needed.
 #   5. Keeps the 2-hourly copies (recent/) for 2 days, every night's copy
 #      (daily/) for 35 days, and the first of each month (monthly/) for good.
 #   6. Copies the uploaded files (rhema-files, in the main Cloudflare
@@ -109,6 +111,12 @@ jobs:
           else
             echo "NIGHT=false" >> "$GITHUB_ENV"
           fi
+          # The rows in the main tables, counted just before the copy, so step
+          # 5 can prove the copy holds at least as many (2026-11-16, request
+          # 218: "nothing goes away, nothing misses, nothing is lost").
+          docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
+            sh -c 'for t in patients staff medical_profiles consultation_notes nursing_notes vital_signs medications_given patient_medications lab_requests lab_results prescriptions payments patient_files activity_log; do
+                     printf "%s %s\n" "$t" "$(psql "$URL" -tA -c "select count(*) from public.$t")"; done' > counts.txt
           docker run --rm --network host -e URL="$LIVE_URL" -v "$PWD/copy:/copy" postgres:17 \
             sh -c 'pg_dump "$URL" --format=custom --schema=public --schema=private --file=/copy/hospital.dump &&
                    pg_dump "$URL" --format=custom --data-only --table=auth.users --table=auth.identities --file=/copy/accounts.dump'
@@ -160,6 +168,15 @@ jobs:
             grep -q "TABLE DATA public $table " check/hospital.list || { echo "FAILED: $table is missing"; exit 1; }
           done
           grep -q "TABLE DATA auth users " check/accounts.list || { echo "FAILED: sign in accounts are missing"; exit 1; }
+          # Every row counted before the copy is in it (new rows may be extra).
+          cp counts.txt check/counts.txt
+          docker run --rm -v "$PWD/check:/check" postgres:17 \
+            sh -c 'while read -r t before; do
+                     inside=$(pg_restore --data-only --schema=public --table="$t" -f - /check/hospital.dump | sed -n "/^COPY /,/^\\\\.\$/p" | wc -l)
+                     inside=$((inside - 2)); if [ "$inside" -lt 0 ]; then inside=0; fi
+                     if [ "$inside" -lt "$before" ]; then echo "FAILED: $t had $before rows, the copy holds $inside"; exit 1; fi
+                     echo "$t: $before rows before, $inside in the copy"
+                   done < /check/counts.txt'
           echo "Backup checked: stored, unchanged, opens with the passphrase, all key tables present."
           rm -rf check check.gpg check.tar.gz
 
@@ -252,10 +269,18 @@ jobs:
               copied=$((copied + 1))
             done
             echo "$kind files: $(wc -l < live.txt) live, $copied newly copied, all locked."
+            # Every live file must now be in the backup. A file with a name we
+            # do not expect would have been skipped above, so it fails here too.
+            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "files/$kind/" --endpoint-url "$R2" \
+              --query 'Contents[].Key' --output text > have.raw
+            tr '\t' '\n' < have.raw | grep -v '^None$' | sed "s#^files/$kind/##; s/\.gpg$//" | sort > have.txt || true
+            missing=$(comm -13 have.txt live.txt | wc -l)
+            if [ "$missing" -gt 0 ]; then echo "FAILED: $missing $kind file(s) are not in the backup"; exit 1; fi
+            echo "$kind files: every live file is in the backup."
           done
           rm -rf files have.txt live.txt have.raw live.raw
 
       # ===== 8. Nothing left behind on GitHub's computer =====
       - name: Clean up
         if: always()
-        run: rm -rf copy check files ./*.gpg ./*.tar.gz fingerprint.txt have.txt live.txt have.raw live.raw
+        run: rm -rf copy check files ./*.gpg ./*.tar.gz fingerprint.txt counts.txt have.txt live.txt have.raw live.raw
