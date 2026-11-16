@@ -865,6 +865,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     e. "The doctors and other departments should not see a button that says
        take payment. A doctor or nurse who is also an admin should not see take
        payment."
+    LIVE 2026-11-16: 211 (payment kinds with test and medicine pickers, every
+    payment with date and time, First registered, old file month; migration
+    first_registered_and_payment_lists, test 043) and c, d, e (medicine box
+    closed with a clear arrow; Medical record button in the queue for medical
+    staff; Take payment and the pay cards only for the Front Desk and an admin
+    who does not work with patients). a and b: plan read back, waits for yes.
 
 212. **Vital signs: pickers and Other on each box.** (2026-11-16) "The vital
     signs, can there be pickers + others on each of the box, so they can pick
