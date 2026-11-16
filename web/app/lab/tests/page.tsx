@@ -210,6 +210,12 @@ function TestDetails({
           onSaved={onSaved}
         />
       ) : null}
+      {test.note ? (
+        <div className={styles.testNote}>
+          <b>{test.note.heading}</b>
+          <span>{test.note.text}</span>
+        </div>
+      ) : null}
       {test.fields.length ? (
         <ul className={styles.boxList}>
           {test.fields.map((field) => (

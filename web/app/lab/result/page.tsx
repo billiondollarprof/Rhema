@@ -362,6 +362,13 @@ function ResultBoxes({
 
   return (
     <div className={styles.fields}>
+      {/* The test's fixed note, such as the Widal significant titre value. */}
+      {test.note ? (
+        <div className={styles.testNote}>
+          <b>{test.note.heading}</b>
+          <span>{test.note.text}</span>
+        </div>
+      ) : null}
       {test.fields.map((field, place) => {
         const id = `box-${at}-${place}`
         const value = values[field.name] ?? ''

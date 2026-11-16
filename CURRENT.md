@@ -849,6 +849,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+210. **Widal: a "Significant titre value" heading.** (2026-11-16) "Only
+    insignificant titre value. I can see that the significant is the comment,
+    but we can add a heading that says significant titre value at the top with
+    the explanation followed." DONE: the explanation sits under that heading at
+    the top of the Widal boxes and is the first line of every Widal result;
+    comment picks are now Insignificant / Significant titre obtained.
+
 209. **Lab and Other, a batch.** (2026-11-16) His yes to 208: "your
     understanding is right and on that SQL is yes." Then:
     a. "The test and the pharmacy and every place there's Other, make it so
@@ -864,6 +871,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        tests, let them be correct."
     e. "Even under a test, if there is a type they can add, because I noticed
        there's no significant titre value."
+    LIVE 2026-11-16 (migration 20261116125814, test 042, 9 breaks caught):
+    208 lab prices: lab sends, admin approves or refuses (Admin > Prices top),
+    standard on its own after 72 hours (backup job, every 2 hours); Front Desk
+    sees standard, or the waiting price marked "not yet approved"; empty boxes
+    say "e.g. 2,000". a: Other has a tick "Save it to the list for everybody"
+    (on by default); new lab tests saved for everybody; words typed with Other
+    inside a test box are kept for that box. Medicines: a doctor's or nurse's
+    Other still waits for the Pharmacy to confirm (his rule of 2026-11-11,
+    unchanged). b: results screen says who was told and has "Send patient to a
+    room" (opens the patient card). c: fixed, a new test starts with empty
+    boxes. d/e: 1/640 titre, significant titre comment, vaginal and urine
+    microscopy, Hepatitis B profile boxes, no microscopy on blood culture.
+    Pharmacy prices with approval: not built (he did not say pharmacy too).
 
 208. **Tests come with prices; the lab proposes, the admin approves.**
     (2026-11-16) "Add price pickers too so tests comes with price, especially

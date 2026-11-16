@@ -465,3 +465,22 @@ textarea.input {
   gap: 6px;
   margin: 4px 0 8px;
 }
+
+/* A test's fixed note, such as the Widal significant titre value. */
+.testNote {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--tint-2);
+  border: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.testNote b {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink2);
+}
