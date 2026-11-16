@@ -855,6 +855,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     DECIDED same day (on 211's question): doctors do not see payments: "No,
     doctors only knows that the patient has already paid for that test."
     211's SQL still waits for his yes.
+    BUILT 2026-11-16: every vital sign box is a number list (opens at the usual
+    value: 120/80, 36.8, 76, 16, 98, 65 kg, 165 cm), search, Other to type.
+    Vital signs he added himself (such as Blood sugar) stay typed boxes.
 
 211. **Front Desk payments by kind, with pickers; payments and first
     registration on the record; month picker for old files.** (2026-11-16)

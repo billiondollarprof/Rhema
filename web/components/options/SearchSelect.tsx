@@ -52,6 +52,12 @@ type Props = {
   // A list longer than this gets a search box.
   searchFrom?: number
   invalid?: boolean
+  // When the list opens, it is scrolled to this line (or to the chosen one),
+  // such as 36.8 for a temperature, so the usual value is one tap away.
+  startAt?: string
+  // false: the search box does not take the keyboard when the list opens
+  // (number lists, where tapping is quicker than typing).
+  focusSearch?: boolean
 }
 
 export default function SearchSelect({
@@ -63,10 +69,28 @@ export default function SearchSelect({
   onOther,
   searchFrom = 8,
   invalid = false,
+  startAt,
+  focusSearch = true,
 }: Props) {
   const [open, setOpen] = useState(false)
   const [typed, setTyped] = useState('')
   const box = useRef<HTMLDivElement>(null)
+  const list = useRef<HTMLDivElement>(null)
+
+  // ===== 1b. Open at the chosen line, or at the usual one =====
+  useEffect(() => {
+    if (!open || !list.current) return
+    const target = value || startAt
+    if (!target) return
+    const line = list.current.querySelector<HTMLElement>(`[data-value="${CSS.escape(target)}"]`)
+    if (line) list.current.scrollTop = line.offsetTop - list.current.clientHeight / 2
+  }, [open, value, startAt])
+
+  // An open list near the bottom of a phone screen is brought into view.
+  useEffect(() => {
+    if (!open || !list.current) return
+    list.current.parentElement?.scrollIntoView({ block: 'nearest' })
+  }, [open])
   const long = options.length > searchFrom
 
   // ===== 2. Close on a tap outside =====
@@ -152,9 +176,9 @@ export default function SearchSelect({
             <input
               className={styles.search}
               aria-label="Type to find"
-              placeholder="Type the first letters"
+              placeholder="Type to find"
               value={typed}
-              autoFocus
+              autoFocus={focusSearch}
               onChange={(event) => setTyped(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Escape') setOpen(false)
@@ -166,7 +190,7 @@ export default function SearchSelect({
               }}
             />
           ) : null}
-          <div className={styles.list} role="listbox" aria-labelledby={id}>
+          <div className={styles.list} role="listbox" aria-labelledby={id} ref={list}>
             {shown.map((option, at) => {
               const heading =
                 option.group && option.group !== shown[at - 1]?.group ? option.group : null
@@ -177,6 +201,7 @@ export default function SearchSelect({
                     type="button"
                     role="option"
                     aria-selected={option.value === value}
+                    data-value={option.value}
                     className={styles.option}
                     onClick={() => choose(option.value)}
                   >

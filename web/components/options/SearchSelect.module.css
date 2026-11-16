@@ -69,6 +69,8 @@
 
 /* ===== 2. The open list ===== */
 .panel {
+  /* Room for the bottom menu on a phone when the list is scrolled into view. */
+  scroll-margin-bottom: 90px;
   display: grid;
   gap: 6px;
   padding: 8px;
@@ -97,6 +99,7 @@
 }
 
 .list {
+  position: relative;
   max-height: 280px;
   overflow-y: auto;
   display: grid;
