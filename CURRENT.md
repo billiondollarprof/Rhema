@@ -860,7 +860,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     said "still delete it, all 8". Migration 20261116110342 (test 041, three
     breaks caught) ran on testing (nothing matched, 17 kept) then live. Live
     now has 0 patients, payments, visits and families. Left: 2 files of
-    RMC-000003 in file storage, unreachable; clear later. Next number RMC-000009.
+    RMC-000003 in file storage, unreachable. Next number RMC-000009.
+    FILES CLEARED 2026-11-16 (his words: "clear the uploaded files, it was me
+    that uploaded it"): new job files-leftovers.yml (list, or delete with a
+    limit) deleted the 2 leftovers from rhema-files; a list run after shows 0.
 
 204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
     need prices to be a picker, the hospital decides per time how much a test
