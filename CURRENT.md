@@ -849,6 +849,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+215. **History behind the menu: money for the Front Desk and admin, numbers
+    for the Lab and Pharmacy, own work for each consultant.** (2026-11-16)
+    "The front desk can see history of everyone registered today and all
+    payments made, so they can also see how many different categories of
+    payment... individual, antenatal and family are different amounts, the lab
+    tests and the medicine. It also shows the amount of money in total... by
+    day, week, month, and even hourly range. Each category also has its own
+    total apart from the general total... so the front desk can cross check
+    what was paid. Then also total paid by mode of payment, cash, POS or
+    transfer... Pharmacy and lab only see numbers. The pharmacy sees how many
+    drugs and how much was sold or given out today, then the lab as well. Only
+    the admin and front desk see all history amounts... each consultant can
+    still see their own history... how many patients in particular they
+    attended to. The history button can sit behind the hamburger menu."
+    Also his yes to 214's SQL ("Yes to the SQLs").
+
 214. **His answers on 213 a and b, plus notes titles and lab edits.**
     (2026-11-16) "1. yes 2. yes" (send paid lab tests to the Lab, paid drugs to
     the Pharmacy). "3. yes on the pharmacy but entering number of units or
