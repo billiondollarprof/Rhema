@@ -957,3 +957,9 @@ this file.
   every uploaded file, written in Activity. Every migration of the day is on
   both databases with 0 new warnings; the emailed record now shows note
   titles. Checked on testing and live.
+- **217c, 218a to 218d (2026-11-16): the doctor's note and the medication
+  chart, Next.js, and the backup check.** The four boxes with words to tap,
+  medicines straight onto the chart, Send to the nurses; the chart with Given,
+  last dose and next due; the summary and the plan banner; each role's work
+  first. Next.js 16.4.5. The backup counts rows and files and fails if any is
+  missing. Checked on testing and live.

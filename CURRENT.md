@@ -868,6 +868,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        well, the population of the medicine, the arrangement, the lab as well
        ... areas where our own look simpler and better, we keep. Where their
        own seems better, we make adjustments... put all the plans together."
+    STATUS (2026-11-16, night):
+    a. Done. Live read: the director's account is a doctor in Consultant Room 1,
+       kind consultation, so he could write; the fault was placement and names.
+    b. LIVE: the four boxes with tap words, medicines to the chart, Send to the
+       nurses, the medication chart (Given, then Yes), the summary, the plan
+       banner for nurses, each role's work first, Visits by day. No SQL.
+    c. LIVE: Next.js 16.4.3 to 16.4.5. typescript-eslint 8.73.0 (clears a
+       dev-only minimatch notice) was published 2026-11-16, so it waits a week.
+    d. LIVE: the backup now proves every counted row is in the copy and every
+       live file is in the backup; a run by hand passed on live. FOUND:
+       GitHub starts scheduled runs hours late or not at all (the 01:17 run
+       came at about 08:00; 0 of the 2-hourly runs started in 9 hours).
+       Proposed fix waits for his yes and a token: a Cloudflare Worker timer
+       (free) that starts the backup every 2 hours.
+    e. Research done, the whole-flow plan sent to him. WAITING FOR HIS YES.
 
 217. **Download our data, a review of today, then simplicity.** (2026-11-16)
     a. "Download our data: if you've checked it and everything checks out,
