@@ -952,3 +952,8 @@ this file.
   medicine box arrow; Medical record from the queue; Take payment only for the
   Front Desk; send paid work to the Lab and Pharmacy; pharmacy stock; note
   titles; lab corrections. Checked on testing and live each time.
+- **217a, 217b (2026-11-16): Download our data, and the review of the day.**
+  Admin, Data tab: PIN again, one ZIP with a spreadsheet for every table and
+  every uploaded file, written in Activity. Every migration of the day is on
+  both databases with 0 new warnings; the emailed record now shows note
+  titles. Checked on testing and live.

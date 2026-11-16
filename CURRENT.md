@@ -874,6 +874,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     record... so-so drug given at so-so time, so-so dose by so-so person. So
     that any person that comes around will see it." Picking drug, then
     milligram, then dosage to record a dose "will more difficult".
+    STATUS: a. LIVE 2026-11-16 (Admin, Data tab; migration 20261116201525,
+    test 046; checked with made up data, ZIP opened, wrong PIN and cancel
+    checked). b. Done: all 13 of today's migrations on both databases, 0 new
+    warnings; fixed the emailed record missing note titles (LIVE). c. Research
+    done, proposal sent to him, WAITING FOR HIS YES before building.
+    Also asked: Next.js shows a moderate security notice (16.4.3, fix is a
+    small version bump; does not touch this app, which is static). Waiting
+    for his yes to bump it.
 
 216. **History: his answers and the front desk's real need.** (2026-11-16)
     "Yes, admin 3 card fees." "The front desk... when they click history,
