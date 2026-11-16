@@ -249,7 +249,8 @@ export function recordEmail(data: RecordData) {
     `<tr><td style="padding:14px 24px 0;color:#0f2238"><div style="font-weight:bold;font-size:15px;color:#0a2a5e;border-bottom:1px solid #e2e8f0;padding-bottom:4px">${escapeHtml(s.title)}</div>` +
     s.lines
       .map(
-        (l) => `<div style="font-size:14px;line-height:21px;padding:4px 0">${escapeHtml(l)}</div>`,
+        (l) =>
+          `<div style="font-size:14px;line-height:21px;padding:4px 0;white-space:pre-line">${escapeHtml(l)}</div>`,
       )
       .join('') +
     '</td></tr>'

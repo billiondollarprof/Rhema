@@ -9,6 +9,12 @@
  * Each test can also carry a photo or PDF of the printout (slice 2): a
  * photo is shrunk in the phone before it is sent (lib/lab/files.ts).
  *
+ * A test on the lab menu (lib/lab/catalogue.ts) shows its own boxes: a
+ * number with its unit and usual range, or a pick such as Negative or +.
+ * They are written as plain lines of result text, with the free text box
+ * kept as the comment (request 196a, 2026-11-16). A test not on the menu
+ * keeps the one free text box, as before.
+ *
  * Never: show the patient's medical history here. The lab sees the
  * patient's name and number, the tests and the note, and nothing else.
  */
@@ -22,6 +28,7 @@ import styles from '../_parts/lab.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import { getLabRequest, recordResults, type LabRequest, type ResultItem } from '@/lib/lab/lab'
+import { ALL_LAB_TESTS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
 import { prepareFile, sizeWords, uploadFile, type ReadyFile } from '@/lib/lab/files'
 import type { PatientResult } from '@/lib/patients/patients'
 import { useRightPage } from '@/lib/auth/routes'
@@ -29,7 +36,14 @@ import { useAuth } from '@/lib/auth/session'
 
 // file: a photo (already shrunk) or PDF chosen for this test, sent when
 // Result ready is tapped.
-type Line = { test: string; result: string; file?: ReadyFile }
+// values: what was filled in each box of a test on the lab menu, by box name.
+type Line = { test: string; result: string; values: Record<string, string>; file?: ReadyFile }
+
+// The words saved for one test: the boxes written out, then the comment.
+function resultText(line: Line): string {
+  const menu = findLabTest(line.test)
+  return menu ? composeResult(menu, line.values, line.result) : line.result.trim()
+}
 
 function EnterResults() {
   const auth = useAuth()
@@ -40,7 +54,7 @@ function EnterResults() {
 
   const [request, setRequest] = useState<LabRequest | null | undefined>(undefined)
   const [walkIn, setWalkIn] = useState<PatientResult | null>(null)
-  const [lines, setLines] = useState<Line[]>([{ test: '', result: '' }])
+  const [lines, setLines] = useState<Line[]>([{ test: '', result: '', values: {} }])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -52,7 +66,7 @@ function EnterResults() {
     getLabRequest(client, requestId).then((found) => {
       if (!current) return
       setRequest(found)
-      if (found) setLines(found.tests.map((test) => ({ test, result: '' })))
+      if (found) setLines(found.tests.map((test) => ({ test, result: '', values: {} })))
     })
     return () => {
       current = false
@@ -64,7 +78,7 @@ function EnterResults() {
   // ===== 2. Save =====
   // Each test needs typed words or an attached file (or both).
   const complete = lines.every(
-    (line) => line.test.trim().length >= 2 && (line.result.trim() || line.file),
+    (line) => line.test.trim().length >= 2 && (resultText(line) || line.file),
   )
   const patientName = request?.patient?.full_name ?? walkIn?.full_name ?? ''
   const patientNumber = request?.patient?.patient_number ?? walkIn?.patient_number ?? ''
@@ -78,7 +92,7 @@ function EnterResults() {
     for (const line of lines) {
       const item: ResultItem = {
         test: line.test.trim(),
-        result: line.result.trim() || 'See the attached file.',
+        result: resultText(line) || 'See the attached file.',
       }
       if (line.file) {
         const sent = await uploadFile(client, line.file)
@@ -107,6 +121,14 @@ function EnterResults() {
 
   function change(index: number, part: 'test' | 'result', value: string) {
     setLines((all) => all.map((line, at) => (at === index ? { ...line, [part]: value } : line)))
+  }
+
+  function setValue(index: number, box: string, value: string) {
+    setLines((all) =>
+      all.map((line, at) =>
+        at === index ? { ...line, values: { ...line.values, [box]: value } } : line,
+      ),
+    )
   }
 
   function setFile(index: number, file: ReadyFile | undefined) {
@@ -181,14 +203,33 @@ function EnterResults() {
                         aria-label="Test"
                         placeholder="Test, e.g. Malaria test"
                         maxLength={80}
+                        list="lab-menu"
                         value={line.test}
                         onChange={(event) => change(index, 'test', event.target.value)}
                       />
                     )}
+                    {findLabTest(line.test) ? (
+                      <ResultBoxes
+                        test={findLabTest(line.test) as LabTest}
+                        at={index}
+                        values={line.values}
+                        onChange={(box, value) => setValue(index, box, value)}
+                      />
+                    ) : null}
                     <textarea
                       className={styles.input}
-                      aria-label={`Result for ${line.test || 'this test'}`}
-                      placeholder={line.file ? 'Result (optional with a file)' : 'Result'}
+                      aria-label={
+                        findLabTest(line.test)
+                          ? `Comment for ${line.test}`
+                          : `Result for ${line.test || 'this test'}`
+                      }
+                      placeholder={
+                        findLabTest(line.test)
+                          ? 'Comment (optional)'
+                          : line.file
+                            ? 'Result (optional with a file)'
+                            : 'Result'
+                      }
                       maxLength={5000}
                       value={line.result}
                       onChange={(event) => change(index, 'result', event.target.value)}
@@ -202,9 +243,16 @@ function EnterResults() {
                 ))
               : null}
             {ready && !request ? (
+              <datalist id="lab-menu">
+                {ALL_LAB_TESTS.map((test) => (
+                  <option key={test.name} value={test.name} />
+                ))}
+              </datalist>
+            ) : null}
+            {ready && !request ? (
               <button
                 className={styles.button}
-                onClick={() => setLines((all) => [...all, { test: '', result: '' }])}
+                onClick={() => setLines((all) => [...all, { test: '', result: '', values: {} }])}
                 disabled={lines.length >= 20}
               >
                 Add another test
@@ -228,7 +276,64 @@ function EnterResults() {
   )
 }
 
-// ===== 3. Attach a photo or PDF to one test =====
+// ===== 3. The boxes for one test on the lab menu =====
+// A pick list for a box with choices; a number box with its unit and usual
+// range; a short line of text for anything else.
+function ResultBoxes({
+  test,
+  at,
+  values,
+  onChange,
+}: {
+  test: LabTest
+  at: number
+  values: Record<string, string>
+  onChange: (box: string, value: string) => void
+}) {
+  return (
+    <div className={styles.fields}>
+      {test.fields.map((field, place) => {
+        const id = `box-${at}-${place}`
+        const value = values[field.name] ?? ''
+        return (
+          <div key={field.name} className={styles.field}>
+            <label htmlFor={id}>{field.name}</label>
+            {field.choices ? (
+              <select
+                id={id}
+                className={styles.input}
+                value={value}
+                onChange={(event) => onChange(field.name, event.target.value)}
+              >
+                <option value="">Choose</option>
+                {field.choices.map((choice) => (
+                  <option key={choice} value={choice}>
+                    {choice}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className={styles.unit}>
+                <input
+                  id={id}
+                  className={styles.input}
+                  inputMode={field.unit ? 'decimal' : undefined}
+                  maxLength={120}
+                  value={value}
+                  onChange={(event) => onChange(field.name, event.target.value)}
+                />
+                {field.unit ? <span>{field.unit}</span> : null}
+              </div>
+            )}
+            {field.range ? <small>Usual: {field.range}</small> : null}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ===== 4. Attach a photo or PDF to one test =====
 // The photo is shrunk straight away, so the size shown is what will be sent.
 function AttachFile({
   label,

@@ -2,7 +2,8 @@
  * app/lab/request/page.tsx: Request lab.
  *
  * Why: the demo's "Request lab test" (request 115). A doctor, nurse or
- * matron picks the patient, taps the common tests or types another, and
+ * matron picks the patient, taps the common tests or finds any other one
+ * (search or browse by section, request 196a, 2026-11-16), and
  * sends it to the Front Desk for payment or straight to the Laboratory.
  * Opened from Home (no patient yet) or from the patient's record (?p=12).
  *
@@ -15,6 +16,7 @@ import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PatientPicker from '../_parts/PatientPicker'
+import TestSearch from '../_parts/TestSearch'
 import styles from '../_parts/lab.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
@@ -34,7 +36,6 @@ function RequestLab() {
 
   const [patient, setPatient] = useState<PatientResult | null>(null)
   const [tests, setTests] = useState<string[]>([])
-  const [typed, setTyped] = useState('')
   const [note, setNote] = useState('')
   const [sendTo, setSendTo] = useState<SendTo>('front_desk')
   const [busy, setBusy] = useState(false)
@@ -60,13 +61,6 @@ function RequestLab() {
     setTests((chosen) =>
       chosen.includes(test) ? chosen.filter((item) => item !== test) : [...chosen, test],
     )
-  }
-
-  function addTyped() {
-    const test = typed.trim()
-    if (test.length < 2 || tests.includes(test)) return
-    setTests((chosen) => [...chosen, test])
-    setTyped('')
   }
 
   // ===== 3. Send =====
@@ -142,7 +136,7 @@ function RequestLab() {
 
             {/* ----- The tests ----- */}
             <div>
-              <span className={styles.label}>Tests</span>
+              <span className={styles.label}>Common tests</span>
               <div className={styles.chips}>
                 {[...COMMON_TESTS, ...custom].map((test) => (
                   <button
@@ -156,24 +150,8 @@ function RequestLab() {
                 ))}
               </div>
             </div>
-            <div className={styles.row}>
-              <input
-                className={styles.input}
-                aria-label="Another test"
-                placeholder="Another test, e.g. Liver function test"
-                value={typed}
-                maxLength={80}
-                onChange={(event) => setTyped(event.target.value)}
-                onKeyDown={(event) => event.key === 'Enter' && addTyped()}
-              />
-              <button
-                className={styles.button}
-                onClick={addTyped}
-                disabled={typed.trim().length < 2}
-              >
-                Add
-              </button>
-            </div>
+            {/* ----- Every other test: search or browse (request 196a) ----- */}
+            <TestSearch client={client} staffId={staff.id} chosen={tests} onToggle={toggle} />
 
             {/* ----- A note for the lab ----- */}
             <div>
