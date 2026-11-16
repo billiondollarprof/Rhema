@@ -120,16 +120,50 @@ async function ask<T>(
   args: Record<string, unknown>,
 ): Promise<T | null> {
   const { data, error } = await client.rpc(name, args)
-  if (error || !data) return null
+  // Only a summary (an object) is used; anything else counts as no answer,
+  // so a wrong reply can never break the page.
+  if (error || !data || typeof data !== 'object' || Array.isArray(data)) return null
   return data as T
 }
 
-export const loadMoney = (client: SupabaseClient, from: Date, to: Date, mine: boolean) =>
+// The Front Desk always gets only their own; the database sees to it.
+// staff: an admin's choice of one person, or null for everybody.
+export const loadMoney = (
+  client: SupabaseClient,
+  from: Date,
+  to: Date,
+  mine: boolean,
+  staff: string | null,
+) =>
   ask<Money>(client, 'money_summary', {
     p_from: from.toISOString(),
     p_to: to.toISOString(),
     p_mine: mine,
+    p_staff: staff,
   })
+
+// When this person last signed in with the email code: the start of the
+// Front Desk's shift. Unlocking with the PIN does not change it.
+export async function loadShiftStart(client: SupabaseClient): Promise<Date | null> {
+  const { data, error } = await client.rpc('my_shift_start')
+  if (error || typeof data !== 'string') return null
+  return new Date(data)
+}
+
+// The people who take payments, for an admin's "Taken by".
+export async function loadTakers(
+  client: SupabaseClient,
+): Promise<{ id: string; full_name: string }[]> {
+  const { data } = await client
+    .from('staff')
+    .select('id, full_name, role, can_admin')
+    .eq('is_active', true)
+    .order('full_name')
+    .limit(200)
+  const rows =
+    (data as { id: string; full_name: string; role: string; can_admin: boolean }[] | null) ?? []
+  return rows.filter((one) => one.role === 'front_desk' || one.can_admin)
+}
 export const loadLab = (client: SupabaseClient, from: Date, to: Date) =>
   ask<LabNumbers>(client, 'lab_summary', { p_from: from.toISOString(), p_to: to.toISOString() })
 export const loadPharmacy = (client: SupabaseClient, from: Date, to: Date) =>

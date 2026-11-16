@@ -304,3 +304,65 @@
     grid-column: 2;
   }
 }
+
+/* ===== The period and Taken by drop downs, side by side when there is room ===== */
+.pickers {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  max-width: 620px;
+}
+
+.picker {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.picker label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+/* The Front Desk's shift, at the top. */
+.shiftCard {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--tint-2);
+}
+
+.shiftCard span {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.shiftCard b {
+  font-size: 16px;
+}
+
+/* A long list, folded until it is opened. */
+.fold {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 12px;
+}
+
+.fold > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--link);
+}
+
+.fold[open] {
+  padding-bottom: 8px;
+}

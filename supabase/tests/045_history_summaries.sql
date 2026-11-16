@@ -54,17 +54,18 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 do $$
 declare
-  all_of jsonb := public.money_summary(now() - interval '1 hour', now() + interval '1 minute', false);
-  mine jsonb := public.money_summary(now() - interval '1 hour', now() + interval '1 minute', true);
+  all_of jsonb := public.money_summary(now() - interval '1 hour', now() + interval '1 minute', false, null);
+  mine jsonb := public.money_summary(now() - interval '1 hour', now() + interval '1 minute', true, null);
 begin
-  if (all_of ->> 'total')::numeric < 8500 then
-    raise exception 'FAIL 1: the total is wrong: %', all_of ->> 'total';
+  -- The Front Desk asking for everybody still gets only their own.
+  if (all_of ->> 'total')::numeric <> 3500 then
+    raise exception 'FAIL 1: the Front Desk saw another person''s money: %', all_of ->> 'total';
   end if;
   if not (all_of -> 'by_category') @> '[{"key":"card_antenatal","amount":2000}]'::jsonb then
     raise exception 'FAIL 1: the antenatal card is not its own category: %', all_of -> 'by_category';
   end if;
   if not (all_of -> 'by_mode') @> '[{"key":"cash","amount":2000}]'::jsonb
-     or not (all_of -> 'by_mode') @> '[{"key":"transfer","amount":5000}]'::jsonb then
+     or (all_of -> 'by_mode') @> '[{"key":"transfer"}]'::jsonb then
     raise exception 'FAIL 1: the totals by mode are wrong: %', all_of -> 'by_mode';
   end if;
   if (mine ->> 'total')::numeric <> 3500 then
@@ -75,7 +76,42 @@ begin
   end if;
 end $$;
 reset role;
-\echo 'PASS 1: the Front Desk sees totals by category and mode, and only its own'
+\echo 'PASS 1: the Front Desk sees only its own money, by category and mode'
+
+
+-- ===== 1b. An admin sees everybody, or one person =====
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-000000000457', 't045-admin@test.rhema');
+insert into public.staff (id, full_name, email, role) values
+  ('00000000-0000-0000-0000-000000000457', 'T45 Admin', 't045-admin@test.rhema', 'admin');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000457"}', true);
+set local role authenticated;
+do $$
+begin
+  if (public.money_summary(now() - interval '1 hour', now() + interval '1 minute', false, null) ->> 'total')::numeric < 8500 then
+    raise exception 'FAIL 1b: the admin does not see everybody';
+  end if;
+  if (public.money_summary(now() - interval '1 hour', now() + interval '1 minute', false,
+        '00000000-0000-0000-0000-000000000452') ->> 'total')::numeric <> 5000 then
+    raise exception 'FAIL 1b: the admin cannot see one person''s money';
+  end if;
+end $$;
+reset role;
+\echo 'PASS 1b: an admin sees everybody, or one person they choose'
+
+
+-- ===== 1c. The shift starts at the last email sign in =====
+update auth.users set last_sign_in_at = now() - interval '30 hours'
+where id = '00000000-0000-0000-0000-000000000451';
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000451"}', true);
+set local role authenticated;
+do $$
+begin
+  if public.my_shift_start() is null or public.my_shift_start() > now() - interval '29 hours' then
+    raise exception 'FAIL 1c: the shift start is not the last sign in';
+  end if;
+end $$;
+reset role;
+\echo 'PASS 1c: the shift starts at the last email sign in'
 
 
 -- ===== 2. A voided payment is left out =====
@@ -85,7 +121,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 do $$
 begin
-  if (public.money_summary(now() - interval '1 hour', now() + interval '1 minute', true) ->> 'total')::numeric <> 0 then
+  if (public.money_summary(now() - interval '1 hour', now() + interval '1 minute', true, null) ->> 'total')::numeric <> 0 then
     raise exception 'FAIL 2: a voided payment was counted';
   end if;
 end $$;
@@ -101,7 +137,7 @@ begin
     perform set_config('request.jwt.claims', json_build_object('sub', person)::text, true);
     set local role authenticated;
     begin
-      perform public.money_summary(now() - interval '1 hour', now(), false);
+      perform public.money_summary(now() - interval '1 hour', now(), false, null);
       raise exception 'FAIL 3: % saw the money', person;
     exception when insufficient_privilege then null;
     end;
@@ -182,7 +218,7 @@ set local role authenticated;
 do $$
 begin
   begin
-    perform public.money_summary(now() - interval '500 days', now(), false);
+    perform public.money_summary(now() - interval '500 days', now(), false, null);
     raise exception 'FAIL 5: a period of 500 days was answered';
   exception when invalid_parameter_value then null;
   end;

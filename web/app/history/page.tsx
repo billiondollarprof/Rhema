@@ -35,6 +35,8 @@ import {
   PATIENT_CATEGORY_WORDS,
   PERIODS,
   loadLab,
+  loadShiftStart,
+  loadTakers,
   loadMoney,
   loadMyWork,
   loadPharmacy,
@@ -46,6 +48,7 @@ import {
   type PeriodKey,
   type PharmacyNumbers,
 } from '@/lib/history/history'
+import SearchSelect from '@/components/options/SearchSelect'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -65,11 +68,18 @@ export default function HistoryPage() {
   useRightPage(auth.status, '/history/')
   const { client, staff } = auth
 
-  const [period, setPeriod] = useState<PeriodKey>('today')
+  // The Front Desk works by shift: from their last email sign in (Anthony,
+  // 2026-11-16: "they want to see from the time their own session started").
+  const frontDesk = staff?.role === 'front_desk' && !staff.can_admin
+  // What was chosen; until then, the shift for the Front Desk, today for others.
+  const [chosen, setPeriod] = useState<PeriodKey | 'shift' | null>(null)
+  const period: PeriodKey | 'shift' = chosen ?? (frontDesk ? 'shift' : 'today')
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
-  // Only my own payments: on for the Front Desk, off for an admin.
-  const [mineOnly, setMineOnly] = useState<boolean | null>(null)
+  const [shiftStart, setShiftStart] = useState<Date | null>(null)
+  // An admin: everybody, or one person ("" is everybody).
+  const [takenBy, setTakenBy] = useState('')
+  const [takers, setTakers] = useState<{ value: string; label: string }[]>([])
 
   const [money, setMoney] = useState<Money | null>(null)
   const [lab, setLab] = useState<LabNumbers | null>(null)
@@ -81,15 +91,38 @@ export default function HistoryPage() {
   const seesLab = staff?.role === 'laboratory'
   const seesPharmacy = staff?.role === 'pharmacy'
   const seesWork = Boolean(staff?.can_medical)
-  const mine = mineOnly ?? staff?.role === 'front_desk'
-  const range = periodRange(period, from, to)
+  const range =
+    period === 'shift'
+      ? shiftStart
+        ? { from: shiftStart, to: new Date() }
+        : null
+      : periodRange(period, from, to)
+
+  // ===== 0. The shift start, and who takes payments (for an admin) =====
+  useEffect(() => {
+    if (!client || !staff) return
+    let current = true
+    loadShiftStart(client).then((found) => {
+      if (current) setShiftStart(found ?? new Date(new Date().setHours(0, 0, 0, 0)))
+    })
+    if (staff.can_admin) {
+      loadTakers(client).then((found) => {
+        if (current) setTakers(found.map((one) => ({ value: one.id, label: one.full_name })))
+      })
+    }
+    return () => {
+      current = false
+    }
+  }, [client, staff])
 
   // ===== 1. Ask for each part this person sees =====
   useEffect(() => {
     if (!client || !staff || !range) return
     let current = true
     Promise.all([
-      seesMoney ? loadMoney(client, range.from, range.to, mine) : Promise.resolve(null),
+      seesMoney
+        ? loadMoney(client, range.from, range.to, false, takenBy || null)
+        : Promise.resolve(null),
       seesLab ? loadLab(client, range.from, range.to) : Promise.resolve(null),
       seesPharmacy ? loadPharmacy(client, range.from, range.to) : Promise.resolve(null),
       seesWork ? loadMyWork(client, range.from, range.to) : Promise.resolve(null),
@@ -106,7 +139,19 @@ export default function HistoryPage() {
     }
     // The range is rebuilt from these each render; its times are the key.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, staff, period, from, to, mine, seesMoney, seesLab, seesPharmacy, seesWork])
+  }, [
+    client,
+    staff,
+    period,
+    from,
+    to,
+    shiftStart,
+    takenBy,
+    seesMoney,
+    seesLab,
+    seesPharmacy,
+    seesWork,
+  ])
 
   if (auth.status !== 'ready' || !client || !staff) return null
   const cash = money?.by_mode.find((bucket) => bucket.key === 'cash')
@@ -116,21 +161,56 @@ export default function HistoryPage() {
       <div className={styles.page}>
         <h2>History</h2>
 
-        {/* ===== 1. The period ===== */}
-        <div className={styles.periods} role="group" aria-label="Period">
-          {PERIODS.map(([key, words]) => (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={period === key}
-              onClick={() => {
+        {/* ===== 1. The period: a drop down, so nothing crowds the page ===== */}
+        {frontDesk && period === 'shift' && shiftStart ? (
+          <div className={styles.shiftCard}>
+            <span>My shift</span>
+            <b>
+              Since you signed in:{' '}
+              {shiftStart.toLocaleString('en-GB', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </b>
+          </div>
+        ) : null}
+        <div className={styles.pickers}>
+          <div className={styles.picker}>
+            <label htmlFor="history-period">Show</label>
+            <SearchSelect
+              id="history-period"
+              value={period}
+              options={(frontDesk
+                ? [
+                    ['shift', 'This shift'],
+                    ...PERIODS.filter(([key]) => key === 'today' || key === 'hours24'),
+                  ]
+                : PERIODS
+              ).map(([key, words]) => ({ value: key, label: words }))}
+              onChange={(next) => {
                 setLoading(true)
-                setPeriod(key)
+                setPeriod(next as PeriodKey | 'shift')
               }}
-            >
-              {words}
-            </button>
-          ))}
+            />
+          </div>
+          {staff.can_admin && seesMoney ? (
+            <div className={styles.picker}>
+              <label htmlFor="history-taken-by">Taken by</label>
+              <SearchSelect
+                id="history-taken-by"
+                value={takenBy}
+                placeholder="Everybody"
+                options={[{ value: '', label: 'Everybody' }, ...takers]}
+                onChange={(next) => {
+                  setLoading(true)
+                  setTakenBy(next)
+                }}
+              />
+            </div>
+          ) : null}
         </div>
         {period === 'custom' ? (
           <div className={styles.custom}>
@@ -167,15 +247,13 @@ export default function HistoryPage() {
         {seesMoney ? (
           <section className={styles.section}>
             <div className={styles.sectionHead}>
-              <h3>Money taken</h3>
-              <div className={styles.toggle} role="group" aria-label="Whose payments">
-                <button type="button" aria-pressed={mine} onClick={() => setMineOnly(true)}>
-                  Only payments I took
-                </button>
-                <button type="button" aria-pressed={!mine} onClick={() => setMineOnly(false)}>
-                  Everybody
-                </button>
-              </div>
+              <h3>
+                {frontDesk
+                  ? 'Money I took'
+                  : takenBy
+                    ? `Money taken by ${takers.find((one) => one.value === takenBy)?.label ?? 'one person'}`
+                    : 'Money taken by everybody'}
+              </h3>
             </div>
 
             <div className={styles.totalCard}>
@@ -246,41 +324,44 @@ export default function HistoryPage() {
                     </span>
                   ))}
                 </div>
-                <ul className={styles.list}>
-                  {money.registered.map((one) => (
-                    <li key={one.patient}>
-                      <span>{timeWords(one.at)}</span>
-                      <b>{one.patient}</b>
-                      <span>
-                        {PATIENT_CATEGORY_WORDS[one.category]}
-                        {one.old_file ? ' · old file' : ''}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <details className={styles.fold}>
+                  <summary>See each patient registered</summary>
+                  <ul className={styles.list}>
+                    {money.registered.map((one) => (
+                      <li key={one.patient}>
+                        <span>{timeWords(one.at)}</span>
+                        <b>{one.patient}</b>
+                        <span>
+                          {PATIENT_CATEGORY_WORDS[one.category]}
+                          {one.old_file ? ' · old file' : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </>
             ) : (
               <p className={styles.muted}>Nobody registered in this period.</p>
             )}
 
-            <h4>Payments</h4>
             {money && money.payments.length > 0 ? (
-              <ul className={styles.list}>
-                {money.payments.map((one) => (
-                  <li key={one.id}>
-                    <span>{timeWords(one.at)}</span>
-                    <b>{naira(one.amount)}</b>
-                    <span>
-                      {CATEGORY_WORDS[one.category] ?? one.category} ·{' '}
-                      {MODE_WORDS[one.mode] ?? one.mode} · {one.patient}
-                      {!mine && one.taken_by ? ` · ${one.taken_by}` : ''}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.muted}>No payments in this period.</p>
-            )}
+              <details className={styles.fold}>
+                <summary>See each payment ({money.payments.length})</summary>
+                <ul className={styles.list}>
+                  {money.payments.map((one) => (
+                    <li key={one.id}>
+                      <span>{timeWords(one.at)}</span>
+                      <b>{naira(one.amount)}</b>
+                      <span>
+                        {CATEGORY_WORDS[one.category] ?? one.category} ·{' '}
+                        {MODE_WORDS[one.mode] ?? one.mode} · {one.patient}
+                        {!frontDesk && !takenBy && one.taken_by ? ` · ${one.taken_by}` : ''}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
           </section>
         ) : null}
 

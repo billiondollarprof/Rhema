@@ -47,8 +47,9 @@ module.exports.SCREENS = [
   // History (requests 215, 216): money for the Front Desk, numbers for others.
   {
     path: '/history/',
-    waitFor: 'Money taken',
+    waitFor: 'Money I took',
     extra: {
+      'rpc/my_shift_start': new Date(Date.now() - 9 * 3600 * 1000).toISOString(),
       'rpc/money_summary': {
         total: 46500,
         count: 9,
@@ -100,6 +101,22 @@ module.exports.SCREENS = [
             old_file: false,
           },
         ],
+      },
+    },
+  },
+  {
+    path: '/history/',
+    waitFor: 'Money taken by everybody',
+    role: 'admin',
+    admin: true,
+    extra: {
+      'rpc/money_summary': {
+        total: 46500,
+        count: 9,
+        by_category: [{ key: 'lab_test', count: 4, amount: 18000 }],
+        by_mode: [{ key: 'cash', count: 5, amount: 21500 }],
+        payments: [],
+        registered: [],
       },
     },
   },

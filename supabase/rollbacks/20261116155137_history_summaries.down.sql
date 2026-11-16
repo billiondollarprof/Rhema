@@ -8,9 +8,11 @@
 drop function if exists public.my_summary(timestamptz, timestamptz);
 drop function if exists public.pharmacy_summary(timestamptz, timestamptz);
 drop function if exists public.lab_summary(timestamptz, timestamptz);
-drop function if exists public.money_summary(timestamptz, timestamptz, boolean);
+drop function if exists public.money_summary(timestamptz, timestamptz, boolean, uuid);
 drop function if exists private.my_summary(timestamptz, timestamptz);
 drop function if exists private.pharmacy_summary(timestamptz, timestamptz);
 drop function if exists private.lab_summary(timestamptz, timestamptz);
-drop function if exists private.money_summary(timestamptz, timestamptz, boolean);
+drop function if exists private.money_summary(timestamptz, timestamptz, boolean, uuid);
+drop function if exists public.my_shift_start();
+drop function if exists private.my_shift_start();
 drop function if exists private.check_period(timestamptz, timestamptz);

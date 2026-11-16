@@ -860,7 +860,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     how many they attended to." Design: "easy to spot and understand.
     Screenshot and check it until it looks good both on mobile and
     desktop/tablet."
-    BUILT 2026-11-16, held for his SQL yes: History in the menu (migration
+    CORRECTED 2026-11-16 (his words: "the front desk just want to know the one
+    they themselves collected... from the time their own session started...
+    admin is now the one that sees everything"): the Front Desk sees only
+    their own money, enforced by the database, from their last email sign in
+    ("This shift"), with Today and Last 24 hours; no Everybody. Admin: Period
+    drop down (dates and hours) and Taken by (Everybody or one person). Long
+    lists folded. His SQL yes "if it matches"; it matched.
+    BUILT 2026-11-16: History in the menu (migration
     20261116155137_history_summaries, test 045, 9 breaks caught). Front Desk
     and admin: total, Cash/POS/Transfer (cash marked, "Count the cash in hand:
     it should be..."), each category with its own total (card split into

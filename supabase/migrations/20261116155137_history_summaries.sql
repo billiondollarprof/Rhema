@@ -6,7 +6,15 @@
 --   1. money_summary: the Front Desk and admins. Total taken, by category
 --      (the card split into Individual, Family and Antenatal), by how it was
 --      paid (cash, POS, transfer), the payments, and the patients registered.
---      "Only payments I took" gives what one person collected on duty.
+--      The Front Desk ALWAYS gets only what they took themselves; an admin
+--      gets everybody, or one person they choose (Anthony, 2026-11-16: "the
+--      front desk just want to know the one they themselves collected...
+--      admin is now the one that sees everything that each and everyone
+--      collected").
+--   1b. my_shift_start: when this person last signed in with the email code
+--      (unlocking with the PIN does not change it). The Front Desk's shift
+--      runs from then: "from the time their own session started... some of
+--      them, their session can last for 48 hours".
 --   2. lab_summary: the Laboratory. Counts only, no money.
 --   3. pharmacy_summary: the Pharmacy. Counts only, no money.
 --   4. my_summary: anybody, about their own work only: the patients they
@@ -44,7 +52,7 @@ revoke execute on function private.check_period(timestamptz, timestamptz) from p
 
 
 -- ===== 1. Money: the Front Desk and admins =====
-create function private.money_summary(p_from timestamptz, p_to timestamptz, p_mine boolean)
+create function private.money_summary(p_from timestamptz, p_to timestamptz, p_mine boolean, p_staff uuid)
 returns jsonb
 language plpgsql
 stable
@@ -54,11 +62,21 @@ as $$
 declare
   me uuid := (select auth.uid());
   answer jsonb;
+  -- Whose payments: the Front Desk only ever their own; an admin everybody,
+  -- or one person (p_staff), or their own (p_mine).
+  only_staff uuid;
 begin
   if not (select private.can_take_payment()) then
     raise exception 'Only the Front Desk and admins see money' using errcode = '42501';
   end if;
   perform private.check_period(p_from, p_to);
+  if not (select private.is_admin()) then
+    only_staff := me;
+  elsif p_mine then
+    only_staff := me;
+  else
+    only_staff := p_staff;
+  end if;
 
   with paid as (
     select p.id, p.amount, p.mode::text as mode, p.received_at, p.receipt_number,
@@ -70,7 +88,7 @@ begin
     left join public.staff s on s.id = p.received_by
     where p.received_at >= p_from and p.received_at < p_to
       and p.voided_at is null
-      and (not p_mine or p.received_by = me)
+      and (only_staff is null or p.received_by = only_staff)
   )
   select jsonb_build_object(
     'total', coalesce((select sum(amount) from paid), 0),
@@ -98,13 +116,26 @@ begin
       from (
         select created_at, patient_number, category, from_old_file from public.patients
         where created_at >= p_from and created_at < p_to and voided_at is null
-          and (not p_mine or created_by = me)
+          and (only_staff is null or created_by = only_staff)
         order by created_at desc limit 500
       ) r
     ), '[]'::jsonb)
   ) into answer;
   return answer;
 end;
+$$;
+
+
+-- ===== 1b. When this person last signed in (the start of their shift) =====
+create function private.my_shift_start()
+returns timestamptz
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select u.last_sign_in_at from auth.users u
+  where u.id = (select auth.uid()) and (select private.is_active_staff());
 $$;
 
 
@@ -244,18 +275,25 @@ $$;
 
 
 -- ===== 5. What the app may call =====
-revoke execute on function private.money_summary(timestamptz, timestamptz, boolean) from public, anon;
+revoke execute on function private.money_summary(timestamptz, timestamptz, boolean, uuid) from public, anon;
+revoke execute on function private.my_shift_start() from public, anon;
+grant  execute on function private.my_shift_start() to authenticated;
 revoke execute on function private.lab_summary(timestamptz, timestamptz) from public, anon;
 revoke execute on function private.pharmacy_summary(timestamptz, timestamptz) from public, anon;
 revoke execute on function private.my_summary(timestamptz, timestamptz) from public, anon;
-grant  execute on function private.money_summary(timestamptz, timestamptz, boolean) to authenticated;
+grant  execute on function private.money_summary(timestamptz, timestamptz, boolean, uuid) to authenticated;
 grant  execute on function private.lab_summary(timestamptz, timestamptz) to authenticated;
 grant  execute on function private.pharmacy_summary(timestamptz, timestamptz) to authenticated;
 grant  execute on function private.my_summary(timestamptz, timestamptz) to authenticated;
 
-create function public.money_summary(p_from timestamptz, p_to timestamptz, p_mine boolean)
+create function public.money_summary(p_from timestamptz, p_to timestamptz, p_mine boolean, p_staff uuid)
 returns jsonb language sql security invoker set search_path = ''
-as $$ select private.money_summary(p_from, p_to, p_mine); $$;
+as $$ select private.money_summary(p_from, p_to, p_mine, p_staff); $$;
+create function public.my_shift_start()
+returns timestamptz language sql security invoker set search_path = ''
+as $$ select private.my_shift_start(); $$;
+revoke execute on function public.my_shift_start() from public, anon;
+grant  execute on function public.my_shift_start() to authenticated;
 create function public.lab_summary(p_from timestamptz, p_to timestamptz)
 returns jsonb language sql security invoker set search_path = ''
 as $$ select private.lab_summary(p_from, p_to); $$;
@@ -266,11 +304,11 @@ create function public.my_summary(p_from timestamptz, p_to timestamptz)
 returns jsonb language sql security invoker set search_path = ''
 as $$ select private.my_summary(p_from, p_to); $$;
 
-revoke execute on function public.money_summary(timestamptz, timestamptz, boolean) from public, anon;
+revoke execute on function public.money_summary(timestamptz, timestamptz, boolean, uuid) from public, anon;
 revoke execute on function public.lab_summary(timestamptz, timestamptz) from public, anon;
 revoke execute on function public.pharmacy_summary(timestamptz, timestamptz) from public, anon;
 revoke execute on function public.my_summary(timestamptz, timestamptz) from public, anon;
-grant  execute on function public.money_summary(timestamptz, timestamptz, boolean) to authenticated;
+grant  execute on function public.money_summary(timestamptz, timestamptz, boolean, uuid) to authenticated;
 grant  execute on function public.lab_summary(timestamptz, timestamptz) to authenticated;
 grant  execute on function public.pharmacy_summary(timestamptz, timestamptz) to authenticated;
 grant  execute on function public.my_summary(timestamptz, timestamptz) to authenticated;
