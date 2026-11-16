@@ -849,6 +849,35 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
+    "Let's remove all the test patients added before today. But if there is any
+    patient added this morning that is in the last 10hrs leave it, but anything
+    higher, just delete, they should be around five test patients in the live
+    site." Cut off: added before 00:55 Lagos time on 16 November is deleted.
+    Rules: a read on live and any delete are asked first (CLAUDE.md section 2).
+    Asked him 2026-11-16 for (1) a read only look, then (2) the delete batch.
+
+204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
+    need prices to be a picker, the hospital decides per time how much a test
+    costs and if they want to make it fixed it should be something they set in
+    the admin settings. From front desk to pharmacy, they can decide to set the
+    price as a standard including laboratory, otherwise let the field just show
+    e.g. so they can manually enter the price of anything themselves." Read back
+    to him 2026-11-16, waits for his yes.
+    Also, same message, on 203: "don't switch it. Don't switch the testing site.
+    Leave it. I will not go to the hospital. I would go to the other hospital."
+    Testing was already switched to Okparavero when this arrived; asked him
+    whether to put Rhema back now or leave Okparavero showing.
+
+203. **Pitch: testing shows Okparavero Memorial Hospital.** (2026-11-16, he was
+    at their hospital) "Let's just switch the testing site... then we revert it
+    back to Rhema. Then later we settle down and do the multiple ones... we will
+    still do for this particular one so that they can access it anytime." DONE
+    on testing 2026-11-16 (brand okparavero, OM letters, logo too blurred). TO
+    DO: put Rhema back on testing when he says (ops/pitch.json brand rhema), and
+    give Okparavero its own lasting demo when the demos are built (198, 201).
+    LAB (202) LIVE 2026-11-16, same day.
+
 202. **The hospital's own lab list.** (2026-11-16, he sent LABORATORY_REPORT.docx,
     real past reports) "This is the laboratory document, check it to know
     what's left and what to correct. Also see the structure and propose the
