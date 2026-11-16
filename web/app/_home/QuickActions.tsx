@@ -45,7 +45,8 @@ const DOCTOR: Action[] = [
 const NURSE: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#00838f', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
-  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
+  // Announce moved into Messages (2026-11-16), so Request lab sits here.
+  { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: true, job: '/lab/request/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const PHARMACY: Action[] = [
@@ -61,16 +62,18 @@ const LABORATORY: Action[] = [
   { icon: 'msg', label: 'Messages', colour: '#00897b', ready: true, job: '/messages/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
+// Invite staff is in the menu (Admin) and Announce is in Messages, so the
+// admin's four are the everyday ones (Anthony, 2026-11-16).
 const ADMIN: Action[] = [
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   {
-    icon: 'users',
-    label: 'Invite staff',
+    icon: 'shield',
+    label: 'Activity log',
     colour: '#546e7a',
     ready: true,
-    job: '/admin/?tab=invite',
+    job: '/admin/?tab=activity',
   },
-  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
+  { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: true, job: '/messages/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 
@@ -118,16 +121,5 @@ export default function QuickActions({ role, only }: { role: string; only?: Acti
         </button>
       ))}
     </div>
-  )
-}
-
-// The admin's own buttons, shown last for somebody who also works with
-// patients (Anthony, 2026-11-10).
-export function AdminQuickActions() {
-  return (
-    <QuickActions
-      role="admin"
-      only={ADMIN.filter((a) => a.label !== 'Find patient' && a.label !== 'Call attention')}
-    />
   )
 }

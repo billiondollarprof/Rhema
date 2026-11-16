@@ -306,3 +306,80 @@ textarea.input {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* ===== Find a test: search, then the sections folded (request 196a) ===== */
+.search {
+  display: grid;
+  gap: 10px;
+}
+
+.sections {
+  display: grid;
+  gap: 6px;
+}
+
+.section {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #fff;
+}
+
+.section > summary {
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section > summary small {
+  color: var(--mut);
+  font-weight: 600;
+}
+
+.section[open] {
+  padding-bottom: 12px;
+}
+
+/* ===== The boxes for one test's result (request 196a) ===== */
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.field small {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unit .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.unit span {
+  color: var(--mut);
+  font-size: 13px;
+  white-space: nowrap;
+}

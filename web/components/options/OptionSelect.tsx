@@ -59,6 +59,8 @@ export default function OptionSelect({
   const [typing, setTyping] = useState(false)
   const [typed, setTyped] = useState('')
   const [busy, setBusy] = useState(false)
+  // A long list gets a search box: type the first letters (2026-11-16).
+  const [search, setSearch] = useState('')
 
   // A fresh copy, behind what is already showing.
   useEffect(() => {
@@ -72,7 +74,21 @@ export default function OptionSelect({
   }, [client, staffId])
 
   const options = useMemo(() => optionsOf(all, list), [all, list])
+  const long = options.length > 12
+  const words = search.trim().toLowerCase()
+  const shown = words
+    ? [
+        ...options.filter((option) => option.label.toLowerCase().startsWith(words)),
+        ...options.filter(
+          (option) =>
+            !option.label.toLowerCase().startsWith(words) &&
+            option.label.toLowerCase().includes(words),
+        ),
+      ]
+    : options
   const chosen = options.find((option) => option.label.toLowerCase() === value.toLowerCase())
+  // The chosen line stays in the drop down while a search hides the others.
+  const listed = chosen && !shown.includes(chosen) ? [chosen, ...shown] : shown
 
   async function save() {
     const words = typed.trim()
@@ -120,6 +136,15 @@ export default function OptionSelect({
 
   return (
     <div className={styles.wrap}>
+      {long ? (
+        <input
+          className={styles.input}
+          aria-label="Search this list"
+          placeholder="Search this list"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      ) : null}
       <select
         id={id}
         className={styles.select}
@@ -132,7 +157,7 @@ export default function OptionSelect({
         <option value="">{placeholder}</option>
         {/* A value already on the entry that is not in the list. */}
         {value && !chosen ? <option value={value}>{value}</option> : null}
-        {options.map((option) => (
+        {listed.map((option) => (
           <option key={option.id} value={option.label}>
             {option.label}
           </option>

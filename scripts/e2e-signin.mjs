@@ -338,7 +338,7 @@ try {
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
   await page.getByPlaceholder('Type the first letters').fill('Amlo')
   await page.getByRole('option', { name: 'Amlodipine' }).click()
-  await page.getByRole('button', { name: '5 mg tablet' }).click()
+  await page.getByRole('button', { name: '5 mg tablet', exact: true }).click()
   await page.getByLabel('Dose', { exact: true }).selectOption('1 tablet')
   await page.getByLabel('How often').selectOption('Once daily')
   await page.getByRole('button', { name: 'Add medicine' }).click()

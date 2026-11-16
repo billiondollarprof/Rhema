@@ -35,6 +35,7 @@ import { useRouter } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import FilePicker from '../_parts/FilePicker'
+import OptionSelect from '@/components/options/OptionSelect'
 import styles from '../_parts/patients.module.css'
 import { lastSeenWords } from '../_parts/PatientDetail'
 import type { ReadyFile } from '@/lib/files/files'
@@ -66,6 +67,19 @@ export default function OldFilePage() {
   const [sex, setSex] = useState<Sex | null>(null)
   // The front desk asked for it (2026-11-16): individual, family or antenatal.
   const [category, setCategory] = useState<Category>('individual')
+  // The rest of the card, folded away until somebody opens it (2026-11-16).
+  const [more, setMore] = useState({
+    email: '',
+    address: '',
+    town: '',
+    lga: '',
+    state: '',
+    kinName: '',
+    kinRelationship: '',
+    kinPhone: '',
+  })
+  const setMorePart = (key: keyof typeof more) => (value: string) =>
+    setMore({ ...more, [key]: value })
   const [files, setFiles] = useState<ReadyFile[]>([])
   const [tried, setTried] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -100,6 +114,15 @@ export default function OldFilePage() {
     cleanedPhone !== '' && !phoneLooksRight(cleanedPhone)
       ? 'Type an 11 digit phone number, like 08031234567.'
       : null
+  const kinPhone = cleanPhone(more.kinPhone)
+  const kinPhoneWrong =
+    kinPhone !== '' && !phoneLooksRight(kinPhone)
+      ? 'Type an 11 digit phone number, like 08031234567.'
+      : null
+  const emailWrong =
+    more.email.trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(more.email.trim())
+      ? 'Check the email.'
+      : null
   const bornWrong =
     born && new Date(born) > new Date() ? 'The date of birth cannot be in the future.' : null
 
@@ -118,7 +141,8 @@ export default function OldFilePage() {
   // ===== 3. Save: look for the same phone first =====
   async function save(skipCheck = false) {
     setTried(true)
-    if (!client || !staff || nameWrong || phoneWrong || bornWrong) return
+    if (!client || !staff || nameWrong || phoneWrong || bornWrong || kinPhoneWrong || emailWrong)
+      return
     setBusy(true)
     setProblem(null)
     if (!skipCheck && cleanedPhone !== '') {
@@ -138,6 +162,16 @@ export default function OldFilePage() {
       born || null,
       sex,
       category,
+      {
+        email: more.email.trim().toLowerCase() || null,
+        address: more.address.trim() || null,
+        town: more.town || null,
+        lga: more.lga || null,
+        state: more.state || null,
+        next_of_kin_name: more.kinName.trim() || null,
+        next_of_kin_relationship: more.kinRelationship || null,
+        next_of_kin_phone: kinPhone || null,
+      },
     )
     if (result.problem || !result.patient) {
       setBusy(false)
@@ -155,6 +189,16 @@ export default function OldFilePage() {
     setBorn('')
     setSex(null)
     setCategory('individual')
+    setMore({
+      email: '',
+      address: '',
+      town: '',
+      lga: '',
+      state: '',
+      kinName: '',
+      kinRelationship: '',
+      kinPhone: '',
+    })
     setFiles([])
     setTried(false)
     setSaved(null)
@@ -350,6 +394,115 @@ export default function OldFilePage() {
               ))}
             </div>
           </div>
+          {/* ===== More details, folded (2026-11-16) ===== */}
+          <details className={styles.more}>
+            <summary>More details (optional): address, next of kin, email</summary>
+            <div className={styles.field}>
+              <label htmlFor="old-address">Address</label>
+              <input
+                id="old-address"
+                className={styles.input}
+                maxLength={200}
+                value={more.address}
+                onChange={(event) => setMorePart('address')(event.target.value)}
+              />
+            </div>
+            <div className={styles.fields2}>
+              <div className={styles.field}>
+                <label htmlFor="old-town">Town / City</label>
+                <OptionSelect
+                  client={client}
+                  staffId={staff.id}
+                  list="town"
+                  id="old-town"
+                  value={more.town}
+                  onChange={setMorePart('town')}
+                  placeholder="Choose the town"
+                  otherLabel="Type the town"
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="old-lga">Local government (LGA)</label>
+                <OptionSelect
+                  client={client}
+                  staffId={staff.id}
+                  list="lga"
+                  id="old-lga"
+                  value={more.lga}
+                  onChange={setMorePart('lga')}
+                  placeholder="Choose the local government"
+                  otherLabel="Type the local government"
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="old-state">State</label>
+                <OptionSelect
+                  client={client}
+                  staffId={staff.id}
+                  list="state"
+                  id="old-state"
+                  value={more.state}
+                  onChange={setMorePart('state')}
+                  placeholder="Choose the State"
+                  otherLabel="Type the State"
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="old-email">Email</label>
+                <input
+                  id="old-email"
+                  className={styles.input}
+                  type="email"
+                  inputMode="email"
+                  value={more.email}
+                  aria-invalid={tried && emailWrong ? 'true' : undefined}
+                  onChange={(event) => setMorePart('email')(event.target.value)}
+                />
+                {tried && emailWrong ? <small className={styles.error}>{emailWrong}</small> : null}
+              </div>
+            </div>
+            <span className={styles.fieldTitle}>Next of kin</span>
+            <div className={styles.fields2}>
+              <div className={styles.field}>
+                <label htmlFor="old-kin-name">Full name</label>
+                <input
+                  id="old-kin-name"
+                  className={styles.input}
+                  maxLength={120}
+                  value={more.kinName}
+                  onChange={(event) => setMorePart('kinName')(event.target.value)}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="old-kin-relationship">Relationship</label>
+                <OptionSelect
+                  client={client}
+                  staffId={staff.id}
+                  list="relationship"
+                  id="old-kin-relationship"
+                  value={more.kinRelationship}
+                  onChange={setMorePart('kinRelationship')}
+                  placeholder="Choose the relationship"
+                  otherLabel="Type the relationship"
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="old-kin-phone">Phone</label>
+                <input
+                  id="old-kin-phone"
+                  className={styles.input}
+                  inputMode="tel"
+                  placeholder="08031234567"
+                  value={more.kinPhone}
+                  aria-invalid={tried && kinPhoneWrong ? 'true' : undefined}
+                  onChange={(event) => setMorePart('kinPhone')(event.target.value)}
+                />
+                {tried && kinPhoneWrong ? (
+                  <small className={styles.error}>{kinPhoneWrong}</small>
+                ) : null}
+              </div>
+            </div>
+          </details>
           <div className={styles.field}>
             <span className={styles.fieldTitle}>Old file (optional)</span>
             <FilePicker files={files} onChange={setFiles} disabled={busy} />

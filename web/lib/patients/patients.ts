@@ -333,6 +333,22 @@ export async function registerPatient(
 // date of birth and sex if the old file has them (Anthony, 2026-11-02:
 // "they can add or skip it"). The database still gives the patient their
 // own RMC number.
+// The optional parts of an old file (Anthony, 2026-11-16: "add the other
+// fields but collapse them").
+export type OldFileExtras = Partial<
+  Pick<
+    PatientCard,
+    | 'email'
+    | 'address'
+    | 'town'
+    | 'lga'
+    | 'state'
+    | 'next_of_kin_name'
+    | 'next_of_kin_relationship'
+    | 'next_of_kin_phone'
+  >
+>
+
 export async function registerFromOldFile(
   client: SupabaseClient,
   fullName: string,
@@ -342,6 +358,8 @@ export async function registerFromOldFile(
   sex: Sex | null = null,
   // Individual, family or antenatal (request 192, 2026-11-16).
   category: Category = 'individual',
+  // The rest of the card, if the old file has it (request 196c).
+  extras: OldFileExtras = {},
 ): Promise<{ patient: PatientCard | null; problem: string | null }> {
   const cleanName = fullName.trim().replace(/\s+/g, ' ')
   const { data, error } = await client
@@ -352,6 +370,7 @@ export async function registerFromOldFile(
       date_of_birth: dateOfBirth,
       sex,
       category,
+      ...extras,
       from_old_file: true,
       created_by: staffId,
     })

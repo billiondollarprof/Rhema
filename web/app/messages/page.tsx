@@ -27,6 +27,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './messages.module.css'
@@ -340,6 +341,13 @@ function Messages() {
       <AppShell>
         <div className={styles.page}>
           <h2>Messages</h2>
+          {/* Announcements moved here from Home, so Home keeps four buttons
+              (Anthony, 2026-11-16). For those who may announce. */}
+          {staff.can_announce ? (
+            <Link className={styles.announce} href="/announce/">
+              Announce to everybody
+            </Link>
+          ) : null}
           <p className={styles.muted}>
             Messages go from room to room, and you have no room yet. Ask your admin to give you one
             in Admin, Staff.
@@ -373,6 +381,13 @@ function Messages() {
         <section className={styles.list} aria-label="Rooms">
           <h2>Messages</h2>
           <p className={styles.muted}>From {staff.room?.name ?? 'your room'}</p>
+          {/* Announcements moved here from Home, so Home keeps four buttons
+              (Anthony, 2026-11-16). For those who may announce. */}
+          {staff.can_announce ? (
+            <Link className={styles.announce} href="/announce/">
+              Announce to everybody
+            </Link>
+          ) : null}
           {conversations.map((conversation) => (
             <button
               key={conversation.key}
