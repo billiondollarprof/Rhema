@@ -359,6 +359,8 @@ export function lineWords(line: LogRow): string {
   const what = fields.length ? `: ${fields.join(', ')}` : ''
 
   if (line.table_name === 'attention_calls') return 'Called for attention'
+  // Request 217a: the admin downloaded the hospital's data.
+  if (line.action === 'export') return 'Downloaded all the hospital data'
   if (line.table_name === 'record_openings') return `Opened the medical record of ${patient}`
   if (line.table_name === 'patients') {
     return line.action === 'insert' ? `Registered ${patient}` : `Updated ${patient}${what}`

@@ -186,6 +186,7 @@ module.exports.SCREENS = [
   { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
   { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },
   { path: '/admin/?tab=activity', waitFor: 'activities today', admin: true },
+  { path: '/admin/?tab=data', waitFor: 'This file holds every patient', admin: true },
   // Settings part 1 (2026-11-16): the price list, with made up prices.
   {
     path: '/admin/?tab=prices',
