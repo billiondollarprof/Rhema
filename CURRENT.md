@@ -849,6 +849,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+214. **His answers on 213 a and b, plus notes titles and lab edits.**
+    (2026-11-16) "1. yes 2. yes" (send paid lab tests to the Lab, paid drugs to
+    the Pharmacy). "3. yes on the pharmacy but entering number of units or
+    sachets can only be required when the pharmacy actually sets the quantity in
+    stock otherwise it remains skippable. 4. show warning when it's at zero and
+    allow anyway and keep showing warning until the restock but this only
+    matters if the pharmacy actually set it. 5. one unit and let pack be its
+    own line."
+    "On the nursing note let's add title and then the body becomes the note, so
+    they can title their notes, same with consultants."
+    "The lab scientist should be able to find and edit/add patients medical
+    tests as long as the front desk has confirmed them paid... they can make
+    mistake and discover later and go to edit or cancel... If they mistakenly
+    mark finished at the lab without adding the test, refuse and add warnings
+    that they should add test details."
+
 213. **After a payment, send it on; pharmacy stock; small fixes.** (2026-11-16)
     His yes to 211's SQL: "yes on the sql". Then:
     a. "If front desk takes a payment, they will now have to send to lab, same
