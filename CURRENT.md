@@ -849,6 +849,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+210. **Widal: a "Significant titre value" heading.** (2026-11-16) "Only
+    insignificant titre value. I can see that the significant is the comment,
+    but we can add a heading that says significant titre value at the top with
+    the explanation followed." DONE: the explanation sits under that heading at
+    the top of the Widal boxes and is the first line of every Widal result;
+    comment picks are now Insignificant / Significant titre obtained.
+
 209. **Lab and Other, a batch.** (2026-11-16) His yes to 208: "your
     understanding is right and on that SQL is yes." Then:
     a. "The test and the pharmacy and every place there's Other, make it so

@@ -44,6 +44,9 @@ export type LabTest = {
   // Other names people search by, such as FBC or E/U/Cr, and old names.
   also?: string[]
   fields: LabField[]
+  // A fixed note at the top of the test, on the screen and in the result,
+  // such as the Widal "Significant titre value" (Anthony, 2026-11-16).
+  note?: { heading: string; text: string }
 }
 
 export type LabSection = {
@@ -114,11 +117,14 @@ const ANTIBIOTICS = [
   'Pefloxacin',
 ]
 const TITRE = ['1/20', '1/40', '1/80', '1/160', '1/320', '1/640']
-const WIDAL_COMMENTS = [
-  'Insignificant titre obtained.',
-  'Significant titre obtained (1/160 or above).',
-  'Titres above 1/160 are considered significant for possible enteric fever and would require stool or blood culture for confirmatory diagnosis.',
-]
+const WIDAL_COMMENTS = ['Insignificant titre obtained.', 'Significant titre obtained.']
+// The explanation, under its own heading at the top of every Widal result
+// (Anthony, 2026-11-16: "add a heading that says significant titre value at
+// the top with the explanation followed").
+const WIDAL_NOTE = {
+  heading: 'Significant titre value',
+  text: 'Titres above 1/160 are considered significant for possible enteric fever and would require stool or blood culture for confirmatory diagnosis.',
+}
 
 // The boxes shared by tests.
 const PCV_BOX: LabField = { name: 'PCV', unit: '%', range: 'M 40 to 54, F 36 to 46' }
@@ -311,6 +317,7 @@ export const LAB_SECTIONS: LabSection[] = [
       {
         name: 'Widal Test',
         also: ['Widal', 'Typhoid test'],
+        note: WIDAL_NOTE,
         fields: [
           { name: 'S. typhi D, O antigen', choices: TITRE, heading: 'Agglutination titres' },
           { name: 'S. typhi D, H antigen', choices: TITRE },
@@ -657,6 +664,9 @@ export function composeResult(
   comment: string,
 ): string {
   const lines: string[] = []
+  // The test's fixed note goes first, once something is filled in.
+  const anyFilled = test.fields.some((field) => (values[field.name] ?? '').trim())
+  if (test.note && anyFilled) lines.push(`${test.note.heading}: ${test.note.text}`)
   let heading: string | null = null
   let headingWritten = false
   for (const field of test.fields) {
