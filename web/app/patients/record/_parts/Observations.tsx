@@ -365,6 +365,9 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
 // ===== 2. Nursing notes =====
 export function NursingNotesSection({ client, staffId, patientId, record, reload }: Props) {
   const [adding, setAdding] = useState(false)
+  // A title, then the note (Anthony, 2026-11-16: "let's add title and then
+  // the body becomes the note").
+  const [title, setTitle] = useState('')
   const [note, setNote] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
 
@@ -375,12 +378,14 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
     }
     const result = await addLine(client, 'nursing_notes', {
       patient_id: patientId,
+      title: title.trim() || null,
       note: note.trim(),
       written_by: staffId,
     })
     if (result) setProblem(result)
     else {
       setAdding(false)
+      setTitle('')
       setNote('')
       setProblem(null)
       reload()
@@ -393,7 +398,12 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
       {record.nursingNotes.map((line) => (
         <Line
           key={line.id}
-          what={<span className={styles.note}>{line.note}</span>}
+          what={
+            <span className={styles.note}>
+              {line.title ? <b className={styles.noteTitle}>{line.title}</b> : null}
+              {line.note}
+            </span>
+          }
           meta={`${line.author?.full_name ?? 'Staff'}, ${when(line.created_at)}`}
           voided={voidedOf(line)}
           voidable={{ client, table: 'nursing_notes', id: line.id, staffId, onDone: reload }}
@@ -401,6 +411,17 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
       ))}
       {adding ? (
         <div className={styles.form}>
+          <div className={styles.field}>
+            <label htmlFor="nursing-title">Title (optional)</label>
+            <input
+              id="nursing-title"
+              className={styles.input}
+              maxLength={120}
+              placeholder="e.g. Night check"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
           <div className={styles.field}>
             <label htmlFor="nursing-note">Note</label>
             <textarea
@@ -451,7 +472,7 @@ export function ConsultationsSection({
   reload,
   canWrite,
 }: Props & { canWrite: boolean }) {
-  const empty = { complaint: '', findings: '', assessment: '', plan: '' }
+  const empty = { title: '', complaint: '', findings: '', assessment: '', plan: '' }
   const [adding, setAdding] = useState(false)
   const [parts, setParts] = useState<Record<string, string>>(empty)
   const [problem, setProblem] = useState<string | null>(null)
@@ -465,6 +486,7 @@ export function ConsultationsSection({
     }
     const result = await addLine(client, 'consultation_notes', {
       patient_id: patientId,
+      title: parts.title.trim() || null,
       ...values,
       written_by: staffId,
     })
@@ -486,7 +508,12 @@ export function ConsultationsSection({
       {record.consultations.map((line) => (
         <Line
           key={line.id}
-          what={<b>{when(line.created_at)}</b>}
+          what={
+            <b>
+              {line.title ? `${line.title} · ` : ''}
+              {when(line.created_at)}
+            </b>
+          }
           meta={`Written by ${line.author?.full_name ?? 'staff'}`}
           voided={voidedOf(line)}
           voidable={
@@ -507,6 +534,17 @@ export function ConsultationsSection({
       ))}
       {adding ? (
         <div className={styles.form}>
+          <div className={styles.field}>
+            <label htmlFor="consult-title">Title (optional)</label>
+            <input
+              id="consult-title"
+              className={styles.input}
+              maxLength={120}
+              placeholder="e.g. Review of fever"
+              value={parts.title}
+              onChange={(e) => setParts({ ...parts, title: e.target.value })}
+            />
+          </div>
           {CONSULT_PARTS.map((part) => (
             <div className={styles.field} key={part.key}>
               <label htmlFor={`consult-${part.key}`}>{part.label}</label>

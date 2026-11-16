@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
 import OptionSelect from '@/components/options/OptionSelect'
 import styles from '../_parts/pharmacy.module.css'
+import { knownMedicines } from '@/lib/medicines/medicines'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import { getPatient, type PatientResult } from '@/lib/patients/patients'
@@ -89,7 +90,17 @@ function Prescribe() {
     setDrafts((all) => all.map((draft, at) => (at === index ? { ...draft, [part]: value } : draft)))
   }
 
-  const ready = drafts.every((draft) => draft.drug.trim().length >= 2)
+  // A medicine the Pharmacy counts needs a quantity (request 214); the others
+  // do not.
+  const counted = (draft: Draft) =>
+    knownMedicines(staff?.id).find(
+      (line) =>
+        line.name.toLowerCase() === draft.drug.trim().toLowerCase() &&
+        (line.strength ?? '').toLowerCase() === draft.strength.trim().toLowerCase() &&
+        line.in_stock !== null,
+    )
+  const needsQuantity = (draft: Draft) => Boolean(counted(draft)) && !/^\s*\d/.test(draft.quantity)
+  const ready = drafts.every((draft) => draft.drug.trim().length >= 2 && !needsQuantity(draft))
 
   // ===== 3. Send =====
   async function send() {
@@ -276,11 +287,18 @@ function Prescribe() {
                     <input
                       id={`quantity-${index}`}
                       className={styles.input}
-                      placeholder="30 tablets"
+                      placeholder={
+                        counted(draft)?.unit ? `e.g. 30 ${counted(draft)?.unit}s` : '30 tablets'
+                      }
                       maxLength={60}
                       value={draft.quantity}
                       onChange={(event) => change(index, 'quantity', event.target.value)}
                     />
+                    {needsQuantity(draft) ? (
+                      <small className={styles.error}>
+                        The Pharmacy counts this medicine: start with how many.
+                      </small>
+                    ) : null}
                   </div>
                   <div className={styles.wide}>
                     <label className={styles.label} htmlFor={`note-${index}`}>

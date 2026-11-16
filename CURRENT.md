@@ -849,6 +849,47 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+215. **History behind the menu: money for the Front Desk and admin, numbers
+    for the Lab and Pharmacy, own work for each consultant.** (2026-11-16)
+    "The front desk can see history of everyone registered today and all
+    payments made, so they can also see how many different categories of
+    payment... individual, antenatal and family are different amounts, the lab
+    tests and the medicine. It also shows the amount of money in total... by
+    day, week, month, and even hourly range. Each category also has its own
+    total apart from the general total... so the front desk can cross check
+    what was paid. Then also total paid by mode of payment, cash, POS or
+    transfer... Pharmacy and lab only see numbers. The pharmacy sees how many
+    drugs and how much was sold or given out today, then the lab as well. Only
+    the admin and front desk see all history amounts... each consultant can
+    still see their own history... how many patients in particular they
+    attended to. The history button can sit behind the hamburger menu."
+    Also his yes to 214's SQL ("Yes to the SQLs").
+
+214. **His answers on 213 a and b, plus notes titles and lab edits.**
+    (2026-11-16) "1. yes 2. yes" (send paid lab tests to the Lab, paid drugs to
+    the Pharmacy). "3. yes on the pharmacy but entering number of units or
+    sachets can only be required when the pharmacy actually sets the quantity in
+    stock otherwise it remains skippable. 4. show warning when it's at zero and
+    allow anyway and keep showing warning until the restock but this only
+    matters if the pharmacy actually set it. 5. one unit and let pack be its
+    own line."
+    "On the nursing note let's add title and then the body becomes the note, so
+    they can title their notes, same with consultants."
+    "The lab scientist should be able to find and edit/add patients medical
+    tests as long as the front desk has confirmed them paid... they can make
+    mistake and discover later and go to edit or cancel... If they mistakenly
+    mark finished at the lab without adding the test, refuse and add warnings
+    that they should add test details."
+    BUILT 2026-11-16, held for his SQL yes (migration 20261116145838, test
+    044, 10 breaks caught; test 031 kept, 009 caught a doctor read gap that
+    was fixed): Front Desk Send to the Laboratory / Pharmacy after a lab or
+    drug payment, with an optional doctor; stock (unit, warn level, restock,
+    recount, drops on dispensing, below 0 allowed with warnings, Running low on
+    the Pharmacy's Home, how many required only for counted lines); titles on
+    nursing and consultation notes; Lab: warning naming tests without details,
+    database refuses Result ready (missing_tests), Find a patient's tests page,
+    cancel a wrong result with a reason, add the right one.
+
 213. **After a payment, send it on; pharmacy stock; small fixes.** (2026-11-16)
     His yes to 211's SQL: "yes on the sql". Then:
     a. "If front desk takes a payment, they will now have to send to lab, same
@@ -865,6 +906,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     e. "The doctors and other departments should not see a button that says
        take payment. A doctor or nurse who is also an admin should not see take
        payment."
+    LIVE 2026-11-16: 211 (payment kinds with test and medicine pickers, every
+    payment with date and time, First registered, old file month; migration
+    first_registered_and_payment_lists, test 043) and c, d, e (medicine box
+    closed with a clear arrow; Medical record button in the queue for medical
+    staff; Take payment and the pay cards only for the Front Desk and an admin
+    who does not work with patients). a and b: plan read back, waits for yes.
 
 212. **Vital signs: pickers and Other on each box.** (2026-11-16) "The vital
     signs, can there be pickers + others on each of the box, so they can pick

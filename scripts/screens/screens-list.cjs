@@ -35,6 +35,8 @@ module.exports.SCREENS = [
   { path: '/lab/result/', waitFor: 'Add a lab result' },
   // Every test, no patient (2026-11-16).
   { path: '/lab/tests/', waitFor: 'Lab test list', role: 'laboratory' },
+  // Find a patient's paid tests, to correct (request 214).
+  { path: '/lab/patient/', waitFor: "Find a patient's tests", role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
   { path: '/pharmacy/list/', waitFor: 'Medicine list', role: 'pharmacy' },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },

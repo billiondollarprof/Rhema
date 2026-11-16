@@ -133,6 +133,10 @@ export default function LabCard({
           <Link className={`${styles.button} ${styles.wide}`} href="/lab/tests/">
             Lab test list
           </Link>
+          {/* Find a patient's paid tests, to enter or correct (request 214). */}
+          <Link className={`${styles.button} ${styles.wide}`} href="/lab/patient/">
+            Find a patient&apos;s tests
+          </Link>
         </div>
       ) : null}
       {requests === null ? <p className={styles.muted}>Loading…</p> : null}

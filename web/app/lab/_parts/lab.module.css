@@ -484,3 +484,42 @@ textarea.input {
   letter-spacing: 0.03em;
   color: var(--ink2);
 }
+
+/* ===== Corrections on a finished request (request 214) ===== */
+.warning {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--warn-bg-1);
+  color: var(--c-9a5b00, #9a5b00);
+  font-weight: 600;
+}
+
+.earlier {
+  display: grid;
+  gap: 8px;
+}
+
+.earlierLine {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.resultLines {
+  display: block;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+
+.cancelled {
+  text-decoration: line-through;
+  color: var(--mut);
+}
+
+.cancelled small {
+  display: block;
+  text-decoration: none;
+}

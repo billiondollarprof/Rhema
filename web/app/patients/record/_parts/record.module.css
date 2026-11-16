@@ -539,3 +539,9 @@ a.small {
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* A note's title, on its own line above the note (2026-11-16). */
+.noteTitle {
+  display: block;
+  margin-bottom: 2px;
+}

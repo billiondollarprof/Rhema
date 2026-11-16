@@ -305,3 +305,18 @@ a.button {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
+
+/* Running low, on the Pharmacy's card (request 214). */
+.runningLow {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--warn-bg-1);
+  color: var(--ink);
+}
+
+.runningLow ul {
+  margin: 0;
+  padding-left: 18px;
+}

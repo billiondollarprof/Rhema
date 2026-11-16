@@ -206,3 +206,58 @@ export async function familyPayments(
     .limit(20)
   return (data as unknown as Payment[] | null) ?? []
 }
+
+// ===== Send a payment on (request 213a, 2026-11-16) =====
+// The Front Desk sends paid lab tests to the Laboratory, or paid drugs to the
+// Pharmacy. The database checks it is the Front Desk, that the payment is of
+// that kind, and that it is sent once.
+function sendWords(error: { code?: string } | null, data: unknown): string | null {
+  if (error?.code === '42501') return 'Only the Front Desk can send a payment on.'
+  if (error) return 'It could not be sent. Check the internet and try again.'
+  if (data === 'already_sent') return 'This payment was already sent.'
+  return null
+}
+
+export async function sendPaidToLab(
+  client: SupabaseClient,
+  paymentId: number,
+  tests: string[],
+  doctor: string | null,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('send_paid_to_lab', {
+    payment: paymentId,
+    wanted: tests,
+    doctor,
+    send_note: null,
+  })
+  return sendWords(error, data)
+}
+
+export async function sendPaidToPharmacy(
+  client: SupabaseClient,
+  paymentId: number,
+  items: { drug: string; strength: string | null; quantity: string | null }[],
+  doctor: string | null,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('send_paid_to_pharmacy', {
+    payment: paymentId,
+    items,
+    doctor,
+    send_note: null,
+  })
+  return sendWords(error, data)
+}
+
+// Doctors, nurses and the matron, to say who wrote the paper.
+export async function loadClinicians(
+  client: SupabaseClient,
+): Promise<{ id: string; full_name: string }[]> {
+  const { data } = await client
+    .from('staff')
+    .select('id, full_name')
+    .eq('is_active', true)
+    .eq('can_medical', true)
+    .order('full_name')
+    .limit(200)
+  return (data as { id: string; full_name: string }[] | null) ?? []
+}
