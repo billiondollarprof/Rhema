@@ -849,6 +849,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
+    need prices to be a picker, the hospital decides per time how much a test
+    costs and if they want to make it fixed it should be something they set in
+    the admin settings. From front desk to pharmacy, they can decide to set the
+    price as a standard including laboratory, otherwise let the field just show
+    e.g. so they can manually enter the price of anything themselves." Read back
+    to him 2026-11-16, waits for his yes.
+    Also, same message, on 203: "don't switch it. Don't switch the testing site.
+    Leave it. I will not go to the hospital. I would go to the other hospital."
+    Testing was already switched to Okparavero when this arrived; asked him
+    whether to put Rhema back now or leave Okparavero showing.
+
 203. **Pitch: testing shows Okparavero Memorial Hospital.** (2026-11-16, he was
     at their hospital) "Let's just switch the testing site... then we revert it
     back to Rhema. Then later we settle down and do the multiple ones... we will
