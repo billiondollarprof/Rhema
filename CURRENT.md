@@ -849,6 +849,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+207. **Lab test list for the lab scientists.** (2026-11-16) "Can the lab
+    scientists see the list of test without any patient data, if not please
+    fix." They could not (tests only showed inside a request). BUILT: page
+    /lab/tests/ (every test by section, its boxes, units, normal ranges and
+    picks, plus tests added with Other), linked from the lab's card on Home.
+
 206. **Backup: a copy of everything, all the time.** (2026-11-16) "Does it take
     duplicate files?... the backup is duplicating the patient data immediately,
     or the backup only takes raw files?... I want a system whereby the backup is

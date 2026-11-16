@@ -406,3 +406,56 @@ textarea.input {
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* ===== The Lab test list (2026-11-16) ===== */
+.testList {
+  display: grid;
+  gap: 6px;
+}
+
+.testItem {
+  border-top: 1px solid var(--line);
+  padding: 4px 0;
+}
+
+.testItem > summary {
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.testItem > summary small {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.boxList,
+.plainList {
+  margin: 4px 0 8px;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.boxList li {
+  display: grid;
+  gap: 2px;
+}
+
+.boxList em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink2);
+}
+
+.boxList small {
+  color: var(--mut);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
