@@ -55,8 +55,12 @@
 
 .arrow {
   flex-shrink: 0;
+  /* A fixed size, so the arrow is never squeezed when the words wrap onto
+     two lines (it showed as an "L" on 2026-11-16). */
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
   color: var(--link);
-  transition: transform 0.15s;
 }
 
 .box[aria-expanded='true'] .arrow {
@@ -65,6 +69,8 @@
 
 /* ===== 2. The open list ===== */
 .panel {
+  /* Room for the bottom menu on a phone when the list is scrolled into view. */
+  scroll-margin-bottom: 90px;
   display: grid;
   gap: 6px;
   padding: 8px;
@@ -93,6 +99,7 @@
 }
 
 .list {
+  position: relative;
   max-height: 280px;
   overflow-y: auto;
   display: grid;

@@ -521,3 +521,21 @@ a.small {
   min-width: 72px;
   font-size: 14px;
 }
+
+/* A vital sign typed with Other, and its way back to the list (2026-11-16). */
+.vitalTyping {
+  display: grid;
+  gap: 4px;
+}
+
+.linkButton {
+  font: inherit;
+  font-size: 13px;
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: underline;
+}
