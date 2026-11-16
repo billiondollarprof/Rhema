@@ -849,6 +849,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+216. **History: his answers and the front desk's real need.** (2026-11-16)
+    "Yes, admin 3 card fees." "The front desk... when they click history,
+    they are seeing the payments. The admin is seeing the same thing... all
+    payments for today, in the last 24 hours... choose range of time, let's
+    say last six hours... or their particular shift, since they started the
+    shift... they want to know how much they made when they were on duty...
+    by category... by mode of payment... the total paid... count the cash they
+    have and know that it matches. Others are also able to see just numbers of
+    how many they attended to." Design: "easy to spot and understand.
+    Screenshot and check it until it looks good both on mobile and
+    desktop/tablet."
+
 215. **History behind the menu: money for the Front Desk and admin, numbers
     for the Lab and Pharmacy, own work for each consultant.** (2026-11-16)
     "The front desk can see history of everyone registered today and all
