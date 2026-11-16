@@ -849,6 +849,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
+    "Let's remove all the test patients added before today. But if there is any
+    patient added this morning that is in the last 10hrs leave it, but anything
+    higher, just delete, they should be around five test patients in the live
+    site." Cut off: added before 00:55 Lagos time on 16 November is deleted.
+    Rules: a read on live and any delete are asked first (CLAUDE.md section 2).
+    Asked him 2026-11-16 for (1) a read only look, then (2) the delete batch.
+
 204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
     need prices to be a picker, the hospital decides per time how much a test
     costs and if they want to make it fixed it should be something they set in
