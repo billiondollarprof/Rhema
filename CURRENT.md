@@ -849,6 +849,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+209. **Lab and Other, a batch.** (2026-11-16) His yes to 208: "your
+    understanding is right and on that SQL is yes." Then:
+    a. "The test and the pharmacy and every place there's Other, make it so
+       that they can save that type of test or medication as part of the
+       lists... when they add a new test they should be able to save it as
+       standard so next time it becomes part of the picker."
+    b. "After the lab scientist is done with the patient data, they can send to
+       room and also save/submit to the doctor that requested and any other
+       doctor or others that have access to see the data."
+    c. "Do not add any picker that belongs to another category to another
+       category e.g. PCV is showing AA which I don't think it's supposed to be."
+    d. "Take some time and make sure everything is in order especially the lab
+       tests, let them be correct."
+    e. "Even under a test, if there is a type they can add, because I noticed
+       there's no significant titre value."
+
 208. **Tests come with prices; the lab proposes, the admin approves.**
     (2026-11-16) "Add price pickers too so tests comes with price, especially
     check the list I uploaded, there's price in it. Also the lab scientist can
