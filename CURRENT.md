@@ -849,6 +849,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+206. **Backup: a copy of everything, all the time.** (2026-11-16) "Does it take
+    duplicate files?... the backup is duplicating the patient data immediately,
+    or the backup only takes raw files?... I want a system whereby the backup is
+    taking in everything automatically. So at any point in time, the hospital
+    can decide, okay, they want their data. If the live site ever crashes...
+    they can access their data." ANSWERED 2026-11-16, his choice waits.
+    FOUND: backup.yml copies only lab/ files; record/ files (old file scans,
+    patient files) are not in the backup. To fix (asked him).
+    Same message, 203: "rhema back, okparavero out, we would build the proper
+    demo later." DONE: testing back to Rhema.
+
 205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
     "Let's remove all the test patients added before today. But if there is any
     patient added this morning that is in the last 10hrs leave it, but anything
