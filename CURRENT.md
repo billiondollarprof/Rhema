@@ -861,6 +861,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     demo later." DONE: testing back to Rhema.
     DECIDED 2026-11-16: "1 and 3 is great": (1) backup every 2 hours, free;
     (3) a Download our data button in Admin. Point in time recovery (paid) later.
+    (1) LIVE 2026-11-16: backup.yml every 2 hours (recent/ kept 2 days, daily/
+    35 days, monthly/ for good); record/ files now backed up with lab/. Run by
+    hand after the merge: success, copy checked and opened, both file kinds read.
+    (3) Plan read back to him 2026-11-16, waits for his yes.
 
 205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
     "Let's remove all the test patients added before today. But if there is any
