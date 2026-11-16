@@ -140,7 +140,7 @@ export default function OptionSelect({
         <input
           className={styles.input}
           aria-label={`Search: ${placeholder}`}
-          placeholder="Type the first letters to find it"
+          placeholder="Search this list"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
