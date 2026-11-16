@@ -28,7 +28,18 @@ import styles from '../_parts/lab.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import { getLabRequest, recordResults, type LabRequest, type ResultItem } from '@/lib/lab/lab'
-import { ALL_LAB_TESTS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
+import { LAB_SECTIONS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
+import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
+
+// Every test on the lab menu, under its section, for a walk in result.
+const MENU_OPTIONS: SelectOption[] = LAB_SECTIONS.flatMap((section) =>
+  section.tests.map((test) => ({
+    value: test.name,
+    label: test.name,
+    group: section.name,
+    also: test.also,
+  })),
+)
 import { prepareFile, sizeWords, uploadFile, type ReadyFile } from '@/lib/lab/files'
 import type { PatientResult } from '@/lib/patients/patients'
 import { useRightPage } from '@/lib/auth/routes'
@@ -198,14 +209,13 @@ function EnterResults() {
                     {request ? (
                       <b>{line.test}</b>
                     ) : (
-                      <input
-                        className={styles.input}
-                        aria-label="Test"
-                        placeholder="Test, e.g. Malaria test"
-                        maxLength={80}
-                        list="lab-menu"
+                      <SearchSelect
+                        id={`test-${index}`}
                         value={line.test}
-                        onChange={(event) => change(index, 'test', event.target.value)}
+                        placeholder="Choose the test"
+                        options={MENU_OPTIONS}
+                        onChange={(name) => change(index, 'test', name)}
+                        onOther={(typed) => change(index, 'test', typed)}
                       />
                     )}
                     {findLabTest(line.test) ? (
@@ -242,13 +252,6 @@ function EnterResults() {
                   </div>
                 ))
               : null}
-            {ready && !request ? (
-              <datalist id="lab-menu">
-                {ALL_LAB_TESTS.map((test) => (
-                  <option key={test.name} value={test.name} />
-                ))}
-              </datalist>
-            ) : null}
             {ready && !request ? (
               <button
                 className={styles.button}

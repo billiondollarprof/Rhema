@@ -56,6 +56,13 @@ async function shot(page, name) {
   await page.setViewportSize({ width: 390, height: 844 })
 }
 
+// Pick a line from the app's own drop down (SearchSelect, 2026-11-16): open
+// the box by its label, then tap the line.
+async function pickFrom(page, label, line) {
+  await page.getByLabel(label, { exact: true }).click()
+  await page.getByRole('option', { name: line, exact: true }).click()
+}
+
 function step(text) {
   console.log(`-- ${text}`)
 }
@@ -328,8 +335,8 @@ try {
   step('She adds a severe allergy; the banner turns red')
   await page.getByRole('button', { name: '+ Add an allergy' }).click()
   // Picked from the lists (2026-11-12), not typed.
-  await page.getByLabel('Allergic to', { exact: true }).selectOption('Penicillin')
-  await page.getByLabel('Reaction', { exact: true }).selectOption('Rash')
+  await pickFrom(page, 'Allergic to', 'Penicillin')
+  await pickFrom(page, 'Reaction', 'Rash')
   await page.getByLabel('Severe reaction').check()
   await page.getByRole('button', { name: 'Add allergy' }).click()
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
@@ -339,8 +346,8 @@ try {
   await page.getByPlaceholder('Type the first letters').fill('Amlo')
   await page.getByRole('option', { name: 'Amlodipine' }).click()
   await page.getByRole('button', { name: '5 mg tablet', exact: true }).click()
-  await page.getByLabel('Dose', { exact: true }).selectOption('1 tablet')
-  await page.getByLabel('How often').selectOption('Once daily')
+  await pickFrom(page, 'Dose', '1 tablet')
+  await pickFrom(page, 'How often', 'Once daily')
   await page.getByRole('button', { name: 'Add medicine' }).click()
   await page.getByText('Amlodipine 5 mg tablet', { exact: true }).waitFor()
   await page.getByRole('button', { name: 'Suspend', exact: true }).click()
@@ -374,12 +381,14 @@ try {
   // The Other way for a dose: typed once, kept in her own list.
   step('A dose not in the list is added with Other, and is in her list after')
   await page.getByRole('button', { name: '+ Record a dose not on the list' }).click()
-  await page.getByLabel('Dose', { exact: true }).selectOption({ label: 'Other…' })
+  await pickFrom(page, 'Dose', 'Other…')
   await page.getByPlaceholder('Type the dose').fill('7 ml')
   await page.getByRole('button', { name: 'Add and use' }).click()
   // Saved to her list, then the drop down is back with it chosen.
-  await page.locator('select#given-dose').waitFor()
-  await page.waitForFunction(() => document.querySelector('select#given-dose')?.value === '7 ml')
+  await page.locator('button#given-dose').waitFor()
+  await page.waitForFunction(() =>
+    document.querySelector('button#given-dose')?.textContent?.includes('7 ml'),
+  )
   await page.getByRole('button', { name: 'Cancel' }).last().click()
 
   step('She gives a dose; it shows with her name')

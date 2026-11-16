@@ -1,0 +1,161 @@
+/*
+ * components/options/SearchSelect.module.css: the drop down with a search.
+ * The closed box looks like the app's other boxes, with a clear arrow on the
+ * right. The open list sits in the page under the box (never floating over
+ * it), so a card can never cut it off on a small phone.
+ */
+
+/* ===== 1. The closed box ===== */
+.wrap {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.box {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.box:focus-visible {
+  outline: 2px solid #8fb4f0;
+  border-color: #1f5fd0;
+}
+
+.box[aria-expanded='true'] {
+  border-color: #1f5fd0;
+}
+
+.box[aria-invalid='true'] {
+  border-color: var(--red);
+}
+
+.value,
+.placeholder {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.placeholder {
+  color: #64748b;
+}
+
+.arrow {
+  flex-shrink: 0;
+  color: #1f5fd0;
+  transition: transform 0.15s;
+}
+
+.box[aria-expanded='true'] .arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== 2. The open list ===== */
+.panel {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 24px -14px rgba(15, 34, 56, 0.35);
+}
+
+.search {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--ink);
+}
+
+.search:focus {
+  outline: 2px solid #8fb4f0;
+  border-color: #1f5fd0;
+  background: #fff;
+}
+
+.list {
+  max-height: 280px;
+  overflow-y: auto;
+  display: grid;
+  overscroll-behavior: contain;
+}
+
+.group {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  padding: 10px 8px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.option,
+.otherLine {
+  font: inherit;
+  font-size: 15px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.option:hover,
+.option:focus-visible,
+.otherLine:hover,
+.otherLine:focus-visible {
+  background: #eef4ff;
+  outline: 0;
+}
+
+.option[aria-selected='true'] {
+  background: #e3edff;
+  font-weight: 700;
+}
+
+.option small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.otherLine {
+  color: #1f5fd0;
+  font-weight: 600;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 8px 8px;
+  margin-top: 4px;
+}
+
+.none {
+  margin: 6px 8px;
+  color: #64748b;
+  font-size: 14px;
+}
