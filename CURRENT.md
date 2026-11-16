@@ -849,6 +849,29 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+212. **Vital signs: pickers and Other on each box.** (2026-11-16) "The vital
+    signs, can there be pickers + others on each of the box, so they can pick
+    from options without typing?"
+    DECIDED same day (on 211's question): doctors do not see payments: "No,
+    doctors only knows that the patient has already paid for that test."
+    211's SQL still waits for his yes.
+    BUILT 2026-11-16: every vital sign box is a number list (opens at the usual
+    value: 120/80, 36.8, 76, 16, 98, 65 kg, 165 cm), search, Other to type.
+    Vital signs he added himself (such as Blood sugar) stay typed boxes.
+
+211. **Front Desk payments by kind, with pickers; payments and first
+    registration on the record; month picker for old files.** (2026-11-16)
+    "Payment should have other categories, so they can choose from the list,
+    either lab test, card payment, drug payment and when they choose payment
+    for pharmacy or lab, they should also have a picker to select what
+    particular test or medication... for rush hour where the doctor may not
+    have time to reach for the computer to request for test so they can just
+    give a patient a piece of paper to meet front desk for payment. And on the
+    patient records all payments made with date and time will be shown. When a
+    patient was registered first should also show. For older patients, please
+    add a month picker because they're registering the patients month by
+    month."
+
 210. **Widal: a "Significant titre value" heading.** (2026-11-16) "Only
     insignificant titre value. I can see that the significant is the comment,
     but we can add a heading that says significant titre value at the top with

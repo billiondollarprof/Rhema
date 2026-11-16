@@ -16,7 +16,7 @@
  */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import Section, { EmptyLine } from './Section'
@@ -31,6 +31,7 @@ import {
   type Vitals,
 } from '@/lib/record/record'
 import { recall, remember } from '@/lib/cache/memory'
+import SearchSelect from '@/components/options/SearchSelect'
 
 type Props = {
   client: SupabaseClient
@@ -56,6 +57,33 @@ const READINGS: { key: keyof Vitals; label: string; unit: string }[] = [
   { key: 'weight_kg', label: 'Weight', unit: ' kg' },
   { key: 'height_cm', label: 'Height', unit: ' cm' },
 ]
+
+// ===== 1a. The numbers each box offers, and where its list opens =====
+// Anthony, 2026-11-16 (request 212): "pickers + Other on each of the box, so
+// they can pick from options without typing." The list opens at the usual
+// value; Other types anything outside the list.
+type Range = { from: number; to: number; step: number; start: string; decimals: number }
+const RANGES: Record<string, Range> = {
+  systolic: { from: 60, to: 250, step: 2, start: '120', decimals: 0 },
+  diastolic: { from: 30, to: 150, step: 2, start: '80', decimals: 0 },
+  temperature_c: { from: 34, to: 42, step: 0.1, start: '36.8', decimals: 1 },
+  pulse: { from: 30, to: 200, step: 1, start: '76', decimals: 0 },
+  breathing_rate: { from: 8, to: 60, step: 1, start: '16', decimals: 0 },
+  spo2: { from: 70, to: 100, step: 1, start: '98', decimals: 0 },
+  weight_kg: { from: 1, to: 200, step: 0.5, start: '65', decimals: 1 },
+  height_cm: { from: 40, to: 220, step: 1, start: '165', decimals: 0 },
+}
+
+// "36.8", "65" (not "65.0"), and so on, from the lowest to the highest.
+function numbersOf(range: Range): string[] {
+  const found: string[] = []
+  const count = Math.round((range.to - range.from) / range.step)
+  for (let at = 0; at <= count; at++) {
+    const value = range.from + at * range.step
+    found.push(String(Number(value.toFixed(range.decimals))))
+  }
+  return found
+}
 
 function VitalsReadings({ vitals }: { vitals: Vitals }) {
   const shown: [string, string][] = []
@@ -194,16 +222,14 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     reload()
   }
 
-  const box = (key: string, label: string, placeholder: string) => (
+  const box = (key: string, label: string) => (
     <div className={styles.field} key={key}>
       <label htmlFor={`vit-${key}`}>{label}</label>
-      <input
+      <VitalPick
         id={`vit-${key}`}
-        className={styles.input}
-        inputMode="decimal"
-        placeholder={placeholder}
+        range={RANGES[key]}
         value={values[key]}
-        onChange={(e) => setValues({ ...values, [key]: e.target.value })}
+        onChange={(value) => setValues({ ...values, [key]: value })}
       />
     </div>
   )
@@ -248,14 +274,14 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
       {adding ? (
         <div className={styles.form}>
           <div className={styles.fields}>
-            {box('systolic', 'BP top (systolic)', 'e.g. 120')}
-            {box('diastolic', 'BP bottom (diastolic)', 'e.g. 80')}
-            {box('temperature_c', 'Temperature °C', 'e.g. 36.8')}
-            {box('pulse', 'Pulse (bpm)', 'e.g. 76')}
-            {box('breathing_rate', 'Breathing (/min)', 'e.g. 16')}
-            {box('spo2', 'Oxygen SpO2 (%)', 'e.g. 98')}
-            {box('weight_kg', 'Weight (kg)', 'e.g. 68')}
-            {box('height_cm', 'Height (cm)', 'e.g. 170')}
+            {box('systolic', 'BP top (systolic)')}
+            {box('diastolic', 'BP bottom (diastolic)')}
+            {box('temperature_c', 'Temperature °C')}
+            {box('pulse', 'Pulse (bpm)')}
+            {box('breathing_rate', 'Breathing (/min)')}
+            {box('spo2', 'Oxygen SpO2 (%)')}
+            {box('weight_kg', 'Weight (kg)')}
+            {box('height_cm', 'Height (cm)')}
             {measures.map((measure) => (
               <div className={styles.field} key={`measure-${measure.id}`}>
                 <label htmlFor={`vit-x-${measure.id}`}>
@@ -512,5 +538,58 @@ export function ConsultationsSection({
         </div>
       ) : null}
     </Section>
+  )
+}
+
+// ===== One vital sign box: pick a number, or type one with Other =====
+function VitalPick({
+  id,
+  range,
+  value,
+  onChange,
+}: {
+  id: string
+  range: Range
+  value: string
+  onChange: (value: string) => void
+}) {
+  // Other with nothing typed: a box to type the number in.
+  const [typing, setTyping] = useState(false)
+  const options = useMemo(
+    () => numbersOf(range).map((number) => ({ value: number, label: number })),
+    [range],
+  )
+
+  if (typing) {
+    return (
+      <div className={styles.vitalTyping}>
+        <input
+          id={id}
+          className={styles.input}
+          inputMode="decimal"
+          autoFocus
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <button type="button" className={styles.linkButton} onClick={() => setTyping(false)}>
+          Back to the list
+        </button>
+      </div>
+    )
+  }
+  return (
+    <SearchSelect
+      id={id}
+      value={value}
+      placeholder={`e.g. ${range.start}`}
+      options={options}
+      startAt={range.start}
+      focusSearch={false}
+      onChange={onChange}
+      onOther={(typed) => {
+        if (typed) onChange(typed)
+        else setTyping(true)
+      }}
+    />
   )
 }
