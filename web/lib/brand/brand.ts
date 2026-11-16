@@ -58,6 +58,15 @@ const BRANDS: Record<string, Brand> = {
     initials: 'MA',
     address: '',
   },
+  // Pitched 2026-11-16 (Anthony was visiting them). The logo on their card
+  // was too blurred to copy, so the letters are the mark.
+  okparavero: {
+    key: 'okparavero',
+    name: 'Okparavero Memorial Hospital',
+    short: 'OMH',
+    initials: 'OM',
+    address: '159 Sapele Warri Road, Sapele, Delta State',
+  },
 }
 
 // ===== 3. The one in use for this build =====
