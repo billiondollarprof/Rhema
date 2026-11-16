@@ -32,6 +32,19 @@ export function worksWithPatients(staff: { role: string; room: { kind: string } 
   )
 }
 
+// Who sees Take payment (Anthony, 2026-11-16, request 213e): the Front Desk,
+// and an admin who does not work with patients. A doctor, nurse or matron
+// never does, even one who is also an admin. The database checks payments
+// on its own; this only decides what the screen shows.
+export function takesPayments(staff: {
+  role: string
+  can_admin?: boolean
+  room: { kind: string } | null
+}): boolean {
+  if (staff.role === 'front_desk') return true
+  return Boolean(staff.can_admin) && !worksWithPatients(staff)
+}
+
 // Two letters for the round name badge, e.g. "Chioma Eze" -> "CE".
 export function initials(name: string): string {
   const parts = name

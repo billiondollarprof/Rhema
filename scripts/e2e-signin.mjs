@@ -343,6 +343,8 @@ try {
 
   step('She picks a medicine from the list, suspends it with a reason, and resumes it')
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
+  // The medicine box opens with a tap (2026-11-16), then the search.
+  await page.getByText('Choose the medicine', { exact: true }).click()
   await page.getByPlaceholder('Type the first letters').fill('Amlo')
   await page.getByRole('option', { name: 'Amlodipine' }).click()
   await page.getByRole('button', { name: '5 mg tablet', exact: true }).click()
@@ -365,6 +367,7 @@ try {
   // as pending, and found again from its first letters.
   step('A medicine not in the list is added with Other, and is remembered for her')
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
+  await page.getByText('Choose the medicine', { exact: true }).click()
   await page.getByPlaceholder('Type the first letters').fill('Zorbex')
   await page.getByRole('option', { name: /Other: add/ }).click()
   await page.getByLabel('Strength or size (optional)').fill('5 mg tablet')

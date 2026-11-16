@@ -147,3 +147,34 @@
   color: var(--red);
   font-size: 14px;
 }
+
+/* The closed box: looks like every other drop down, with a clear arrow. */
+.closed {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--mut);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.closed svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--link);
+}
+
+.closed:focus-visible {
+  outline: 2px solid #8fb4f0;
+  border-color: var(--link);
+}

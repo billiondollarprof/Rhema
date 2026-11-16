@@ -170,6 +170,13 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
               <Link className={styles.button} href={`/patients/?p=${entry.patient_id}`}>
                 Open patient
               </Link>
+              {/* Straight to the medical record, for doctors and nurses
+                  (Anthony, 2026-11-16, request 213d). */}
+              {staff.can_medical ? (
+                <Link className={styles.button} href={`/patients/record/?p=${entry.patient_id}`}>
+                  Medical record
+                </Link>
+              ) : null}
             </div>
           </div>
         ))}
