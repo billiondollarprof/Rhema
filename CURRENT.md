@@ -871,6 +871,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        Typed records from another hospital's software are easier (a file).
     g. Dark mode: "some of the nurses are complaining that it's too bright."
     h. "Every picker with a long list: a search where they type the first letter."
+    STATUS 2026-11-16:
+    - a. Built, on testing: 103 tests in 8 sections (lib/lab/catalogue.ts),
+      Find a test search, browse by section, add a new test; result boxes with
+      unit and usual range. No SQL needed. Waits for his own list to compare.
+    - b. Built, on testing: migration 20261116060435 (about 400 more starter
+      medicines with strengths, 42 more doses in mg, mcg, IU and ml). Test 039.
+    - c. Built, on testing: More details (optional) folded on Register from old
+      file. Doctors already open and add to old file records (checked).
+    - e. Built, on testing: Home has 4 big buttons; Announce sits in Messages.
+    - h. Built, on testing: search box on every pick list longer than 12.
+    - 189 antenatal visits and the registration pick lists: LIVE 2026-11-16.
+    - Still to do: d (page by page review), f (Google Drive import design),
+      g (dark mode).
 
 187. **Open a patient from the queue.** (2026-11-16) "After calling in a
     patient, at the patient queue they should be able to click on the patient
