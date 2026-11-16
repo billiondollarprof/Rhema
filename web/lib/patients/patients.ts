@@ -49,6 +49,9 @@ export type PatientCard = {
   family_id: number | null
   family: { family_number: string } | null
   created_at: string
+  // An old file: the month it was first opened at the hospital (the 1st of
+  // that month), chosen on Register from old file (request 211).
+  first_registered_on?: string | null
 }
 
 // What the full form fills in. The number, the author and the times are
@@ -56,7 +59,14 @@ export type PatientCard = {
 // date of birth and sex.
 export type PatientDetails = Omit<
   PatientCard,
-  'id' | 'patient_number' | 'created_at' | 'from_old_file' | 'date_of_birth' | 'sex' | 'family'
+  | 'id'
+  | 'patient_number'
+  | 'created_at'
+  | 'from_old_file'
+  | 'date_of_birth'
+  | 'sex'
+  | 'family'
+  | 'first_registered_on'
 > & { date_of_birth: string; sex: Sex }
 
 // A search result also says when the patient was last seen (their last
@@ -78,7 +88,7 @@ export type TodayVisit = {
 
 // Also used for the device copy (lib/offline/patientCopy).
 export const CARD_COLUMNS =
-  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, family_id, family:families(family_number), created_at'
+  'id, patient_number, full_name, date_of_birth, sex, category, phone, email, address, town, lga, state, country, next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, from_old_file, family_id, family:families(family_number), created_at, first_registered_on'
 
 // "Female", "Male", or that it is not recorded yet (an old file).
 export function sexWords(sex: Sex | null): string {
@@ -346,6 +356,7 @@ export type OldFileExtras = Partial<
     | 'next_of_kin_name'
     | 'next_of_kin_relationship'
     | 'next_of_kin_phone'
+    | 'first_registered_on'
   >
 >
 
@@ -487,4 +498,25 @@ export async function loadRooms(
     .eq('is_active', true)
     .order('id', { ascending: true })
   return (data as { id: number; name: string; kind: string }[] | null) ?? []
+}
+
+// ===== When the patient first registered (request 211, 2026-11-16) =====
+// An old file carries the month it was first opened at the hospital
+// ("November 2024"); anybody else, the day they were added here.
+export function firstRegisteredWords(patient: {
+  created_at?: string | null
+  first_registered_on?: string | null
+}): string {
+  if (patient.first_registered_on) {
+    return new Date(`${patient.first_registered_on}T00:00:00`).toLocaleDateString('en-GB', {
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+  if (!patient.created_at) return 'Not recorded'
+  return new Date(patient.created_at).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }

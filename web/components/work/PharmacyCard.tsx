@@ -34,12 +34,14 @@ import {
   type Prescription,
 } from '@/lib/pharmacy/pharmacy'
 import { onChange } from '@/lib/live/changes'
+import { takesPayments } from '@/lib/auth/roles'
 
 type View = 'pay' | 'dispense'
 
 // ===== 1. Which list this person sees =====
 function viewFor(staff: StaffMember): View | null {
-  if (staff.role === 'front_desk' || staff.role === 'admin') return 'pay'
+  // The Front Desk, or an admin who does not work with patients (request 213e).
+  if (takesPayments(staff)) return 'pay'
   if (staff.role === 'pharmacy') return 'dispense'
   return null
 }

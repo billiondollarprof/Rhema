@@ -40,6 +40,7 @@ import {
 import { takePayment } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { takesPayments } from '@/lib/auth/roles'
 
 function EditPatient() {
   const auth = useAuth()
@@ -165,8 +166,8 @@ function EditPatient() {
                 fromOldFile={patient.from_old_file}
               />
             ) : null}
-            {staff && (staff.role === 'front_desk' || staff.can_admin) ? (
-              <PaymentsCard client={client} patientId={patient.id} />
+            {staff && takesPayments(staff) ? (
+              <PaymentsCard client={client} patientId={patient.id} staffId={staff?.id} />
             ) : null}
           </>
         ) : null}

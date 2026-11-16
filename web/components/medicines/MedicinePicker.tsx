@@ -66,6 +66,10 @@ export default function MedicinePicker({
   const [newStrength, setNewStrength] = useState('')
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // Closed: a box with a clear arrow, "Choose the medicine". Tapping it opens
+  // the search and the list (Anthony, 2026-11-16: "make the drop down arrow
+  // visible enough that they know they can just click to see a list").
+  const [open, setOpen] = useState(false)
 
   // A fresh copy, behind what is already showing.
   useEffect(() => {
@@ -160,6 +164,7 @@ export default function MedicinePicker({
             className={styles.small}
             onClick={() => {
               onChange('', '')
+              setOpen(true)
               setTyped('')
             }}
           >
@@ -201,12 +206,38 @@ export default function MedicinePicker({
     )
   }
 
-  // ===== 3. Search =====
+  // ===== 3. Closed: one box with an arrow =====
+  if (!open) {
+    return (
+      <button
+        id={id}
+        type="button"
+        className={styles.closed}
+        aria-haspopup="listbox"
+        onClick={() => setOpen(true)}
+      >
+        <span>{kind === 'item' ? 'Choose the supply' : 'Choose the medicine'}</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M6 9l6 6 6-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+    )
+  }
+
+  // ===== 4. Search =====
   return (
     <div className={styles.picker}>
       <input
         id={id}
         className={styles.box}
+        autoFocus
         placeholder={placeholder}
         autoComplete="off"
         maxLength={120}

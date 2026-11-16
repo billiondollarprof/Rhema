@@ -29,11 +29,15 @@ export const PURPOSE_WORDS: Record<PaymentPurpose, string> = {
   other: 'Other',
 }
 
-// What the Front Desk picks from when taking a payment here (lab tests and
-// drugs are paid from their own cards on Home).
+// What the Front Desk picks from when taking a payment here. Lab tests and
+// drugs are here too (Anthony, 2026-11-16, request 211): at rush hour a
+// doctor writes on paper, and the patient pays at the Front Desk without a
+// request in the app.
 export const TAKE_PURPOSES: PaymentPurpose[] = [
-  'consultation',
   'registration_card',
+  'consultation',
+  'lab_test',
+  'drugs',
   'scan',
   'other',
 ]

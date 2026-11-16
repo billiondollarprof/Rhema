@@ -35,6 +35,7 @@ import { recall, remember } from '@/lib/cache/memory'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
+import { takesPayments } from '@/lib/auth/roles'
 
 function FindPatient() {
   const auth = useAuth()
@@ -260,7 +261,7 @@ function FindPatient() {
                   staffId={staff.id}
                   canMedical={staff.can_medical}
                   // Payments: the Front Desk and admins (request 123, part 2).
-                  canPay={staff.role === 'front_desk' || staff.can_admin}
+                  canPay={takesPayments(staff)}
                   // Only the Front Desk registers patients (Anthony, 2026-11-10).
                   canRegister={staff.role === 'front_desk'}
                   showMedicines={staff.role === 'pharmacy'}
