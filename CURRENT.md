@@ -849,6 +849,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+202. **The hospital's own lab list.** (2026-11-16, he sent LABORATORY_REPORT.docx,
+    real past reports) "This is the laboratory document, check it to know
+    what's left and what to correct. Also see the structure and propose the
+    best arrangement for easy picking. Don't forget, we always include Other for
+    anything not on the list." The document holds real patients: only test
+    names, fields, units, ranges and result wording were taken; the working
+    copy was deleted, nothing of it is in the repo.
+
 201. **Profile, and the go ahead on Settings and the demos.** (2026-11-16)
     "You can always go ahead with the settings the way you have described it,
     one at a time." "What about profile?... they can, maybe put their profile

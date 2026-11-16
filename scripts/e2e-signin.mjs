@@ -466,10 +466,10 @@ try {
   step('Lab: Nurse One requests a malaria test from the record, for payment')
   await page.getByRole('link', { name: 'Request lab' }).first().click()
   await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
-  await page.getByRole('button', { name: 'Malaria test' }).click()
+  await page.getByRole('button', { name: 'Malaria Parasite (MP)' }).click()
   await page.getByRole('button', { name: 'Send request' }).click()
   await page
-    .getByText('Sent to the Lab, and to the Front Desk for payment: Malaria test.')
+    .getByText('Sent to the Lab, and to the Front Desk for payment: Malaria Parasite (MP).')
     .waitFor()
 
   step('Lab: the front desk takes 2,000 naira by POS; it leaves the list and stays gone')
@@ -478,7 +478,7 @@ try {
   await desk.getByText('Asked by Test Nurse One').waitFor()
   await desk.getByRole('button', { name: 'Take payment' }).click()
   // One price box per test; the app shows the total on the button.
-  await desk.getByLabel('Malaria test').fill('2,000')
+  await desk.getByLabel('Malaria Parasite (MP)').fill('2,000')
   await desk.getByRole('button', { name: 'POS' }).click()
   await desk.getByRole('button', { name: 'Record payment · ₦2,000' }).click()
   await desk.getByText('Nothing waiting for payment.').waitFor()

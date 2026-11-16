@@ -21,7 +21,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useEffect, useState } from 'react'
+import { Fragment, Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PatientPicker from '../_parts/PatientPicker'
 import styles from '../_parts/lab.module.css'
@@ -293,43 +293,58 @@ function ResultBoxes({
   values: Record<string, string>
   onChange: (box: string, value: string) => void
 }) {
+  // Picks where "Other" was chosen with nothing typed: they show a box to
+  // type in, until "Back to the list" (request 202: "we always include Other").
+  const [typing, setTyping] = useState<string[]>([])
+
   return (
     <div className={styles.fields}>
       {test.fields.map((field, place) => {
         const id = `box-${at}-${place}`
         const value = values[field.name] ?? ''
+        const typed = typing.includes(field.name)
         return (
-          <div key={field.name} className={styles.field}>
-            <label htmlFor={id}>{field.name}</label>
-            {field.choices ? (
-              <select
-                id={id}
-                className={styles.input}
-                value={value}
-                onChange={(event) => onChange(field.name, event.target.value)}
-              >
-                <option value="">Choose</option>
-                {field.choices.map((choice) => (
-                  <option key={choice} value={choice}>
-                    {choice}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className={styles.unit}>
-                <input
+          <Fragment key={field.name}>
+            {field.heading ? <b className={styles.fieldsHeading}>{field.heading}</b> : null}
+            <div className={styles.field}>
+              <label htmlFor={id}>{field.name}</label>
+              {field.choices && !typed ? (
+                <SearchSelect
                   id={id}
-                  className={styles.input}
-                  inputMode={field.unit ? 'decimal' : undefined}
-                  maxLength={120}
                   value={value}
-                  onChange={(event) => onChange(field.name, event.target.value)}
+                  options={field.choices.map((choice) => ({ value: choice, label: choice }))}
+                  onChange={(next) => onChange(field.name, next)}
+                  onOther={(words) => {
+                    if (words) onChange(field.name, words)
+                    else setTyping([...typing, field.name])
+                  }}
                 />
-                {field.unit ? <span>{field.unit}</span> : null}
-              </div>
-            )}
-            {field.range ? <small>Usual: {field.range}</small> : null}
-          </div>
+              ) : (
+                <div className={styles.unit}>
+                  <input
+                    id={id}
+                    className={styles.input}
+                    inputMode={field.unit && !field.choices ? 'decimal' : undefined}
+                    maxLength={200}
+                    value={value}
+                    autoFocus={typed}
+                    onChange={(event) => onChange(field.name, event.target.value)}
+                  />
+                  {field.unit && !field.choices ? <span>{field.unit}</span> : null}
+                </div>
+              )}
+              {typed ? (
+                <button
+                  type="button"
+                  className={styles.linkButton}
+                  onClick={() => setTyping(typing.filter((name) => name !== field.name))}
+                >
+                  Back to the list
+                </button>
+              ) : null}
+              {field.range ? <small>Normal: {field.range}</small> : null}
+            </div>
+          </Fragment>
         )
       })}
     </div>
