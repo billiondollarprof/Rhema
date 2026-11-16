@@ -434,3 +434,26 @@ button.row:hover {
   padding: 8px;
   user-select: all;
 }
+
+/* ===== The price list (Settings part 1, 2026-11-16) ===== */
+.field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priceRow > span {
+  font-weight: 700;
+  color: var(--ink2);
+}
+
+.priceRow .input {
+  flex: 1;
+  min-width: 0;
+}

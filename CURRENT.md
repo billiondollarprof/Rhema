@@ -867,6 +867,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     running the SQL."
     DECIDED: Settings goes into Admin, one part at a time (hospital details and
     prices first). Demos on the StellaXafe Cloudflare account, not Vercel.
+    BUILT 2026-11-16: Settings part 1, the price list (migration
+    20261116072103, test 040, Admin > Prices). Profile picture NOT built:
+    a staff photo is new personal data (NDPA), so it waits for his yes on the
+    plan in the chat.
 
 197. **Settings: do we need it?** (2026-11-16) "Find out if you are going to be
     needing a settings section and what are they going to be setting up... who
@@ -886,6 +890,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     enter... Every other detail is not compulsory, whether medical records...
     They can enter whatever they have and save... Register from old file... it
     is only the name that is compulsory."
+    CHECKED 2026-11-16: medical record forms save whatever is filled in (each
+    only refuses a completely empty line, such as a medicine with no name).
+    Register from old file needs only the name. OPEN QUESTION for him: a new
+    patient today needs name, date of birth and sex (his rule of 2026-11-10,
+    "for the new patients, it is needed"); phone is optional, because children
+    in a family may have none. Change to name and phone only? Not changed.
 200. **Pickers as drop downs with search, and clean pages.** (2026-11-16) "Like
     this chemistry now... shouldn't it be just like a drop down? When they click
     on the drop down, they will now select and they should be able to search...
@@ -896,6 +906,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     very very clean in all screen sizes... on landscape the things that need to
     be horizontal can stay horizontal... on portrait one after the other...
     screenshot, look at it, then make it look better." Goes with 196d.
+    LIVE 2026-11-16: one drop down (SearchSelect) for every pick list: arrow,
+    search box on lists longer than 8, Other at the end. Request lab: all tests
+    in one grouped drop down in place of the section chips. Page by page review
+    (196d) still to do.
 
 196. **Big batch, 2026-11-16 (his permission: "when you are done and you see that
     everything is okay, run the SQL that is needed to lock it in").**
@@ -935,8 +949,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - e (first version, replaced): Home has 4 big buttons; Announce sits in Messages.
     - h. LIVE: search box on every pick list longer than 12.
     - 189 antenatal visits and the registration pick lists: LIVE 2026-11-16.
-    - Still to do: d (page by page review), f (Google Drive import design),
-      g (dark mode).
+    - g. LIVE 2026-11-16: Dark look in the menu, kept on the device. Light
+      look unchanged (every colour named, same values). Receipt stays white.
+    - Still to do: d (page by page review), f (Google Drive import design).
 
 187. **Open a patient from the queue.** (2026-11-16) "After calling in a
     patient, at the patient queue they should be able to click on the patient

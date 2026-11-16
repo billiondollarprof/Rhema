@@ -32,6 +32,7 @@ export default function PriceForm({
   save,
   onCancel,
   onDone,
+  prices = [],
 }: {
   // Keeps each box's label tied to its own box when several forms are open.
   formId: string
@@ -40,8 +41,13 @@ export default function PriceForm({
   save: (lines: Line[], mode: PaymentMode) => Promise<string | null>
   onCancel: () => void
   onDone: () => void
+  // The price list's amount for each line, filled in (Settings, 2026-11-16).
+  // The Front Desk can still change it. Missing lines start empty.
+  prices?: (number | undefined)[]
 }) {
-  const [typed, setTyped] = useState<string[]>(labels.map(() => ''))
+  const [typed, setTyped] = useState<string[]>(
+    labels.map((_, at) => (prices[at] ? String(prices[at]) : '')),
+  )
   const [mode, setMode] = useState<PaymentMode>('cash')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
