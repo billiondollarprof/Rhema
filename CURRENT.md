@@ -849,6 +849,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+201. **Profile, and the go ahead on Settings and the demos.** (2026-11-16)
+    "You can always go ahead with the settings the way you have described it,
+    one at a time." "What about profile?... they can, maybe put their profile
+    picture if they want to... cap it at maximum 500 kilobytes... the system
+    automatically strips the picture and reduces the size until it's below 500
+    kilobytes. If you can't get below 500 kilobytes, the system rejects it...
+    other things for their profile, if at all is needed... if it's not needed,
+    you can scrap that." Demos: "I think StellaXafe is better... we'll use my
+    StellaXafe account... arrange it in a way that I can easily delete them...
+    after a month of pitching a hospital and no response, I can delete it...
+    check that Cloudflare can accept as many demos as possible, or maybe if we
+    have built up to 20, we can delete some older ones... so Cloudflare
+    doesn't charge us money." He will set the demos up with me when he is back,
+    with the lab list. "After you check everything checks out, you can run the
+    SQL and give me the reports. Make sure everything passes on CI before
+    running the SQL."
+    DECIDED: Settings goes into Admin, one part at a time (hospital details and
+    prices first). Demos on the StellaXafe Cloudflare account, not Vercel.
+
 197. **Settings: do we need it?** (2026-11-16) "Find out if you are going to be
     needing a settings section and what are they going to be setting up... who
     has access to settings, who sees settings, and is settings going to be
@@ -908,7 +927,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
       medicines with strengths, 42 more doses in mg, mcg, IU and ml). Test 039.
     - c. LIVE: More details (optional) folded on Register from old
       file. Doctors already open and add to old file records (checked).
-    - e. LIVE: Home has 4 big buttons; Announce sits in Messages.
+    - e. CORRECTED 2026-11-16 (his words: "admin screen can remain the way it
+      was... front desk... all of them that had only four big buttons can
+      remain"). LIVE: only double role staff change: they see the four
+      buttons of their patient role, Invite staff under Admin, Announce under
+      Messages. Admin, nurse and Front Desk Home are back as before.
+    - e (first version, replaced): Home has 4 big buttons; Announce sits in Messages.
     - h. LIVE: search box on every pick list longer than 12.
     - 189 antenatal visits and the registration pick lists: LIVE 2026-11-16.
     - Still to do: d (page by page review), f (Google Drive import design),

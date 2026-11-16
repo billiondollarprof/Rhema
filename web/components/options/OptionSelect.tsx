@@ -3,8 +3,9 @@
  * from a short list, with "Other" to type one that is missing.
  *
  * Why: Anthony, 2026-11-12: doses, how often, allergies and the like are
- * picked, not typed. On a computer the first letter jumps to that line; on a
- * phone it opens the phone's own list.
+ * picked, not typed. Since 2026-11-16 (request 200) it is the app's own drop
+ * down (SearchSelect): a clear arrow, and a search box on a long list where
+ * they type the first letters.
  *
  * "Other" shows a box to type it. It is kept for the person from then on (and
  * becomes standard for everybody when a second person types the same one). A
@@ -20,6 +21,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './OptionSelect.module.css'
+import SearchSelect from './SearchSelect'
 import {
   addOption,
   knownOptions,
@@ -29,8 +31,6 @@ import {
   type PickList,
   type PickOption,
 } from '@/lib/options/options'
-
-const OTHER = '__other__'
 
 type Props = {
   client: SupabaseClient
@@ -59,8 +59,6 @@ export default function OptionSelect({
   const [typing, setTyping] = useState(false)
   const [typed, setTyped] = useState('')
   const [busy, setBusy] = useState(false)
-  // A long list gets a search box: type the first letters (2026-11-16).
-  const [search, setSearch] = useState('')
 
   // A fresh copy, behind what is already showing.
   useEffect(() => {
@@ -74,21 +72,7 @@ export default function OptionSelect({
   }, [client, staffId])
 
   const options = useMemo(() => optionsOf(all, list), [all, list])
-  const long = options.length > 12
-  const words = search.trim().toLowerCase()
-  const shown = words
-    ? [
-        ...options.filter((option) => option.label.toLowerCase().startsWith(words)),
-        ...options.filter(
-          (option) =>
-            !option.label.toLowerCase().startsWith(words) &&
-            option.label.toLowerCase().includes(words),
-        ),
-      ]
-    : options
   const chosen = options.find((option) => option.label.toLowerCase() === value.toLowerCase())
-  // The chosen line stays in the drop down while a search hides the others.
-  const listed = chosen && !shown.includes(chosen) ? [chosen, ...shown] : shown
 
   async function save() {
     const words = typed.trim()
@@ -136,34 +120,21 @@ export default function OptionSelect({
 
   return (
     <div className={styles.wrap}>
-      {long ? (
-        <input
-          className={styles.input}
-          aria-label="Search this list"
-          placeholder="Search this list"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      ) : null}
-      <select
+      <SearchSelect
         id={id}
-        className={styles.select}
-        value={value}
-        onChange={(event) => {
-          if (event.target.value === OTHER) setTyping(true)
-          else onChange(event.target.value)
+        value={chosen?.label ?? value}
+        placeholder={placeholder}
+        options={options.map((option) => ({
+          value: option.label,
+          label: option.label,
+          note: option.standard ? undefined : 'Yours',
+        }))}
+        onChange={onChange}
+        onOther={(words) => {
+          setTyped(words)
+          setTyping(true)
         }}
-      >
-        <option value="">{placeholder}</option>
-        {/* A value already on the entry that is not in the list. */}
-        {value && !chosen ? <option value={value}>{value}</option> : null}
-        {listed.map((option) => (
-          <option key={option.id} value={option.label}>
-            {option.label}
-          </option>
-        ))}
-        <option value={OTHER}>Other…</option>
-      </select>
+      />
       {chosen && !chosen.standard ? (
         <button
           type="button"
