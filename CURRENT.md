@@ -849,6 +849,35 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+197. **Settings: do we need it?** (2026-11-16) "Find out if you are going to be
+    needing a settings section and what are they going to be setting up... who
+    has access to settings, who sees settings, and is settings going to be
+    department by department... Does other softwares have that?... why should
+    we?... we must design for flexibility, ease of use, lightness, reliability,
+    security, durability." ANSWERED in chat 2026-11-16, waits for his decision.
+198. **A demo per hospital on Vercel ("Vessel").** (2026-11-16) "Is it possible I
+    connect my Vessel app here?... push a demo of what we are building... every
+    hospital that I want to show... no password... no back end... they will just
+    select front desk from the login page... hospitalname.vessel.app... even if
+    they want to come back to the demo later." Read back to him 2026-11-16,
+    waits for his yes and the platform choice (a new service costs money).
+199. **Only the biodata is compulsory.** (2026-11-16) "None of them is a
+    compulsory detail... The only details that are compulsory is the biodata,
+    which is the patient name, phone number... the things that the front desk
+    enter... Every other detail is not compulsory, whether medical records...
+    They can enter whatever they have and save... Register from old file... it
+    is only the name that is compulsory."
+200. **Pickers as drop downs with search, and clean pages.** (2026-11-16) "Like
+    this chemistry now... shouldn't it be just like a drop down? When they click
+    on the drop down, they will now select and they should be able to search...
+    type the first letter... put a visible drop down arrow on anyone that has a
+    drop down... if the options are plenty, put a search... still put Other so
+    they can enter what they have... every picker comes with its own number
+    (medicine: name, then milligram, then dosage)... everything well arranged,
+    very very clean in all screen sizes... on landscape the things that need to
+    be horizontal can stay horizontal... on portrait one after the other...
+    screenshot, look at it, then make it look better." Goes with 196d.
+
 196. **Big batch, 2026-11-16 (his permission: "when you are done and you see that
     everything is okay, run the SQL that is needed to lock it in").**
     a. Lab: "take what is in Swift practice EMR and add it... later when I bring
