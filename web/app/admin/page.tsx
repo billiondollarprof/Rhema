@@ -1,6 +1,7 @@
 /*
- * app/admin/page.tsx: Admin. Staff, invitations, rooms, prices and the
- * activity log, in five tabs (Prices added 2026-11-16, Settings part 1).
+ * app/admin/page.tsx: Admin. Staff, invitations, rooms, prices, the
+ * activity log and Data (download our data), in six tabs (Prices added 2026-11-16, Settings
+ * part 1; Data added 2026-11-16, request 217a).
  *
  * Why: build step 7 and request 112 (Anthony, 2026-10-30). "Super simple
  * system to use... easy flow." So one page, a few tabs, and the tab is kept
@@ -18,6 +19,7 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ActivityTab from './_parts/ActivityTab'
+import DataTab from './_parts/DataTab'
 import InviteTab from './_parts/InviteTab'
 import PricesTab from './_parts/PricesTab'
 import RoomsTab from './_parts/RoomsTab'
@@ -44,6 +46,8 @@ const TABS = [
   // Settings part 1 (2026-11-16): the price list.
   ['prices', 'Prices'],
   ['activity', 'Activity'],
+  // Request 217a (2026-11-16): download everything, admin and PIN only.
+  ['data', 'Data'],
 ] as const
 type Tab = (typeof TABS)[number][0]
 
@@ -121,6 +125,7 @@ function Admin() {
             ) : null}
             {staff && tab === 'prices' ? <PricesTab client={client} /> : null}
             {staff && tab === 'activity' ? <ActivityTab client={client} staff={staff} /> : null}
+            {staff && tab === 'data' ? <DataTab client={client} /> : null}
           </>
         )}
       </div>

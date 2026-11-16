@@ -104,7 +104,9 @@ const KINDS: Record<FileKind, KindRules> = {
         `lab_results?select=id&file_key=eq.${encodeURIComponent(key)}&limit=1`,
         token,
       )
-      return Boolean(rows && rows.length > 0)
+      if (rows && rows.length > 0) return true
+      // An admin downloading the hospital's data (request 217a, 2026-11-16).
+      return (await callFunction(env, post, 'export_may_read', { key }, token)) === true
     },
     label: 'Lab file',
   },

@@ -4,6 +4,17 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-16 (evening): requests 202 to 216 LIVE. Lab menu from the
+  Laboratory's own reports; lab prices with admin approval (72 hours); Other
+  saved for everybody; payment kinds with pickers; First registered and the old
+  file month; vital sign lists; send paid work to the Lab and Pharmacy;
+  pharmacy stock; note titles; lab corrections; History (the Front Desk sees
+  its own shift from its last email sign in, the admin everybody or one person,
+  the Lab and Pharmacy counts, consultants their own work); three card fees.
+  The 8 live test patients and their 2 files deleted with his yes. Backups
+  every 2 hours. Open: Download our data (plan waits), page by page tidy,
+  Google Drive import, pharmacy prices with approval (not asked).
+
 - 2026-11-16 (later): request 196, first half LIVE. Antenatal visit table and
   client details (189) and the registration pick lists. Home has 4 big
   buttons; Announce sits in Messages. Search on pick lists longer than 12.
