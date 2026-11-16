@@ -849,6 +849,16 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+208. **Tests come with prices; the lab proposes, the admin approves.**
+    (2026-11-16) "Add price pickers too so tests comes with price, especially
+    check the list I uploaded, there's price in it. Also the lab scientist can
+    add/edit price of any test and the admin approves it and it becomes the
+    standard price. But if admin hasn't approved it after 72hrs, make the price
+    standard regardless... Option for Other included in the price list."
+    CHECKED: the uploaded LABORATORY_REPORT.docx has no prices in it (no naira
+    sign, no amounts beside tests); asked him for the price list. Plan read
+    back 2026-11-16, waits for his yes. Goes with 204.
+
 207. **Lab test list for the lab scientists.** (2026-11-16) "Can the lab
     scientists see the list of test without any patient data, if not please
     fix." They could not (tests only showed inside a request). BUILT: page
