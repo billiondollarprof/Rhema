@@ -849,6 +849,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+212. **Vital signs: pickers and Other on each box.** (2026-11-16) "The vital
+    signs, can there be pickers + others on each of the box, so they can pick
+    from options without typing?"
+    DECIDED same day (on 211's question): doctors do not see payments: "No,
+    doctors only knows that the patient has already paid for that test."
+    211's SQL still waits for his yes.
+
 211. **Front Desk payments by kind, with pickers; payments and first
     registration on the record; month picker for old files.** (2026-11-16)
     "Payment should have other categories, so they can choose from the list,
