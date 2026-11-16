@@ -26,7 +26,9 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import CodeBoxes from '@/components/auth/CodeBoxes'
+import AppLoading from '@/components/shell/AppLoading'
 import EmailPicker from '@/components/auth/EmailPicker'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Logo from '@/components/brand/Logo'
@@ -64,6 +66,12 @@ export default function SignInPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Home is fetched while the person types, so it opens at once after.
+  const router = useRouter()
+  useEffect(() => {
+    router.prefetch('/')
+  }, [router])
+
   // Take the email out of the address once it is in the box, so it does
   // not stay in the browser's history. If the link is opened while this
   // page is already open in the same tab, only the # changes, so listen
@@ -83,6 +91,9 @@ export default function SignInPage() {
   }, [linkEmail])
 
   if (auth.status === 'loading') return <div className={styles.page} />
+  // Signed in: the opening screen while Home opens, never the email form
+  // again (Anthony, 2026-11-16, request 188).
+  if (auth.status === 'ready') return <AppLoading />
 
   // The people remembered on this device. Read here, in the browser, once
   // the sign in state is known. With nobody remembered, start at the email.

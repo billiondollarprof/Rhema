@@ -849,6 +849,41 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+187. **Open a patient from the queue.** (2026-11-16) "After calling in a
+    patient, at the patient queue they should be able to click on the patient
+    and open the profile."
+188. **Sign in feels slow.** (2026-11-16) "After you put the code, the system
+    tends to delay... maybe even show you the place where you enter your Gmail
+    again before eventually showing the dashboard... when the system locks and
+    you enter your PIN, it still shows that login page slightly before opening
+    your dashboard... look into it and see if you can fix it."
+189. **Antenatal: palpation columns and the card's data.** (2026-11-16, three
+    photos: the "Anti-natal record" visit table and the P.H.C. data and client
+    details pages) "The midwife (consultant room 2) gave me some lists... they
+    do palpation... height of fundus... we need to add columns for the
+    palpation... check if we already have those data."
+190. **Lab templates.** (2026-11-16) "The laboratory data, I currently have it,
+    so I will upload everything to you... structure them so they can just be
+    picking data." Waiting for his upload.
+191. **Pick instead of type, everywhere.** (2026-11-16) "Doctors, nurses,
+    pharmacy, laboratory, front desk, anywhere it is possible to populate with
+    choices, we add... limit the typing to the bare minimum... consultation
+    notes and nursing notes, where it is necessary to type." Step by step.
+192. **Register from old file needs the category.** (2026-11-16) "The front
+    desk complained that register old file does not have category like
+    individual, family and antenatal."
+193. **More pharmacy drugs.** (2026-11-16) "Apart from the 112... search the
+    internet, Nigeria and everywhere, the drugs they sell... populate."
+194. **Read old files from photos.** (2026-11-16) "If we snap the files of old
+    patients and you extract the major details (name, phone, sex, age or date of
+    birth, category, next of kin)... in batches of a hundred... if not clear,
+    manually." He charges the hospital separately. Raised: real patient data must
+    not pass through the chat (CLAUDE.md, NDPA); needs a way inside the app.
+195. **Dark mode.** (2026-11-16) "We also need a dark mode toggle because of
+    the eye... ensure every text fits, nothing becomes illegible or too faint...
+    let the dark mode feel natural just like the light mode."
+    Also 2026-11-16: "I have set emergency room myself."
+
 177. **Medicine list to pick from, instead of typing (pharmacy, nurse, doctor).**
     (2026-11-11, after a day at the hospital) "They said it would be nice if
     they uploaded all the medicine that they normally give. Instead of

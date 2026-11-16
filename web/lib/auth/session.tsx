@@ -179,8 +179,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // ----- 3b. Make one remembered person the one using the device -----
+  // `known`: the staff row when the caller has just read it (a fresh sign
+  // in), so it is not asked for twice (request 188, 2026-11-16).
   const activate = useCallback(
-    async (id: string) => {
+    async (id: string, known?: StaffMember) => {
       const remembered = getAccount(id)
       const personClient = clientFor(id)
       const { data } = await personClient.auth.getSession()
@@ -189,7 +191,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const member = await loadStaff(personClient, id)
+      // The staff row and "has a PIN" are asked at the same time, not one
+      // after the other: on a slow network each question costs a second.
+      const [member, pinSet] = await Promise.all([
+        known ?? loadStaff(personClient, id),
+        hasPin(personClient),
+      ])
       if (!member) {
         await signOutHere(id, 'This account is switched off. Ask your administrator.')
         return
@@ -203,7 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       saveAccount(current)
       setAccount(current)
 
-      if (!(await hasPin(personClient))) setStatus('needs-pin')
+      if (!pinSet) setStatus('needs-pin')
       else if (remembered.locked || idleTooLong) setStatus('locked')
       else setStatus('ready')
     },
@@ -233,7 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         locked: false,
       })
       setNotice(null)
-      await activate(member.id)
+      await activate(member.id, member)
       return null
     },
     [activate, signOutHere],

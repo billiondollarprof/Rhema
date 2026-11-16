@@ -340,6 +340,8 @@ export async function registerFromOldFile(
   staffId: string,
   dateOfBirth: string | null = null,
   sex: Sex | null = null,
+  // Individual, family or antenatal (request 192, 2026-11-16).
+  category: Category = 'individual',
 ): Promise<{ patient: PatientCard | null; problem: string | null }> {
   const cleanName = fullName.trim().replace(/\s+/g, ' ')
   const { data, error } = await client
@@ -349,6 +351,7 @@ export async function registerFromOldFile(
       phone,
       date_of_birth: dateOfBirth,
       sex,
+      category,
       from_old_file: true,
       created_by: staffId,
     })
