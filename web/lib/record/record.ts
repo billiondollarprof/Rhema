@@ -87,11 +87,14 @@ export type Vitals = Voidable & {
   recorder: { full_name: string } | null
 }
 export type Note = Voidable & {
+  // A short heading for the note (request 214, 2026-11-16); older notes have none.
+  title: string | null
   note: string
   created_at: string
   author: { full_name: string } | null
 }
 export type Consultation = Voidable & {
+  title: string | null
   complaint: string | null
   findings: string | null
   assessment: string | null
@@ -216,12 +219,12 @@ export async function loadRecord(
     ).limit(30),
     byPatient(
       'nursing_notes',
-      `${VOID}, note, created_at, author:staff!written_by(full_name)`,
+      `${VOID}, title, note, created_at, author:staff!written_by(full_name)`,
       'created_at',
     ).limit(50),
     byPatient(
       'consultation_notes',
-      `${VOID}, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name)`,
+      `${VOID}, title, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name)`,
       'created_at',
     ).limit(30),
     byPatient(

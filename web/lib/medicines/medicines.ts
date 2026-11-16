@@ -29,10 +29,30 @@ export type MedicineLine = {
   added_by: string | null
   created_at: string
   adder: { full_name: string } | null
+  // Stock (request 214, 2026-11-16): the unit sold (tablet, sachet...), how
+  // many are left, and the level below which the Pharmacy is warned. in_stock
+  // null: the Pharmacy does not count this line, so nothing is required.
+  unit: string | null
+  in_stock: number | null
+  low_level: number | null
+}
+
+// "12 tablets left", "Out of stock", or null when the line is not counted.
+export function stockWords(line: Pick<MedicineLine, 'unit' | 'in_stock'>): string | null {
+  if (line.in_stock === null || line.in_stock === undefined) return null
+  const left = Number(line.in_stock)
+  if (left <= 0) return 'Out of stock'
+  return `${left} ${unitWords(line.unit, left)} left`.replace(/\s+/g, ' ')
+}
+
+// "1 tablet", "12 tablets": the unit with an s when there is more than one.
+export function unitWords(unit: string | null | undefined, count: number): string {
+  if (!unit) return ''
+  return count === 1 || unit.endsWith('s') ? unit : `${unit}s`
 }
 
 const COLUMNS =
-  'id, name, strength, kind, status, source, is_active, added_by, created_at, adder:staff!added_by(full_name)'
+  'id, name, strength, kind, status, source, is_active, added_by, created_at, adder:staff!added_by(full_name), unit, in_stock, low_level'
 
 function deviceKey(staffId: string) {
   return `rhema-medicines-${staffId}`
@@ -159,3 +179,38 @@ export async function updateMedicine(
 // The words on a line: "Paracetamol 500 mg tablet".
 export const medicineWords = (name: string, strength: string | null | undefined) =>
   [name, strength].filter(Boolean).join(' ')
+
+// ===== Stock (request 214, 2026-11-16) =====
+// Only the Pharmacy; the database checks. Each answers words to show, or null.
+export async function setStockSettings(
+  client: SupabaseClient,
+  id: number,
+  unit: string,
+  lowLevel: number | null,
+): Promise<string | null> {
+  const { error } = await client.rpc('set_stock_settings', {
+    medicine: id,
+    new_unit: unit,
+    new_low: lowLevel,
+  })
+  if (error?.code === '42501') return 'Only the Pharmacy sets stock.'
+  return error ? 'That could not be saved. Check the internet and try again.' : null
+}
+
+export async function moveStock(
+  client: SupabaseClient,
+  id: number,
+  amount: number,
+  reason: string,
+  note: string | null,
+): Promise<string | null> {
+  const { error } = await client.rpc('move_stock', {
+    medicine: id,
+    amount,
+    why: reason,
+    move_note: note,
+  })
+  if (error?.code === '23505') return 'That was just saved.'
+  if (error?.code === '42501') return 'Only the Pharmacy changes stock.'
+  return error ? 'That could not be saved. Check the internet and try again.' : null
+}

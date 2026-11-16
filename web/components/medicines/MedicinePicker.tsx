@@ -32,6 +32,7 @@ import {
   knownMedicines,
   loadMedicines,
   medicineWords,
+  stockWords,
   type MedicineLine,
 } from '@/lib/medicines/medicines'
 
@@ -88,6 +89,10 @@ export default function MedicinePicker({
   )
   const matches = useMemo(() => findMedicines(names, typed), [names, typed])
   const picked = names.find((entry) => entry.name.toLowerCase() === name.toLowerCase())
+  // The chosen line, for its stock.
+  const chosenLine = picked?.strengths.find(
+    (line) => (line.strength ?? '').toLowerCase() === (strength ?? '').toLowerCase(),
+  )
 
   async function saveNew() {
     if (newName.trim().length < 2) {
@@ -159,6 +164,15 @@ export default function MedicinePicker({
       <div className={styles.picker}>
         <div className={styles.chosen}>
           <b>{medicineWords(name, strength)}</b>
+          {/* How many are left, when the Pharmacy counts it (request 214). */}
+          {chosenLine && stockWords(chosenLine) ? (
+            <small className={Number(chosenLine.in_stock) <= 0 ? styles.stockOut : styles.hint}>
+              {stockWords(chosenLine)}
+              {Number(chosenLine.in_stock) <= 0
+                ? '. It can still be given; tell the Pharmacy.'
+                : ''}
+            </small>
+          ) : null}
           <button
             type="button"
             className={styles.small}
@@ -185,6 +199,7 @@ export default function MedicinePicker({
                   onClick={() => onChange(name, line.strength ?? '')}
                 >
                   {line.strength ?? 'No strength'}
+                  {stockWords(line) ? ` · ${stockWords(line)}` : ''}
                 </button>
               ))}
               <button

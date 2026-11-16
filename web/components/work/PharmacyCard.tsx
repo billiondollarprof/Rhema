@@ -35,6 +35,12 @@ import {
 } from '@/lib/pharmacy/pharmacy'
 import { onChange } from '@/lib/live/changes'
 import { takesPayments } from '@/lib/auth/roles'
+import {
+  loadMedicines,
+  medicineWords,
+  stockWords,
+  type MedicineLine,
+} from '@/lib/medicines/medicines'
 
 type View = 'pay' | 'dispense'
 
@@ -106,6 +112,8 @@ export default function PharmacyCard({
           {list && list.length ? <span className={styles.count}>{list.length}</span> : null}
         </h3>
       )}
+      {/* Medicines running low, for the Pharmacy (request 214). */}
+      {view === 'dispense' ? <RunningLow client={client} staffId={staff.id} /> : null}
       {list === null ? <p className={styles.muted}>Loading…</p> : null}
       {list && list.length === 0 ? <p className={styles.muted}>{empty}</p> : null}
       {/* Straight after a payment: its receipt, one tap away (request 123). */}
@@ -218,6 +226,48 @@ function Entry({
           onDone={() => onPaid(prescription.patient_id)}
         />
       ) : null}
+    </div>
+  )
+}
+
+// ===== Running low (request 214, 2026-11-16) =====
+// Counted medicines at or below the level the Pharmacy set, or at 0. Shown
+// until the Pharmacy restocks. Lines nobody counts never show here.
+function RunningLow({ client, staffId }: { client: SupabaseClient; staffId: string }) {
+  const [low, setLow] = useState<MedicineLine[]>([])
+  useEffect(() => {
+    let current = true
+    loadMedicines(client, staffId).then((lines) => {
+      if (!current || !lines) return
+      setLow(
+        lines.filter(
+          (line) =>
+            line.status === 'standard' &&
+            line.is_active &&
+            line.in_stock !== null &&
+            Number(line.in_stock) <= Math.max(0, Number(line.low_level ?? 0)),
+        ),
+      )
+    })
+    return () => {
+      current = false
+    }
+  }, [client, staffId])
+
+  if (low.length === 0) return null
+  return (
+    <div className={styles.runningLow}>
+      <b>Running low ({low.length})</b>
+      <ul>
+        {low.map((line) => (
+          <li key={line.id}>
+            {medicineWords(line.name, line.strength)}: {stockWords(line)}
+          </li>
+        ))}
+      </ul>
+      <Link className={styles.button} href="/pharmacy/list/">
+        Restock in the Medicine list
+      </Link>
     </div>
   )
 }

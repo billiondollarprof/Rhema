@@ -864,6 +864,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     mistake and discover later and go to edit or cancel... If they mistakenly
     mark finished at the lab without adding the test, refuse and add warnings
     that they should add test details."
+    BUILT 2026-11-16, held for his SQL yes (migration 20261116145838, test
+    044, 10 breaks caught; test 031 kept, 009 caught a doctor read gap that
+    was fixed): Front Desk Send to the Laboratory / Pharmacy after a lab or
+    drug payment, with an optional doctor; stock (unit, warn level, restock,
+    recount, drops on dispensing, below 0 allowed with warnings, Running low on
+    the Pharmacy's Home, how many required only for counted lines); titles on
+    nursing and consultation notes; Lab: warning naming tests without details,
+    database refuses Result ready (missing_tests), Find a patient's tests page,
+    cancel a wrong result with a reason, add the right one.
 
 213. **After a payment, send it on; pharmacy stock; small fixes.** (2026-11-16)
     His yes to 211's SQL: "yes on the sql". Then:

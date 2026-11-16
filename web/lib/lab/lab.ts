@@ -188,7 +188,78 @@ export async function recordResults(
   })
   if (error) return 'The results could not be saved. Check the internet and try again.'
   if (data === 'not_paid') return 'This test has not been paid for yet. Ask the Front Desk.'
+  if (data === 'missing_tests')
+    return 'Some tests have no details yet. Add the result for every test before Result ready.'
   return null
+}
+
+// ===== 4b. Corrections by the Laboratory (request 214, 2026-11-16) =====
+// "The lab scientists can make mistake and discover later and go to edit or
+// cancel." Only on a request the Front Desk confirmed paid; the database checks.
+
+// The results on one request, cancelled ones too (they stay, crossed out).
+export type RequestResult = LabResult & {
+  voided_at: string | null
+  void_reason: string | null
+}
+
+export async function loadRequestResults(
+  client: SupabaseClient,
+  requestId: number,
+): Promise<RequestResult[]> {
+  const { data } = await client
+    .from('lab_results')
+    .select(
+      'id, request_id, test, result, file_key, file_name, file_type, file_size, recorded_at, voided_at, void_reason, ' +
+        'recorder:staff!lab_results_recorded_by_fkey(full_name)',
+    )
+    .eq('request_id', requestId)
+    .order('recorded_at')
+  return (data as unknown as RequestResult[] | null) ?? []
+}
+
+// Add one result to a paid request (a missed test, or the corrected one).
+export async function addResult(
+  client: SupabaseClient,
+  requestId: number,
+  item: ResultItem,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('add_lab_result', { request: requestId, item })
+  if (error) return 'The result could not be saved. Check the internet and try again.'
+  if (data === 'not_paid') return 'This test has not been paid for yet. Ask the Front Desk.'
+  if (data === 'missing_tests') return 'Type the result, or attach a file, first.'
+  return null
+}
+
+// Cancel a wrong result. It stays in the record, crossed out, with the reason.
+export async function cancelResult(
+  client: SupabaseClient,
+  resultId: number,
+  reason: string,
+): Promise<string | null> {
+  if (reason.trim().length < 2) return 'Give a short reason.'
+  const { data, error } = await client.rpc('cancel_lab_result', {
+    result_id: resultId,
+    why: reason,
+  })
+  if (error) return 'That could not be cancelled. Check the internet and try again.'
+  if (data !== 'cancelled') return 'That result was already cancelled.'
+  return null
+}
+
+// A patient's paid lab requests (waiting for the Lab, or finished), newest first.
+export async function listPaidRequests(
+  client: SupabaseClient,
+  patientId: number,
+): Promise<LabRequest[]> {
+  const { data } = await client
+    .from('lab_requests')
+    .select(REQUEST_COLUMNS)
+    .eq('patient_id', patientId)
+    .in('status', ['awaiting_test', 'completed'])
+    .order('requested_at', { ascending: false })
+    .limit(50)
+  return (data as unknown as LabRequest[] | null) ?? []
 }
 
 // ===== 5. The person who asked: results ready for them =====

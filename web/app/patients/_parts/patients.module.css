@@ -1067,3 +1067,15 @@
   color: var(--link);
   cursor: pointer;
 }
+
+/* How many, under a drug line, with its stock (request 214). */
+.qtyLine {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 4px;
+}
+
+.stockOut {
+  color: var(--c-9a5b00, #9a5b00);
+  font-weight: 600;
+}

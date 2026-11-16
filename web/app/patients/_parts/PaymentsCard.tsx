@@ -25,13 +25,22 @@ import {
 } from '@/lib/prices/prices'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
 import { LAB_SECTIONS, findLabTest } from '@/lib/lab/catalogue'
-import { loadMedicines, medicineWords } from '@/lib/medicines/medicines'
+import {
+  loadMedicines,
+  medicineWords,
+  stockWords,
+  unitWords,
+  type MedicineLine,
+} from '@/lib/medicines/medicines'
 import { loadOptions, optionsOf } from '@/lib/options/options'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
 import { PAYMENT_MODES, naira, type PaymentMode } from '@/lib/lab/lab'
 import {
+  loadClinicians,
+  sendPaidToLab,
+  sendPaidToPharmacy,
   PURPOSE_WORDS,
   TAKE_PURPOSES,
   patientPayments,
@@ -41,7 +50,9 @@ import {
   type PaymentPurpose,
 } from '@/lib/payments/payments'
 
-type Line = { label: string; price: string }
+// qty: how many, for a drug line (request 214). Needed only when the
+// Pharmacy counts that medicine's stock.
+type Line = { label: string; price: string; qty?: string }
 
 // "7,500" and "7500.50" both read as numbers; anything else reads as 0.
 function readNaira(typed: string): number {
@@ -106,6 +117,14 @@ export default function PaymentsCard({
   // Drugs: the medicine list, name and strength. Other for anything else.
   const [labAdded, setLabAdded] = useState<string[]>([])
   const [drugs, setDrugs] = useState<SelectOption[]>([])
+  // Each drug line by its words ("Paracetamol 500 mg tablet"), for its stock.
+  const [drugLines, setDrugLines] = useState<Record<string, MedicineLine>>({})
+  // After a lab or drug payment: send it on (request 213a).
+  const [sendOn, setSendOn] = useState<{
+    paymentId: number
+    purpose: 'lab_test' | 'drugs'
+    lines: Line[]
+  } | null>(null)
   useEffect(() => {
     if (purpose !== 'lab_test' && purpose !== 'drugs') return
     let current = true
@@ -117,6 +136,9 @@ export default function PaymentsCard({
     if (purpose === 'drugs' && staffId) {
       loadMedicines(client, staffId).then((lines) => {
         if (!current || !lines) return
+        const byWords: Record<string, MedicineLine> = {}
+        for (const line of lines) byWords[medicineWords(line.name, line.strength)] = line
+        setDrugLines(byWords)
         setDrugs(
           lines
             .filter((line) => line.status === 'standard' && line.is_active)
@@ -169,8 +191,12 @@ export default function PaymentsCard({
   // ===== 2. Take a payment =====
   const amounts = lines.map((line) => readNaira(line.price))
   const total = amounts.reduce((sum, amount) => sum + amount, 0)
+  // A counted medicine needs how many (request 214); others do not.
+  const qtyMissing = (line: Line) =>
+    purpose === 'drugs' && drugLines[line.label]?.in_stock != null && !(Number(line.qty) > 0)
   const ready =
-    lines.every((line) => line.label.trim().length > 0) && amounts.every((amount) => amount > 0)
+    lines.every((line) => line.label.trim().length > 0 && !qtyMissing(line)) &&
+    amounts.every((amount) => amount > 0)
 
   function choose(next: PaymentPurpose) {
     setPurpose(next)
@@ -215,6 +241,10 @@ export default function PaymentsCard({
       return
     }
     setJustTaken(answer)
+    // Lab tests and drugs go on to the Lab or the Pharmacy next (request 213a).
+    if (purpose === 'lab_test' || purpose === 'drugs')
+      setSendOn({ paymentId: answer, purpose, lines: lines.map((line) => ({ ...line })) })
+    else setSendOn(null)
     setTaking(false)
     setLines([{ label: PURPOSE_WORDS[purpose], price: '' }])
     await load()
@@ -233,6 +263,14 @@ export default function PaymentsCard({
             Print receipt
           </Link>
         </div>
+      ) : null}
+      {sendOn ? (
+        <SendOn
+          client={client}
+          send={sendOn}
+          drugLines={drugLines}
+          onDone={() => setSendOn(null)}
+        />
       ) : null}
 
       {/* ----- Take a payment ----- */}
@@ -284,6 +322,43 @@ export default function PaymentsCard({
                   }
                 />
               </div>
+              {purpose === 'drugs' && line.label ? (
+                <div className={styles.qtyLine}>
+                  <input
+                    className={styles.input}
+                    aria-label={`How many of ${line.label}`}
+                    inputMode="decimal"
+                    placeholder={
+                      drugLines[line.label]?.unit
+                        ? `How many ${drugLines[line.label]?.unit}s`
+                        : 'How many (optional)'
+                    }
+                    value={line.qty ?? ''}
+                    onChange={(event) =>
+                      change(at, 'qty', event.target.value.replace(/[^\d.]/g, ''))
+                    }
+                  />
+                  {drugLines[line.label] && stockWords(drugLines[line.label]) ? (
+                    <small
+                      className={
+                        Number(drugLines[line.label]?.in_stock) <= 0
+                          ? styles.stockOut
+                          : styles.muted
+                      }
+                    >
+                      {stockWords(drugLines[line.label])}
+                      {Number(drugLines[line.label]?.in_stock) <= 0
+                        ? '. It can still be sold.'
+                        : ''}
+                    </small>
+                  ) : null}
+                  {qtyMissing(line) ? (
+                    <small className={styles.error}>
+                      The Pharmacy counts this medicine: type how many.
+                    </small>
+                  ) : null}
+                </div>
+              ) : null}
               {lines.length > 1 ? (
                 <button
                   type="button"
@@ -391,6 +466,113 @@ export default function PaymentsCard({
       {payments && payments.length === 0 && !taking ? (
         <p className={styles.muted}>No payments yet.</p>
       ) : null}
+    </div>
+  )
+}
+
+// ===== 5. Send a lab or drug payment on (request 213a) =====
+// The Lab gets the tests, or the Pharmacy the drugs, already paid. "Which
+// doctor wrote the paper" is optional: that person is told when lab results
+// are ready.
+function SendOn({
+  client,
+  send,
+  drugLines,
+  onDone,
+}: {
+  client: SupabaseClient
+  send: { paymentId: number; purpose: 'lab_test' | 'drugs'; lines: Line[] }
+  drugLines: Record<string, MedicineLine>
+  onDone: () => void
+}) {
+  const [doctors, setDoctors] = useState<SelectOption[]>([])
+  const [doctor, setDoctor] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
+  const toLab = send.purpose === 'lab_test'
+
+  useEffect(() => {
+    let current = true
+    loadClinicians(client).then((found) => {
+      if (current)
+        setDoctors(found.map((person) => ({ value: person.id, label: person.full_name })))
+    })
+    return () => {
+      current = false
+    }
+  }, [client])
+
+  async function go() {
+    setBusy(true)
+    setProblem(null)
+    const answer = toLab
+      ? await sendPaidToLab(
+          client,
+          send.paymentId,
+          send.lines.map((line) => line.label),
+          doctor || null,
+        )
+      : await sendPaidToPharmacy(
+          client,
+          send.paymentId,
+          send.lines.map((line) => {
+            const known = drugLines[line.label]
+            return {
+              drug: known ? known.name : line.label,
+              strength: known?.strength ?? null,
+              quantity: line.qty
+                ? `${line.qty}${known?.unit ? ` ${unitWords(known.unit, Number(line.qty))}` : ''}`
+                : null,
+            }
+          }),
+          doctor || null,
+        )
+    setBusy(false)
+    if (answer) setProblem(answer)
+    else setSent(true)
+  }
+
+  if (sent) {
+    return (
+      <div className={styles.ok}>
+        <b>{toLab ? 'Sent to the Laboratory.' : 'Sent to the Pharmacy.'}</b>
+        <button type="button" className={styles.button} onClick={onDone}>
+          Done
+        </button>
+      </div>
+    )
+  }
+  return (
+    <div className={styles.payBox}>
+      <b>{toLab ? 'Now send the tests to the Laboratory' : 'Now send the drugs to the Pharmacy'}</b>
+      <span className={styles.muted}>
+        {send.lines.map((line) => line.label + (line.qty ? ` × ${line.qty}` : '')).join(', ')}
+      </span>
+      <label htmlFor={`send-doctor-${send.paymentId}`} className={styles.fieldTitle}>
+        Which doctor wrote the paper? (optional)
+      </label>
+      <SearchSelect
+        id={`send-doctor-${send.paymentId}`}
+        value={doctor}
+        placeholder="Choose the doctor"
+        options={doctors}
+        onChange={setDoctor}
+      />
+      {problem ? <p className={styles.error}>{problem}</p> : null}
+      <div className={styles.buttons}>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.primary}`}
+          disabled={busy}
+          onClick={go}
+        >
+          {busy ? 'Sending…' : toLab ? 'Send to the Laboratory' : 'Send to the Pharmacy'}
+        </button>
+        <button type="button" className={styles.button} onClick={onDone} disabled={busy}>
+          Not now
+        </button>
+      </div>
     </div>
   )
 }

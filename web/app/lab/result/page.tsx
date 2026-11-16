@@ -20,6 +20,7 @@
  */
 'use client'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { Fragment, Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -27,7 +28,16 @@ import PatientPicker from '../_parts/PatientPicker'
 import styles from '../_parts/lab.module.css'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
-import { getLabRequest, recordResults, type LabRequest, type ResultItem } from '@/lib/lab/lab'
+import {
+  addResult,
+  cancelResult,
+  getLabRequest,
+  loadRequestResults,
+  recordResults,
+  type LabRequest,
+  type RequestResult,
+  type ResultItem,
+} from '@/lib/lab/lab'
 import { LAB_SECTIONS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
 import { addOption } from '@/lib/options/options'
@@ -115,9 +125,16 @@ function EnterResults() {
 
   // ===== 2. Save =====
   // Each test needs typed words or an attached file (or both).
-  const complete = lines.every(
-    (line) => line.test.trim().length >= 2 && (resultText(line) || line.file),
-  )
+  // A finished request is corrected: only the lines filled in are added,
+  // and at least one is needed (request 214).
+  const correcting = Boolean(request && request.status === 'completed')
+  const filled = (line: Line) => line.test.trim().length >= 2 && (resultText(line) || line.file)
+  const complete = correcting ? lines.some(filled) : lines.every(filled)
+  // The tests still without details, named under the button (request 214:
+  // "refuse and add warnings that they should add test details").
+  const missing = correcting
+    ? []
+    : lines.filter((line) => !filled(line)).map((line) => line.test || 'A test')
   const patientName = request?.patient?.full_name ?? walkIn?.full_name ?? ''
   const patientNumber = request?.patient?.patient_number ?? walkIn?.patient_number ?? ''
 
@@ -128,6 +145,7 @@ function EnterResults() {
     // First the files, one by one; then the results that point at them.
     const items: ResultItem[] = []
     for (const line of lines) {
+      if (correcting && !filled(line)) continue
       const item: ResultItem = {
         test: line.test.trim(),
         result: resultText(line) || 'See the attached file.',
@@ -146,12 +164,21 @@ function EnterResults() {
       }
       items.push(item)
     }
-    const problem = await recordResults(
-      client,
-      request ? request.id : null,
-      request ? null : (walkIn?.id ?? null),
-      items,
-    )
+    let problem: string | null = null
+    if (correcting && request) {
+      // Each added or corrected result on its own.
+      for (const item of items) {
+        problem = await addResult(client, request.id, item)
+        if (problem) break
+      }
+    } else {
+      problem = await recordResults(
+        client,
+        request ? request.id : null,
+        request ? null : (walkIn?.id ?? null),
+        items,
+      )
+    }
     setBusy(false)
     if (problem) {
       setError(problem)
@@ -187,7 +214,10 @@ function EnterResults() {
   // The patient whose results were just saved.
   const donePatientId = request ? request.patient_id : (walkIn?.id ?? null)
   const notLab = !staff.can_lab
-  const ready = request ? request.status === 'awaiting_test' : Boolean(walkIn)
+  // A finished request can be corrected too: add a missed or corrected result.
+  const ready = request
+    ? request.status === 'awaiting_test' || request.status === 'completed'
+    : Boolean(walkIn)
 
   return (
     <AppShell>
@@ -251,7 +281,7 @@ function EnterResults() {
               </p>
             ) : null}
             {request && request.status === 'completed' ? (
-              <p className={styles.good}>These results are already in the record.</p>
+              <EarlierResults client={client} requestId={request.id} />
             ) : null}
 
             {/* ----- One box per test ----- */}
@@ -322,13 +352,18 @@ function EnterResults() {
             ) : null}
 
             {error ? <p className={styles.error}>{error}</p> : null}
+            {ready && missing.length > 0 ? (
+              <p className={styles.warning}>
+                Add the details for {missing.join(', ')} before Result ready.
+              </p>
+            ) : null}
             {ready ? (
               <button
                 className={`${styles.button} ${styles.primary}`}
                 onClick={save}
                 disabled={!complete || busy}
               >
-                {busy ? 'Saving…' : 'Result ready'}
+                {busy ? 'Saving…' : correcting ? 'Add to the record' : 'Result ready'}
               </button>
             ) : null}
           </div>
@@ -493,5 +528,80 @@ export default function EnterResultsPage() {
     <Suspense fallback={null}>
       <EnterResults />
     </Suspense>
+  )
+}
+
+// ===== 5. Results already on a finished request, each can be cancelled =====
+// A wrong result is cancelled with a reason; it stays in the record crossed
+// out. The correct one is added with the boxes below (request 214).
+function EarlierResults({ client, requestId }: { client: SupabaseClient; requestId: number }) {
+  const [results, setResults] = useState<RequestResult[] | null>(null)
+  const [cancelling, setCancelling] = useState<number | null>(null)
+  const [reason, setReason] = useState('')
+  const [problem, setProblem] = useState<string | null>(null)
+
+  useEffect(() => {
+    let current = true
+    loadRequestResults(client, requestId).then((found) => {
+      if (current) setResults(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, requestId])
+
+  async function cancel(id: number) {
+    const answer = await cancelResult(client, id, reason)
+    if (answer) {
+      setProblem(answer)
+      return
+    }
+    setCancelling(null)
+    setReason('')
+    setProblem(null)
+    setResults(await loadRequestResults(client, requestId))
+  }
+
+  return (
+    <div className={styles.earlier}>
+      <p className={styles.good}>
+        These results are in the record. To correct one, cancel it with a reason, then add the right
+        one below.
+      </p>
+      {results === null ? <p className={styles.muted}>Loading the results…</p> : null}
+      {(results ?? []).map((line) => (
+        <div key={line.id} className={styles.earlierLine}>
+          <div className={line.voided_at ? styles.cancelled : undefined}>
+            <b>{line.test}</b>
+            <span className={styles.resultLines}>{line.result}</span>
+            {line.voided_at ? <small>Cancelled: {line.void_reason}</small> : null}
+          </div>
+          {!line.voided_at && cancelling !== line.id ? (
+            <button className={styles.button} onClick={() => setCancelling(line.id)}>
+              Cancel this result
+            </button>
+          ) : null}
+          {cancelling === line.id ? (
+            <div className={styles.row}>
+              <input
+                className={styles.input}
+                aria-label={`Why ${line.test} is cancelled`}
+                placeholder="Why, e.g. wrong sample read"
+                maxLength={300}
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+              />
+              <button className={styles.button} onClick={() => cancel(line.id)}>
+                Cancel it
+              </button>
+              <button className={styles.button} onClick={() => setCancelling(null)}>
+                Keep
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ))}
+      {problem ? <p className={styles.error}>{problem}</p> : null}
+    </div>
   )
 }

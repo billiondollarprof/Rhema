@@ -31,9 +31,14 @@ import {
   findMedicines,
   knownMedicines,
   loadMedicines,
+  moveStock,
+  setStockSettings,
+  stockWords,
   updateMedicine,
   type MedicineLine,
 } from '@/lib/medicines/medicines'
+import SearchSelect from '@/components/options/SearchSelect'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 
@@ -55,6 +60,8 @@ export default function MedicineListPage() {
   const [editing, setEditing] = useState<number | null>(null)
   const [editName, setEditName] = useState('')
   const [editStrength, setEditStrength] = useState('')
+  // The line whose stock is open (request 214).
+  const [stockFor, setStockFor] = useState<number | null>(null)
 
   const staffId = staff?.id
   const reload = useCallback(async () => {
@@ -308,6 +315,17 @@ export default function MedicineListPage() {
                 ) : (
                   <div key={line.id} className={styles.lineRow}>
                     <span>{line.strength ?? 'No strength'}</span>
+                    {/* Stock (request 214): how many are left, or not counted. */}
+                    <span
+                      className={`${styles.tag} ${
+                        line.in_stock !== null &&
+                        Number(line.in_stock) <= Number(line.low_level ?? 0)
+                          ? styles.tagWarn
+                          : ''
+                      }`}
+                    >
+                      {stockWords(line) ?? 'Stock not counted'}
+                    </span>
                     {line.source === 'starter' ? (
                       <span className={`${styles.tag} ${styles.tagWarn}`}>Starter</span>
                     ) : null}
@@ -332,6 +350,23 @@ export default function MedicineListPage() {
                     >
                       Switch off
                     </button>
+                    <button
+                      className={`${styles.button} ${styles.small}`}
+                      disabled={busy}
+                      onClick={() => setStockFor(stockFor === line.id ? null : line.id)}
+                    >
+                      Stock
+                    </button>
+                    {stockFor === line.id ? (
+                      <StockEditor
+                        client={client}
+                        line={line}
+                        onDone={async () => {
+                          setStockFor(null)
+                          await reload()
+                        }}
+                      />
+                    ) : null}
                   </div>
                 ),
               )}
@@ -365,5 +400,150 @@ export default function MedicineListPage() {
         ) : null}
       </div>
     </AppShell>
+  )
+}
+
+// ===== Stock for one line (request 214, 2026-11-16) =====
+// The unit it is sold in, the level that warns, and the count: add new stock,
+// or correct the count (recount, expired, damaged). Every change is kept.
+const UNITS = [
+  'tablet',
+  'capsule',
+  'sachet',
+  'bottle',
+  'vial',
+  'ampoule',
+  'tube',
+  'pack',
+  'strip',
+  'piece',
+  'bag',
+]
+
+function StockEditor({
+  client,
+  line,
+  onDone,
+}: {
+  client: SupabaseClient
+  line: MedicineLine
+  onDone: () => Promise<void>
+}) {
+  const [unit, setUnit] = useState(line.unit ?? '')
+  const [low, setLow] = useState(line.low_level !== null ? String(line.low_level) : '')
+  const [added, setAdded] = useState('')
+  const [count, setCount] = useState('')
+  const [why, setWhy] = useState('correction')
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+  const now = line.in_stock !== null ? Number(line.in_stock) : null
+
+  async function act(job: () => Promise<string | null>) {
+    setBusy(true)
+    setProblem(null)
+    const answer = await job()
+    setBusy(false)
+    if (answer) setProblem(answer)
+    else await onDone()
+  }
+
+  return (
+    <div className={styles.stockBox}>
+      <b>
+        Stock of {line.name} {line.strength ?? ''}:{' '}
+        {now === null ? 'not counted yet' : `${now} ${line.unit ?? ''}`}
+      </b>
+      <div className={styles.stockGrid}>
+        <div>
+          <label htmlFor={`unit-${line.id}`}>Sold as</label>
+          <SearchSelect
+            id={`unit-${line.id}`}
+            value={unit}
+            placeholder="Choose the unit"
+            options={UNITS.map((word) => ({ value: word, label: word }))}
+            onChange={setUnit}
+            onOther={(typed) => typed && setUnit(typed)}
+          />
+        </div>
+        <div>
+          <label htmlFor={`low-${line.id}`}>Warn me below</label>
+          <input
+            id={`low-${line.id}`}
+            className={styles.input}
+            inputMode="decimal"
+            placeholder="e.g. 20"
+            value={low}
+            onChange={(event) => setLow(event.target.value.replace(/[^\d.]/g, ''))}
+          />
+        </div>
+      </div>
+      <button
+        className={`${styles.button} ${styles.small}`}
+        disabled={busy}
+        onClick={() =>
+          act(() => setStockSettings(client, line.id, unit, low === '' ? null : Number(low)))
+        }
+      >
+        Save unit and warning
+      </button>
+
+      <div className={styles.stockGrid}>
+        <div>
+          <label htmlFor={`add-${line.id}`}>New stock arrived</label>
+          <input
+            id={`add-${line.id}`}
+            className={styles.input}
+            inputMode="decimal"
+            placeholder="e.g. 200"
+            value={added}
+            onChange={(event) => setAdded(event.target.value.replace(/[^\d.]/g, ''))}
+          />
+        </div>
+        <button
+          className={`${styles.button} ${styles.small}`}
+          disabled={busy || !(Number(added) > 0)}
+          onClick={() => act(() => moveStock(client, line.id, Number(added), 'restock', null))}
+        >
+          Add to stock
+        </button>
+      </div>
+
+      <div className={styles.stockGrid}>
+        <div>
+          <label htmlFor={`count-${line.id}`}>Correct the count to</label>
+          <input
+            id={`count-${line.id}`}
+            className={styles.input}
+            inputMode="decimal"
+            placeholder={now === null ? 'e.g. 150' : String(now)}
+            value={count}
+            onChange={(event) => setCount(event.target.value.replace(/[^\d.]/g, ''))}
+          />
+        </div>
+        <div>
+          <label htmlFor={`why-${line.id}`}>Why</label>
+          <select
+            id={`why-${line.id}`}
+            className={styles.input}
+            value={why}
+            onChange={(event) => setWhy(event.target.value)}
+          >
+            <option value="correction">Recount</option>
+            <option value="expired">Expired</option>
+            <option value="damaged">Damaged</option>
+          </select>
+        </div>
+        <button
+          className={`${styles.button} ${styles.small}`}
+          disabled={busy || count === '' || Number(count) === (now ?? 0)}
+          onClick={() =>
+            act(() => moveStock(client, line.id, Number(count) - (now ?? 0), why, null))
+          }
+        >
+          Correct the count
+        </button>
+      </div>
+      {problem ? <p className={styles.error}>{problem}</p> : null}
+    </div>
   )
 }
