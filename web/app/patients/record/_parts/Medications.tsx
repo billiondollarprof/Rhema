@@ -21,6 +21,7 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
+import OptionSelect from '@/components/options/OptionSelect'
 import { medicineWords } from '@/lib/medicines/medicines'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
@@ -127,22 +128,28 @@ export function MedicationsSection({ client, staffId, patientId, record, reload 
             </div>
             <div className={styles.field}>
               <label htmlFor="med-dose">Dose</label>
-              <input
+              <OptionSelect
+                client={client}
+                staffId={staffId}
+                list="dose"
                 id="med-dose"
-                className={styles.input}
-                placeholder="e.g. 500 mg"
                 value={dose}
-                onChange={(e) => setDose(e.target.value)}
+                onChange={setDose}
+                placeholder="Choose the dose"
+                otherLabel="Type the dose"
               />
             </div>
             <div className={styles.field}>
               <label htmlFor="med-often">How often</label>
-              <input
+              <OptionSelect
+                client={client}
+                staffId={staffId}
+                list="frequency"
                 id="med-often"
-                className={styles.input}
-                placeholder="e.g. Twice daily"
                 value={howOften}
-                onChange={(e) => setHowOften(e.target.value)}
+                onChange={setHowOften}
+                placeholder="Choose how often"
+                otherLabel="Type how often"
               />
             </div>
           </div>
@@ -311,20 +318,28 @@ function MedicationLine({
                   </div>
                   <div className={styles.field}>
                     <label htmlFor={`edit-dose-${medication.id}`}>Dose</label>
-                    <input
+                    <OptionSelect
+                      client={client}
+                      staffId={staffId}
+                      list="dose"
                       id={`edit-dose-${medication.id}`}
-                      className={styles.input}
                       value={newDose}
-                      onChange={(e) => setNewDose(e.target.value)}
+                      onChange={setNewDose}
+                      placeholder="Choose the dose"
+                      otherLabel="Type the dose"
                     />
                   </div>
                   <div className={styles.field}>
                     <label htmlFor={`edit-often-${medication.id}`}>How often</label>
-                    <input
+                    <OptionSelect
+                      client={client}
+                      staffId={staffId}
+                      list="frequency"
                       id={`edit-often-${medication.id}`}
-                      className={styles.input}
                       value={newOften}
-                      onChange={(e) => setNewOften(e.target.value)}
+                      onChange={setNewOften}
+                      placeholder="Choose how often"
+                      otherLabel="Type how often"
                     />
                   </div>
                 </div>
@@ -377,11 +392,15 @@ function MedicationLine({
                 <div className={styles.fields}>
                   <div className={styles.field}>
                     <label htmlFor={`dose-${medication.id}`}>Dose given</label>
-                    <input
+                    <OptionSelect
+                      client={client}
+                      staffId={staffId}
+                      list="dose"
                       id={`dose-${medication.id}`}
-                      className={styles.input}
                       value={dose}
-                      onChange={(e) => setDose(e.target.value)}
+                      onChange={setDose}
+                      placeholder="Choose the dose"
+                      otherLabel="Type the dose"
                     />
                   </div>
                   <div className={`${styles.field} ${styles.fieldWide}`}>
@@ -482,12 +501,15 @@ export function DosesSection({ client, staffId, patientId, record, reload }: Pro
             </div>
             <div className={styles.field}>
               <label htmlFor="given-dose">Dose</label>
-              <input
+              <OptionSelect
+                client={client}
+                staffId={staffId}
+                list="dose"
                 id="given-dose"
-                className={styles.input}
-                placeholder="e.g. 1 g"
                 value={dose}
-                onChange={(e) => setDose(e.target.value)}
+                onChange={setDose}
+                placeholder="Choose the dose"
+                otherLabel="Type the dose"
               />
             </div>
             <div className={`${styles.field} ${styles.fieldWide}`}>

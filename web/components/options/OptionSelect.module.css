@@ -1,0 +1,63 @@
+/*
+ * components/options/OptionSelect.module.css: the drop down with "Other".
+ * Looks like the app's other boxes.
+ */
+.wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.select,
+.input {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.select:focus,
+.input:focus {
+  outline: 2px solid #8fb4f0;
+  border-color: #1f5fd0;
+}
+
+.other {
+  display: grid;
+  gap: 6px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.small {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1.5px solid #1f5fd0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f5fd0;
+  cursor: pointer;
+}
+
+.quiet {
+  font: inherit;
+  font-size: 13px;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #5b6b80;
+  text-decoration: underline;
+  cursor: pointer;
+}
