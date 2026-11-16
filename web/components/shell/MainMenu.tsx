@@ -6,7 +6,8 @@
  * there, then by the right of it, hamburger menu icon... Every other thing
  * is now behind hamburger menu... Keeps it clean." Behind it: Lock screen,
  * Notifications (with a red bubble of how many wait, request 132), the
- * installation guide (later with the user manual inside it), and Sign out. The automations go here too, when they are built.
+ * installation guide (later with the user manual inside it), the dark look
+ * (request 196g), and Sign out. The automations go here too, when they are built.
  *
  * Never: put Call attention behind this menu. It stays in the top bar,
  * one tap away, because it is urgent.
@@ -19,6 +20,7 @@ import Icon from './Icon'
 import styles from './AppShell.module.css'
 import { useAuth } from '@/lib/auth/session'
 import { readOutbox } from '@/lib/offline/outbox'
+import { currentTheme, setTheme, type Theme } from '@/lib/theme/theme'
 
 export default function MainMenu({
   buttonClass,
@@ -30,6 +32,8 @@ export default function MainMenu({
 }) {
   const auth = useAuth()
   const [open, setOpen] = useState(false)
+  // The look on this device: light or dark (request 196g).
+  const [theme, setThemeShown] = useState<Theme>(() => currentTheme())
   const box = useRef<HTMLDivElement | null>(null)
 
   // ===== 1. A tap outside the list, or Escape, shuts it =====
@@ -111,6 +115,20 @@ export default function MainMenu({
             <Icon name="bolt" size={18} />
             Automations
           </Link>
+          {/* Dark look on or off, kept on this device (request 196g). */}
+          <button
+            className={styles.menuItem}
+            role="menuitemcheckbox"
+            aria-checked={theme === 'dark'}
+            onClick={() => {
+              const next: Theme = theme === 'dark' ? 'light' : 'dark'
+              setTheme(next)
+              setThemeShown(next)
+            }}
+          >
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={18} />
+            {theme === 'dark' ? 'Light look' : 'Dark look'}
+          </button>
           <hr className={styles.menuLine} />
           <button
             className={`${styles.menuItem} ${styles.menuRed}`}

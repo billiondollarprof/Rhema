@@ -16,6 +16,7 @@ import { AuthProvider } from '@/lib/auth/session'
 import LoadingGate from '@/components/shell/LoadingGate'
 import AppFreshness from '@/components/shell/AppFreshness'
 import { BRAND } from '@/lib/brand/brand'
+import { THEME_FIRST } from '@/lib/theme/theme'
 
 export const metadata: Metadata = {
   title: BRAND.name,
@@ -76,9 +77,11 @@ const STUCK_ON_LOGO = `(function () {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: MOVE_TO_REAL_ADDRESS }} />
+        {/* The dark look, if chosen on this device, before anything shows. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_FIRST }} />
       </head>
       <body>
         {/* Who is signed in and whether the screen is locked, for every

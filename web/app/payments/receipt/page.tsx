@@ -162,7 +162,7 @@ function Receipt() {
 
         {/* ===== 3. The receipt, as it prints ===== */}
         {payments && payments.length > 0 && patient ? (
-          <article className={styles.receipt}>
+          <article className={`${styles.receipt} lightOnly`}>
             <header className={styles.letterhead}>
               <Logo size={64} />
               <div>

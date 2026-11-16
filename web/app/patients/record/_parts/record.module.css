@@ -65,21 +65,21 @@
 }
 
 .bannerRed {
-  background: #fdecea;
-  border: 1px solid #f5c2c0;
-  color: #b42318;
+  background: var(--bad-bg);
+  border: 1px solid var(--c-f5c2c0);
+  color: var(--c-b42318);
 }
 
 .bannerGreen {
-  background: #e8f5ee;
-  border: 1px solid #bfe3cf;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
   color: var(--grn);
 }
 
 .bannerAmber {
-  background: #fff7e6;
-  border: 1px solid #ffe0a3;
-  color: #9a5b00;
+  background: var(--warn-bg-2);
+  border: 1px solid var(--c-ffe0a3);
+  color: var(--c-9a5b00);
 }
 
 /* ===== 3. The two columns on a wide screen ===== */
@@ -104,7 +104,7 @@
 
 /* ===== 4. A section card that folds open and shut ===== */
 .section {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   min-width: 0;
@@ -202,18 +202,18 @@
 }
 
 .green {
-  background: #e4f3ec;
+  background: var(--c-e4f3ec);
   color: var(--grn);
 }
 
 .orange {
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
 }
 
 .red {
-  background: #fdecea;
-  color: #b42318;
+  background: var(--bad-bg);
+  color: var(--c-b42318);
 }
 
 .grey {
@@ -263,9 +263,9 @@
   min-height: 32px;
   padding: 4px 10px;
   border-radius: 10px;
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -288,7 +288,7 @@
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
 }
 
@@ -314,7 +314,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 4px;
 }
 
@@ -324,9 +324,9 @@
   width: 100%;
   padding: 9px 10px;
   min-height: 40px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 textarea.input {
@@ -350,15 +350,15 @@ textarea.input {
   font: inherit;
   font-size: 12px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 4px 10px;
   cursor: pointer;
 }
 
 .chip[aria-pressed='true'] {
-  border-color: var(--bl);
-  color: var(--bl);
+  border-color: var(--link);
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -411,8 +411,8 @@ a.small {
 
 /* ===== Files on the record (request 128) ===== */
 .blue {
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
 }
 
 /* A long file name breaks rather than pushing the line off a phone. */
@@ -426,7 +426,7 @@ a.small {
   gap: 8px;
   padding: 12px;
   border-radius: 14px;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   box-shadow: 0 14px 30px -20px rgba(15, 34, 56, 0.3);
 }

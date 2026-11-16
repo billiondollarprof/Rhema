@@ -20,7 +20,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -45,7 +45,7 @@
   height: 42px;
   border-radius: 13px;
   background: linear-gradient(135deg, #efe7fb, #ddd0f5);
-  color: #7e57c2;
+  color: var(--c-7e57c2);
   flex-shrink: 0;
 }
 
@@ -84,7 +84,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 5px;
 }
 
@@ -94,9 +94,9 @@
   width: 100%;
   padding: 10px;
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 textarea.input {
@@ -135,7 +135,7 @@ textarea.input {
   padding: 6px 12px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   cursor: pointer;
 }
@@ -168,7 +168,7 @@ textarea.input {
 }
 
 .segments button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
@@ -190,9 +190,9 @@ textarea.input {
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -202,12 +202,12 @@ textarea.input {
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
@@ -231,7 +231,7 @@ textarea.input {
   width: 100%;
   text-align: left;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 10px;
   color: var(--ink);
@@ -240,7 +240,7 @@ textarea.input {
 
 .person:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 /* Only the name grows; the initials circle keeps its size (it is a span
@@ -263,7 +263,7 @@ textarea.input {
 .result {
   display: grid;
   gap: 6px;
-  border-left: 3px solid #ddd0f5;
+  border-left: 3px solid var(--c-ddd0f5);
   padding-left: 10px;
 }
 
@@ -278,7 +278,7 @@ textarea.input {
   padding: 8px 12px;
   border: 1px dashed #b9a5e3;
   border-radius: 12px;
-  color: #7e57c2;
+  color: var(--c-7e57c2);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -322,7 +322,7 @@ textarea.input {
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0 12px;
-  background: #fff;
+  background: var(--card);
 }
 
 .section > summary {
@@ -359,7 +359,7 @@ textarea.input {
 .field label {
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
 }
 
 .field small {

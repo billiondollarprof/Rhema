@@ -108,7 +108,7 @@
   right: var(--panel-right);
   width: min(260px, calc(100vw - 24px));
   z-index: 40;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -195,7 +195,7 @@
 
 .nav {
   display: flex;
-  background: #fff;
+  background: var(--card);
   border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   position: sticky;
@@ -216,7 +216,7 @@
 }
 
 .navItem.on {
-  color: var(--bl);
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -304,7 +304,7 @@
     display: none !important;
   }
   .app {
-    background: #fff;
+    background: var(--card);
   }
   .main {
     padding: 0;

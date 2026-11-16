@@ -22,7 +22,7 @@
 .notice {
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
+  background: var(--card);
   min-width: 0;
   overflow: hidden;
 }
@@ -44,11 +44,11 @@
 }
 
 .fold:hover {
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .fold[aria-expanded='true'] {
-  background: #f4f8ff;
+  background: var(--tint-2);
   border-bottom: 1px solid var(--line);
 }
 
@@ -65,7 +65,7 @@
 
 .chevron {
   display: inline-flex;
-  color: var(--bl);
+  color: var(--link);
   flex-shrink: 0;
   transition: transform 0.15s ease;
 }
@@ -88,7 +88,7 @@
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fbfcfe;
+  background: var(--c-fbfcfe);
   min-width: 0;
 }
 
@@ -123,9 +123,9 @@
   min-height: 38px;
   padding: 8px 14px;
   border-radius: 10px;
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   text-decoration: none;
   display: inline-flex;
   align-items: center;

@@ -16,14 +16,14 @@
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
 }
 
 .select:focus,
 .input:focus {
   outline: 2px solid #8fb4f0;
-  border-color: #1f5fd0;
+  border-color: var(--link);
 }
 
 .other {
@@ -43,10 +43,10 @@
   font-weight: 600;
   min-height: 34px;
   padding: 4px 12px;
-  border: 1.5px solid #1f5fd0;
+  border: 1.5px solid var(--link);
   border-radius: 10px;
-  background: #fff;
-  color: #1f5fd0;
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -57,7 +57,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: #5b6b80;
+  color: var(--mut-2);
   text-decoration: underline;
   cursor: pointer;
 }

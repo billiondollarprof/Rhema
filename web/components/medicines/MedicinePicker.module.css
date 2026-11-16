@@ -16,13 +16,13 @@
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
 }
 
 .box:focus {
   outline: 2px solid #8fb4f0;
-  border-color: #1f5fd0;
+  border-color: var(--link);
 }
 
 .chosen {
@@ -33,7 +33,7 @@
   padding: 8px 12px;
   border: 1px solid #8fb4f0;
   border-radius: 12px;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .chosen b {
@@ -50,7 +50,7 @@
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 8px 24px rgba(15, 34, 56, 0.12);
 }
 
@@ -72,7 +72,7 @@
 
 .row:hover,
 .row:focus-visible {
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .strengths {
@@ -86,10 +86,10 @@
   font-weight: 600;
   min-height: 40px;
   padding: 6px 14px;
-  border: 1.5px solid #1f5fd0;
+  border: 1.5px solid var(--link);
   border-radius: 12px;
-  background: #fff;
-  color: #1f5fd0;
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -104,13 +104,13 @@
   font-weight: 700;
   padding: 1px 8px;
   border-radius: 10px;
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
   white-space: nowrap;
 }
 
 .other {
-  color: #1f5fd0;
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -120,10 +120,10 @@
   font-weight: 600;
   min-height: 34px;
   padding: 4px 12px;
-  border: 1.5px solid #1f5fd0;
+  border: 1.5px solid var(--link);
   border-radius: 10px;
-  background: #fff;
-  color: #1f5fd0;
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -133,7 +133,7 @@
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
 }
 
 .hint {

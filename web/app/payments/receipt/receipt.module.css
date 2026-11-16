@@ -30,19 +30,19 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
 }
 
@@ -52,7 +52,7 @@
 
 /* ===== 2. The receipt ===== */
 .receipt {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 24px;
@@ -71,7 +71,7 @@
   margin: 0;
   font-size: 20px;
   letter-spacing: 0.04em;
-  color: #0a2a5e;
+  color: var(--nv-ink);
 }
 
 .letterhead p {
@@ -120,9 +120,9 @@
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.06em;
-  color: #0a2a5e;
-  background: #f1f5fb;
-  border: 1px solid #dbe4f3;
+  color: var(--nv-ink);
+  background: var(--c-f1f5fb);
+  border: 1px solid var(--c-dbe4f3);
   border-radius: 8px;
   padding: 4px 8px;
   overflow-wrap: anywhere;
@@ -232,12 +232,12 @@
 
 .good {
   margin: 0;
-  color: #15803d;
+  color: var(--c-15803d);
   font-weight: 600;
 }
 
 .bad {
   margin: 0;
-  color: #b91c1c;
+  color: var(--c-b91c1c);
   font-weight: 600;
 }
