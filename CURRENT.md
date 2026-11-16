@@ -849,19 +849,56 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+196. **Big batch, 2026-11-16 (his permission: "when you are done and you see that
+    everything is okay, run the SQL that is needed to lock it in").**
+    a. Lab: "take what is in Swift practice EMR and add it... later when I bring
+       the list, check if any is missing... rewrite it the way our list is."
+    b. Pharmacy: "add them, the starter list, all of it... add the milligram for
+       picker... the dosage as well."
+    c. Register from old file: "add the other fields but collapse them (address,
+       next of kin and the others)." And: "a doctor can still view and add medical
+       records to old patients, the way a normally registered patient would be."
+    d. "Check every other section for where we would add pickers... organize each
+       section... let every other page be as simple and well organized as Home, in
+       landscape or portrait."
+    e. Home buttons: "an admin who is also front desk or doctor: if a button could
+       repeat itself, just one button... no point having that Invite staff big
+       button anymore (it is in the sidebar)... announcements: put it inside
+       Messages, an Announce button at the top for those who can announce... the
+       front page will not have more than four buttons."
+    f. Old files from photos: "we upload into Google Drive, then you look at the
+       Google Drive and pick the major information and attach the file to each."
+       Typed records from another hospital's software are easier (a file).
+    g. Dark mode: "some of the nurses are complaining that it's too bright."
+    h. "Every picker with a long list: a search where they type the first letter."
+
 187. **Open a patient from the queue.** (2026-11-16) "After calling in a
     patient, at the patient queue they should be able to click on the patient
-    and open the profile."
+    and open the profile." LIVE 2026-11-16: an Open patient button on each
+    queue line.
 188. **Sign in feels slow.** (2026-11-16) "After you put the code, the system
     tends to delay... maybe even show you the place where you enter your Gmail
     again before eventually showing the dashboard... when the system locks and
     you enter your PIN, it still shows that login page slightly before opening
-    your dashboard... look into it and see if you can fix it."
+    your dashboard... look into it and see if you can fix it." LIVE 2026-11-16:
+    once signed in or unlocked, the sign in and lock pages show the navy opening
+    screen while Home opens (never the email form or idle screen again); Home is
+    fetched in advance; a fresh sign in asks the database 2 questions at once
+    instead of 4 one after the other. Ask him whether it feels better.
 189. **Antenatal: palpation columns and the card's data.** (2026-11-16, three
     photos: the "Anti-natal record" visit table and the P.H.C. data and client
     details pages) "The midwife (consultant room 2) gave me some lists... they
     do palpation... height of fundus... we need to add columns for the
-    palpation... check if we already have those data."
+    palpation... check if we already have those data." FOUND: next of kin
+    details, route tests, previous pregnancies and consent were built (request
+    170). MISSING, BUILT 2026-11-16, NOT LIVE (waits for his yes to the SQL):
+    migration 20261116051615_antenatal_visits_and_client (the visit table:
+    fundus, presentation, position, FHR, urine protein and sugar, BP, pulse,
+    respiration, weight, Hb, oedema, drugs given, remark, examiner, return
+    date; her marital status, religion, education, occupation, tribe; medical
+    history ticklist; surgical history) and the due date from the LMP. Also
+    waiting: migration 20261112124143_pick_lists_registration_lab and the
+    registration card drop downs (town, LGA, State, relationship).
 190. **Lab templates.** (2026-11-16) "The laboratory data, I currently have it,
     so I will upload everything to you... structure them so they can just be
     picking data." Waiting for his upload.
@@ -871,7 +908,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     notes and nursing notes, where it is necessary to type." Step by step.
 192. **Register from old file needs the category.** (2026-11-16) "The front
     desk complained that register old file does not have category like
-    individual, family and antenatal."
+    individual, family and antenatal." LIVE 2026-11-16.
 193. **More pharmacy drugs.** (2026-11-16) "Apart from the 112... search the
     internet, Nigeria and everywhere, the drugs they sell... populate."
 194. **Read old files from photos.** (2026-11-16) "If we snap the files of old

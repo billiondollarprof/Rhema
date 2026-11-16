@@ -19,6 +19,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import OptionSelect from '@/components/options/OptionSelect'
+import type { PickList } from '@/lib/options/options'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
@@ -73,6 +76,10 @@ type FormProps = {
   // (contact, address and next of kin cleared), still linked to the family.
   familyCard?: string | null
   onSave: (details: PatientDetails, fee: CardFee) => void
+  // For the drop downs (town, local government, State, relationship):
+  // picked, not typed (Anthony, 2026-11-16). Without them, plain boxes.
+  client?: SupabaseClient
+  staffId?: string
 }
 
 // "7,500" and "7500.50" read as numbers; empty reads as nothing (null);
@@ -132,6 +139,8 @@ export default function PatientForm({
   feeRequiredIf,
   familyCard,
   onSave,
+  client,
+  staffId,
 }: FormProps) {
   const [details, setDetails] = useState<PatientDetails>(initial)
   // Family member form: whether Change category was tapped.
@@ -202,6 +211,27 @@ export default function PatientForm({
           value={(details[key] as string | null) ?? ''}
           aria-invalid={shown[key] ? 'true' : undefined}
           onChange={(event) => set(key, event.target.value as never)}
+        />
+        {shown[key] ? <small className={styles.error}>{shown[key]}</small> : null}
+      </div>
+    )
+  }
+
+  // A drop down with "Other", for the repeated answers.
+  function pick(key: keyof PatientDetails, label: string, list: PickList, placeholder: string) {
+    if (!client || !staffId) return text(key, label)
+    return (
+      <div className={styles.field}>
+        <label htmlFor={`field-${key}`}>{label}</label>
+        <OptionSelect
+          client={client}
+          staffId={staffId}
+          list={list}
+          id={`field-${key}`}
+          value={(details[key] as string | null) ?? ''}
+          onChange={(value) => set(key, value as never)}
+          placeholder={placeholder}
+          otherLabel={`Type the ${label.toLowerCase()}`}
         />
         {shown[key] ? <small className={styles.error}>{shown[key]}</small> : null}
       </div>
@@ -336,9 +366,9 @@ export default function PatientForm({
               {text('phone', 'Phone / WhatsApp number', '0803 555 0126', 'tel')}
               {text('email', 'Email (optional)', 'name@example.com', 'email')}
               {text('address', 'Address', 'House number and street')}
-              {text('town', 'Town / City', 'e.g. Surulere')}
-              {text('lga', 'Local government (LGA)')}
-              {text('state', 'State')}
+              {pick('town', 'Town / City', 'town', 'Choose the town')}
+              {pick('lga', 'Local government (LGA)', 'lga', 'Choose the local government')}
+              {pick('state', 'State', 'state', 'Choose the State')}
               {text('country', 'Country')}
             </div>
           </section>
@@ -357,7 +387,12 @@ export default function PatientForm({
           </div>
           <div className={styles.fields}>
             {text('next_of_kin_name', 'Full name', 'e.g. Ngozi Okoro')}
-            {text('next_of_kin_relationship', 'Relationship', 'e.g. Spouse, Parent')}
+            {pick(
+              'next_of_kin_relationship',
+              'Relationship',
+              'relationship',
+              'Choose the relationship',
+            )}
             {text('next_of_kin_phone', 'Phone / WhatsApp number', '', 'tel')}
           </div>
         </section>

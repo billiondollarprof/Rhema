@@ -184,8 +184,11 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 do $$
 begin
-  if (select count(*) from public.pick_options) <> 0 then
-    raise exception 'FAIL 7: the Front Desk can read the lists';
+  -- The medical lists only; the registration lists are the Front Desk's
+  -- own (migration pick_lists_registration_lab).
+  if (select count(*) from public.pick_options
+      where list in ('dose', 'frequency', 'allergen', 'reaction', 'condition')) <> 0 then
+    raise exception 'FAIL 7: the Front Desk can read the medical lists';
   end if;
   begin
     perform public.use_pick_option('dose', 'Nope');

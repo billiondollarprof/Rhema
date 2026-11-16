@@ -22,7 +22,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { recall, remember } from '../cache/memory'
 
-export type PickList = 'dose' | 'frequency' | 'allergen' | 'reaction' | 'condition'
+export type PickList =
+  | 'dose'
+  | 'frequency'
+  | 'allergen'
+  | 'reaction'
+  | 'condition'
+  // Added 2026-11-16 (migration pick_lists_registration_lab).
+  | 'lab_test'
+  | 'relationship'
+  | 'state'
+  | 'lga'
+  | 'town'
+  | 'occupation'
+  | 'tribe'
 
 export type PickOption = {
   id: number

@@ -38,8 +38,11 @@ import {
   type AntenatalTest,
 } from '@/lib/record/antenatal'
 import { onChange } from '@/lib/live/changes'
+import { ClientPart, DueDate, HistoryPart, VisitsPart } from './AntenatalVisits'
 
 type Props = { client: SupabaseClient; staffId: string; patientId: number }
+// The last menstrual period, from the profile, for the due date.
+type SectionProps = Props & { lmp?: string | null }
 
 const today = () => new Date().toISOString().slice(0, 10)
 const dateWords = (iso: string | null) =>
@@ -83,7 +86,7 @@ function Field({
 }
 
 // ===== 2. The antenatal booking =====
-export function AntenatalSection({ client, staffId, patientId }: Props) {
+export function AntenatalSection({ client, staffId, patientId, lmp = null }: SectionProps) {
   const [data, setData] = useState<Awaited<ReturnType<typeof loadAntenatal>> | null>(null)
   const load = useCallback(
     async () => setData(await loadAntenatal(client, patientId)),
@@ -103,7 +106,37 @@ export function AntenatalSection({ client, staffId, patientId }: Props) {
   if (!data) return null
   const live = (rows: { voided_at: string | null }[]) => rows.filter((row) => !row.voided_at).length
   return (
-    <Section title="Antenatal booking" count={live(data.tests) + live(data.pregnancies)} open>
+    <Section
+      title="Antenatal booking"
+      count={live(data.tests) + live(data.pregnancies) + live(data.visits)}
+      open
+    >
+      {/* The rest of the card (2026-11-16): due date, visits, her details,
+          her histories. */}
+      <DueDate lmp={lmp} />
+      <VisitsPart
+        client={client}
+        staffId={staffId}
+        patientId={patientId}
+        visits={data.visits}
+        onDone={load}
+      />
+      <ClientPart
+        key={`client-${data.booking?.client_tribe ?? ''}-${data.booking?.client_occupation ?? ''}`}
+        client={client}
+        staffId={staffId}
+        patientId={patientId}
+        booking={data.booking}
+        onDone={load}
+      />
+      <HistoryPart
+        key={`history-${data.booking?.history_yes.join(',') ?? ''}-${data.booking?.surgery_type ?? ''}`}
+        client={client}
+        staffId={staffId}
+        patientId={patientId}
+        booking={data.booking}
+        onDone={load}
+      />
       <DocumentedBox
         client={client}
         staffId={staffId}
