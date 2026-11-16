@@ -945,3 +945,10 @@ this file.
 - 205, LIVE 2026-11-16: the 8 test patients on live deleted with every record
   pointing at them, after a read only look and his confirmation. Checked after:
   0 patients, payments, visits and families on live.
+
+- 208 to 214, LIVE 2026-11-16: lab prices with admin approval and 72 hours;
+  Other saved for everybody; Widal significant titre heading; payment kinds
+  with pickers; First registered and the old file month; vital sign lists;
+  medicine box arrow; Medical record from the queue; Take payment only for the
+  Front Desk; send paid work to the Lab and Pharmacy; pharmacy stock; note
+  titles; lab corrections. Checked on testing and live each time.

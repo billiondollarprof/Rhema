@@ -45,7 +45,7 @@ import { naira, PAYMENT_MODES } from '@/lib/lab/lab'
 import { familyPayments, takePayment, type Payment } from '@/lib/payments/payments'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
-import { CARD_ITEM, loadPrices, priceOf } from '@/lib/prices/prices'
+import { cardPriceFor, loadPrices, type Price } from '@/lib/prices/prices'
 
 function RegisterPatient() {
   const auth = useAuth()
@@ -73,12 +73,13 @@ function RegisterPatient() {
   const [formKey, setFormKey] = useState(0)
 
   // The card fee on the price list, offered under the fee box (2026-11-16).
-  const [cardFee, setCardFee] = useState<number | undefined>(undefined)
+  // The card fees on the price list, by kind of patient (2026-11-16).
+  const [cardPrices, setCardPrices] = useState<Price[]>([])
   useEffect(() => {
     if (!client) return
     let current = true
     loadPrices(client).then((found) => {
-      if (current && found) setCardFee(priceOf(found, 'card', CARD_ITEM))
+      if (current && found) setCardPrices(found)
     })
     return () => {
       current = false
@@ -449,7 +450,7 @@ function RegisterPatient() {
             busy={busy}
             problem={problem}
             withPayment
-            cardFee={cardFee}
+            cardFeeFor={(category) => cardPriceFor(cardPrices, category)}
             // Family member changed to Individual or Antenatal: a fresh
             // registration, so the card fee is paid (requests 160, 165).
             feeRequiredIf={familyId ? (details) => details.category !== 'family' : undefined}

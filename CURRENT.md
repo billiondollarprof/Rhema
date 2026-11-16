@@ -849,6 +849,34 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+216. **History: his answers and the front desk's real need.** (2026-11-16)
+    "Yes, admin 3 card fees." "The front desk... when they click history,
+    they are seeing the payments. The admin is seeing the same thing... all
+    payments for today, in the last 24 hours... choose range of time, let's
+    say last six hours... or their particular shift, since they started the
+    shift... they want to know how much they made when they were on duty...
+    by category... by mode of payment... the total paid... count the cash they
+    have and know that it matches. Others are also able to see just numbers of
+    how many they attended to." Design: "easy to spot and understand.
+    Screenshot and check it until it looks good both on mobile and
+    desktop/tablet."
+    CORRECTED 2026-11-16 (his words: "the front desk just want to know the one
+    they themselves collected... from the time their own session started...
+    admin is now the one that sees everything"): the Front Desk sees only
+    their own money, enforced by the database, from their last email sign in
+    ("This shift"), with Today and Last 24 hours; no Everybody. Admin: Period
+    drop down (dates and hours) and Taken by (Everybody or one person). Long
+    lists folded. His SQL yes "if it matches"; it matched.
+    BUILT 2026-11-16: History in the menu (migration
+    20261116155137_history_summaries, test 045, 9 breaks caught). Front Desk
+    and admin: total, Cash/POS/Transfer (cash marked, "Count the cash in hand:
+    it should be..."), each category with its own total (card split into
+    Individual, Family, Antenatal), patients registered, payments; "Only
+    payments I took" (on for the Front Desk) or Everybody. Lab and Pharmacy:
+    counts only. Doctors and nurses: their own work. Periods: Today, last 6
+    or 24 hours, this week, this month, dates and times chosen. Admin >
+    Prices: three card fees; Register and Take payment use the patient's kind.
+
 215. **History behind the menu: money for the Front Desk and admin, numbers
     for the Lab and Pharmacy, own work for each consultant.** (2026-11-16)
     "The front desk can see history of everyone registered today and all
@@ -880,7 +908,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     mistake and discover later and go to edit or cancel... If they mistakenly
     mark finished at the lab without adding the test, refuse and add warnings
     that they should add test details."
-    BUILT 2026-11-16, held for his SQL yes (migration 20261116145838, test
+    LIVE 2026-11-16 after his yes (migration 20261116145838, test
     044, 10 breaks caught; test 031 kept, 009 caught a doctor read gap that
     was fixed): Front Desk Send to the Laboratory / Pharmacy after a lab or
     drug payment, with an optional doctor; stock (unit, warn level, restock,

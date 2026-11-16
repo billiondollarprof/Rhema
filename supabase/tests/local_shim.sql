@@ -43,7 +43,10 @@ grant usage on schema public to anon, authenticated, service_role;
 
 create table if not exists auth.users (
   id    uuid primary key,
-  email text
+  email text,
+  -- When the person last signed in with the email code, as in Supabase
+  -- (History's shift start, 2026-11-16).
+  last_sign_in_at timestamptz
 );
 
 -- The same as Supabase's auth.uid(): the signed in person's id, taken from

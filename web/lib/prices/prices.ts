@@ -21,6 +21,23 @@ export type Price = { id: number; kind: PriceKind; item: string; amount: number 
 export const CARD_ITEM = 'Registration card'
 export const CONSULTATION_ITEM = 'Consultation'
 
+// A card fee for each kind of patient (Anthony, 2026-11-16: "individual,
+// antenatal and family are different amounts... admin 3 card fees").
+export const CARD_ITEMS: Record<string, string> = {
+  individual: 'Card (Individual)',
+  family: 'Card (Family)',
+  antenatal: 'Card (Antenatal)',
+}
+
+// The card fee for this kind of patient; the single card fee set before
+// 2026-11-16 still counts for an Individual.
+export function cardPriceFor(prices: Price[], category: string): number | undefined {
+  return (
+    priceOf(prices, 'card', CARD_ITEMS[category] ?? CARD_ITEMS.individual) ??
+    (category === 'individual' ? priceOf(prices, 'card', CARD_ITEM) : undefined)
+  )
+}
+
 // ===== 2. Read =====
 export async function loadPrices(client: SupabaseClient): Promise<Price[] | null> {
   const { data, error } = await client

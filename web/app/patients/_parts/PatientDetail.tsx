@@ -205,7 +205,14 @@ export default function PatientDetail({
       <FamilyCard client={client} patient={patient} canAdd={canRegister} />
 
       {/* Payments and receipts, for the Front Desk and admins. */}
-      {canPay ? <PaymentsCard client={client} patientId={patient.id} staffId={staffId} /> : null}
+      {canPay ? (
+        <PaymentsCard
+          client={client}
+          patientId={patient.id}
+          staffId={staffId}
+          category={patient.category}
+        />
+      ) : null}
 
       {/* ===== 2. What can be done from here ===== */}
       {sending ? (

@@ -44,6 +44,116 @@ module.exports.SCREENS = [
   { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },
   { path: '/announce/', waitFor: 'Show on Home until', medical: true },
   { path: '/notifications/', waitFor: 'Notifications' },
+  // History (requests 215, 216): money for the Front Desk, numbers for others.
+  {
+    path: '/history/',
+    waitFor: 'Money I took',
+    extra: {
+      'rpc/my_shift_start': new Date(Date.now() - 9 * 3600 * 1000).toISOString(),
+      'rpc/money_summary': {
+        total: 46500,
+        count: 9,
+        by_category: [
+          { key: 'lab_test', count: 4, amount: 18000 },
+          { key: 'consultation', count: 3, amount: 15000 },
+          { key: 'card_antenatal', count: 1, amount: 5000 },
+          { key: 'card_individual', count: 1, amount: 2000 },
+          { key: 'drugs', count: 2, amount: 6500 },
+        ],
+        by_mode: [
+          { key: 'cash', count: 5, amount: 21500 },
+          { key: 'pos', count: 3, amount: 17000 },
+          { key: 'transfer', count: 1, amount: 8000 },
+        ],
+        payments: [
+          {
+            id: 1,
+            at: new Date().toISOString(),
+            receipt: 'RCT-000009',
+            patient: 'RMC-000012',
+            category: 'lab_test',
+            mode: 'cash',
+            amount: 4500,
+            taken_by: 'Chioma Eze',
+          },
+          {
+            id: 2,
+            at: new Date().toISOString(),
+            receipt: 'RCT-000008',
+            patient: 'RMC-000011',
+            category: 'card_antenatal',
+            mode: 'pos',
+            amount: 5000,
+            taken_by: 'Chioma Eze',
+          },
+        ],
+        registered: [
+          {
+            at: new Date().toISOString(),
+            patient: 'RMC-000012',
+            category: 'individual',
+            old_file: false,
+          },
+          {
+            at: new Date().toISOString(),
+            patient: 'RMC-000011',
+            category: 'antenatal',
+            old_file: false,
+          },
+        ],
+      },
+    },
+  },
+  {
+    path: '/history/',
+    waitFor: 'Money taken by everybody',
+    role: 'admin',
+    admin: true,
+    extra: {
+      'rpc/money_summary': {
+        total: 46500,
+        count: 9,
+        by_category: [{ key: 'lab_test', count: 4, amount: 18000 }],
+        by_mode: [{ key: 'cash', count: 5, amount: 21500 }],
+        payments: [],
+        registered: [],
+      },
+    },
+  },
+  {
+    path: '/history/',
+    waitFor: 'Pharmacy',
+    role: 'pharmacy',
+    extra: {
+      'rpc/pharmacy_summary': {
+        dispensed: 7,
+        waiting: 2,
+        unpaid: 1,
+        by_drug: [
+          { drug: 'Paracetamol 500 mg tablet', times: 4, amount: 120, unit: 'tablets' },
+          {
+            drug: 'Artemether and lumefantrine 80/480 mg tablet',
+            times: 3,
+            amount: 18,
+            unit: 'tablets',
+          },
+        ],
+      },
+    },
+  },
+  {
+    path: '/history/',
+    waitFor: 'My work',
+    role: 'doctor',
+    medical: true,
+    extra: {
+      'rpc/my_summary': {
+        patients: 6,
+        counts: { consultation: 6, lab: 3, prescription: 4 },
+        list: [{ patient: 'RMC-000012', at: new Date().toISOString(), times: 3 }],
+      },
+    },
+  },
   { path: '/automations/', waitFor: 'Happy birthday' },
   {
     path: '/payments/receipt/?id=1',

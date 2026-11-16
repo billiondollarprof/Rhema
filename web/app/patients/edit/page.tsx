@@ -167,7 +167,12 @@ function EditPatient() {
               />
             ) : null}
             {staff && takesPayments(staff) ? (
-              <PaymentsCard client={client} patientId={patient.id} staffId={staff?.id} />
+              <PaymentsCard
+                client={client}
+                patientId={patient.id}
+                staffId={staff?.id}
+                category={patient.category}
+              />
             ) : null}
           </>
         ) : null}

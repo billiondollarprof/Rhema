@@ -70,9 +70,10 @@ type FormProps = {
   // individual"): when this answers true for what is on the form, the
   // Payment section shows and the card fee must be paid before saving.
   feeRequiredIf?: (details: PatientDetails) => boolean
-  // The card fee from the price list, offered with a "Use it" button
-  // (Settings, 2026-11-16). Never filled in by itself: the fee is optional.
-  cardFee?: number
+  // The card fee from the price list for a kind of patient (Individual,
+  // Family, Antenatal), offered with a "Use it" button (2026-11-16). Never
+  // filled in by itself: the fee is optional.
+  cardFeeFor?: (category: string) => number | undefined
   // Adding a member to a family (request 165, 2026-11-09): the family's
   // card number. The category shows as that family, with Change category.
   // Changing it to Individual or Antenatal starts a fresh registration
@@ -140,7 +141,7 @@ export default function PatientForm({
   withPayment = false,
   familyPaid,
   feeRequiredIf,
-  cardFee,
+  cardFeeFor,
   familyCard,
   onSave,
   client,
@@ -182,6 +183,7 @@ export default function PatientForm({
 
   // Whether the card fee must be paid now, for what is on the form.
   const feeNeededNow = feeRequiredIf?.(details) ?? false
+  const cardFee = cardFeeFor?.(details.category)
 
   function set<K extends keyof PatientDetails>(key: K, value: PatientDetails[K]) {
     setDetails((now) => ({ ...now, [key]: value }))
