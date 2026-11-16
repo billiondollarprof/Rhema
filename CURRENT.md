@@ -866,7 +866,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     their own money, enforced by the database, from their last email sign in
     ("This shift"), with Today and Last 24 hours; no Everybody. Admin: Period
     drop down (dates and hours) and Taken by (Everybody or one person). Long
-    lists folded. His SQL yes "if it matches"; it matched.
+    lists folded. His SQL yes "if it matches"; it matched. LIVE 2026-11-16.
     BUILT 2026-11-16: History in the menu (migration
     20261116155137_history_summaries, test 045, 9 breaks caught). Front Desk
     and admin: total, Cash/POS/Transfer (cash marked, "Count the cash in hand:
