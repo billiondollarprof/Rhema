@@ -40,7 +40,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -76,7 +76,7 @@
   height: 42px;
   border-radius: 13px;
   background: linear-gradient(135deg, #e6f0ff, #cfe0fb);
-  color: var(--bl);
+  color: var(--link);
   flex-shrink: 0;
 }
 
@@ -100,7 +100,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 5px;
 }
 
@@ -110,9 +110,9 @@
   width: 100%;
   padding: 10px;
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 .input:focus {
@@ -127,7 +127,7 @@
 
 .hint {
   display: block;
-  color: var(--bl);
+  color: var(--link);
   font-weight: 600;
   font-size: 13px;
   margin-top: 4px;
@@ -155,7 +155,7 @@
 }
 
 .segments button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
@@ -177,9 +177,9 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -189,12 +189,12 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
@@ -209,9 +209,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   padding: 0 10px;
   color: var(--mut);
 }
@@ -235,7 +235,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 10px;
   cursor: pointer;
@@ -245,7 +245,7 @@
 .result[aria-current='true'],
 .result:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .result > div {
@@ -276,13 +276,13 @@
   padding: 1px 10px;
   border-radius: 10px;
   font-size: 12px;
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
   white-space: nowrap;
 }
 
 .tagBusy {
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
 }
 
@@ -352,8 +352,8 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background: #e8f5ee;
-  border: 1px solid #bfe3cf;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
   border-radius: 16px;
   padding: 12px;
 }
@@ -365,8 +365,8 @@
 .warn {
   display: grid;
   gap: 10px;
-  background: #fff7e6;
-  border: 1px solid #ffe0a3;
+  background: var(--warn-bg-2);
+  border: 1px solid var(--c-ffe0a3);
   border-radius: 16px;
   padding: 12px;
 }
@@ -417,13 +417,13 @@
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   min-width: 0;
 }
 
 .fileList li > svg {
   flex-shrink: 0;
-  color: var(--bl);
+  color: var(--link);
 }
 
 .fileList li > span {
@@ -448,13 +448,13 @@
    blue button is the primary button." White, with a blue outline and blue
    words (it was a raised slate button from 2026-11-02). */
 .oldFile {
-  background: #fff;
-  color: #1f5fd0;
-  border-color: #1f5fd0;
+  background: var(--card);
+  color: var(--link);
+  border-color: var(--link);
 }
 
 .oldFile:hover {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 /* Find patient (on Register patient): a raised 3D button in the app's
@@ -493,7 +493,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 5px;
 }
 
@@ -523,7 +523,7 @@
 }
 
 .previewBox {
-  background: #fff;
+  background: var(--card);
   border-radius: 18px;
   width: min(900px, 100%);
   max-height: calc(100dvh - 32px);
@@ -570,7 +570,7 @@
   max-height: calc(100dvh - 110px);
   margin: 0 auto;
   object-fit: contain;
-  background: #f6f8fb;
+  background: var(--c-f6f8fb);
 }
 
 .previewPdf {
@@ -605,7 +605,7 @@
 }
 
 .fileOpen:hover b {
-  color: var(--bl);
+  color: var(--link);
 }
 
 /* ===== 11. Delete warning (old file only) ===== */
@@ -614,9 +614,9 @@
   gap: 8px;
   padding: 12px;
   border-radius: 14px;
-  background: #fdecea;
-  border: 1px solid #f5c2bd;
-  color: #8a1c13;
+  background: var(--bad-bg);
+  border: 1px solid var(--c-f5c2bd);
+  color: var(--c-8a1c13);
 }
 
 .dangerButton {
@@ -682,14 +682,14 @@
   gap: 8px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: #ede7f6;
-  color: #4527a0;
+  background: var(--c-ede7f6);
+  color: var(--c-4527a0);
 }
 
 .familyButton {
-  background: #ede7f6;
+  background: var(--c-ede7f6);
   border-color: #d1c4e9;
-  color: #4527a0;
+  color: var(--c-4527a0);
 }
 
 .familyList {
@@ -714,7 +714,7 @@
 
 .familyList a:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .familyList span {
@@ -733,9 +733,9 @@
   gap: 12px;
   padding: 14px;
   border-radius: 16px;
-  background: #fff8e6;
-  border: 1px solid #f3dca4;
-  color: #7a4f00;
+  background: var(--c-fff8e6);
+  border: 1px solid var(--c-f3dca4);
+  color: var(--c-7a4f00);
 }
 
 .waitingCard > div {
@@ -745,7 +745,7 @@
 }
 
 .waitingCard small {
-  color: #8a6d2b;
+  color: var(--c-8a6d2b);
 }
 
 /* ===== 14. Payments on the profile (request 123, part 2) ===== */
@@ -773,7 +773,7 @@
   height: 32px;
   border: 0;
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
   color: var(--mut);
   cursor: pointer;
 }
@@ -832,9 +832,9 @@
   gap: 10px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: #e8f5ee;
-  border: 1px solid #bfe3cf;
-  color: #1f6b4a;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
+  color: var(--grn-2);
   font-weight: 600;
 }
 
@@ -855,7 +855,7 @@
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #fbfcfe;
+  background: var(--c-fbfcfe);
   min-width: 0;
 }
 
@@ -885,7 +885,7 @@
   gap: 12px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: #f8fafc;
+  background: var(--tint-1);
   border: 1px solid var(--line);
 }
 
@@ -914,8 +914,8 @@
   flex-wrap: wrap;
   padding: 8px 10px;
   border-radius: 12px;
-  background: #f3eefb;
-  color: #4c2a85;
+  background: var(--c-f3eefb);
+  color: var(--c-4c2a85);
 }
 
 .linkButton {
@@ -927,7 +927,7 @@
   padding: 6px 0;
   border: 0;
   background: none;
-  color: #1f5fd0;
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -960,14 +960,14 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   overflow: hidden;
 }
 
 .resultRow:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .resultRow > .result {
@@ -1026,7 +1026,7 @@
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 /* The folded "More details" on Register from old file (2026-11-16). */
@@ -1036,13 +1036,13 @@
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
 }
 
 .more > summary {
   cursor: pointer;
   font-weight: 700;
-  color: #1f5fd0;
+  color: var(--link);
   min-height: 32px;
   display: flex;
   align-items: center;

@@ -21,7 +21,7 @@
 .tabs {
   display: flex;
   gap: 4px;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 4px;
@@ -61,7 +61,7 @@
 
 /* ===== 2. Cards ===== */
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -91,7 +91,7 @@
   height: 42px;
   border-radius: 13px;
   background: linear-gradient(135deg, #e6f0ff, #cfe0fb);
-  color: var(--bl);
+  color: var(--link);
   flex-shrink: 0;
 }
 
@@ -142,7 +142,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 5px;
 }
 
@@ -152,9 +152,9 @@
   width: 100%;
   padding: 10px;
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 .input:focus {
@@ -209,9 +209,9 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -220,19 +220,19 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
 
 .danger {
   color: var(--red);
-  border-color: #f5c2c0;
+  border-color: var(--c-f5c2c0);
 }
 
 .dangerFull {
@@ -266,7 +266,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 10px;
   color: var(--ink);
@@ -280,7 +280,7 @@ button.row {
 button.row[aria-current='true'],
 button.row:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .rowText {
@@ -307,27 +307,27 @@ button.row:hover {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
 }
 
 .tagGreen {
-  background: #e3f6ea;
+  background: var(--c-e3f6ea);
   color: var(--grn);
 }
 
 .tagAmber {
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
 }
 
 .tagRed {
-  background: #fdecea;
+  background: var(--bad-bg);
   color: var(--red);
 }
 
 .tagGrey {
-  background: #eef1f5;
+  background: var(--c-eef1f5);
   color: var(--mut);
 }
 
@@ -378,7 +378,7 @@ button.row:hover {
 }
 
 .lines div {
-  border-left: 3px solid #cfe0fb;
+  border-left: 3px solid var(--c-cfe0fb);
   padding-left: 8px;
 }
 
@@ -399,7 +399,7 @@ button.row:hover {
 }
 
 .dialog {
-  background: #fff;
+  background: var(--card);
   border-radius: 20px;
   padding: 20px;
   width: min(400px, 100%);

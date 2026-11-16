@@ -18,7 +18,7 @@
 
 /* ===== 2. The white card (demo .lc) ===== */
 .card {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   border-radius: 22px;
   padding: 26px;
@@ -60,7 +60,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 4px 0 -4px;
 }
 
@@ -70,9 +70,9 @@
   width: 100%;
   padding: 10px;
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 .input:focus {
@@ -91,9 +91,9 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -102,12 +102,12 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
@@ -115,7 +115,7 @@
 .quiet {
   border: 0;
   background: none;
-  color: var(--bl);
+  color: var(--link);
 }
 
 .button:disabled {
@@ -144,10 +144,10 @@
   font-size: 24px;
   font-weight: 700;
   padding: 0;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 14px;
   color: var(--ink);
-  background: #fff;
+  background: var(--card);
 }
 
 .box:focus {
@@ -194,7 +194,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 10px;
   cursor: pointer;
@@ -203,7 +203,7 @@
 
 .person:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .person small {
@@ -310,12 +310,12 @@
   gap: 10px;
   align-items: start;
   padding: 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--tint-1);
   font-size: 13px;
   line-height: 1.5;
-  color: #334155;
+  color: var(--c-334155);
   cursor: pointer;
 }
 
@@ -327,7 +327,7 @@
 }
 
 .agree a {
-  color: #1f5fd0;
+  color: var(--link);
   font-weight: 600;
 }
 
@@ -348,10 +348,10 @@
   font: inherit;
   font-size: 18px;
   min-width: 46px;
-  border: 1.5px solid #1f5fd0;
+  border: 1.5px solid var(--link);
   border-radius: 10px;
-  background: #fff;
-  color: #1f5fd0;
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -359,9 +359,9 @@
   display: grid;
   gap: 2px;
   padding: 4px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 8px 24px rgba(15, 34, 56, 0.12);
 }
 
@@ -388,7 +388,7 @@
 
 .comboPick:hover,
 .comboPick[aria-selected='true'] {
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .comboForget {
@@ -397,9 +397,9 @@
   font-size: 12px;
   min-height: 32px;
   padding: 2px 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 8px;
-  background: #fff;
-  color: #5b6b80;
+  background: var(--card);
+  color: var(--mut-2);
   cursor: pointer;
 }

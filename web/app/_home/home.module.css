@@ -21,7 +21,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -49,8 +49,8 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background: #fff7e6;
-  border: 1px solid #ffe0a3;
+  background: var(--warn-bg-2);
+  border: 1px solid var(--c-ffe0a3);
   border-radius: 16px;
   padding: 12px;
 }
@@ -180,7 +180,7 @@
 }
 
 .segments button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
@@ -206,8 +206,8 @@
   padding: 1px 10px;
   border-radius: 10px;
   font-size: 12px;
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
 }
 
 .queue {
@@ -221,7 +221,7 @@
   padding: 10px;
   display: grid;
   gap: 8px;
-  background: #fff;
+  background: var(--card);
 }
 
 .entryTop {
@@ -250,12 +250,12 @@
   border-radius: 10px;
   font-size: 12px;
   white-space: nowrap;
-  background: #e4f3ec;
+  background: var(--c-e4f3ec);
   color: var(--grn);
 }
 
 .status[data-status='waiting'] {
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
 }
 
@@ -275,9 +275,9 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   /* Also used on a link (Open patient). */
   text-decoration: none;
@@ -287,12 +287,12 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
 }
 
@@ -305,8 +305,8 @@
 .count {
   font-size: 12px;
   font-weight: 700;
-  color: var(--bl);
-  background: #e3f2fd;
+  color: var(--link);
+  background: var(--tint-5);
   border-radius: 10px;
   padding: 1px 8px;
 }
@@ -384,17 +384,17 @@ a.button {
 .fieldLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
 }
 
 .money {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
   padding: 0 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 .money:focus-within {
@@ -444,9 +444,9 @@ a.button {
   gap: 10px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: #e8f5ee;
-  border: 1px solid #bfe3cf;
-  color: #1f6b4a;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
+  color: var(--grn-2);
   font-weight: 600;
 }
 

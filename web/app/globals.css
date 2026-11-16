@@ -15,12 +15,239 @@
   /* The hospital's own red, from its letterhead. Accents only (request 114). */
   --brand-red: #d9232d;
   --amb: #ef6c00;
+  /* Named colours for cards, tints, text and borders (dark mode, request
+     196g, 2026-11-16). In the light look each one is exactly the colour the
+     screens used before, so the light look did not change. */
+  --card: #fff;
+  --tint-1: #f8fafc;
+  --tint-2: #f4f8ff;
+  --tint-3: #eef4ff;
+  --tint-4: #e8f0fd;
+  --tint-5: #e3f2fd;
+  --tint-strong-1: #cfe0fb;
+  --tint-strong-2: #e3edff;
+  --warn-bg-1: #fff1de;
+  --warn-bg-2: #fff7e6;
+  --bad-bg: #fdecea;
+  --good-bg: #e8f5ee;
+  --ink2: #475569;
+  --mut-2: #5b6b80;
+  --link: #1f5fd0;
+  --link-2: #1565c0;
+  --link-3: #2a74e6;
+  --nv-ink: #0a2a5e;
+  --grn-2: #1f6b4a;
+  --field-line: #cbd5e1;
+  color-scheme: light;
+  /* --c-xxxxxx is the colour #xxxxxx of the light look, with its dark
+     partner below (made 2026-11-16 for the dark look). */
+  --c-15803d: #15803d;
+  --c-334155: #334155;
+  --c-3b4a5e: #3b4a5e;
+  --c-4527a0: #4527a0;
+  --c-4c2a85: #4c2a85;
+  --c-7a4f00: #7a4f00;
+  --c-7e57c2: #7e57c2;
+  --c-8a1c13: #8a1c13;
+  --c-8a5a00: #8a5a00;
+  --c-8a6d2b: #8a6d2b;
+  --c-9a5b00: #9a5b00;
+  --c-b2dfdb: #b2dfdb;
+  --c-b42318: #b42318;
+  --c-b91c1c: #b91c1c;
+  --c-b9cdf3: #b9cdf3;
+  --c-b9e2cf: #b9e2cf;
+  --c-bfe3cf: #bfe3cf;
+  --c-c66a00: #c66a00;
+  --c-cbd5e1: #cbd5e1;
+  --c-cfe0fb: #cfe0fb;
+  --c-dbe4f3: #dbe4f3;
+  --c-ddd0f5: #ddd0f5;
+  --c-dfe5ee: #dfe5ee;
+  --c-e2e8f0: #e2e8f0;
+  --c-e3f6ea: #e3f6ea;
+  --c-e4f3ec: #e4f3ec;
+  --c-e53935: #e53935;
+  --c-ede7f6: #ede7f6;
+  --c-eef1f5: #eef1f5;
+  --c-eef2f7: #eef2f7;
+  --c-f1f5fb: #f1f5fb;
+  --c-f3dc9b: #f3dc9b;
+  --c-f3dca4: #f3dca4;
+  --c-f3eefb: #f3eefb;
+  --c-f5c2bd: #f5c2bd;
+  --c-f5c2c0: #f5c2c0;
+  --c-f6f8fb: #f6f8fb;
+  --c-fbfcfe: #fbfcfe;
+  --c-ffe0a3: #ffe0a3;
+  --c-fff3dc: #fff3dc;
+  --c-fff4d6: #fff4d6;
+  --c-fff8e6: #fff8e6;
   /* The width of the page column on a desktop. The top bar lines up with
      it, so the bar and the page share the same left and right edges. */
   --page-width: 1280px;
   /* Where the drop down panels (Call attention, Menu) sit from the right:
      under the buttons, which line up with the page column on a desktop. */
   --panel-right: 12px;
+}
+
+/* ===== The dark look (request 196g) =====
+   Anthony, 2026-11-16: "some of the nurses are complaining that it's too
+   bright." Chosen per device in the menu, saved on the device. Every text
+   colour here is at least 4.5 to 1 against the card and the page, so
+   nothing goes faint. The coloured buttons (blue, green, red) keep their
+   colour and their white words. */
+:root[data-theme='dark'] {
+  --bg: #0d1520;
+  --card: #162130;
+  --tint-1: #1b2839;
+  --tint-2: #1b2839;
+  --tint-3: #1e2d42;
+  --tint-4: #1e2d42;
+  --tint-5: #1e2d42;
+  --tint-strong-1: #24395c;
+  --tint-strong-2: #24395c;
+  --warn-bg-1: #3a2a14;
+  --warn-bg-2: #3a2a14;
+  --bad-bg: #3d1d1f;
+  --good-bg: #163327;
+  --ink: #e8eef6;
+  --ink2: #c5d0dd;
+  --mut: #a3b1c2;
+  --mut-2: #a3b1c2;
+  --line: #2a3a50;
+  --field-line: #3d5170;
+  --link: #8cb8ff;
+  --link-2: #8cb8ff;
+  --link-3: #8cb8ff;
+  --nv-ink: #bcd0f2;
+  --grn: #63d0a0;
+  --grn-2: #63d0a0;
+  --red: #ff7b7b;
+  --amb: #ffab5e;
+  color-scheme: dark;
+  --c-15803d: #63d0a0;
+  --c-334155: #c5d0dd;
+  --c-3b4a5e: #c5d0dd;
+  --c-4527a0: #c7b3f5;
+  --c-4c2a85: #c7b3f5;
+  --c-7a4f00: #ffc56e;
+  --c-7e57c2: #c7b3f5;
+  --c-8a1c13: #ff8a80;
+  --c-8a5a00: #ffc56e;
+  --c-8a6d2b: #ffc56e;
+  --c-9a5b00: #ffc56e;
+  --c-b2dfdb: #3d5170;
+  --c-b42318: #ff8a80;
+  --c-b91c1c: #ff8a80;
+  --c-b9cdf3: #3d5170;
+  --c-b9e2cf: #3d5170;
+  --c-bfe3cf: #3d5170;
+  --c-c66a00: #ffc56e;
+  --c-cbd5e1: #1b2839;
+  --c-cfe0fb: #3d5170;
+  --c-dbe4f3: #3d5170;
+  --c-ddd0f5: #3d5170;
+  --c-dfe5ee: #3d5170;
+  --c-e2e8f0: #3d5170;
+  --c-e3f6ea: #163327;
+  --c-e4f3ec: #163327;
+  --c-e53935: #ff8a80;
+  --c-ede7f6: #2a2040;
+  --c-eef1f5: #1b2839;
+  --c-eef2f7: #1b2839;
+  --c-f1f5fb: #1b2839;
+  --c-f3dc9b: #3d5170;
+  --c-f3dca4: #3d5170;
+  --c-f3eefb: #2a2040;
+  --c-f5c2bd: #3d5170;
+  --c-f5c2c0: #3d5170;
+  --c-f6f8fb: #1b2839;
+  --c-fbfcfe: #1b2839;
+  --c-ffe0a3: #3d5170;
+  --c-fff3dc: #3a2a14;
+  --c-fff4d6: #3a2a14;
+  --c-fff8e6: #3a2a14;
+}
+
+/* A part that stays in the light look even in the dark look: the printed
+   receipt, which is paper (request 196g). */
+.lightOnly {
+  --bg: #f1f4f9;
+  --ink: #0f2238;
+  --mut: #64748b;
+  --line: #e5eaf2;
+  --nv: #0a2a5e;
+  --bl: #1f5fd0;
+  --grn: #2e7d5b;
+  --red: #d32f2f;
+  --brand-red: #d9232d;
+  --amb: #ef6c00;
+  --card: #fff;
+  --tint-1: #f8fafc;
+  --tint-2: #f4f8ff;
+  --tint-3: #eef4ff;
+  --tint-4: #e8f0fd;
+  --tint-5: #e3f2fd;
+  --tint-strong-1: #cfe0fb;
+  --tint-strong-2: #e3edff;
+  --warn-bg-1: #fff1de;
+  --warn-bg-2: #fff7e6;
+  --bad-bg: #fdecea;
+  --good-bg: #e8f5ee;
+  --ink2: #475569;
+  --mut-2: #5b6b80;
+  --link: #1f5fd0;
+  --link-2: #1565c0;
+  --link-3: #2a74e6;
+  --nv-ink: #0a2a5e;
+  --grn-2: #1f6b4a;
+  --field-line: #cbd5e1;
+  --c-15803d: #15803d;
+  --c-334155: #334155;
+  --c-3b4a5e: #3b4a5e;
+  --c-4527a0: #4527a0;
+  --c-4c2a85: #4c2a85;
+  --c-7a4f00: #7a4f00;
+  --c-7e57c2: #7e57c2;
+  --c-8a1c13: #8a1c13;
+  --c-8a5a00: #8a5a00;
+  --c-8a6d2b: #8a6d2b;
+  --c-9a5b00: #9a5b00;
+  --c-b2dfdb: #b2dfdb;
+  --c-b42318: #b42318;
+  --c-b91c1c: #b91c1c;
+  --c-b9cdf3: #b9cdf3;
+  --c-b9e2cf: #b9e2cf;
+  --c-bfe3cf: #bfe3cf;
+  --c-c66a00: #c66a00;
+  --c-cbd5e1: #cbd5e1;
+  --c-cfe0fb: #cfe0fb;
+  --c-dbe4f3: #dbe4f3;
+  --c-ddd0f5: #ddd0f5;
+  --c-dfe5ee: #dfe5ee;
+  --c-e2e8f0: #e2e8f0;
+  --c-e3f6ea: #e3f6ea;
+  --c-e4f3ec: #e4f3ec;
+  --c-e53935: #e53935;
+  --c-ede7f6: #ede7f6;
+  --c-eef1f5: #eef1f5;
+  --c-eef2f7: #eef2f7;
+  --c-f1f5fb: #f1f5fb;
+  --c-f3dc9b: #f3dc9b;
+  --c-f3dca4: #f3dca4;
+  --c-f3eefb: #f3eefb;
+  --c-f5c2bd: #f5c2bd;
+  --c-f5c2c0: #f5c2c0;
+  --c-f6f8fb: #f6f8fb;
+  --c-fbfcfe: #fbfcfe;
+  --c-ffe0a3: #ffe0a3;
+  --c-fff3dc: #fff3dc;
+  --c-fff4d6: #fff4d6;
+  --c-fff8e6: #fff8e6;
+  color-scheme: light;
+  background: var(--card);
+  color: var(--ink);
 }
 
 /* 96px is the menu down the left, 24px the page's own side gap. */

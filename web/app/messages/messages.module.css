@@ -68,7 +68,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   border-radius: 14px;
   padding: 12px;
   color: var(--ink);
@@ -79,7 +79,7 @@
 .row[aria-current='true'],
 .row:hover {
   border-color: #8fb4f0;
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .row span {
@@ -116,7 +116,7 @@
      320 pixel phone (layout check, 2026-11-02). */
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -175,7 +175,7 @@
 
 .mine {
   justify-self: end;
-  background: #e3f2fd;
+  background: var(--tint-5);
   border-radius: 14px 14px 4px 14px;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .read {
-  color: var(--bl);
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -265,7 +265,7 @@
   display: block;
   font-size: 12px;
   color: var(--mut);
-  border-left: 3px solid #b9cdf3;
+  border-left: 3px solid var(--c-b9cdf3);
   padding: 2px 0 2px 8px;
   margin-bottom: 4px;
   overflow: hidden;
@@ -278,8 +278,8 @@
   justify-self: start;
   font-size: 12px;
   font-weight: 700;
-  color: #1f5fd0;
-  background: #e8f0fd;
+  color: var(--link);
+  background: var(--tint-4);
   border-radius: 999px;
   padding: 1px 8px;
   margin-bottom: 2px;
@@ -298,9 +298,9 @@
   min-height: 34px;
   padding: 4px 12px;
   border-radius: 10px;
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
@@ -331,8 +331,8 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  border-left: 3px solid #1f5fd0;
-  background: #f4f8ff;
+  border-left: 3px solid var(--link);
+  background: var(--tint-2);
   border-radius: 8px;
   font-size: 13px;
   min-width: 0;
@@ -367,7 +367,7 @@
   padding: 6px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card);
   max-height: 220px;
   overflow-y: auto;
 }
@@ -388,7 +388,7 @@
 }
 
 .person:hover {
-  background: #f4f8ff;
+  background: var(--tint-2);
 }
 
 .person small {
@@ -412,8 +412,8 @@
   padding: 8px 14px;
   border: 1.5px solid #fb8c00;
   border-radius: 12px;
-  background: #fff;
-  color: #c66a00;
+  background: var(--card);
+  color: var(--c-c66a00);
   font-weight: 700;
   text-decoration: none;
 }

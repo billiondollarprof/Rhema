@@ -20,7 +20,7 @@
 .head h1 {
   margin: 4px 0 0;
   font-size: 26px;
-  color: #0a2a5e;
+  color: var(--nv-ink);
 }
 
 .meta {
@@ -41,9 +41,9 @@
   padding: 8px 16px;
   min-height: 36px;
   border-radius: 999px;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  color: #0f2238;
+  border: 1px solid var(--field-line);
+  background: var(--card);
+  color: var(--ink);
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
@@ -51,12 +51,12 @@
 
 .tabs a.on {
   background: #1f5fd0;
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
 }
 
 .body {
-  background: #fff;
+  background: var(--card);
   border-radius: 16px;
   padding: 8px 22px 22px;
   box-shadow: 0 10px 30px -18px rgba(10, 42, 94, 0.35);
@@ -68,7 +68,7 @@
 .body h2 {
   font-size: 17px;
   margin: 22px 0 6px;
-  color: #0a2a5e;
+  color: var(--nv-ink);
 }
 
 .body p,
@@ -85,7 +85,7 @@
 }
 
 .body a {
-  color: #1f5fd0;
+  color: var(--link);
   /* Big enough to tap on a phone. */
   display: inline-block;
   padding: 7px 0;
@@ -104,11 +104,11 @@
   text-align: left;
   vertical-align: top;
   padding: 8px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--c-e2e8f0);
 }
 
 .body th {
-  color: #475569;
+  color: var(--ink2);
   font-weight: 600;
 }
 
@@ -122,7 +122,7 @@
 }
 
 .foot a {
-  color: #1f5fd0;
+  color: var(--link);
   font-weight: 600;
   padding: 8px 0;
 }

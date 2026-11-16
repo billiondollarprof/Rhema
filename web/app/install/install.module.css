@@ -35,21 +35,21 @@
   padding: 7px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   cursor: pointer;
 }
 
 .tab[aria-selected='true'] {
   background: var(--bl);
-  border-color: var(--bl);
+  border-color: var(--link);
   color: #fff;
 }
 
 .panel {
   width: 100%;
   max-width: 860px !important;
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 18px;

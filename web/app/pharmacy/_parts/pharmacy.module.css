@@ -19,7 +19,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -44,7 +44,7 @@
   height: 42px;
   border-radius: 13px;
   background: linear-gradient(135deg, #efe7fb, #ddd0f5);
-  color: #7e57c2;
+  color: var(--c-7e57c2);
   flex-shrink: 0;
 }
 
@@ -83,7 +83,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
   margin: 0 0 5px;
 }
 
@@ -93,9 +93,9 @@
   width: 100%;
   padding: 10px;
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 textarea.input {
@@ -134,7 +134,7 @@ textarea.input {
   padding: 6px 12px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   cursor: pointer;
 }
@@ -167,7 +167,7 @@ textarea.input {
 }
 
 .segments button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
@@ -189,9 +189,9 @@ textarea.input {
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -201,12 +201,12 @@ textarea.input {
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
@@ -220,7 +220,7 @@ textarea.input {
 .drug {
   display: grid;
   gap: 8px;
-  border-left: 3px solid #b2dfdb;
+  border-left: 3px solid var(--c-b2dfdb);
   padding-left: 10px;
 }
 
@@ -252,9 +252,9 @@ textarea.input {
 
 /* "Also send to": a softer grey button beside Back to the record. */
 .soft {
-  background: #eef2f7;
-  border-color: #dfe5ee;
-  color: #3b4a5e;
+  background: var(--c-eef2f7);
+  border-color: var(--c-dfe5ee);
+  color: var(--c-3b4a5e);
 }
 
 /* ===== 7. The medicine list (Anthony, 2026-11-11) ===== */
@@ -287,19 +287,19 @@ textarea.input {
   font-weight: 700;
   padding: 1px 8px;
   border-radius: 10px;
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
   white-space: nowrap;
 }
 
 .tagWarn {
-  background: #fff1de;
+  background: var(--warn-bg-1);
   color: var(--amb);
 }
 
 .tagOff {
-  background: #eef2f7;
-  color: #5b6b80;
+  background: var(--c-eef2f7);
+  color: var(--mut-2);
 }
 
 .editRow {

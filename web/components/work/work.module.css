@@ -12,7 +12,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
@@ -61,7 +61,7 @@
 }
 
 .segments button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
@@ -72,8 +72,8 @@
   padding: 1px 10px;
   border-radius: 10px;
   font-size: 12px;
-  background: #e3f2fd;
-  color: var(--bl);
+  background: var(--tint-5);
+  color: var(--link);
 }
 
 .queue {
@@ -87,7 +87,7 @@
   padding: 10px;
   display: grid;
   gap: 8px;
-  background: #fff;
+  background: var(--card);
 }
 
 .entryTop {
@@ -126,19 +126,19 @@
   /* A secondary button looks like a button: blue outline, blue words
      (Anthony, 2026-11-09: "a white button on a white screen... looking
      like you just wrote a text"). Primary and danger set their own. */
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
 .button:hover:not(:disabled) {
-  background: #eef4ff;
+  background: var(--tint-3);
 }
 
 .primary {
   background: linear-gradient(180deg, #2a74e6, #1f5fd0);
-  border-color: #1f5fd0;
+  border-color: var(--link);
   color: #fff;
 }
 
@@ -150,8 +150,8 @@
 .count {
   font-size: 12px;
   font-weight: 700;
-  color: var(--bl);
-  background: #e3f2fd;
+  color: var(--link);
+  background: var(--tint-5);
   border-radius: 10px;
   padding: 1px 8px;
 }
@@ -227,17 +227,17 @@ a.button {
 .fieldLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #475569;
+  color: var(--ink2);
 }
 
 .money {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
   padding: 0 10px;
-  background: #fff;
+  background: var(--card);
 }
 
 .money:focus-within {
@@ -276,9 +276,9 @@ a.button {
   gap: 10px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: #e8f5ee;
-  border: 1px solid #bfe3cf;
-  color: #1f6b4a;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
+  color: var(--grn-2);
   font-weight: 600;
 }
 
@@ -287,8 +287,8 @@ a.button {
 .waitingPay {
   font-size: 12px;
   font-weight: 600;
-  color: #9a5b00;
-  background: #fff3dc;
+  color: var(--c-9a5b00);
+  background: var(--c-fff3dc);
   border-radius: 999px;
   padding: 6px 10px;
 }

@@ -19,7 +19,7 @@
   max-height: min(70dvh, 560px);
   overflow-y: auto;
   z-index: 40;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -50,7 +50,7 @@
   gap: 8px;
   padding: 0 10px;
   margin: 0 0 6px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-line);
   border-radius: 10px;
   color: var(--mut);
   min-height: 36px;
@@ -171,15 +171,15 @@
   min-height: 32px;
   padding: 4px 12px;
   border-radius: 10px;
-  border: 1.5px solid #1f5fd0;
-  background: #fff;
-  color: #1f5fd0;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
   cursor: pointer;
 }
 
 .alertsOn {
   background: var(--bl);
-  border-color: var(--bl);
+  border-color: var(--link);
   color: #fff;
 }
 
@@ -196,8 +196,8 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #e53935;
-  background: #fdecea;
+  color: var(--c-e53935);
+  background: var(--bad-bg);
   transition:
     background 0.2s,
     color 0.2s;
@@ -284,9 +284,9 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
-  border: 1px solid #f5c2c0;
+  border: 1px solid var(--c-f5c2c0);
   border-left: 4px solid #e53935;
   border-radius: 14px;
   box-shadow:
@@ -325,7 +325,7 @@
 }
 
 .alertText .blockedHint {
-  color: #b42318;
+  color: var(--c-b42318);
   margin-top: 4px;
 }
 
@@ -357,7 +357,7 @@
 
 /* ===== Call patient (request 129): green, a door, its own headline ===== */
 .alertPatient {
-  border-color: #b9e2cf;
+  border-color: var(--c-b9e2cf);
   border-left-color: #2e7d5b;
 }
 
@@ -370,5 +370,5 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #2e7d5b;
+  color: var(--grn);
 }
