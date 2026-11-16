@@ -80,8 +80,10 @@ export type RecordData = {
   }[]
   // "Other" vital signs, such as blood sugar.
   vitalExtras: { name: string; unit: string | null; value: number; recorded_at: string }[]
-  nursing: { note: string; created_at: string; author: Who }[]
+  // title: since 2026-11-16 a note may have a title; older ones have none.
+  nursing: { title?: string | null; note: string; created_at: string; author: Who }[]
   consultations: {
+    title?: string | null
     complaint: string | null
     findings: string | null
     assessment: string | null
@@ -214,6 +216,7 @@ export function recordSections(data: RecordData): Section[] {
       title: 'Consultation notes',
       lines: data.consultations.map((c) => {
         const parts = [
+          c.title ? `${c.title}:` : '',
           c.complaint ? `Complaint: ${c.complaint}` : '',
           c.findings ? `Findings: ${c.findings}` : '',
           c.assessment ? `Assessment: ${c.assessment}` : '',
@@ -226,7 +229,8 @@ export function recordSections(data: RecordData): Section[] {
     sections.push({
       title: 'Nursing notes',
       lines: data.nursing.map(
-        (n) => `${when(n.created_at)} (${n.author?.full_name ?? 'Staff'}): ${n.note}`,
+        (n) =>
+          `${when(n.created_at)} (${n.author?.full_name ?? 'Staff'}): ${n.title ? `${n.title}: ` : ''}${n.note}`,
       ),
     })
   return sections
@@ -332,10 +336,10 @@ export async function emailRecord(
       30,
     ),
     ask('vital_extras', 'name,unit,value,recorded_at', 'recorded_at', 60),
-    ask('nursing_notes', `note,created_at,${who('written_by')}`, 'created_at', 50),
+    ask('nursing_notes', `title,note,created_at,${who('written_by')}`, 'created_at', 50),
     ask(
       'consultation_notes',
-      `complaint,findings,assessment,plan,created_at,${who('written_by')}`,
+      `title,complaint,findings,assessment,plan,created_at,${who('written_by')}`,
       'created_at',
       30,
     ),
