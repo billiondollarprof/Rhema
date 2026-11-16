@@ -1,7 +1,12 @@
 # backup.yml: the nightly backup of the LIVE hospital database (request 94,
 # Anthony's choice 2026-10-30: a second Cloudflare account, not Google Drive).
 #
-# What it does, in order, every night at 02:17 Nigeria time:
+# Every 2 hours (Anthony, 2026-11-16, request 206: "the backup is taking in
+# everything automatically... if the live site ever crashes... they can
+# access their data"), so at most about 2 hours of work can be lost. The run
+# at 02:17 Nigeria time is the NIGHT run; the others are the 2-hourly runs.
+#
+# What it does, in order:
 #   1. Copies the live database: the hospital's own tables (schemas public
 #      and private, with their rules) and the sign in accounts (auth.users,
 #      auth.identities), which the staff rows point at.
@@ -12,9 +17,12 @@
 #   4. Checks it: downloads it again, compares the fingerprint, unlocks it,
 #      and lists what is inside, so a broken backup fails loudly here instead
 #      of being found broken on the day it is needed.
-#   5. Keeps every night for 35 days, and the first of each month for good.
-#   6. Copies the attached lab result files (rhema-files, in the main
-#      Cloudflare account) into files/, each one locked with the same
+#   5. Keeps the 2-hourly copies (recent/) for 2 days, every night's copy
+#      (daily/) for 35 days, and the first of each month (monthly/) for good.
+#   6. Copies the uploaded files (rhema-files, in the main Cloudflare
+#      account): lab result files (lab/) and, since 2026-11-16, the patient
+#      record files and old file scans (record/), which were missing from
+#      the backup until then. Into files/, each one locked with the same
 #      passphrase. Files never change once saved (each has a random name),
 #      so only files not copied before are copied, and none is ever removed
 #      from the backup. The main account key can only READ rhema-files
@@ -29,8 +37,9 @@
 name: Nightly backup
 on:
   schedule:
-    # 01:17 UTC is 02:17 in Lagos, when the hospital is quietest.
-    - cron: '17 1 * * *'
+    # Every 2 hours, at 17 minutes past: 01:17 UTC (02:17 in Lagos, when the
+    # hospital is quietest) is the night run, then 03:17, 05:17 and so on.
+    - cron: '17 1-23/2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -92,6 +101,14 @@ jobs:
           mkdir -p copy
           stamp=$(date -u +%Y-%m-%d)
           echo "STAMP=$stamp" >> "$GITHUB_ENV"
+          # The hour, for the 2-hourly copy's name, and whether this is the
+          # night run (01 UTC, or a run started by hand).
+          echo "HOUR=$(date -u +%H)" >> "$GITHUB_ENV"
+          if [ "$(date -u +%H)" = "01" ] || [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "NIGHT=true" >> "$GITHUB_ENV"
+          else
+            echo "NIGHT=false" >> "$GITHUB_ENV"
+          fi
           docker run --rm --network host -e URL="$LIVE_URL" -v "$PWD/copy:/copy" postgres:17 \
             sh -c 'pg_dump "$URL" --format=custom --schema=public --schema=private --file=/copy/hospital.dump &&
                    pg_dump "$URL" --format=custom --data-only --table=auth.users --table=auth.identities --file=/copy/accounts.dump'
@@ -112,6 +129,12 @@ jobs:
       # ===== 4. Upload to the backup account =====
       - name: Upload to the backup account
         run: |
+          # Every run: the 2-hourly copy, named by day and hour.
+          aws s3 cp "rhema-$STAMP.tar.gz.gpg" "s3://$BUCKET/recent/rhema-$STAMP-$HOUR.tar.gz.gpg" \
+            --endpoint-url "$R2" --only-show-errors
+          echo "CHECK_KEY=recent/rhema-$STAMP-$HOUR.tar.gz.gpg" >> "$GITHUB_ENV"
+          if [ "$NIGHT" != "true" ]; then exit 0; fi
+          # The night run: also the nightly copy, kept 35 days.
           aws s3 cp "rhema-$STAMP.tar.gz.gpg" "s3://$BUCKET/daily/rhema-$STAMP.tar.gz.gpg" \
             --endpoint-url "$R2" --only-show-errors
           # The first of the month is also kept for good.
@@ -123,7 +146,7 @@ jobs:
       # ===== 5. Check it: download, compare, unlock, list =====
       - name: Check the backup can be opened
         run: |
-          aws s3 cp "s3://$BUCKET/daily/rhema-$STAMP.tar.gz.gpg" check.gpg --endpoint-url "$R2" --only-show-errors
+          aws s3 cp "s3://$BUCKET/$CHECK_KEY" check.gpg --endpoint-url "$R2" --only-show-errors
           if [ "$(sha256sum check.gpg | cut -d' ' -f1)" != "$(cat fingerprint.txt)" ]; then
             echo "FAILED: the stored backup is not the one that was sent"; exit 1
           fi
@@ -140,8 +163,20 @@ jobs:
           echo "Backup checked: stored, unchanged, opens with the passphrase, all key tables present."
           rm -rf check check.gpg check.tar.gz
 
-      # ===== 6. Keep 35 days of nightly copies =====
+      # ===== 6. Keep 2 days of 2-hourly copies, 35 days of nightly copies =====
+      - name: Remove 2-hourly copies older than 2 days
+        run: |
+          cutoff=$(date -u -d '2 days ago' +%Y-%m-%d-%H)
+          aws s3 ls "s3://$BUCKET/recent/" --endpoint-url "$R2" | awk '{print $4}' | while read -r name; do
+            when=$(echo "$name" | sed -n 's/^rhema-\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}-[0-9]\{2\}\)\.tar\.gz\.gpg$/\1/p')
+            if [ -n "$when" ] && [ "$when" \< "$cutoff" ]; then
+              aws s3 rm "s3://$BUCKET/recent/$name" --endpoint-url "$R2" --only-show-errors
+              echo "Removed an old 2-hourly copy from $when"
+            fi
+          done
+
       - name: Remove nightly copies older than 35 days
+        if: env.NIGHT == 'true'
         run: |
           cutoff=$(date -u -d '35 days ago' +%Y-%m-%d)
           aws s3 ls "s3://$BUCKET/daily/" --endpoint-url "$R2" | awk '{print $4}' | while read -r name; do
@@ -157,6 +192,7 @@ jobs:
       # Runs only after the backup above is saved and checked, so tonight's
       # copy still holds them for its 35 days.
       - name: Delete messages older than a year
+        if: env.NIGHT == 'true'
         run: |
           # The command is in single quotes so that $URL is read inside the
           # container, where it is set, as in the backup step above.
@@ -169,39 +205,44 @@ jobs:
       # yesterday and never finished should not still show in that room.
       # Each one is ended with the reason "end_of_day", never deleted.
       - name: End yesterday's open visits
+        if: env.NIGHT == 'true'
         run: |
           ended=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
             sh -c 'psql "$URL" -tA -c "select private.close_old_visits()"')
           echo "Visits still open from before today, now ended: $ended"
 
-      # ===== 7. The lab result files: copy the new ones, each locked =====
-      - name: Copy new lab result files
+      # ===== 7. The uploaded files: copy the new ones, each locked =====
+      # lab/: lab result files. record/: patient record files and old file
+      # scans (added 2026-11-16; before that they were not backed up).
+      - name: Copy new uploaded files
         run: |
           mkdir -p files
-          # Each list is read on its own line (not in a pipe), so a wrong key
-          # stops the run here instead of quietly looking like "0 files".
-          # What the backup already holds (names without the .gpg ending).
-          aws s3api list-objects-v2 --bucket "$BUCKET" --prefix files/lab/ --endpoint-url "$R2" \
-            --query 'Contents[].Key' --output text > have.raw
-          tr '\t' '\n' < have.raw | grep -v '^None$' | sed 's#^files/lab/##; s/\.gpg$//' | sort > have.txt || true
-          # What the live bucket holds, read with the main account's read only key.
-          AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
-            aws s3api list-objects-v2 --bucket rhema-files --prefix lab/ --endpoint-url "$FILES_R2" \
-            --query 'Contents[].Key' --output text > live.raw
-          tr '\t' '\n' < live.raw | grep -v '^None$' | sed 's#^lab/##' | sort > live.txt || true
-          copied=0
-          for name in $(comm -13 have.txt live.txt); do
-            # Our own names only (a random id and webp, jpg or pdf).
-            echo "$name" | grep -Eq '^[0-9a-f-]{36}\.(webp|jpg|pdf)$' || continue
+          for kind in lab record; do
+            # Each list is read on its own line (not in a pipe), so a wrong key
+            # stops the run here instead of quietly looking like "0 files".
+            # What the backup already holds (names without the .gpg ending).
+            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "files/$kind/" --endpoint-url "$R2" \
+              --query 'Contents[].Key' --output text > have.raw
+            tr '\t' '\n' < have.raw | grep -v '^None$' | sed "s#^files/$kind/##; s/\.gpg$//" | sort > have.txt || true
+            # What the live bucket holds, read with the main account's read only key.
             AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
-              aws s3 cp "s3://rhema-files/lab/$name" "files/$name" --endpoint-url "$FILES_R2" --only-show-errors
-            printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback \
-              --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "files/$name.gpg" "files/$name"
-            aws s3 cp "files/$name.gpg" "s3://$BUCKET/files/lab/$name.gpg" --endpoint-url "$R2" --only-show-errors
-            rm -f "files/$name" "files/$name.gpg"
-            copied=$((copied + 1))
+              aws s3api list-objects-v2 --bucket rhema-files --prefix "$kind/" --endpoint-url "$FILES_R2" \
+              --query 'Contents[].Key' --output text > live.raw
+            tr '\t' '\n' < live.raw | grep -v '^None$' | sed "s#^$kind/##" | sort > live.txt || true
+            copied=0
+            for name in $(comm -13 have.txt live.txt); do
+              # Our own names only (a random id and webp, jpg or pdf).
+              echo "$name" | grep -Eq '^[0-9a-f-]{36}\.(webp|jpg|pdf)$' || continue
+              AWS_ACCESS_KEY_ID="$FILES_KEY_ID" AWS_SECRET_ACCESS_KEY="$FILES_SECRET" \
+                aws s3 cp "s3://rhema-files/$kind/$name" "files/$name" --endpoint-url "$FILES_R2" --only-show-errors
+              printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback \
+                --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "files/$name.gpg" "files/$name"
+              aws s3 cp "files/$name.gpg" "s3://$BUCKET/files/$kind/$name.gpg" --endpoint-url "$R2" --only-show-errors
+              rm -f "files/$name" "files/$name.gpg"
+              copied=$((copied + 1))
+            done
+            echo "$kind files: $(wc -l < live.txt) live, $copied newly copied, all locked."
           done
-          echo "Lab files: $(wc -l < live.txt) live, $copied newly copied, all locked."
           rm -rf files have.txt live.txt have.raw live.raw
 
       # ===== 8. Nothing left behind on GitHub's computer =====
