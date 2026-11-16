@@ -849,6 +849,23 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+213. **After a payment, send it on; pharmacy stock; small fixes.** (2026-11-16)
+    His yes to 211's SQL: "yes on the sql". Then:
+    a. "If front desk takes a payment, they will now have to send to lab, same
+       with medicine/pharmacy payment."
+    b. "The pharmacy/medication is supposed to have units/packet/sachets... if a
+       person is taking any drug, they should be able to pick how many, whether
+       it's sachets or tablets, and the pharmacy is able to set how many is left
+       and as they sell to patients, the number drops until they restock...
+       just like in standard pharmacy."
+    c. "On the medications, make the drop down arrow visible enough that they
+       know they can just click to see a list."
+    d. "Can the patients in queue have a button that opens straight to medical
+       records for doctors and nurses."
+    e. "The doctors and other departments should not see a button that says
+       take payment. A doctor or nurse who is also an admin should not see take
+       payment."
+
 212. **Vital signs: pickers and Other on each box.** (2026-11-16) "The vital
     signs, can there be pickers + others on each of the box, so they can pick
     from options without typing?"
