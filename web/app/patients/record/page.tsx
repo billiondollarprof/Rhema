@@ -12,9 +12,14 @@
  *   3. Read the record, and show the allergy banner above everything.
  *
  * Layout (Anthony, 2026-10-29: simple, seamless, aligned): on a phone,
- * one column. On a wide screen, the day's work on the left (medicines,
- * doses, readings, notes) and the background facts on the right
- * (allergies, profile, conditions).
+ * one column. On a wide screen, the day's work on the left and the
+ * background facts on the right (allergies, profile, conditions).
+ *
+ * Since 2026-11-16 (request 217c, his yes 218b): a summary at the top,
+ * then each role's own work first. In a consulting room: the consultation
+ * note (open), lab, prescriptions, then the medication chart. Everybody
+ * else: the doctor's treatment plan at the top, then the medication chart,
+ * vital signs and nursing notes. Visits by day sits near the bottom.
  *
  * Files (request 128): scans, results and old paper files sit in their own
  * section. Download asks "Full medical history" (printed, or saved as a
@@ -41,7 +46,10 @@ import FilesSection from './_parts/Files'
 import LabSection from './_parts/Lab'
 import NotSent from './_parts/NotSent'
 import PrescriptionsSection from './_parts/Prescriptions'
-import { ConsultationsSection, NursingNotesSection, VitalsSection } from './_parts/Observations'
+import MedicationChart from './_parts/Chart'
+import ConsultationsSection from './_parts/Consultation'
+import { NursingNotesSection, VitalsSection } from './_parts/Observations'
+import { PlanBanner, SummaryCard, VisitsSection } from './_parts/Summary'
 import styles from './_parts/record.module.css'
 import buttons from '../_parts/patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
@@ -82,6 +90,8 @@ function PatientRecord() {
   const { client, staff } = auth
   const allowed = Boolean(staff?.can_medical)
   const staffId = staff?.id ?? null
+  // A consulting room: the doctor's view of the record (request 217c).
+  const inConsultingRoom = staff?.room?.kind === 'consultation'
 
   // What this person already loaded stays in memory, so the record shows at
   // once and stays if the network drops (Anthony, 2026-11-11). Memory only:
@@ -337,23 +347,61 @@ function PatientRecord() {
           <>
             <NotSent staffId={staff.id} patientId={props.patientId} />
             <AllergyBanner record={props.record} />
+            <SummaryCard record={props.record} />
+            {/* The doctor's plan, at the top for everybody but the doctor
+                writing it (request 217c). */}
+            {!inConsultingRoom ? <PlanBanner record={props.record} /> : null}
             <div className={styles.columns}>
-              <div className={styles.column}>
-                <MedicationsSection {...props} />
-                <DosesSection {...props} />
-                <VitalsSection {...props} />
-                <NursingNotesSection {...props} />
-                <ConsultationsSection {...props} canWrite={staff.room?.kind === 'consultation'} />
-                <LabSection client={client} patientId={props.patientId} />
-                <PrescriptionsSection client={client} patientId={props.patientId} />
-                <FilesSection
-                  client={client}
-                  staffId={staff.id}
-                  patientId={props.patientId}
-                  fromOldFile={patient.from_old_file}
-                  onLoaded={setFiles}
-                />
-              </div>
+              {/* Each role sees its own work first (request 217c): the
+                  doctor the note, then lab; everybody else the chart,
+                  vital signs and nursing notes. */}
+              {inConsultingRoom ? (
+                <div className={styles.column}>
+                  <ConsultationsSection
+                    {...props}
+                    patientName={patient.full_name}
+                    canWrite={inConsultingRoom}
+                  />
+                  <LabSection client={client} patientId={props.patientId} />
+                  <PrescriptionsSection client={client} patientId={props.patientId} />
+                  <MedicationChart {...props} />
+                  <VitalsSection {...props} />
+                  <NursingNotesSection {...props} />
+                  <MedicationsSection {...props} open={false} />
+                  <DosesSection {...props} open={false} />
+                  <VisitsSection record={props.record} />
+                  <FilesSection
+                    client={client}
+                    staffId={staff.id}
+                    patientId={props.patientId}
+                    fromOldFile={patient.from_old_file}
+                    onLoaded={setFiles}
+                  />
+                </div>
+              ) : (
+                <div className={styles.column}>
+                  <MedicationChart {...props} />
+                  <VitalsSection {...props} />
+                  <NursingNotesSection {...props} />
+                  <ConsultationsSection
+                    {...props}
+                    patientName={patient.full_name}
+                    canWrite={inConsultingRoom}
+                  />
+                  <LabSection client={client} patientId={props.patientId} />
+                  <PrescriptionsSection client={client} patientId={props.patientId} />
+                  <MedicationsSection {...props} open={false} />
+                  <DosesSection {...props} open={false} />
+                  <VisitsSection record={props.record} />
+                  <FilesSection
+                    client={client}
+                    staffId={staff.id}
+                    patientId={props.patientId}
+                    fromOldFile={patient.from_old_file}
+                    onLoaded={setFiles}
+                  />
+                </div>
+              )}
               <div className={styles.column}>
                 <AllergiesSection {...props} />
                 <ProfileSection

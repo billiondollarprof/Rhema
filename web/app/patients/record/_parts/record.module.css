@@ -545,3 +545,286 @@ a.small {
   display: block;
   margin-bottom: 2px;
 }
+
+/* ===== The summary, the treatment plan and the chart (request 217c) ===== */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.summary > div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  min-width: 0;
+}
+
+.summary span,
+.planBanner > span {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.summary b {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.summary small,
+.planBanner small {
+  font-size: 12px;
+  color: var(--mut);
+}
+
+.planBanner {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--bl);
+  background: var(--tint-1);
+}
+
+.planBanner p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* The four boxes' common words, as small chips to tap. */
+.phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.phrase {
+  font: inherit;
+  font-size: 13px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 17px;
+  border: 1px solid var(--field-line);
+  background: var(--card);
+  color: var(--link);
+  cursor: pointer;
+}
+
+.phrase:active {
+  background: var(--tint-2);
+}
+
+.medicineLine {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed var(--field-line);
+}
+
+.saveDone {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--good-bg);
+  border: 1px solid var(--c-bfe3cf);
+}
+
+/* The medication chart: a table on a wide screen, two lines on a phone. */
+.chart,
+.doseTable {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chartHead,
+.chartRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.chartHead,
+.doseHead {
+  background: var(--tint-2);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.chartRow + .chartRow,
+.chartHead + .chartRow {
+  border-top: 1px solid var(--line);
+}
+
+.chartMedicine,
+.chartCell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chartMedicine small,
+.chartCell small {
+  font-size: 12px;
+  color: var(--mut);
+}
+
+.chartLabel {
+  display: none;
+}
+
+.chartLate {
+  color: var(--c-b42318);
+  font-weight: 700;
+}
+
+.chartAction {
+  justify-self: end;
+}
+
+.chartConfirm {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--tint-1);
+}
+
+.chartTitle {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.doseHead,
+.doseRow {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.doseRow {
+  border-top: 1px solid var(--line);
+}
+
+.doseRow > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.doseMedicine {
+  font-weight: 600;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .chartHead {
+    display: none;
+  }
+
+  .chartRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .chartMedicine {
+    grid-column: 1 / -1;
+  }
+
+  .chartLabel {
+    display: block;
+  }
+
+  .chartAction {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    display: grid;
+  }
+
+  .doseHead {
+    display: none;
+  }
+
+  .doseRow {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .doseRow > span:nth-child(3),
+  .doseRow > span:nth-child(4) {
+    grid-column: 2;
+    font-size: 13px;
+    color: var(--mut);
+  }
+}
+
+/* Visits by day */
+.day {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 12px;
+}
+
+.day + .day {
+  margin-top: 6px;
+}
+
+.day > summary {
+  cursor: pointer;
+  min-height: 48px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 0;
+}
+
+.day > summary small {
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.dayNote {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.chartIntro {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.chartIntro p {
+  margin: 0;
+}

@@ -25,6 +25,9 @@ type SendProps = {
   patientName: string
   // The visit the patient is in now, if any: they are moved from it.
   openVisit?: { id: number; room: string } | null
+  // Only rooms of these kinds, e.g. the nursing rooms for "Send to the
+  // nurses" after a consultation (request 217c). Every room when left out.
+  kinds?: string[]
   onSent: (roomName: string) => void
   onCancel: () => void
 }
@@ -35,6 +38,7 @@ export default function SendToRoom({
   patientId,
   patientName,
   openVisit = null,
+  kinds,
   onSent,
   onCancel,
 }: SendProps) {
@@ -47,8 +51,17 @@ export default function SendToRoom({
   // ===== 1. The rooms a patient can be sent to (not the front desk) =====
   useEffect(() => {
     loadRooms(client).then((all) =>
-      setRooms(all.filter((room) => room.kind !== 'front_desk' && room.name !== openVisit?.room)),
+      setRooms(
+        all.filter(
+          (room) =>
+            room.kind !== 'front_desk' &&
+            room.name !== openVisit?.room &&
+            (!kinds || kinds.includes(room.kind)),
+        ),
+      ),
     )
+    // kinds is a fixed list from the caller, so it is read once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, openVisit?.room])
 
   // ===== 2. Send =====

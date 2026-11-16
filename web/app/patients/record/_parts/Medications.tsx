@@ -53,7 +53,16 @@ function localNow() {
 }
 
 // ===== 1. Medications =====
-export function MedicationsSection({ client, staffId, patientId, record, reload }: Props) {
+// open: shut when the medication chart above shows the same medicines
+// (request 217c); open everywhere else, as before.
+export function MedicationsSection({
+  client,
+  staffId,
+  patientId,
+  record,
+  reload,
+  open = true,
+}: Props & { open?: boolean }) {
   const [adding, setAdding] = useState(false)
   // The medicine and its strength come from the picker.
   const [medicine, setMedicine] = useState('')
@@ -96,7 +105,7 @@ export function MedicationsSection({ client, staffId, patientId, record, reload 
   }
 
   return (
-    <Section title="Current medications" count={live} open>
+    <Section title="Current medications" count={live} open={open} id="record-medications">
       {sorted.length === 0 ? <EmptyLine text="No medicines recorded." /> : null}
       {sorted.map((medication) => (
         <MedicationLine
@@ -434,7 +443,14 @@ function MedicationLine({
 }
 
 // ===== 2. Doses given =====
-export function DosesSection({ client, staffId, patientId, record, reload }: Props) {
+export function DosesSection({
+  client,
+  staffId,
+  patientId,
+  record,
+  reload,
+  open = true,
+}: Props & { open?: boolean }) {
   const [adding, setAdding] = useState(false)
   const [medicine, setMedicine] = useState('')
   const [strength, setStrength] = useState('')
@@ -466,7 +482,12 @@ export function DosesSection({ client, staffId, patientId, record, reload }: Pro
   }
 
   return (
-    <Section title="Doses given" count={record.doses.filter((d) => !d.voided_at).length} open>
+    <Section
+      title="Doses given"
+      count={record.doses.filter((d) => !d.voided_at).length}
+      open={open}
+      id="record-doses"
+    >
       {record.doses.length === 0 ? <EmptyLine text="No doses recorded yet." /> : null}
       {record.doses.map((given) => (
         <Line
