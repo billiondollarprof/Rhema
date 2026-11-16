@@ -96,6 +96,17 @@ export default function MainMenu({
               <em className={styles.menuCount}>{waiting > 99 ? '99+' : waiting}</em>
             ) : null}
           </Link>
+          {/* History: money for the Front Desk and admins, numbers for the
+              Lab and Pharmacy, own work for doctors and nurses (request 215). */}
+          <Link
+            className={styles.menuItem}
+            role="menuitem"
+            href="/history/"
+            onClick={() => setOpen(false)}
+          >
+            <Icon name="clock" size={18} />
+            History
+          </Link>
           <Link
             className={styles.menuItem}
             role="menuitem"

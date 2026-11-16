@@ -1,0 +1,306 @@
+/*
+ * history.module.css: History (requests 215 and 216). The total first and
+ * biggest; cash, POS and transfer as three cards, cash marked; each category
+ * a line with its count, its amount and a bar for its share.
+ */
+
+/* ===== 1. Page ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.page h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.muted {
+  color: var(--mut);
+  margin: 0;
+  font-size: 13px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grn);
+}
+
+.input {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--field-line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+/* ===== 2. The period and the toggle ===== */
+.periods,
+.toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.periods button,
+.toggle button {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--field-line);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.periods button[aria-pressed='true'],
+.toggle button[aria-pressed='true'] {
+  background: var(--bl);
+  border-color: var(--bl);
+  color: #fff;
+}
+
+.custom {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.custom label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+/* ===== 3. A section ===== */
+.section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+
+.section h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.section h4 {
+  margin: 6px 0 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ===== 4. The total: the first thing seen ===== */
+.totalCard {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0a2a5e, #1f5fd0);
+  color: #fff;
+}
+
+.totalCard span {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.totalCard b {
+  font-size: 34px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.totalCard small {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ===== 5. Cash, POS, transfer, and the number tiles ===== */
+.modes {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.modeCard {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--tint-1);
+  min-width: 0;
+}
+
+.modeCard span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+.modeCard b {
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+.modeCard small {
+  font-size: 12px;
+  color: var(--mut);
+}
+
+.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 480px) {
+  .three .modeCard {
+    padding: 10px 8px;
+  }
+
+  .three .modeCard b {
+    font-size: 17px;
+  }
+}
+
+.cash {
+  border: 2px solid var(--grn);
+  background: var(--good-bg);
+}
+
+/* ===== 6. Lines with a count, an amount and a bar ===== */
+.rows {
+  display: grid;
+  gap: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.rowName {
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rowCount {
+  font-size: 13px;
+  color: var(--mut);
+  white-space: nowrap;
+}
+
+.rowAmount {
+  white-space: nowrap;
+  font-size: 16px;
+}
+
+/* The share of the total, a thin line across the bottom of the row. */
+.barTrack {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--tint-2);
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--bl);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: var(--tint-2);
+  border: 1px solid var(--line);
+}
+
+/* ===== 7. Lists of payments, patients ===== */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.list li {
+  display: grid;
+  grid-template-columns: 70px minmax(0, auto) minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 4px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.list li > span:first-child {
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.list li > span:last-child {
+  color: var(--ink2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .list li {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .list li > span:last-child {
+    grid-column: 2;
+  }
+}

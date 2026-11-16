@@ -29,7 +29,8 @@ import styles from './admin.module.css'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
 import { LAB_SECTIONS } from '@/lib/lab/catalogue'
 import {
-  CARD_ITEM,
+  CARD_ITEMS,
+  cardPriceFor,
   CONSULTATION_ITEM,
   decidePrice,
   loadPriceChanges,
@@ -87,15 +88,19 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
           The Front Desk sees these when it takes a payment, and can still change the amount for one
           patient.
         </p>
-        <OnePrice
-          client={client}
-          id="price-card"
-          label="Registration card fee"
-          kind="card"
-          item={CARD_ITEM}
-          now={priceOf(prices, 'card', CARD_ITEM)}
-          onSaved={reload}
-        />
+        {/* One card fee for each kind of patient (2026-11-16). */}
+        {(['individual', 'family', 'antenatal'] as const).map((kind) => (
+          <OnePrice
+            key={kind}
+            client={client}
+            id={`price-card-${kind}`}
+            label={`Card fee: ${kind === 'individual' ? 'Individual' : kind === 'family' ? 'Family' : 'Antenatal'}`}
+            kind="card"
+            item={CARD_ITEMS[kind]}
+            now={cardPriceFor(prices, kind)}
+            onSaved={reload}
+          />
+        ))}
         <OnePrice
           client={client}
           id="price-consultation"

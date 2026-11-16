@@ -860,6 +860,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     how many they attended to." Design: "easy to spot and understand.
     Screenshot and check it until it looks good both on mobile and
     desktop/tablet."
+    BUILT 2026-11-16, held for his SQL yes: History in the menu (migration
+    20261116155137_history_summaries, test 045, 9 breaks caught). Front Desk
+    and admin: total, Cash/POS/Transfer (cash marked, "Count the cash in hand:
+    it should be..."), each category with its own total (card split into
+    Individual, Family, Antenatal), patients registered, payments; "Only
+    payments I took" (on for the Front Desk) or Everybody. Lab and Pharmacy:
+    counts only. Doctors and nurses: their own work. Periods: Today, last 6
+    or 24 hours, this week, this month, dates and times chosen. Admin >
+    Prices: three card fees; Register and Take payment use the patient's kind.
 
 215. **History behind the menu: money for the Front Desk and admin, numbers
     for the Lab and Pharmacy, own work for each consultant.** (2026-11-16)

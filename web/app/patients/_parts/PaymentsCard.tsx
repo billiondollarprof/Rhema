@@ -14,7 +14,7 @@
 
 import Link from 'next/link'
 import {
-  CARD_ITEM,
+  cardPriceFor,
   CONSULTATION_ITEM,
   loadPriceChanges,
   loadPrices,
@@ -66,11 +66,14 @@ export default function PaymentsCard({
   client,
   patientId,
   staffId,
+  category,
 }: {
   client: SupabaseClient
   patientId: number
   // The person taking the payment, for the lists kept on this device.
   staffId?: string
+  // Individual, family or antenatal: which card fee applies (2026-11-16).
+  category?: string
 }) {
   const [payments, setPayments] = useState<Payment[] | null>(null)
   const [taking, setTaking] = useState(false)
@@ -183,7 +186,7 @@ export default function PaymentsCard({
       purpose === 'consultation'
         ? priceOf(prices, 'consultation', CONSULTATION_ITEM)
         : purpose === 'registration_card'
-          ? priceOf(prices, 'card', CARD_ITEM)
+          ? cardPriceFor(prices, category ?? 'individual')
           : undefined
     return amount ? String(amount) : ''
   }
