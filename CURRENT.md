@@ -849,6 +849,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+203. **Pitch: testing shows Okparavero Memorial Hospital.** (2026-11-16, he was
+    at their hospital) "Let's just switch the testing site... then we revert it
+    back to Rhema. Then later we settle down and do the multiple ones... we will
+    still do for this particular one so that they can access it anytime." DONE
+    on testing 2026-11-16 (brand okparavero, OM letters, logo too blurred). TO
+    DO: put Rhema back on testing when he says (ops/pitch.json brand rhema), and
+    give Okparavero its own lasting demo when the demos are built (198, 201).
+    LAB (202) LIVE 2026-11-16, same day.
+
 202. **The hospital's own lab list.** (2026-11-16, he sent LABORATORY_REPORT.docx,
     real past reports) "This is the laboratory document, check it to know
     what's left and what to correct. Also see the structure and propose the
