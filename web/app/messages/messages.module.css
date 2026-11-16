@@ -401,3 +401,19 @@
   vertical-align: -1px;
   margin-left: 4px;
 }
+
+/* Announce to everybody, at the top of the list (2026-11-16). */
+.announce {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin: 4px 0 8px;
+  padding: 8px 14px;
+  border: 1.5px solid #fb8c00;
+  border-radius: 12px;
+  background: #fff;
+  color: #c66a00;
+  font-weight: 700;
+  text-decoration: none;
+}

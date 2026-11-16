@@ -31,7 +31,7 @@ import CountTiles from './_home/CountTiles'
 import LabCard from '@/components/work/LabCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import QueueCard from './_home/QueueCard'
-import QuickActions, { AdminQuickActions } from './_home/QuickActions'
+import QuickActions from './_home/QuickActions'
 import SeenChart from './_home/SeenChart'
 import styles from './_home/home.module.css'
 import { roleLabel, worksWithPatients } from '@/lib/auth/roles'
@@ -137,9 +137,6 @@ export default function HomePage() {
         <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
         <LabCard client={client} staff={staff} />
         <PharmacyCard client={client} staff={staff} />
-        {/* What pertains to the admin comes last for somebody who also works
-            with patients. */}
-        {staff.can_admin && worksHere ? <AdminQuickActions /> : null}
       </div>
     </AppShell>
   )
