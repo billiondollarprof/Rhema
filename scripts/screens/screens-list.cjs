@@ -6,6 +6,88 @@
  *
  * Never: put a real person's details here. Made up data only.
  */
+// A made up day on one record (request 217c): two medicines on the chart,
+// two doses, a consultation with a plan, and vital signs. Times are hours ago.
+const hoursAgo = (hours) => new Date(Date.now() - hours * 3600 * 1000).toISOString()
+const NURSE = { full_name: 'Nurse Bisi Ade' }
+const DOCTOR = { full_name: 'Dr Emeka Obi' }
+const NOT_VOIDED = { voided_at: null, void_reason: null, voider: null }
+const RECORD_DAY = {
+  'rest/v1/patient_medications': [
+    {
+      id: 1,
+      ...NOT_VOIDED,
+      medicine: 'Artemether/Lumefantrine 80/480 mg tablet',
+      dose: '1 tablet',
+      how_often: 'Twice daily',
+      status: 'active',
+      created_at: hoursAgo(14),
+      author: DOCTOR,
+    },
+    {
+      id: 2,
+      ...NOT_VOIDED,
+      medicine: 'Paracetamol 500 mg tablet',
+      dose: '1 g',
+      how_often: 'Every 8 hours',
+      status: 'active',
+      created_at: hoursAgo(14),
+      author: DOCTOR,
+    },
+  ],
+  'rest/v1/medications_given': [
+    {
+      id: 1,
+      ...NOT_VOIDED,
+      medication_id: 2,
+      medicine: 'Paracetamol 500 mg tablet',
+      dose: '1 g',
+      given_at: hoursAgo(9),
+      note: null,
+      giver: NURSE,
+    },
+    {
+      id: 2,
+      ...NOT_VOIDED,
+      medication_id: 1,
+      medicine: 'Artemether/Lumefantrine 80/480 mg tablet',
+      dose: '1 tablet',
+      given_at: hoursAgo(2),
+      note: null,
+      giver: NURSE,
+    },
+  ],
+  'rest/v1/consultation_notes': [
+    {
+      id: 1,
+      ...NOT_VOIDED,
+      title: 'Fever',
+      complaint: 'Fever, headache, body pains, for 2 days',
+      findings: 'Febrile, not pale, chest clear',
+      assessment: 'Malaria',
+      plan: 'Out-patient treatment, give medicines as charted, encourage oral fluids, review in 48 hours',
+      created_at: hoursAgo(14),
+      author: DOCTOR,
+    },
+  ],
+  'rest/v1/vital_signs': [
+    {
+      id: 1,
+      ...NOT_VOIDED,
+      systolic: 120,
+      diastolic: 80,
+      pulse: 92,
+      temperature_c: 38.4,
+      breathing_rate: 18,
+      spo2: 98,
+      weight_kg: 64,
+      height_cm: null,
+      recorded_at: hoursAgo(14),
+      recorder: NURSE,
+    },
+  ],
+}
+
 // ===== 1. Every screen, and the text that shows it has loaded =====
 module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today' },
@@ -20,6 +102,23 @@ module.exports.SCREENS = [
   { path: '/patients/register/', waitFor: 'Register patient' },
   { path: '/patients/edit/?p=1', waitFor: 'Edit patient' },
   { path: '/patients/record/?p=1', waitFor: 'Current medications', medical: true },
+  // Request 217c: the nurse's record (plan, chart) and the doctor's (note open).
+  {
+    path: '/patients/record/?p=1',
+    waitFor: 'Medication chart',
+    medical: true,
+    role: 'nurse',
+    roomId: 6,
+    extra: RECORD_DAY,
+  },
+  {
+    path: '/patients/record/?p=1',
+    waitFor: 'Write a consultation',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    extra: RECORD_DAY,
+  },
   // Request 170: an antenatal patient's record, with the booking and the consent.
   {
     path: '/patients/record/?p=1',

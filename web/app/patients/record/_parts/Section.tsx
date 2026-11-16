@@ -13,12 +13,14 @@ type SectionProps = {
   title: string
   count?: number
   open?: boolean
+  // An id, so another part can open this one and scroll to it.
+  id?: string
   children: React.ReactNode
 }
 
-export default function Section({ title, count, open = false, children }: SectionProps) {
+export default function Section({ title, count, open = false, id, children }: SectionProps) {
   return (
-    <details className={styles.section} open={open}>
+    <details className={styles.section} open={open} id={id}>
       <summary>
         <span className={styles.grow}>{title}</span>
         {count !== undefined ? <span className={styles.count}>{count}</span> : null}

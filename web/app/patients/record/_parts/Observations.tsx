@@ -1,6 +1,6 @@
 /*
- * record/_parts/Observations.tsx: vital signs, nursing notes and doctor's
- * consultation notes.
+ * record/_parts/Observations.tsx: vital signs and nursing notes. The
+ * doctor's consultation note moved to Consultation.tsx (2026-11-16).
  *
  * Why: the demo's "Observations" and "Consultation" tabs. The nurse takes
  * the readings and writes the notes at the nursing station, and the doctor
@@ -9,7 +9,6 @@
  * Sections in this file:
  *   1. Vital signs: the newest readings first, and Take new readings.
  *   2. Nursing notes: one short note per line, and Add a note.
- *   3. Consultation notes: complaint, findings, assessment and plan.
  *
  * Never: change a saved reading or note. A wrong one is voided with a
  * reason and written again, so the record shows what was corrected.
@@ -449,132 +448,6 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
           </button>
         </div>
       )}
-    </Section>
-  )
-}
-
-// ===== 3. Consultation notes =====
-const CONSULT_PARTS = [
-  { key: 'complaint', label: 'Complaint', hint: 'What the patient came with' },
-  { key: 'findings', label: 'Findings', hint: 'What the examination found' },
-  { key: 'assessment', label: 'Assessment', hint: 'What you think it is' },
-  { key: 'plan', label: 'Plan', hint: 'Tests, treatment, next visit' },
-] as const
-
-// Whoever has a consulting room writes or voids a consultation note, a
-// doctor, nurse or matron (Anthony, 2026-11-10); everybody with the record
-// reads them. The database decides it again.
-export function ConsultationsSection({
-  client,
-  staffId,
-  patientId,
-  record,
-  reload,
-  canWrite,
-}: Props & { canWrite: boolean }) {
-  const empty = { title: '', complaint: '', findings: '', assessment: '', plan: '' }
-  const [adding, setAdding] = useState(false)
-  const [parts, setParts] = useState<Record<string, string>>(empty)
-  const [problem, setProblem] = useState<string | null>(null)
-
-  async function add() {
-    const values: Record<string, string | null> = {}
-    for (const part of CONSULT_PARTS) values[part.key] = parts[part.key].trim() || null
-    if (Object.values(values).every((v) => v === null)) {
-      setProblem('Write at least one part.')
-      return
-    }
-    const result = await addLine(client, 'consultation_notes', {
-      patient_id: patientId,
-      title: parts.title.trim() || null,
-      ...values,
-      written_by: staffId,
-    })
-    if (result) setProblem(result)
-    else {
-      setAdding(false)
-      setParts(empty)
-      setProblem(null)
-      reload()
-    }
-  }
-
-  return (
-    <Section
-      title="Consultation notes"
-      count={record.consultations.filter((c) => !c.voided_at).length}
-    >
-      {record.consultations.length === 0 ? <EmptyLine text="No consultations yet." /> : null}
-      {record.consultations.map((line) => (
-        <Line
-          key={line.id}
-          what={
-            <b>
-              {line.title ? `${line.title} · ` : ''}
-              {when(line.created_at)}
-            </b>
-          }
-          meta={`Written by ${line.author?.full_name ?? 'staff'}`}
-          voided={voidedOf(line)}
-          voidable={
-            canWrite
-              ? { client, table: 'consultation_notes', id: line.id, staffId, onDone: reload }
-              : undefined
-          }
-        >
-          <dl className={styles.consult}>
-            {CONSULT_PARTS.filter((part) => line[part.key]).map((part) => (
-              <div key={part.key}>
-                <dt>{part.label}</dt>
-                <dd className={styles.note}>{line[part.key]}</dd>
-              </div>
-            ))}
-          </dl>
-        </Line>
-      ))}
-      {adding ? (
-        <div className={styles.form}>
-          <div className={styles.field}>
-            <label htmlFor="consult-title">Title (optional)</label>
-            <input
-              id="consult-title"
-              className={styles.input}
-              maxLength={120}
-              placeholder="e.g. Review of fever"
-              value={parts.title}
-              onChange={(e) => setParts({ ...parts, title: e.target.value })}
-            />
-          </div>
-          {CONSULT_PARTS.map((part) => (
-            <div className={styles.field} key={part.key}>
-              <label htmlFor={`consult-${part.key}`}>{part.label}</label>
-              <textarea
-                id={`consult-${part.key}`}
-                className={styles.input}
-                placeholder={part.hint}
-                maxLength={4000}
-                value={parts[part.key]}
-                onChange={(e) => setParts({ ...parts, [part.key]: e.target.value })}
-              />
-            </div>
-          ))}
-          {problem ? <p className={styles.error}>{problem}</p> : null}
-          <div className={styles.actions}>
-            <button className={`${styles.small} ${styles.primary}`} onClick={add}>
-              Save consultation
-            </button>
-            <button className={styles.small} onClick={() => setAdding(false)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : canWrite ? (
-        <div className={styles.actions}>
-          <button className={styles.small} onClick={() => setAdding(true)}>
-            + Write a consultation
-          </button>
-        </div>
-      ) : null}
     </Section>
   )
 }

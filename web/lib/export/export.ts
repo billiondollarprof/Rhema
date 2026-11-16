@@ -14,7 +14,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PinResult } from '@/lib/admin/admin'
-import { makeZip } from './zip'
+import { makeZip } from '@/lib/files/zip'
 
 // ===== 1. Rows into a spreadsheet (CSV) that Excel opens =====
 function csvOf(rows: Record<string, unknown>[]): string {
@@ -49,9 +49,9 @@ export async function downloadOurData(
 
   // The spreadsheets.
   const encoder = new TextEncoder()
-  const files: { name: string; data: Uint8Array<ArrayBuffer> }[] = []
+  const files: { name: string; bytes: Uint8Array }[] = []
   for (const [name, rows] of Object.entries(answer.tables)) {
-    files.push({ name: `spreadsheets/${name}.csv`, data: encoder.encode(csvOf(rows)) })
+    files.push({ name: `spreadsheets/${name}.csv`, bytes: encoder.encode(csvOf(rows)) })
   }
 
   // The uploaded files, one by one.
@@ -72,14 +72,14 @@ export async function downloadOurData(
         missed += 1
         continue
       }
-      files.push({ name: `files/${key}`, data: new Uint8Array(await response.arrayBuffer()) })
+      files.push({ name: `files/${key}`, bytes: new Uint8Array(await response.arrayBuffer()) })
     } catch {
       missed += 1
     }
   }
   files.push({
     name: 'READ ME.txt',
-    data: encoder.encode(
+    bytes: encoder.encode(
       `The hospital's data, downloaded ${new Date().toLocaleString('en-GB')}.\r\n` +
         'spreadsheets: one file for each part of the records, opened with Excel.\r\n' +
         'files: the scans, photos and lab result files, named as in the spreadsheets.\r\n' +

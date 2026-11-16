@@ -68,6 +68,8 @@ export type StatusChange = {
   changer: { full_name: string } | null
 }
 export type DoseGiven = Voidable & {
+  // The medicine's line in the chart; null for a dose not on the list.
+  medication_id: number | null
   medicine: string
   dose: string | null
   given_at: string
@@ -209,7 +211,7 @@ export async function loadRecord(
     ),
     byPatient(
       'medications_given',
-      `${VOID}, medicine, dose, given_at, note, giver:staff!given_by(full_name)`,
+      `${VOID}, medication_id, medicine, dose, given_at, note, giver:staff!given_by(full_name)`,
       'given_at',
     ).limit(50),
     byPatient(

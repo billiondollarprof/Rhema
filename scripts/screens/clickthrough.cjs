@@ -34,6 +34,8 @@ async function openScreen(browser, screen) {
     role: screen.role ?? (screen.medical ? 'nurse' : 'front_desk'),
     medical: Boolean(screen.medical),
     admin: Boolean(screen.admin),
+    // The room, when the screen needs one (request 217c: a consulting room).
+    ...(screen.roomId ? { roomId: screen.roomId } : {}),
   })
   const page = await context.newPage()
   const errors = []
