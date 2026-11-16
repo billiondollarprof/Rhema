@@ -30,13 +30,20 @@ import styles from '@/components/auth/Auth.module.css'
 import { PIN_LENGTH } from '@/lib/auth/config'
 import { listAccounts, type DeviceAccount } from '@/lib/auth/device-accounts'
 import { roleLabel } from '@/lib/auth/roles'
+import { useRouter } from 'next/navigation'
 import { useRightPage } from '@/lib/auth/routes'
+import AppLoading from '@/components/shell/AppLoading'
 import { useAuth } from '@/lib/auth/session'
 
 export default function LockPage() {
   const auth = useAuth()
   useRightPage(auth.status, '/lock/')
   const [open, setOpen] = useState(false)
+  // Home is fetched while the PIN is typed, so it opens at once after.
+  const router = useRouter()
+  useEffect(() => {
+    router.prefetch('/')
+  }, [router])
   // The card shows only once the account is known to be locked.
   const showCard = open && auth.status === 'locked' && Boolean(auth.account)
 
@@ -51,6 +58,10 @@ export default function LockPage() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [showCard])
+
+  // Unlocked: the opening screen while Home opens, not the idle screen
+  // again (Anthony, 2026-11-16, request 188).
+  if (auth.status === 'ready') return <AppLoading />
 
   return (
     <>

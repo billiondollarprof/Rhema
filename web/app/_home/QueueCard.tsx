@@ -24,6 +24,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './home.module.css'
@@ -152,20 +153,24 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
               </span>
             </div>
             <small className={styles.muted}>{entry.room?.name}</small>
-            {buttonsFor(staff, entry.status).length > 0 ? (
-              <div className={styles.entryButtons}>
-                {buttonsFor(staff, entry.status).map(([label, next, main]) => (
-                  <button
-                    key={label}
-                    className={`${styles.button} ${main ? styles.primary : ''}`}
-                    disabled={entry.id in pending}
-                    onClick={() => move(entry, next)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            <div className={styles.entryButtons}>
+              {buttonsFor(staff, entry.status).map(([label, next, main]) => (
+                <button
+                  key={label}
+                  className={`${styles.button} ${main ? styles.primary : ''}`}
+                  disabled={entry.id in pending}
+                  onClick={() => move(entry, next)}
+                >
+                  {label}
+                </button>
+              ))}
+              {/* Open the patient's screen from the queue (Anthony, 2026-11-16:
+                    "after calling in a patient, they should be able to click on
+                    the patient and open the profile"). */}
+              <Link className={styles.button} href={`/patients/?p=${entry.patient_id}`}>
+                Open patient
+              </Link>
+            </div>
           </div>
         ))}
       </div>

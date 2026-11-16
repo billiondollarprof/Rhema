@@ -19,6 +19,8 @@ export type QueueStatus = 'waiting' | 'in_consultation' | 'lab' | 'pharmacy' | '
 
 export type QueueEntry = {
   id: number
+  // The patient, so the queue can open their screen (request 187).
+  patient_id: number
   status: QueueStatus
   note: string | null
   created_at: string
@@ -104,7 +106,7 @@ export async function loadOpenQueue(client: SupabaseClient): Promise<QueueEntry[
   const { data } = await client
     .from('queue_entries')
     .select(
-      'id, status, note, created_at, room:rooms(id, name, kind), patient:patients(patient_number, full_name, category)',
+      'id, patient_id, status, note, created_at, room:rooms(id, name, kind), patient:patients(patient_number, full_name, category)',
     )
     .neq('status', 'done')
     .order('created_at', { ascending: true })

@@ -44,6 +44,7 @@ import {
   findSamePhone,
   phoneLooksRight,
   registerFromOldFile,
+  type Category,
   type PatientCard,
   type PatientResult,
   type Sex,
@@ -63,6 +64,8 @@ export default function OldFilePage() {
   // Optional: only if the old file has them.
   const [born, setBorn] = useState('')
   const [sex, setSex] = useState<Sex | null>(null)
+  // The front desk asked for it (2026-11-16): individual, family or antenatal.
+  const [category, setCategory] = useState<Category>('individual')
   const [files, setFiles] = useState<ReadyFile[]>([])
   const [tried, setTried] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -134,6 +137,7 @@ export default function OldFilePage() {
       staff.id,
       born || null,
       sex,
+      category,
     )
     if (result.problem || !result.patient) {
       setBusy(false)
@@ -150,6 +154,7 @@ export default function OldFilePage() {
     setPhone('')
     setBorn('')
     setSex(null)
+    setCategory('individual')
     setFiles([])
     setTried(false)
     setSaved(null)
@@ -322,6 +327,27 @@ export default function OldFilePage() {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+          <div className={styles.field}>
+            <label>Patient category</label>
+            <div className={styles.segments} role="group" aria-label="Patient category">
+              {(
+                [
+                  ['individual', 'Individual'],
+                  ['family', 'Family'],
+                  ['antenatal', 'Antenatal'],
+                ] as [Category, string][]
+              ).map(([value, words]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={category === value}
+                  onClick={() => setCategory(value)}
+                >
+                  {words}
+                </button>
+              ))}
             </div>
           </div>
           <div className={styles.field}>

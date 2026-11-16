@@ -279,6 +279,11 @@
   background: #fff;
   color: #1f5fd0;
   cursor: pointer;
+  /* Also used on a link (Open patient). */
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .button:hover:not(:disabled) {
