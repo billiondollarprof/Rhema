@@ -936,3 +936,8 @@ this file.
     (deploy: "The Worker has its email key"). Also found and fixed with him:
     the Confirm signup email on testing and live still sent a link; he
     pasted the code wording; the daily check now guards both emails.
+
+- 189, 196b, 196c, 196e, 196h, LIVE 2026-11-16: antenatal visits and client
+  details; more starter medicines and mg doses; folded More details on Register
+  from old file; four Home buttons with Announce in Messages; search on long
+  pick lists. Checked on testing and live (CI, deploy smoke test, database).

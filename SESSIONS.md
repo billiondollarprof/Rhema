@@ -4,6 +4,16 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-16 (later): request 196, first half LIVE. Antenatal visit table and
+  client details (189) and the registration pick lists. Home has 4 big
+  buttons; Announce sits in Messages. Search on pick lists longer than 12.
+  Register from old file has a folded More details. About 400 more starter
+  medicines with strengths and 42 more doses (migration 20261116060435, test
+  039, six breaks caught). Lab menu of 103 tests with search, sections and
+  result boxes (code only, no SQL). CI caught two clashes in the sign-in test
+  from the new search box and the bigger list; both fixed. Next: 196d page
+  review, 196g dark mode, 196f Google Drive import design.
+
 - 2026-11-06: the 6 November day. Domain moved to the hospital's
   Cloudflare (accepted by email), zone Active. Resend on the hospital's
   own account, verified; SMTP and the branded sign-in code templates on

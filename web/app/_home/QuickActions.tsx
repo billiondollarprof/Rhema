@@ -45,8 +45,7 @@ const DOCTOR: Action[] = [
 const NURSE: Action[] = [
   { icon: 'clip', label: 'Patient queue', colour: '#00838f', ready: true, job: QUEUE },
   { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
-  // Announce moved into Messages (2026-11-16), so Request lab sits here.
-  { icon: 'lab', label: 'Request lab', colour: '#7e57c2', ready: true, job: '/lab/request/' },
+  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 const PHARMACY: Action[] = [
@@ -62,18 +61,20 @@ const LABORATORY: Action[] = [
   { icon: 'msg', label: 'Messages', colour: '#00897b', ready: true, job: '/messages/' },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
-// Invite staff is in the menu (Admin) and Announce is in Messages, so the
-// admin's four are the everyday ones (Anthony, 2026-11-16).
+// An admin who also works with patients sees only the four buttons of the
+// patient role. Invite staff waits under Admin in the menu, and Announce under
+// Messages (Anthony, 2026-11-16: "instead of having six buttons... those extra
+// two buttons should hide under"). A plain admin keeps these four.
 const ADMIN: Action[] = [
-  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   {
-    icon: 'shield',
-    label: 'Activity log',
+    icon: 'users',
+    label: 'Invite staff',
     colour: '#546e7a',
     ready: true,
-    job: '/admin/?tab=activity',
+    job: '/admin/?tab=invite',
   },
-  { icon: 'msg', label: 'Messages', colour: '#7e57c2', ready: true, job: '/messages/' },
+  { icon: 'mega', label: 'Announce', colour: '#fb8c00', ready: true, job: '/announce/' },
+  { icon: 'find', label: 'Find patient', colour: '#00897b', ready: true, job: FIND },
   { icon: 'call', label: 'Call attention', colour: '#e53935', ready: true, job: ATTENTION },
 ]
 
