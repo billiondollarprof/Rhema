@@ -113,9 +113,10 @@ const ANTIBIOTICS = [
   'Levofloxacin',
   'Pefloxacin',
 ]
-const TITRE = ['1/20', '1/40', '1/80', '1/160', '1/320']
+const TITRE = ['1/20', '1/40', '1/80', '1/160', '1/320', '1/640']
 const WIDAL_COMMENTS = [
   'Insignificant titre obtained.',
+  'Significant titre obtained (1/160 or above).',
   'Titres above 1/160 are considered significant for possible enteric fever and would require stool or blood culture for confirmatory diagnosis.',
 ]
 
@@ -146,17 +147,42 @@ function sensitivityBoxes(): LabField[] {
   }))
 }
 
+const SEEN = ['Not seen', 'Seen']
+const CRYSTALS = ['Nil', 'Calcium oxalate', 'Uric acid', 'Amorphous phosphates', 'Triple phosphate']
+const CASTS = ['Nil', 'Hyaline casts', 'Granular casts', 'Red cell casts', 'White cell casts']
+
+// What is looked for under the microscope, by kind of sample.
+// vaginal: High vaginal and endocervical swabs. urine: urine. none: blood.
+type Microscopy = 'standard' | 'vaginal' | 'urine' | 'none'
+
+function microscopyBoxes(kind: Microscopy): LabField[] {
+  if (kind === 'none') return []
+  const boxes: LabField[] = [
+    { name: 'Pus cells', choices: PER_HPF, heading: 'Microscopy' },
+    { name: 'Epithelial cells', choices: PER_HPF },
+    { name: 'Red cells', choices: PER_HPF },
+    { name: 'Yeast cells', choices: AMOUNT },
+  ]
+  if (kind === 'vaginal') {
+    boxes.push({ name: 'Trichomonas vaginalis', choices: SEEN })
+    boxes.push({ name: 'Clue cells', choices: SEEN })
+  }
+  if (kind === 'urine') {
+    boxes.push({ name: 'Casts', choices: CASTS })
+    boxes.push({ name: 'Crystals', choices: CRYSTALS })
+  }
+  return boxes
+}
+
 // A culture (M/C/S): microscopy, what grew, and the sensitivity panel.
-function culture(name: string, also: string[] = []): LabTest {
+function culture(name: string, also: string[] = [], kind: Microscopy = 'standard'): LabTest {
+  const growthHeading: LabField = { name: 'Growth', choices: GROWTH, heading: 'Isolation' }
   return {
     name,
     also,
     fields: [
-      { name: 'Pus cells', choices: PER_HPF, heading: 'Microscopy' },
-      { name: 'Epithelial cells', choices: PER_HPF },
-      { name: 'Red cells', choices: PER_HPF },
-      { name: 'Yeast cells', choices: AMOUNT },
-      { name: 'Growth', choices: GROWTH, heading: 'Isolation' },
+      ...microscopyBoxes(kind),
+      growthHeading,
       { name: 'Organism', choices: ORGANISMS },
       { name: 'Second organism', choices: ORGANISMS },
       ...sensitivityBoxes(),
@@ -248,7 +274,7 @@ export const LAB_SECTIONS: LabSection[] = [
       screen('Blood Group', BLOOD_GROUPS, ['Bloodgroup', 'Blood grouping', 'Rhesus', 'BG']),
       screen('Genotype', GENOTYPES, ['Haemoglobin Genotype', 'Hb genotype', 'Hb electrophoresis']),
       single('Haemoglobin (HB)', 'g/dl', 'M 14 to 18, F 12 to 14', ['Hb', 'Haemoglobin']),
-      single('ESR', 'mm/hour', '0 to 20', ['Erythrocyte sedimentation rate']),
+      single('ESR', 'mm/hour', 'M 0 to 15, F 0 to 20', ['Erythrocyte sedimentation rate']),
       screen('Sickling Test', POS_NEG, ['Sickle cell test']),
       {
         name: 'Grouping and Cross Matching',
@@ -318,7 +344,17 @@ export const LAB_SECTIONS: LabSection[] = [
       screen('Chlamydia', POS_NEG),
       screen('Gonorrhoea', POS_NEG),
       screen('Toxoplasma', POS_NEG, ['Toxoplasmosis']),
-      screen('Hepatitis B Profile', ['See the comment'], ['HBV profile', 'HBeAg']),
+      {
+        name: 'Hepatitis B Profile',
+        also: ['HBV profile', 'HBeAg', 'Hepatitis B five panel'],
+        fields: [
+          { name: 'HBsAg', choices: POS_NEG },
+          { name: 'HBsAb', choices: POS_NEG },
+          { name: 'HBeAg', choices: POS_NEG },
+          { name: 'HBeAb', choices: POS_NEG },
+          { name: 'HBcAb', choices: POS_NEG },
+        ],
+      },
       single('HIV Viral Load', 'copies/ml', undefined, ['Viral load']),
       single('CD4 Count', 'cells/µl', '500 to 1500', ['CD4']),
     ],
@@ -337,17 +373,17 @@ export const LAB_SECTIONS: LabSection[] = [
   {
     name: 'Swabs and cultures (M/C/S)',
     tests: [
-      culture('Urine M/C/S', ['Urine MCS', 'Urine MC/S', 'Urine culture']),
-      culture('High Vaginal Swab M/C/S', ['HVS', 'HVS MCS', 'HVS MC/S']),
+      culture('Urine M/C/S', ['Urine MCS', 'Urine MC/S', 'Urine culture'], 'urine'),
+      culture('High Vaginal Swab M/C/S', ['HVS', 'HVS MCS', 'HVS MC/S'], 'vaginal'),
       culture('Urethral Swab M/C/S', ['US', 'Urethral swab', 'US MC/S']),
-      culture('Endocervical Swab M/C/S', ['ECS', 'ECS MCS', 'ECS MC/S']),
+      culture('Endocervical Swab M/C/S', ['ECS', 'ECS MCS', 'ECS MC/S'], 'vaginal'),
       culture('Wound Swab M/C/S', ['Wound MCS', 'Wound MC/S', 'Wound culture']),
       culture('Throat Swab M/C/S', ['Throat MCS', 'Throat MC/S']),
       culture('Sputum M/C/S', ['Sputum', 'Sputum MCS', 'Sputum culture']),
       culture('Stool M/C/S', ['Stool MCS', 'Stool culture']),
       culture('Ear Swab M/C/S', ['Ear MCS']),
       culture('Eye Swab M/C/S', ['Eye MCS']),
-      culture('Blood Culture'),
+      culture('Blood Culture', ['Blood MCS'], 'none'),
       screen(
         'Sputum AFB',
         ['No AFB seen', 'Scanty', '+', '++', '+++'],

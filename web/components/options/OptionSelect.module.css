@@ -61,3 +61,18 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* "Save it to the list for everybody" under a typed Other (2026-11-16). */
+.tick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink2);
+  min-height: 32px;
+}
+
+.tick input {
+  width: 18px;
+  height: 18px;
+}

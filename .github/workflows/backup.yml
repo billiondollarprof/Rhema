@@ -211,6 +211,16 @@ jobs:
             sh -c 'psql "$URL" -tA -c "select private.close_old_visits()"')
           echo "Visits still open from before today, now ended: $ended"
 
+      # ===== 6d. Lab prices waiting 72 hours become standard =====
+      # Anthony, 2026-11-16 (request 208): a price the Laboratory proposed
+      # that the admin did not answer within 72 hours becomes standard. Runs
+      # every 2 hours, after the copy is saved and checked.
+      - name: Make lab prices standard after 72 hours
+        run: |
+          applied=$(docker run --rm --network host -e URL="$LIVE_URL" postgres:17 \
+            sh -c 'psql "$URL" -tA -c "select private.apply_due_prices()"')
+          echo "Lab prices made standard after 72 hours: $applied"
+
       # ===== 7. The uploaded files: copy the new ones, each locked =====
       # lab/: lab result files. record/: patient record files and old file
       # scans (added 2026-11-16; before that they were not backed up).

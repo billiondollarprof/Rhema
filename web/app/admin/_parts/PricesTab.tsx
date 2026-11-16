@@ -7,6 +7,10 @@
  * filled in (or offered, for the optional card fee) and can still change it
  * for one patient.
  *
+ * At the top (request 208, 2026-11-16): lab test prices the Laboratory sent,
+ * waiting for the admin, with Approve and Refuse. One not answered within 72
+ * hours becomes standard on its own.
+ *
  * How it goes:
  *   1. Card fee and consultation: type the amount, tap Save.
  *   2. Lab tests: choose a test from the drop down, type the price, tap Save.
@@ -27,8 +31,12 @@ import { LAB_SECTIONS } from '@/lib/lab/catalogue'
 import {
   CARD_ITEM,
   CONSULTATION_ITEM,
+  decidePrice,
+  loadPriceChanges,
   loadPrices,
   priceOf,
+  standardOn,
+  type PriceChange,
   readAmount,
   setPrice,
   type Price,
@@ -42,15 +50,19 @@ function nairaWords(amount: number): string {
 
 export default function PricesTab({ client }: { client: SupabaseClient }) {
   const [prices, setPrices] = useState<Price[] | null>(null)
+  const [changes, setChanges] = useState<PriceChange[]>([])
 
   // ===== 1. Read the list, and read it again after a change =====
   async function reload() {
     setPrices((await loadPrices(client)) ?? [])
+    setChanges((await loadPriceChanges(client)) ?? [])
   }
   useEffect(() => {
     let current = true
-    loadPrices(client).then((found) => {
-      if (current) setPrices(found ?? [])
+    Promise.all([loadPrices(client), loadPriceChanges(client)]).then(([found, waiting]) => {
+      if (!current) return
+      setPrices(found ?? [])
+      setChanges(waiting ?? [])
     })
     return () => {
       current = false
@@ -63,6 +75,11 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
 
   return (
     <div className={styles.split}>
+      {/* ===== 1b. Lab prices waiting for the admin (request 208) ===== */}
+      {changes.length > 0 ? (
+        <WaitingPrices client={client} changes={changes} prices={prices} onDone={reload} />
+      ) : null}
+
       {/* ===== 2. Card fee and consultation ===== */}
       <div className={styles.card}>
         <h3>Fees</h3>
@@ -254,6 +271,83 @@ function LabPrices({
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ===== 6. Lab prices the Laboratory sent, waiting for the admin =====
+function WaitingPrices({
+  client,
+  changes,
+  prices,
+  onDone,
+}: {
+  client: SupabaseClient
+  changes: PriceChange[]
+  prices: Price[]
+  onDone: () => Promise<void>
+}) {
+  const [busy, setBusy] = useState<number | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  async function decide(change: PriceChange, approve: boolean) {
+    setBusy(change.id)
+    setProblem(null)
+    const answer = await decidePrice(client, change.id, approve)
+    setBusy(null)
+    if (answer) setProblem(answer)
+    else await onDone()
+  }
+
+  return (
+    <div className={`${styles.card} ${styles.waitingCard}`}>
+      <h3>New lab prices waiting for you ({changes.length})</h3>
+      <p className={styles.muted}>
+        Sent by the Laboratory. A price you do not answer becomes standard on its own 72 hours after
+        it was sent.
+      </p>
+      {problem ? <p className={styles.error}>{problem}</p> : null}
+      <div className={styles.list}>
+        {changes.map((change) => {
+          const now = priceOf(prices, 'lab_test', change.item)
+          return (
+            <div key={change.id} className={styles.row}>
+              <span className={styles.rowText}>
+                <b>{change.item}</b>
+                <small>
+                  {now ? `₦${now.toLocaleString('en-GB')}` : 'No price'} to ₦
+                  {change.amount.toLocaleString('en-GB')} · by{' '}
+                  {change.proposer?.full_name ?? 'staff'} · standard on its own{' '}
+                  {standardOn(change).toLocaleString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </small>
+              </span>
+              <div className={styles.buttons}>
+                <button
+                  type="button"
+                  className={`${styles.button} ${styles.primary}`}
+                  disabled={busy === change.id}
+                  onClick={() => decide(change, true)}
+                >
+                  Approve
+                </button>
+                <button
+                  type="button"
+                  className={styles.button}
+                  disabled={busy === change.id}
+                  onClick={() => decide(change, false)}
+                >
+                  Refuse
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

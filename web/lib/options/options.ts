@@ -107,12 +107,18 @@ export function optionsOf(all: PickOption[], list: PickList): PickOption[] {
 // ===== 2. Type one that is missing, or remove one I typed =====
 // Returns the words to use (the list's own spelling if it is already there),
 // or null when it could not be saved.
+// forEverybody (request 209, 2026-11-16): the line is standard for everybody
+// at once, instead of only the typist's until a second person types it.
 export async function addOption(
   client: SupabaseClient,
   list: PickList,
   label: string,
+  forEverybody = false,
 ): Promise<string | null> {
-  const { data, error } = await client.rpc('use_pick_option', { p_list: list, p_label: label })
+  const { data, error } = await client.rpc(
+    forEverybody ? 'save_pick_option_for_everybody' : 'use_pick_option',
+    { p_list: list, p_label: label },
+  )
   if (error || typeof data !== 'string') return null
   return data
 }

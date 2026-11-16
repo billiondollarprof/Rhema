@@ -7,9 +7,10 @@
  * down (SearchSelect): a clear arrow, and a search box on a long list where
  * they type the first letters.
  *
- * "Other" shows a box to type it. It is kept for the person from then on (and
- * becomes standard for everybody when a second person types the same one). A
- * line the person typed can be removed again.
+ * "Other" shows a box to type it, with a tick "Save it to the list for
+ * everybody" (on by default, request 209): then it is on everybody's list at
+ * once. Without the tick it is kept for the person (and becomes standard for
+ * everybody when a second person types the same one), and can be removed again.
  *
  * Without a network the last list still works; a typed line that cannot be
  * saved to the list is still used on this entry.
@@ -59,6 +60,9 @@ export default function OptionSelect({
   const [typing, setTyping] = useState(false)
   const [typed, setTyped] = useState('')
   const [busy, setBusy] = useState(false)
+  // Save a typed line for everybody, on by default (Anthony, 2026-11-16:
+  // "they can save that type... as part of the lists").
+  const [forEverybody, setForEverybody] = useState(true)
 
   // A fresh copy, behind what is already showing.
   useEffect(() => {
@@ -78,7 +82,7 @@ export default function OptionSelect({
     const words = typed.trim()
     if (!words) return
     setBusy(true)
-    const saved = await addOption(client, list, words)
+    const saved = await addOption(client, list, words, forEverybody)
     const fresh = await loadOptions(client, staffId)
     if (fresh) setAll(fresh)
     setBusy(false)
@@ -101,6 +105,14 @@ export default function OptionSelect({
           onChange={(event) => setTyped(event.target.value)}
           onKeyDown={(event) => event.key === 'Enter' && !busy && save()}
         />
+        <label className={styles.tick}>
+          <input
+            type="checkbox"
+            checked={forEverybody}
+            onChange={(event) => setForEverybody(event.target.checked)}
+          />
+          Save it to the list for everybody
+        </label>
         <div className={styles.buttons}>
           <button
             type="button"

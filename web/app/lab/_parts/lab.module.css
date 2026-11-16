@@ -459,3 +459,9 @@ textarea.input {
   font-size: 12px;
   overflow-wrap: anywhere;
 }
+
+.priceChanger {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
