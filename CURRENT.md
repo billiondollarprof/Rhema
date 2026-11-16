@@ -856,6 +856,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     site." Cut off: added before 00:55 Lagos time on 16 November is deleted.
     Rules: a read on live and any delete are asked first (CLAUDE.md section 2).
     Asked him 2026-11-16 for (1) a read only look, then (2) the delete batch.
+    DONE 2026-11-16: he confirmed all 8 (RMC-000001 to 000008) were tests and
+    said "still delete it, all 8". Migration 20261116110342 (test 041, three
+    breaks caught) ran on testing (nothing matched, 17 kept) then live. Live
+    now has 0 patients, payments, visits and families. Left: 2 files of
+    RMC-000003 in file storage, unreachable; clear later. Next number RMC-000009.
 
 204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
     need prices to be a picker, the hospital decides per time how much a test

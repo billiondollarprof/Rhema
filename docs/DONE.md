@@ -941,3 +941,7 @@ this file.
   details; more starter medicines and mg doses; folded More details on Register
   from old file; four Home buttons with Announce in Messages; search on long
   pick lists. Checked on testing and live (CI, deploy smoke test, database).
+
+- 205, LIVE 2026-11-16: the 8 test patients on live deleted with every record
+  pointing at them, after a read only look and his confirmation. Checked after:
+  0 patients, payments, visits and families on live.
