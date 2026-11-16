@@ -849,6 +849,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+206. **Backup: a copy of everything, all the time.** (2026-11-16) "Does it take
+    duplicate files?... the backup is duplicating the patient data immediately,
+    or the backup only takes raw files?... I want a system whereby the backup is
+    taking in everything automatically. So at any point in time, the hospital
+    can decide, okay, they want their data. If the live site ever crashes...
+    they can access their data." ANSWERED 2026-11-16, his choice waits.
+    FOUND: backup.yml copies only lab/ files; record/ files (old file scans,
+    patient files) are not in the backup. To fix (asked him).
+    Same message, 203: "rhema back, okparavero out, we would build the proper
+    demo later." DONE: testing back to Rhema.
+    DECIDED 2026-11-16: "1 and 3 is great": (1) backup every 2 hours, free;
+    (3) a Download our data button in Admin. Point in time recovery (paid) later.
+
 205. **Remove the test patients on LIVE.** (2026-11-16, about 10:55 Lagos time)
     "Let's remove all the test patients added before today. But if there is any
     patient added this morning that is in the last 10hrs leave it, but anything
@@ -860,7 +873,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     said "still delete it, all 8". Migration 20261116110342 (test 041, three
     breaks caught) ran on testing (nothing matched, 17 kept) then live. Live
     now has 0 patients, payments, visits and families. Left: 2 files of
-    RMC-000003 in file storage, unreachable; clear later. Next number RMC-000009.
+    RMC-000003 in file storage, unreachable. Next number RMC-000009.
+    FILES CLEARED 2026-11-16 (his words: "clear the uploaded files, it was me
+    that uploaded it"): new job files-leftovers.yml (list, or delete with a
+    limit) deleted the 2 leftovers from rhema-files; a list run after shows 0.
 
 204. **Prices: not a picker; "e.g." in every price box.** (2026-11-16) "We don't
     need prices to be a picker, the hospital decides per time how much a test
