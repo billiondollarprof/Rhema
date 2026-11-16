@@ -30,6 +30,8 @@ import Icon from '@/components/shell/Icon'
 import { getLabRequest, recordResults, type LabRequest, type ResultItem } from '@/lib/lab/lab'
 import { LAB_SECTIONS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
+import { addOption } from '@/lib/options/options'
+import { choiceKey, loadAddedChoices, saveAddedChoice } from '@/lib/lab/addedChoices'
 
 // Every test on the lab menu, under its section, for a walk in result.
 const MENU_OPTIONS: SelectOption[] = LAB_SECTIONS.flatMap((section) =>
@@ -69,6 +71,31 @@ function EnterResults() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+
+  // Words the Laboratory added with Other inside a test's box, kept for
+  // everybody (request 209e): "test|box" to the words.
+  const [added, setAdded] = useState<Record<string, string[]>>({})
+  useEffect(() => {
+    if (!client || auth.status !== 'ready') return
+    let current = true
+    loadAddedChoices(client).then((found) => {
+      if (current) setAdded(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, auth.status])
+
+  // Save words typed with Other inside a box, then use them.
+  async function addChoice(index: number, test: string, box: string, words: string) {
+    setValue(index, box, words)
+    if (!client) return
+    const saved = await saveAddedChoice(client, test, box, words)
+    if (saved) {
+      const key = choiceKey(test, box)
+      setAdded((all) => ({ ...all, [key]: [...(all[key] ?? []), saved] }))
+    }
+  }
 
   // ===== 1. The request, when there is one: one box per test =====
   useEffect(() => {
@@ -126,12 +153,23 @@ function EnterResults() {
       items,
     )
     setBusy(false)
-    if (problem) setError(problem)
-    else setSaved(true)
+    if (problem) {
+      setError(problem)
+      return
+    }
+    setSaved(true)
   }
 
   function change(index: number, part: 'test' | 'result', value: string) {
-    setLines((all) => all.map((line, at) => (at === index ? { ...line, [part]: value } : line)))
+    setLines((all) =>
+      all.map((line, at) => {
+        if (at !== index) return line
+        // A new test starts with empty boxes, so one test's answer (such as
+        // AA for Genotype) never shows in another test's box (request 209c).
+        if (part === 'test' && value !== line.test) return { ...line, test: value, values: {} }
+        return { ...line, [part]: value }
+      }),
+    )
   }
 
   function setValue(index: number, box: string, value: string) {
@@ -146,6 +184,8 @@ function EnterResults() {
     setLines((all) => all.map((line, at) => (at === index ? { ...line, file } : line)))
   }
 
+  // The patient whose results were just saved.
+  const donePatientId = request ? request.patient_id : (walkIn?.id ?? null)
   const notLab = !staff.can_lab
   const ready = request ? request.status === 'awaiting_test' : Boolean(walkIn)
 
@@ -162,11 +202,23 @@ function EnterResults() {
             <p className={styles.good}>Saved to {patientName}&apos;s record.</p>
             <p className={styles.muted}>
               {request
-                ? 'The person who asked has been told the result is ready.'
-                : 'Nobody was alerted, because nobody asked for it.'}
+                ? `${request.requester?.full_name ?? 'The person who asked'} has been told the result is ready.`
+                : 'Nobody was alerted, because nobody asked for it.'}{' '}
+              Every doctor and nurse who opens the record sees it.
             </p>
+            {/* ----- Send the patient on (request 209b): the patient's card
+                has Send to room, so the patient goes back to the doctor or
+                anywhere else. ----- */}
             <div className={styles.buttons}>
-              <Link className={`${styles.button} ${styles.primary}`} href="/">
+              {donePatientId ? (
+                <Link
+                  className={`${styles.button} ${styles.primary}`}
+                  href={`/patients/?p=${donePatientId}`}
+                >
+                  Send patient to a room
+                </Link>
+              ) : null}
+              <Link className={styles.button} href="/">
                 Back to the lab list
               </Link>
             </div>
@@ -215,7 +267,12 @@ function EnterResults() {
                         placeholder="Choose the test"
                         options={MENU_OPTIONS}
                         onChange={(name) => change(index, 'test', name)}
-                        onOther={(typed) => change(index, 'test', typed)}
+                        onOther={(typed) => {
+                          change(index, 'test', typed)
+                          // A new test is saved for everybody (request 209a).
+                          if (client && typed.trim().length >= 2)
+                            void addOption(client, 'lab_test', typed.trim(), true)
+                        }}
                       />
                     )}
                     {findLabTest(line.test) ? (
@@ -223,7 +280,9 @@ function EnterResults() {
                         test={findLabTest(line.test) as LabTest}
                         at={index}
                         values={line.values}
+                        added={added}
                         onChange={(box, value) => setValue(index, box, value)}
+                        onAdd={(box, words) => addChoice(index, line.test, box, words)}
                       />
                     ) : null}
                     <textarea
@@ -286,12 +345,16 @@ function ResultBoxes({
   test,
   at,
   values,
+  added,
   onChange,
+  onAdd,
 }: {
   test: LabTest
   at: number
   values: Record<string, string>
+  added: Record<string, string[]>
   onChange: (box: string, value: string) => void
+  onAdd: (box: string, words: string) => void
 }) {
   // Picks where "Other" was chosen with nothing typed: they show a box to
   // type in, until "Back to the list" (request 202: "we always include Other").
@@ -312,10 +375,16 @@ function ResultBoxes({
                 <SearchSelect
                   id={id}
                   value={value}
-                  options={field.choices.map((choice) => ({ value: choice, label: choice }))}
+                  options={[
+                    ...field.choices,
+                    ...(added[choiceKey(test.name, field.name)] ?? []).filter(
+                      (word) => !field.choices?.includes(word),
+                    ),
+                  ].map((choice) => ({ value: choice, label: choice }))}
                   onChange={(next) => onChange(field.name, next)}
                   onOther={(words) => {
-                    if (words) onChange(field.name, words)
+                    // Typed words are kept for this box, for everybody.
+                    if (words) onAdd(field.name, words)
                     else setTyping([...typing, field.name])
                   }}
                 />
@@ -329,6 +398,10 @@ function ResultBoxes({
                     value={value}
                     autoFocus={typed}
                     onChange={(event) => onChange(field.name, event.target.value)}
+                    onBlur={() => {
+                      // Words typed after Other are kept for this box.
+                      if (typed && value.trim()) onAdd(field.name, value.trim())
+                    }}
                   />
                   {field.unit && !field.choices ? <span>{field.unit}</span> : null}
                 </div>

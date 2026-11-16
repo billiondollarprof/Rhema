@@ -61,3 +61,67 @@ export function readAmount(typed: string): number | null {
   if (!typed.trim() || !Number.isFinite(value) || value <= 0 || value >= 100000000) return null
   return Math.round(value * 100) / 100
 }
+
+// ===== 4. Lab test prices the Laboratory proposed (request 208) =====
+// A proposal waits for the admin. After 72 hours with no answer it becomes
+// standard on its own (the backup job runs it every 2 hours).
+export type PriceChange = {
+  id: number
+  item: string
+  amount: number
+  status: 'waiting' | 'approved' | 'automatic' | 'refused' | 'replaced'
+  proposed_at: string
+  proposer: { full_name: string } | null
+}
+
+export async function loadPriceChanges(client: SupabaseClient): Promise<PriceChange[] | null> {
+  const { data, error } = await client
+    .from('price_changes')
+    .select(
+      'id, item, amount, status, proposed_at, proposer:staff!price_changes_proposed_by_fkey(full_name)',
+    )
+    .eq('status', 'waiting')
+    .order('proposed_at')
+    .limit(500)
+  if (error || !data) return null
+  return (data as unknown as (PriceChange & { amount: number | string })[]).map((row) => ({
+    ...row,
+    amount: Number(row.amount),
+  }))
+}
+
+// The proposal still waiting for one test, if any.
+export function waitingPriceOf(changes: PriceChange[], item: string): PriceChange | undefined {
+  const wanted = item.trim().toLowerCase()
+  return changes.find((change) => change.item.toLowerCase() === wanted)
+}
+
+// The Laboratory proposes a price. Returns words to show, or null.
+export async function proposePrice(
+  client: SupabaseClient,
+  item: string,
+  amount: number,
+): Promise<string | null> {
+  const { error } = await client.rpc('propose_price', { p_item: item, p_amount: amount })
+  if (!error) return null
+  if (error.code === '23505') return 'That price was just sent. It is waiting for the admin.'
+  if (error.code === '42501') return 'Only the Laboratory or an admin can change lab prices.'
+  return 'The price could not be sent. Check the internet and try again.'
+}
+
+// The admin approves or refuses. Returns words to show, or null.
+export async function decidePrice(
+  client: SupabaseClient,
+  change: number,
+  approve: boolean,
+): Promise<string | null> {
+  const { error } = await client.rpc('decide_price', { p_change: change, p_approve: approve })
+  if (!error) return null
+  if (error.code === '42501') return 'Only an admin can approve prices.'
+  return 'That could not be saved. Check the internet and try again.'
+}
+
+// When a waiting price becomes standard on its own: 72 hours after it was sent.
+export function standardOn(change: PriceChange): Date {
+  return new Date(new Date(change.proposed_at).getTime() + 72 * 60 * 60 * 1000)
+}

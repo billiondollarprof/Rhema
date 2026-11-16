@@ -24,7 +24,14 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
-import { loadPrices, priceOf, type Price } from '@/lib/prices/prices'
+import {
+  loadPriceChanges,
+  loadPrices,
+  priceOf,
+  waitingPriceOf,
+  type Price,
+  type PriceChange,
+} from '@/lib/prices/prices'
 import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { recall, remember } from '@/lib/cache/memory'
@@ -174,10 +181,25 @@ function LabEntry({
   // The price list, read when the form opens, so each test's price is
   // filled in (Settings, 2026-11-16). Empty when there is none or no network.
   const [prices, setPrices] = useState<Price[] | null>(null)
+  // Lab prices still waiting for the admin (request 208).
+  const [waiting, setWaiting] = useState<PriceChange[]>([])
 
   function startPaying() {
     setPaying(true)
-    loadPrices(client).then((found) => setPrices(found ?? []))
+    Promise.all([loadPrices(client), loadPriceChanges(client)]).then(([found, changes]) => {
+      setWaiting(changes ?? [])
+      setPrices(found ?? [])
+    })
+  }
+
+  // The standard price; a test with none takes the new price still waiting,
+  // marked, so the Front Desk knows it is not approved yet.
+  const lineFor = (test: string) => {
+    const standard = prices ? priceOf(prices, 'lab_test', test) : undefined
+    if (standard) return { price: standard, note: undefined }
+    const pending = waitingPriceOf(waiting, test)
+    if (pending) return { price: pending.amount, note: 'New price, not yet approved by the admin' }
+    return { price: undefined, note: undefined }
   }
 
   return (
@@ -232,7 +254,8 @@ function LabEntry({
         <PriceForm
           formId={`lab-${request.id}`}
           labels={request.tests}
-          prices={request.tests.map((test) => priceOf(prices, 'lab_test', test))}
+          prices={request.tests.map((test) => lineFor(test).price)}
+          notes={request.tests.map((test) => lineFor(test).note)}
           save={(lines, mode) => payLabRequestLines(client, request.id, lines, mode)}
           onCancel={() => setPaying(false)}
           onDone={() => onPaid(request.patient_id)}

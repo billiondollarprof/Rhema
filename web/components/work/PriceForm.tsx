@@ -33,6 +33,7 @@ export default function PriceForm({
   onCancel,
   onDone,
   prices = [],
+  notes = [],
 }: {
   // Keeps each box's label tied to its own box when several forms are open.
   formId: string
@@ -44,6 +45,8 @@ export default function PriceForm({
   // The price list's amount for each line, filled in (Settings, 2026-11-16).
   // The Front Desk can still change it. Missing lines start empty.
   prices?: (number | undefined)[]
+  // A word under a line, such as "New price, not yet approved" (request 208).
+  notes?: (string | undefined)[]
 }) {
   const [typed, setTyped] = useState<string[]>(
     labels.map((_, at) => (prices[at] ? String(prices[at]) : '')),
@@ -79,7 +82,7 @@ export default function PriceForm({
             <input
               id={`${formId}-${at}`}
               inputMode="decimal"
-              placeholder="0"
+              placeholder="e.g. 2,000"
               value={typed[at]}
               autoFocus={at === 0}
               onChange={(event) => {
@@ -88,6 +91,7 @@ export default function PriceForm({
               }}
             />
           </div>
+          {notes[at] ? <small className={styles.muted}>{notes[at]}</small> : null}
         </div>
       ))}
 

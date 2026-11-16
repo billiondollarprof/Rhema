@@ -457,3 +457,9 @@ button.row:hover {
   flex: 1;
   min-width: 0;
 }
+
+/* Lab prices waiting for the admin: across the whole width, first. */
+.waitingCard {
+  grid-column: 1 / -1;
+  border-color: var(--c-ffe0a3, #ffe0a3);
+}

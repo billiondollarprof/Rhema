@@ -82,7 +82,8 @@ export default function TestSearch({ client, staffId, chosen, onToggle }: Props)
     }
     setProblem(null)
     setBusy(true)
-    const saved = await addOption(client, 'lab_test', name)
+    // A new test is saved for everybody, so it is on the list next time.
+    const saved = await addOption(client, 'lab_test', name, true)
     setBusy(false)
     const label = saved ?? name
     if (!extra.includes(label)) setExtra([...extra, label])
