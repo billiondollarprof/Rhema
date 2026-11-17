@@ -15,6 +15,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -249,7 +250,7 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
         <Line
           key={vitals.id}
           what={<b>{when(vitals.recorded_at)}</b>}
-          meta={`Taken by ${vitals.recorder?.full_name ?? 'staff'}`}
+          meta={`Taken by ${vitals.signer?.full_name ?? vitals.recorder?.full_name ?? 'staff'}`}
           voided={voidedOf(vitals)}
           voidable={{ client, table: 'vital_signs', id: vitals.id, staffId, onDone: reload }}
         >
@@ -355,6 +356,10 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
           <button className={styles.small} onClick={() => setAdding(true)}>
             + Take new readings
           </button>
+          {/* Every reading as a sheet, full page (request 224). */}
+          <Link className={styles.small} href={`/patients/record/sheet/?p=${patientId}&s=vitals`}>
+            Open the vital signs sheet
+          </Link>
         </div>
       )}
     </Section>

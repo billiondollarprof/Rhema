@@ -22,6 +22,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
 import OptionSelect from '@/components/options/OptionSelect'
+import SearchSelect from '@/components/options/SearchSelect'
+import { ROUTES } from '@/lib/record/signers'
 import { medicineWords } from '@/lib/medicines/medicines'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
@@ -70,6 +72,8 @@ export function MedicationsSection({
   const [strength, setStrength] = useState('')
   const [dose, setDose] = useState('')
   const [howOften, setHowOften] = useState('')
+  // IV, IM, Oral... (request 224).
+  const [route, setRoute] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
 
   // Active first, then suspended, then stopped, voided last.
@@ -90,6 +94,7 @@ export function MedicationsSection({
       patient_id: patientId,
       medicine: medicineWords(medicine.trim(), strength.trim()),
       dose: dose.trim() || null,
+      route: route.trim() || null,
       how_often: howOften.trim() || null,
       added_by: staffId,
     })
@@ -99,6 +104,7 @@ export function MedicationsSection({
       setMedicine('')
       setStrength('')
       setDose('')
+      setRoute('')
       setHowOften('')
       setProblem(null)
       reload()
@@ -148,6 +154,17 @@ export function MedicationsSection({
                 onChange={setDose}
                 placeholder="Choose the dose"
                 otherLabel="Type the dose"
+              />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="med-route">Route</label>
+              <SearchSelect
+                id="med-route"
+                value={route}
+                placeholder="IV, IM, Oral…"
+                options={ROUTES.map((one) => ({ value: one, label: one }))}
+                onChange={setRoute}
+                onOther={(typed) => typed && setRoute(typed)}
               />
             </div>
             <div className={styles.field}>
@@ -271,8 +288,9 @@ function MedicationLine({
           <b>{medication.medicine}</b>
           <br />
           <span className={styles.muted}>
-            {[medication.dose, medication.how_often].filter(Boolean).join(' · ') ||
-              'No dose written'}
+            {[medication.dose, medication.route, medication.how_often]
+              .filter(Boolean)
+              .join(' · ') || 'No dose written'}
           </span>
         </>
       }

@@ -330,7 +330,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* ===== 5. Call attention cards, over every screen ===== */}
         <AttentionAlerts client={client} staffId={staff.id} />
         {/* Sends what waited while the network was down (request 128, step 3). */}
-        <OutboxSender client={client} staffId={staff.id} />
+        <OutboxSender client={client} staffId={staff.id} medical={Boolean(staff.can_medical)} />
 
         {/* ===== 6. Agreeing to the Terms of Use and Privacy Policy, once per
             version of the words (request 156) ===== */}

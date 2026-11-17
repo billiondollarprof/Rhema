@@ -20,6 +20,9 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 17 November: records of open visits are kept, scrambled, on clinical
+// staff's devices for no network, and backups are every 2 hours (requests
+// 206 and 224). Section 6 says so; LEGAL_VERSION stays.
 // 12 November: this device remembers the work emails that signed in on it
 // (request 182). A smaller note in section 3; LEGAL_VERSION stays.
 // 10 November: a doctor or nurse can email a patient their medical record,
@@ -30,7 +33,7 @@ import { BRAND } from '@/lib/brand/brand'
 export const LEGAL_EFFECTIVE = '9 November 2026'
 // 9 November: the providers are no longer named (his decision below). The
 // promises did not change, so LEGAL_VERSION stays and nobody re-agrees.
-export const LEGAL_UPDATED = '12 November 2026'
+export const LEGAL_UPDATED = '17 November 2026'
 // Saved with each staff agreement, so we know which words they agreed to.
 export const LEGAL_VERSION = '2026-11-08'
 
@@ -162,8 +165,19 @@ export default function PrivacyText() {
           log. Once it is in the patient&apos;s inbox, keeping it private is up to the patient.
         </li>
         <li>
-          A copy of the database is made every night, locked with a passphrase, and stored
+          A copy of the database is made every 2 hours, locked with a passphrase, and stored
           separately, so the records survive a fault.
+        </li>
+        <li>
+          So that doctors and nurses can keep working when the network is down, the records of
+          patients with a visit open right now are kept, scrambled, on the devices of signed in
+          clinical staff. Pictures and files are not kept. The copy is deleted when the person signs
+          out, and after 24 hours. Keeping it, and every record opened from it, is written in the
+          activity log.
+        </li>
+        <li>
+          Anything typed while the network is down waits on that device, and is sent as soon as the
+          network is back.
         </li>
         <li>The service that checks the app is answering receives no personal information.</li>
       </ul>
@@ -199,7 +213,7 @@ export default function PrivacyText() {
         </li>
         <li>The screen locks when it is left, and each person signs out at the end of a shift.</li>
         <li>The activity log records who opened and changed records.</li>
-        <li>The nightly copies are checked every night to make sure they can be opened.</li>
+        <li>Every copy is checked as it is made, to make sure it opens and holds every record.</li>
       </ul>
 
       <h2>9. Your rights</h2>

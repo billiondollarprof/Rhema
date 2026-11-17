@@ -145,12 +145,13 @@ export default function MainMenu({
             className={`${styles.menuItem} ${styles.menuRed}`}
             role="menuitem"
             onClick={() => {
-              // Things still waiting to send would be lost: ask first.
+              // Things still waiting to send are kept on this device and sent
+              // when this person signs in here again (request 224): say so.
               const waiting = auth.staff ? readOutbox(auth.staff.id).length : 0
               if (
                 waiting > 0 &&
                 !window.confirm(
-                  `You have ${waiting === 1 ? '1 entry' : `${waiting} entries`} not saved yet. Wait a little longer for the network to come back. If you sign out now, ${waiting === 1 ? 'it' : 'they'} will be deleted from this device. Sign out anyway?`,
+                  `You have ${waiting === 1 ? '1 entry' : `${waiting} entries`} not sent yet, because of the network. ${waiting === 1 ? 'It stays' : 'They stay'} on this device and ${waiting === 1 ? 'is' : 'are'} sent when you sign in here again. Sign out?`,
                 )
               ) {
                 return

@@ -45,6 +45,7 @@ import SearchSelect from '@/components/options/SearchSelect'
 import { medicineWords } from '@/lib/medicines/medicines'
 import { addPhrase, NOTE_PARTS, PHRASES } from '@/lib/record/phrases'
 import { addLine, when, type MedicalRecord } from '@/lib/record/record'
+import { clinicianOptions, ROUTES, type Signer } from '@/lib/record/signers'
 
 type Props = {
   client: SupabaseClient
@@ -54,10 +55,19 @@ type Props = {
   record: MedicalRecord
   reload: () => void
   canWrite: boolean
+  // The full page (request 224): the note fills the screen, with Seen by.
+  fullPage?: boolean
+  signers?: Signer[]
 }
 
 // A medicine the doctor charts with the note.
-type NewMedicine = { name: string; strength: string; dose: string; howOften: string }
+type NewMedicine = {
+  name: string
+  strength: string
+  dose: string
+  route: string
+  howOften: string
+}
 
 const voidedOf = (line: {
   voided_at: string | null
@@ -90,9 +100,17 @@ export default function ConsultationsSection({
   record,
   reload,
   canWrite,
+  fullPage = false,
+  signers = [],
 }: Props) {
   const empty = { title: '', complaint: '', findings: '', assessment: '', plan: '' }
-  const [adding, setAdding] = useState(false)
+  // On the full page the note is open to write at once.
+  const [adding, setAdding] = useState(fullPage && canWrite)
+  // Seen by (request 224): whoever has a consulting room, the midwife in
+  // Consultant Room 2 included; the person signed in when they are one.
+  const clinicians = clinicianOptions(signers)
+  const [chosenSigner, setChosenSigner] = useState('')
+  const seenBy = chosenSigner || (clinicians.some((c) => c.value === staffId) ? staffId : '')
   const [parts, setParts] = useState<Record<string, string>>(empty)
   const [medicines, setMedicines] = useState<NewMedicine[]>([])
   const [problem, setProblem] = useState<string | null>(null)
@@ -132,6 +150,7 @@ export default function ConsultationsSection({
         title: parts.title.trim() || null,
         ...values,
         written_by: staffId,
+        signed_by: seenBy || staffId,
       })
       if (result) {
         setBusy(false)
@@ -146,6 +165,7 @@ export default function ConsultationsSection({
         patient_id: patientId,
         medicine: medicineWords(medicine.name.trim(), medicine.strength.trim()),
         dose: medicine.dose.trim() || null,
+        route: medicine.route.trim() || null,
         how_often: medicine.howOften.trim() || null,
         added_by: staffId,
       })
@@ -175,8 +195,8 @@ export default function ConsultationsSection({
 
   const count = record.consultations.filter((c) => !c.voided_at).length
 
-  return (
-    <Section title="Consultation notes" count={count} open={canWrite}>
+  const body = (
+    <>
       {/* ===== 3. Write a consultation ===== */}
       {adding ? (
         <div className={styles.form}>
@@ -191,8 +211,20 @@ export default function ConsultationsSection({
               onChange={(e) => setParts({ ...parts, title: e.target.value })}
             />
           </div>
+          {fullPage ? (
+            <div className={styles.field}>
+              <label htmlFor="consult-seen-by">Seen by</label>
+              <SearchSelect
+                id="consult-seen-by"
+                value={seenBy}
+                placeholder="Choose who saw the patient"
+                options={clinicians}
+                onChange={setChosenSigner}
+              />
+            </div>
+          ) : null}
           {NOTE_PARTS.map((part) => (
-            <div className={styles.field} key={part.key}>
+            <div className={`${styles.field} ${fullPage ? styles.sheetRow : ''}`} key={part.key}>
               <label htmlFor={`consult-${part.key}`}>{part.label}</label>
               <textarea
                 id={`consult-${part.key}`}
@@ -265,6 +297,22 @@ export default function ConsultationsSection({
                   />
                 </div>
                 <div className={styles.field}>
+                  <label htmlFor={`consult-route-${at}`}>Route</label>
+                  <SearchSelect
+                    id={`consult-route-${at}`}
+                    value={medicine.route}
+                    placeholder="IV, IM, Oral…"
+                    options={ROUTES.map((route) => ({ value: route, label: route }))}
+                    onChange={(route) =>
+                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
+                    }
+                    onOther={(route) =>
+                      route &&
+                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
+                    }
+                  />
+                </div>
+                <div className={styles.field}>
                   <label htmlFor={`consult-often-${at}`}>How often</label>
                   <OptionSelect
                     client={client}
@@ -294,7 +342,10 @@ export default function ConsultationsSection({
               type="button"
               className={styles.small}
               onClick={() =>
-                setMedicines([...medicines, { name: '', strength: '', dose: '', howOften: '' }])
+                setMedicines([
+                  ...medicines,
+                  { name: '', strength: '', dose: '', route: '', howOften: '' },
+                ])
               }
             >
               + Add a medicine
@@ -321,15 +372,25 @@ export default function ConsultationsSection({
         </div>
       ) : canWrite ? (
         <div className={styles.actions}>
-          <button
-            className={`${styles.small} ${styles.primary}`}
-            onClick={() => {
-              setSaved(false)
-              setAdding(true)
-            }}
-          >
-            + Write a consultation
-          </button>
+          {fullPage ? (
+            <button
+              className={`${styles.small} ${styles.primary}`}
+              onClick={() => {
+                setSaved(false)
+                setAdding(true)
+              }}
+            >
+              + Write another consultation
+            </button>
+          ) : (
+            // The note opens on its own full page (request 224).
+            <Link
+              className={`${styles.small} ${styles.primary}`}
+              href={`/patients/record/consult/?p=${patientId}`}
+            >
+              + Write a consultation
+            </Link>
+          )}
         </div>
       ) : null}
 
@@ -364,9 +425,15 @@ export default function ConsultationsSection({
               <Link className={styles.small} href={`/lab/request/?p=${patientId}`}>
                 Request lab
               </Link>
-              <button className={styles.small} onClick={() => setSaved(false)}>
-                Not now
-              </button>
+              {fullPage ? (
+                <Link className={styles.small} href={`/patients/record/?p=${patientId}`}>
+                  Back to the record
+                </Link>
+              ) : (
+                <button className={styles.small} onClick={() => setSaved(false)}>
+                  Not now
+                </button>
+              )}
             </div>
           </div>
         )
@@ -388,7 +455,11 @@ export default function ConsultationsSection({
               {when(line.created_at)}
             </b>
           }
-          meta={`Written by ${line.author?.full_name ?? 'staff'}`}
+          meta={
+            line.signer && line.author && line.signer.full_name !== line.author.full_name
+              ? `Seen by ${line.signer.full_name} · typed by ${line.author.full_name}`
+              : `Written by ${line.signer?.full_name ?? line.author?.full_name ?? 'staff'}`
+          }
           voided={voidedOf(line)}
           voidable={
             canWrite
@@ -406,6 +477,13 @@ export default function ConsultationsSection({
           </dl>
         </Line>
       ))}
+    </>
+  )
+  return fullPage ? (
+    <div className={styles.fullNote}>{body}</div>
+  ) : (
+    <Section title="Consultation notes" count={count} open={canWrite}>
+      {body}
     </Section>
   )
 }

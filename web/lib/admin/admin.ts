@@ -361,6 +361,11 @@ export function lineWords(line: LogRow): string {
   if (line.table_name === 'attention_calls') return 'Called for attention'
   // Request 217a: the admin downloaded the hospital's data.
   if (line.action === 'export') return 'Downloaded all the hospital data'
+  // Request 224: the copy kept for no network, and openings from it.
+  if (line.table_name === 'record_openings' && line.action === 'offline_copy')
+    return `Kept the record of ${patient} on their device for no network`
+  if (line.table_name === 'record_openings' && line.action === 'offline_view')
+    return `Opened the record of ${patient} with no network (device copy)`
   if (line.table_name === 'record_openings') return `Opened the medical record of ${patient}`
   if (line.table_name === 'patients') {
     return line.action === 'insert' ? `Registered ${patient}` : `Updated ${patient}${what}`

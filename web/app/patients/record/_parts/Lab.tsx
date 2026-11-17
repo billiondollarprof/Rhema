@@ -33,11 +33,14 @@ export default function LabSection({
   client,
   patientId,
   sex = null,
+  saved,
 }: {
   client: SupabaseClient
   patientId: number
   // For the ranges that differ for men and women.
   sex?: string | null
+  // The results kept on the device for no network (request 224).
+  saved?: { results: LabResult[]; open: LabRequest[] }
 }) {
   // fresh: a test is waiting, or a result came in within a day. Then the
   // section opens by itself.
@@ -45,12 +48,15 @@ export default function LabSection({
     results: LabResult[]
     open: LabRequest[]
     fresh: boolean
-  } | null>(null)
+  } | null>(saved ? { ...saved, fresh: false } : null)
 
   useEffect(() => {
     let current = true
     loadPatientLab(client, patientId).then((found) => {
       if (!current) return
+      // Nothing came back but the device copy has results: the network is
+      // down, so the copy stays.
+      if (saved && found.results.length + found.open.length === 0) return
       const dayAgo = Date.now() - 24 * 60 * 60 * 1000
       const fresh =
         found.open.length > 0 ||
@@ -60,6 +66,8 @@ export default function LabSection({
     return () => {
       current = false
     }
+    // saved is the copy at the moment the record opened; read once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, patientId])
 
   const count = lab ? lab.results.length + lab.open.length : undefined

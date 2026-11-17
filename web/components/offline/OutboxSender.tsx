@@ -33,6 +33,7 @@ import {
   type OutboxTask,
 } from '@/lib/offline/outbox'
 import { refreshCopy } from '@/lib/offline/patientCopy'
+import { refreshRecordCopy, sendOfflineViews } from '@/lib/offline/recordCopy'
 import { CARD_COLUMNS } from '@/lib/patients/patients'
 
 // The column holding when a row was saved, per table.
@@ -126,9 +127,12 @@ async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask
 export default function OutboxSender({
   client,
   staffId,
+  medical = false,
 }: {
   client: SupabaseClient
   staffId: string
+  // Clinical staff also keep the records of open visits (request 224).
+  medical?: boolean
 }) {
   const [tasks, setTasks] = useState<OutboxTask[]>([])
   const [open, setOpen] = useState(false)
@@ -173,6 +177,26 @@ export default function OutboxSender({
       window.clearInterval(timer)
     }
   }, [client, staffId])
+
+  // ===== 4b. Records of open visits, for clinical staff (request 224) =====
+  // 20 seconds after opening, then every 30 minutes; and the records opened
+  // from the copy are written in the activity log when the network is back.
+  useEffect(() => {
+    if (!medical) return
+    const refresh = () => void refreshRecordCopy(client, staffId)
+    const views = () => void sendOfflineViews(client, staffId)
+    const first = window.setTimeout(() => {
+      views()
+      refresh()
+    }, 20_000)
+    const timer = window.setInterval(refresh, 30 * 60_000)
+    window.addEventListener('online', views)
+    return () => {
+      window.clearTimeout(first)
+      window.clearInterval(timer)
+      window.removeEventListener('online', views)
+    }
+  }, [client, staffId, medical])
 
   if (tasks.length === 0) return null
   const failed = tasks.filter((task) => task.failed).length
