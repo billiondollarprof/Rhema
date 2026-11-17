@@ -12,17 +12,19 @@
  *   2. Google sends the browser back to /api/drive/callback with an answer.
  *      The Worker trades it for a long lived key, scrambles that key
  *      (AES-GCM, with a key made from the Google app's secret, which only
- *      the Worker and the monthly job hold), and hands it to the database
- *      with the one time code (finish_drive_link).
- *   3. The admin lands back on Admin, Data, which says Connected.
+ *      the Worker and the monthly job hold).
+ *   3. The admin lands back on Admin, Data, with the scrambled key and the
+ *      one time code after a "#" in the address (the part a browser never
+ *      sends to any server). The admin's own page hands them to the
+ *      database (finish_drive_link), as the signed in admin, takes them off
+ *      the address, and says Connected. So the Worker needs no key to the
+ *      database, and nobody signed out can reach finish_drive_link.
  *
  * Never: keep, log or show the Google key plain; ask Google for more than
  * the files this app makes and the email address.
  */
 
 export interface DriveEnv {
-  SUPABASE_URL?: string
-  SUPABASE_KEY?: string
   GOOGLE_CLIENT_ID?: string
   GOOGLE_CLIENT_SECRET?: string
 }
@@ -83,7 +85,7 @@ export async function driveCallback(
   const url = new URL(request.url)
   const answer = url.searchParams.get('code') ?? ''
   const state = url.searchParams.get('state') ?? ''
-  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.SUPABASE_URL || !env.SUPABASE_KEY)
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET)
     return backToAdmin(url.origin, 'not-set-up')
   // The admin said no on Google's page, or the code is not ours.
   if (!answer || !UUID.test(state)) return backToAdmin(url.origin, 'failed')
@@ -115,12 +117,11 @@ export async function driveCallback(
   }
 
   const sealed = await sealKey(tokens.refresh_token, env.GOOGLE_CLIENT_SECRET)
-  const saved = await post(`${env.SUPABASE_URL}/rest/v1/rpc/finish_drive_link`, {
-    method: 'POST',
-    headers: { apikey: env.SUPABASE_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: state, key_sealed: sealed, google_email: email }),
-  })
-  if (!saved.ok) return backToAdmin(url.origin, 'failed')
-  const result = (await saved.json()) as string
-  return backToAdmin(url.origin, result === 'done' ? 'connected' : 'expired')
+  // Back to the admin's page, which finishes the link (step 3 above).
+  // base64url: plain letters only, so nothing in it breaks the address.
+  const handover = btoa(JSON.stringify({ code: state, key: sealed, email }))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+  return Response.redirect(`${url.origin}/admin/?tab=data#drive-link=${handover}`, 302)
 }

@@ -12,15 +12,19 @@
  *   1. The admin taps "Connect Google Drive". The database gives a one time
  *      code (15 minutes), and the page goes to Google through our Worker.
  *   2. The admin picks the hospital's Google account and taps Allow.
- *   3. Google sends them back here with ?drive=connected (or a problem),
- *      and the card shows the account and the last copy saved.
+ *   3. Google sends them back through the Worker, which scrambles the key
+ *      and puts it after a "#" in the address (#drive-link=...). This page
+ *      takes it off the address at once and hands it to the database as
+ *      the signed in admin (finish_drive_link). A problem comes back as
+ *      ?drive=failed, expired or not-set-up instead.
+ *   4. The card shows the account and the last copy saved.
  *
  * Never: show or hold the Google key. It stays sealed in the database, and
  * only the monthly job can open it.
  */
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './admin.module.css'
 
@@ -49,6 +53,22 @@ const RETURN_WORDS: Record<string, { good: boolean; words: string }> = {
 function returnAnswer(): string {
   if (typeof window === 'undefined') return ''
   return new URLSearchParams(window.location.search).get('drive') ?? ''
+}
+
+// What the Worker handed back after Google (#drive-link=...): the one time
+// code, the scrambled key and the account's email. After a "#", so it never
+// left this device. null when the page has not just come back from Google.
+type Handover = { code: string; key: string; email: string | null }
+function readHandover(): Handover | null {
+  if (typeof window === 'undefined') return null
+  const part = window.location.hash.match(/^#drive-link=([A-Za-z0-9_-]+)$/)?.[1]
+  if (!part) return null
+  try {
+    const found = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))) as Handover
+    return typeof found.code === 'string' && typeof found.key === 'string' ? found : null
+  } catch {
+    return null
+  }
 }
 
 function when(moment: string | null): string {
@@ -88,17 +108,42 @@ export default function DriveCard({ client }: { client: SupabaseClient }) {
     setLoaded(true)
   }
 
+  // Back from Google: hand the scrambled key to the database, as this admin.
+  // Answers the words to show. The ref makes sure it is handed in once.
+  const handedIn = useRef(false)
+  const finish = useCallback(
+    async (handover: Handover) => {
+      const { data, error } = await client.rpc('finish_drive_link', {
+        code: handover.code,
+        key_sealed: handover.key,
+        google_email: handover.email,
+      })
+      if (error) return RETURN_WORDS.failed
+      return data === 'done' ? RETURN_WORDS.connected : RETURN_WORDS.expired
+    },
+    [client],
+  )
+
   useEffect(() => {
     let current = true
-    // Take Google's answer off the address, so a refresh does not show it again.
-    if (returnAnswer()) window.history.replaceState(null, '', '/admin/?tab=data')
-    void read().then((found) => {
+    const handover = handedIn.current ? null : readHandover()
+    // Take Google's answer and the key off the address at once, so a refresh
+    // or the browser's history never holds them.
+    if (handover || returnAnswer()) window.history.replaceState(null, '', '/admin/?tab=data')
+    async function start() {
+      if (handover) {
+        handedIn.current = true
+        const words = await finish(handover)
+        if (current) setNote(words)
+      }
+      const found = await read()
       if (current) show(found)
-    })
+    }
+    void start()
     return () => {
       current = false
     }
-  }, [read])
+  }, [read, finish])
 
   // ===== 3. Connect: a one time code, then off to Google =====
   async function connect() {

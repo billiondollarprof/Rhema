@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest'
 import { driveCallback, driveStart, sealKey } from './drive'
 
 const env = {
-  SUPABASE_URL: 'https://db.invalid',
-  SUPABASE_KEY: 'public-key',
   GOOGLE_CLIENT_ID: 'client-id',
   GOOGLE_CLIENT_SECRET: 'client-secret',
 }
@@ -34,26 +32,30 @@ describe('driveStart', () => {
 })
 
 describe('driveCallback', () => {
-  it('trades the answer, hands in a scrambled key, and says Connected', async () => {
-    const sent: { url: string; body: string }[] = []
-    const post = (async (url: string, init: RequestInit) => {
-      sent.push({ url, body: String(init.body) })
-      if (url.includes('oauth2.googleapis.com'))
-        return Response.json({ refresh_token: 'the-real-key', id_token: idToken })
-      return Response.json('done')
+  it('trades the answer and hands the scrambled key back to the admin page', async () => {
+    const sent: string[] = []
+    const post = (async (url: string) => {
+      sent.push(url)
+      return Response.json({ refresh_token: 'the-real-key', id_token: idToken })
     }) as unknown as typeof fetch
     const response = await driveCallback(
       new Request(`https://h.test/api/drive/callback?code=g-answer&state=${CODE}`),
       env,
       post,
     )
-    expect(response.headers.get('Location')).toBe('https://h.test/admin/?tab=data&drive=connected')
-    const handed = JSON.parse(sent[1].body)
+    // Only Google is called: the Worker never talks to the database here.
+    expect(sent).toEqual(['https://oauth2.googleapis.com/token'])
+    const where = response.headers.get('Location') ?? ''
+    expect(where.startsWith('https://h.test/admin/?tab=data#drive-link=')).toBe(true)
+    const part = where.split('#drive-link=')[1]
+    expect(part).toMatch(/^[A-Za-z0-9_-]+$/)
+    const handed = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/')))
     expect(handed.code).toBe(CODE)
-    expect(handed.google_email).toBe('hospital@example.com')
+    expect(handed.email).toBe('hospital@example.com')
     // Never the key plain.
-    expect(sent[1].body).not.toContain('the-real-key')
-    expect(handed.key_sealed.length).toBeGreaterThan(20)
+    expect(where).not.toContain('the-real-key')
+    expect(atob(part.replace(/-/g, '+').replace(/_/g, '/'))).not.toContain('the-real-key')
+    expect(handed.key.length).toBeGreaterThan(20)
   })
   it('says failed when the admin says no on Google, or Google refuses', async () => {
     const no = await driveCallback(
@@ -67,18 +69,6 @@ describe('driveCallback', () => {
       (async () => new Response('no', { status: 400 })) as unknown as typeof fetch,
     )
     expect(refused.headers.get('Location')).toContain('drive=failed')
-  })
-  it('says expired when the database refuses an old code', async () => {
-    const post = (async (url: string) =>
-      url.includes('oauth2')
-        ? Response.json({ refresh_token: 'k', id_token: idToken })
-        : Response.json('expired')) as unknown as typeof fetch
-    const response = await driveCallback(
-      new Request(`https://h.test/api/drive/callback?code=x&state=${CODE}`),
-      env,
-      post,
-    )
-    expect(response.headers.get('Location')).toContain('drive=expired')
   })
 })
 
