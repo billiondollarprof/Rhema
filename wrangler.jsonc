@@ -24,6 +24,9 @@
   // own bucket (below), which deletes its files after 7 days. The buckets
   // are private: files are reached only through worker/src/files.ts.
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhema-files" }],
+  // The backup timer (request 218d): 17 minutes past every odd hour, UTC,
+  // the same times as backup.yml. GitHub starts its own schedule hours late.
+  "triggers": { "crons": ["17 1-23/2 * * *"] },
   // The testing site: its own Worker name and its own bucket, so nothing on
   // testing ever touches live files. Deployed with --env testing.
   "env": {
@@ -42,6 +45,8 @@
         "run_worker_first": ["/api/*"],
       },
       "r2_buckets": [{ "binding": "FILES", "bucket_name": "rhema-files-testing" }],
+      // No timer on testing: the backup is of the live database only.
+      "triggers": { "crons": [] },
     },
   },
 }

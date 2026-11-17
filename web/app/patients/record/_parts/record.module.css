@@ -753,6 +753,12 @@ a.small {
     display: none;
   }
 
+  /* Dose and time one under the other, so the date and time show whole. */
+  .chartConfirm .fields,
+  .medicineLine .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .chartRow {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -827,4 +833,9 @@ a.small {
 
 .chartIntro p {
   margin: 0;
+}
+
+.phraseMore {
+  color: var(--ink2);
+  font-weight: 600;
 }

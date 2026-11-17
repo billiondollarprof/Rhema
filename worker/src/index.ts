@@ -9,6 +9,7 @@
  * `wrangler secret put` or from GitHub Actions. Never log patient details,
  * push addresses or keys.
  */
+import { startBackup, type BackupTimerEnv } from './backup-timer'
 import {
   deleteRecordFile,
   downloadFile,
@@ -22,7 +23,7 @@ import { emailRecord, type RecordsEnv } from './records'
 import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
-export interface Env extends FilesEnv, InvitesEnv, ReceiptsEnv, RecordsEnv {
+export interface Env extends FilesEnv, InvitesEnv, ReceiptsEnv, RecordsEnv, BackupTimerEnv {
   // The built screens (web/out), served as static files.
   ASSETS: Fetcher
   // Call attention push (set by the push-keys workflow). Until they are
@@ -179,5 +180,13 @@ export default {
     answered.headers.set('X-Content-Type-Options', 'nosniff')
     answered.headers.set('X-Frame-Options', 'DENY')
     return answered
+  },
+
+  // The timer (request 218d): start the live backup every 2 hours, on time.
+  // Only the live Worker has a timer (wrangler.jsonc).
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      startBackup(env, new Date(controller.scheduledTime)).then((words) => console.log(words)),
+    )
   },
 }

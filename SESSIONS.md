@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-16 (late night): request 218. LIVE: the doctor's note with the
+  director's four boxes, the medication chart, the summary, the plan banner,
+  each role's work first, Visits by day (no SQL); Next.js 16.4.5; the backup
+  proves nothing is lost. Found: GitHub starts scheduled backups hours late;
+  a Worker timer is proposed. The whole-flow plan waits for his yes.
+
 - 2026-11-16 (night): request 217a LIVE: Download our data (Admin, Data
   tab, PIN again, one ZIP of spreadsheets and files, logged). 217b review:
   every migration of the day on both databases; the emailed record now shows

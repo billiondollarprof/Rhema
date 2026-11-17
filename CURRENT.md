@@ -849,6 +849,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
+    a. The token goes on the main hospital Cloudflare account (asked which).
+    b. "Check the things that you have put live for the doctor. Check that
+       everything fits well."
+    c. "For the comparison... check if we need the 1 to 6, they are worth it.
+       Then we run all of them, we add all of them, run the SQLs at once."
+    d. "Check the arrangement, apart from the flow... the interface, how clean
+       their own is... ease of use... We are not trying to design a complex,
+       difficult software... even people who are not that savvy, who uses
+       WhatsApp, can still use it well."
+
 218. **Go ahead with the proposal, Next.js, backups, and the whole flow.** (2026-11-16)
     a. Live read allowed: "you have my permission to check the live database"
        for why the doctor cannot write in consultation notes. He thinks the
@@ -868,6 +879,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        well, the population of the medicine, the arrangement, the lab as well
        ... areas where our own look simpler and better, we keep. Where their
        own seems better, we make adjustments... put all the plans together."
+    STATUS (2026-11-16, night):
+    a. Done. Live read: the director's account is a doctor in Consultant Room 1,
+       kind consultation, so he could write; the fault was placement and names.
+    b. LIVE: the four boxes with tap words, medicines to the chart, Send to the
+       nurses, the medication chart (Given, then Yes), the summary, the plan
+       banner for nurses, each role's work first, Visits by day. No SQL.
+    c. LIVE: Next.js 16.4.3 to 16.4.5. typescript-eslint 8.73.0 (clears a
+       dev-only minimatch notice) was published 2026-11-16, so it waits a week.
+    d. LIVE: the backup now proves every counted row is in the copy and every
+       live file is in the backup; a run by hand passed on live. FOUND:
+       GitHub starts scheduled runs hours late or not at all (the 01:17 run
+       came at about 08:00; 0 of the 2-hourly runs started in 9 hours).
+       Proposed fix waits for his yes and a token: a Cloudflare Worker timer
+       (free) that starts the backup every 2 hours.
+    e. Research done, the whole-flow plan sent to him. WAITING FOR HIS YES.
 
 217. **Download our data, a review of today, then simplicity.** (2026-11-16)
     a. "Download our data: if you've checked it and everything checks out,
