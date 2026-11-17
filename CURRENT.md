@@ -849,6 +849,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+221. **The medical record page: get it right.** (2026-11-17)
+    a. "When I click the button that says add, suspend, or stop medicine, why
+       does it scroll down?... Why doesn't it open the charts?"
+    b. "We have a drop-down button. This drop-down button itself is not as
+       pronouncing as I expect it."
+    c. Common words: "which one is for 2 days and for 1 week again? Inside of
+       the list of medicine: painful urination, dizziness, chest pain."
+    d. "As I am picking something, the thing is still taking me down to the
+       bottom... You click one button, it will just scroll from the viewport."
+    e. "What if the word is not there? Is there a place for the doctor to type
+       in the word themselves?"
+    f. Medicines: "what if the medication... is too plenty? You have to scroll
+       to the bottom to see Other... I thought it's all the medicine in the
+       pharmacy that will be displayed."
+    g. "I'm on the dark mode. Let me change to light mode. It's not the same
+       design."
+    h. "Please go back to this page, this medical record page. We have to get
+       it right... Check the consultation and... the medical records." Also
+       asked whether records preload for when the internet drops.
+
 220. **SQL yes; medicines without a note; drop downs for long lists.** (2026-11-17)
     a. "Rhema backup timer is done." The first token was saved as plain
        text and wiped by a deploy; it was also partly shown in a screenshot,
