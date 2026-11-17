@@ -849,6 +849,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+220. **SQL yes; medicines without a note; drop downs for long lists.** (2026-11-17)
+    a. "Rhema backup timer is done." Token: 1 year expiry (his choice of
+       steps); renewal reminder in Decided below once the date is known.
+    b. "Run the SQLs first." His yes to the 219c batch (migration
+       20261117003602).
+    c. "If a doctor adds a medicine, doctor must add a note to it. Is it
+       compulsory? Is that how other platforms design it? And why?"
+    d. "If they are picking from a selection, long selections should just
+       have drop downs that you can choose from with a search bar, of which
+       the first letter populates only those words that start with their
+       first letter. So it's more minimalistic and easier to use."
+
 219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
     a. The token goes on the main hospital Cloudflare account (asked which).
     b. "Check the things that you have put live for the doctor. Check that
