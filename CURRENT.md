@@ -878,6 +878,28 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     save anywhere: requests while moving 82, now 47 (counts at most once in
     10 seconds, never in the background); every screen's code is fetched
     ahead once. LIVE with this entry.
+    HIS ANSWERS (2026-11-17), "yes on the SQL as long as all is well":
+    a1. Offline copy: "anyone with a visit now is better" (open visits only).
+    a2. Text only; files show that they exist and load when opened.
+    a3. "Front desk keeps what is their business and let the nurses and
+        doctors keep theirs."
+    a4. Safety yes; "we just don't want them to lose data" (unsent work must
+        never be wiped).
+    a5. Log the copy and offline openings: yes. a6. Size fine "as long as
+        it doesn't slow the system". a7. Privacy notice line: yes if not risky.
+    c. All recommendations yes, plus: "the time column automatically
+       updates as you type and save" (the time of recording); "the nurse can
+       enter their name from a picker that contains only nurses, and for
+       doctors in consulting room"; "make it as easy as possible for them to
+       see, including the midwife/nurse who is currently consulting in room
+       2. She is the one in charge of antenatal patients." He sent photos of
+       the two ward sheets: drugs (Time, Name of drugs, Dosage, Route, Sign;
+       events in red: Blood connected, Blood got finished, Blood
+       disconnected; IVF in mls; routes IV, IM, Infusion, Orally) and vital
+       signs (Time, Temp, Pulse, Resp, BP, Sign). No patient details were in
+       the photos; none were copied into the repo.
+    NEXT after this: registration in one trip (one function), offered and
+    accepted with "all your recommendations are good".
 
 222. **A bubble disappears once the message is seen.** (2026-11-17)
     "When someone has already opened a message, even if the person did not
