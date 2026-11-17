@@ -849,6 +849,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+222. **A bubble disappears once the message is seen.** (2026-11-17)
+    "When someone has already opened a message, even if the person did not
+    respond... as long as the person has opened that message and seen it...
+    the bubble should disappear. The only thing that the bubble doesn't
+    disappear... is when a doctor or any nurse or lab or pharmacy requested
+    for something, a request or a sent to room... That one stays until the
+    person acts on it. But normal message, notification, all those things,
+    once the person has seen it, it should not be showing the bubble."
+
+223. **LATER, REMIND HIM: eye comfort research.** (2026-11-17)
+    "Save this for later, so you remind me... search open repos, different
+    places in the internet, how... we can include [eye care] into the app...
+    not just dimming the lights in a way that the system is no longer sharp
+    ... so that when the person is looking at the screen, it will feel okay in
+    the eyes, because some desktop, some older CPUs... even when you dim the
+    lights... That's why I actually added dark mode. Then evaluate the rate at
+    which people say that dark mode helps the eye... whether dark mode is just
+    enough." Research only, after the current work; he decides later.
+
 221. **The medical record page: get it right.** (2026-11-17)
     a. "When I click the button that says add, suspend, or stop medicine, why
        does it scroll down?... Why doesn't it open the charts?"
