@@ -889,6 +889,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        and GitHub secrets, tap Connect on live, turn on 2-Step Verification
        on the hospital's Gmail. LEFT FOR US: run drive-backup.yml once by hand
        and check the zip lands, then move 226b to DONE.
+    b ASKED 2026-11-17 (late): "encryption is the word. So we can scramble
+       it, then they'll not understand anything. But how do you now get the
+       file to be readable eventually? ... it has to be scrambled with a key
+       kept outside... outside the Google Drive." Explained: AES-256 zip
+       (opens in free 7-Zip), long random key, kept as a GitHub secret for
+       the job and on a printed recovery sheet in the hospital safe, plus a
+       StellaXafe copy. WAITING FOR HIS YES. Not built.
        Token rights: GOOGLE app asks only drive.file (files it made) and
        email. GITHUB_BACKUP_TOKEN already could start any workflow; nothing
        new.
