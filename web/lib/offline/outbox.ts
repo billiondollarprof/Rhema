@@ -17,9 +17,10 @@
  * The database's double tap guard and a check before each resend make sure
  * nothing is saved twice.
  *
- * Kept per person on this device, and wiped when they sign out.
+ * Kept per person on this device. It is NOT wiped at sign out (request 224,
+ * 2026-11-17: no lost data): it is sent when that person signs in here again.
  *
- * Never: keep anything here after it is sent, or after sign out.
+ * Never: keep anything here after it is sent.
  */
 
 // ===== 1. Shapes =====
@@ -125,7 +126,7 @@ export function markFailed(staffId: string, id: string, why: string) {
   )
 }
 
-// Sign out: nothing of this person's stays on the device.
+// Not used at sign out any more (request 224); kept for a deliberate clear.
 export function wipeOutbox(staffId: string) {
   try {
     localStorage.removeItem(key(staffId))

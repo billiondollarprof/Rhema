@@ -32,8 +32,9 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
-import { wipeOutbox } from '@/lib/offline/outbox'
+import { wipeRecordCopy } from '@/lib/offline/recordCopy'
 import { wipeCopy } from '@/lib/offline/patientCopy'
+import { isNetworkFailure } from '@/lib/offline/outbox'
 import { rememberEmail } from '@/lib/auth/known-emails'
 import { forgetAll } from '@/lib/cache/memory'
 import { adoptSession, clientFor, dropClient, pendingClient } from './clients'
@@ -102,19 +103,26 @@ export function useAuth(): AuthState {
 }
 
 // ===== 2. Small database questions =====
-async function loadStaff(client: SupabaseClient, id: string): Promise<StaffMember | null> {
-  const { data } = await client
+// 'offline': the network failed, so nobody can say (request 224). null: the
+// database answered, and this person is not active staff.
+async function loadStaff(
+  client: SupabaseClient,
+  id: string,
+): Promise<StaffMember | null | 'offline'> {
+  const { data, error } = await client
     .from('staff')
     .select(
       'id, full_name, role, can_admin, can_medical, can_lab, can_pharmacy, can_announce, room_id, room:rooms(name, kind)',
     )
     .eq('id', id)
     .maybeSingle()
+  if (error && isNetworkFailure(error)) return 'offline'
   return (data as StaffMember | null) ?? null
 }
 
-async function hasPin(client: SupabaseClient): Promise<boolean> {
-  const { data } = await client.rpc('i_have_a_pin')
+async function hasPin(client: SupabaseClient): Promise<boolean | 'offline'> {
+  const { data, error } = await client.rpc('i_have_a_pin')
+  if (error && isNetworkFailure(error)) return 'offline'
   return data === true
 }
 
@@ -164,10 +172,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Offline or already gone: still forget them on this device.
     }
     dropClient(id)
-    // Nothing of this person's stays on the device: the waiting list and
-    // the copy of recent patients go too (request 128, step 3).
-    wipeOutbox(id)
+    // The copy of recent patients and the records kept for no network go.
+    // Entries not sent yet STAY on this device and are sent when this person
+    // signs in here again (Anthony, 2026-11-17, request 224: "we just don't
+    // want them to lose data").
     wipeCopy(id)
+    void wipeRecordCopy(id)
     // And what the screens kept in memory (request 145).
     forgetAll(id)
     removeAccount(id)
@@ -193,10 +203,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // The staff row and "has a PIN" are asked at the same time, not one
       // after the other: on a slow network each question costs a second.
-      const [member, pinSet] = await Promise.all([
+      const [asked, pinAsked] = await Promise.all([
         known ?? loadStaff(personClient, id),
         hasPin(personClient),
       ])
+      // No network (request 224): carry on with what this device last read,
+      // so nobody is signed out, and nothing is lost, because of the network.
+      const member =
+        asked === 'offline' ? ((remembered.member as StaffMember | undefined) ?? null) : asked
+      const pinSet = pinAsked === 'offline' ? remembered.hasPin !== false : pinAsked
+      if (!member && asked === 'offline') {
+        // Never read before on this device: nothing to work with yet.
+        setNotice('No network. Connect once to open the app.')
+        setStatus('signed-out')
+        return
+      }
       if (!member) {
         await signOutHere(id, 'This account is switched off. Ask your administrator.')
         return
@@ -206,7 +227,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setClient(personClient)
       setStaff(member)
       const idleTooLong = Date.now() - remembered.lastActive > LOCK_AFTER_MS
-      const current = { ...remembered, name: member.full_name, role: member.role }
+      const current = {
+        ...remembered,
+        name: member.full_name,
+        role: member.role,
+        member,
+        hasPin: pinSet,
+      }
       saveAccount(current)
       setAccount(current)
 
@@ -225,6 +252,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // (Admin, request 112). Anybody else: nothing changes.
       await personClient.rpc('accept_my_invite')
       const member = await loadStaff(personClient, session.user.id)
+      if (member === 'offline') {
+        await signOutHere(session.user.id, null)
+        return 'No network. Check the connection and try again.'
+      }
       if (!member) {
         await signOutHere(session.user.id, null)
         return 'This email is not set up as hospital staff. Ask your administrator.'
@@ -329,7 +360,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshStaff = useCallback(async () => {
     if (!client || !account) return
     const member = await loadStaff(client, account.id)
-    if (member) setStaff(member)
+    if (member && member !== 'offline') setStaff(member)
   }, [client, account])
 
   useEffect(() => {

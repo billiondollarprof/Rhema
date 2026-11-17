@@ -905,3 +905,41 @@ a.small {
     font-size: 13px;
   }
 }
+
+/* ===== The consultation on its own full page (request 224) ===== */
+.fullNote {
+  display: grid;
+  gap: 14px;
+}
+
+/* Each part a row of the sheet: the name on the left on a wide screen,
+   the words on the right, growing as the doctor types, so all of it shows. */
+.sheetRow {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.sheetRow textarea {
+  min-height: 140px;
+  field-sizing: content;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+@media (min-width: 900px) {
+  .sheetRow {
+    grid-template-columns: 220px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: start;
+  }
+
+  .sheetRow > label {
+    grid-row: span 2;
+    font-size: 15px;
+    padding-top: 10px;
+  }
+}

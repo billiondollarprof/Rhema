@@ -42,6 +42,7 @@ export default function FilesSection({
   patientId,
   fromOldFile,
   onLoaded,
+  saved,
 }: {
   client: SupabaseClient
   staffId: string
@@ -50,8 +51,11 @@ export default function FilesSection({
   fromOldFile: boolean
   // Tells the page which files there are, for Download.
   onLoaded: (files: PatientFile[]) => void
+  // The list kept on the device for no network (request 224): the names
+  // show; a file itself still needs the network to open.
+  saved?: PatientFile[]
 }) {
-  const [files, setFiles] = useState<PatientFile[] | null>(null)
+  const [files, setFiles] = useState<PatientFile[] | null>(saved ?? null)
   const [chosen, setChosen] = useState<ReadyFile[]>([])
   const [adding, setAdding] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -69,12 +73,17 @@ export default function FilesSection({
     let current = true
     listPatientFiles(client, patientId).then((found) => {
       if (!current) return
+      // Nothing came back but the device copy has files: the network is
+      // down, so the copy's list stays.
+      if (found.length === 0 && saved?.length) return
       setFiles(found)
       onLoaded(found)
     })
     return () => {
       current = false
     }
+    // saved is the copy at the moment the record opened; read once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, patientId, onLoaded])
 
   // ===== 2. Attach the chosen files =====

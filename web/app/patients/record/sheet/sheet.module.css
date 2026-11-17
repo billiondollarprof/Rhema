@@ -1,0 +1,284 @@
+/*
+ * sheet.module.css: the treatment and vital signs sheets (request 224), in
+ * the layout of the ward's paper sheets. A table on a wide screen; on a
+ * phone each line keeps its time and name on top, the rest under it.
+ */
+
+/* ===== 1. Page ===== */
+.page {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.head small,
+.muted {
+  color: var(--mut);
+  font-size: 14px;
+  margin: 0;
+}
+
+.offline {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--warn-bg-2);
+  border: 1px solid var(--c-ffe0a3);
+  color: var(--c-9a5b00);
+  font-weight: 600;
+}
+
+.error {
+  margin: 0;
+  color: var(--c-b42318);
+  font-weight: 600;
+}
+
+/* ===== 2. Buttons and the two tabs ===== */
+.button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.primary {
+  background: var(--bl);
+  border-color: var(--bl);
+  color: #fff;
+}
+
+.button:disabled {
+  opacity: 0.6;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--tint-2);
+  max-width: 420px;
+}
+
+.tabs a {
+  text-align: center;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 10px;
+  color: var(--ink2);
+  text-decoration: none;
+}
+
+.tabs a[aria-selected='true'] {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+
+/* ===== 3. The empty line to fill in ===== */
+.entry {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 2px solid var(--bl);
+  background: var(--card);
+}
+
+.entryGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: end;
+}
+
+.cell {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.input {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--field-line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.timeNow {
+  font: inherit;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1px dashed var(--field-line);
+  background: var(--tint-1);
+  color: var(--ink);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entryButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ===== 4. The sheet ===== */
+.table {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.table h3 {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 15px;
+  background: var(--tint-2);
+}
+
+.row {
+  display: grid;
+  gap: 10px;
+  padding: 9px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  align-items: baseline;
+}
+
+.row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.drugRow {
+  grid-template-columns: 70px minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.4fr);
+}
+
+.vitalRow {
+  grid-template-columns: 70px repeat(5, minmax(0, 1fr)) minmax(0, 1.4fr);
+}
+
+.headRow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+}
+
+.time {
+  font-weight: 700;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+/* The ward's events, red as on the paper sheet. */
+.event {
+  color: var(--c-b42318);
+  font-weight: 700;
+}
+
+.row small {
+  color: var(--mut);
+}
+
+/* ===== 5. Phones ===== */
+@media (max-width: 640px) {
+  .wide {
+    grid-column: 1 / -1;
+  }
+
+  .entryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .headRow {
+    display: none;
+  }
+
+  .drugRow {
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  /* Time, drug, sign on the top line; dose and route under the drug. */
+  .drugRow > span:nth-child(3),
+  .drugRow > span:nth-child(4) {
+    grid-column: 2;
+    font-size: 14px;
+    color: var(--ink2);
+  }
+
+  .drugRow > span:nth-child(5) {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 13px;
+    color: var(--mut);
+    text-align: right;
+  }
+
+  .vitalRow {
+    grid-template-columns: 56px repeat(3, minmax(0, 1fr));
+    row-gap: 2px;
+  }
+
+  .vitalRow > span:nth-child(n + 5) {
+    font-size: 14px;
+  }
+
+  .vitalRow > span:nth-child(5) {
+    grid-column: 2;
+  }
+}

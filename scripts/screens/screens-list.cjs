@@ -227,6 +227,31 @@ module.exports.SCREENS = [
     roomId: 2,
     extra: RECORD_DAY,
   },
+  // Request 224: the ward's sheets and the consultation, full page.
+  {
+    path: '/patients/record/sheet/?p=1&s=drugs',
+    waitFor: 'Save line',
+    medical: true,
+    role: 'nurse',
+    roomId: 6,
+    extra: RECORD_DAY,
+  },
+  {
+    path: '/patients/record/sheet/?p=1&s=vitals',
+    waitFor: 'Save readings',
+    medical: true,
+    role: 'nurse',
+    roomId: 6,
+    extra: RECORD_DAY,
+  },
+  {
+    path: '/patients/record/consult/?p=1',
+    waitFor: 'Seen by',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    extra: RECORD_DAY,
+  },
   // Request 170: an antenatal patient's record, with the booking and the consent.
   {
     path: '/patients/record/?p=1',

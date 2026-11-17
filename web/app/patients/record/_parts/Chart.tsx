@@ -30,6 +30,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { DosesSection, MedicationsSection } from './Medications'
@@ -103,6 +104,14 @@ export default function MedicationChart({ client, staffId, patientId, record, re
         </div>
       )}
       <div className={styles.actions}>
+        {/* The whole treatment sheet, full page, like the ward's paper one
+            (request 224). */}
+        <Link
+          className={`${styles.small} ${styles.primary}`}
+          href={`/patients/record/sheet/?p=${patientId}&s=drugs`}
+        >
+          Open the treatment sheet
+        </Link>
         <button
           className={styles.small}
           aria-expanded={managing}
@@ -154,9 +163,11 @@ export default function MedicationChart({ client, staffId, patientId, record, re
                 {dose.medicine}
               </span>
               <span role="cell" className={dose.not_given_reason ? styles.chartLate : undefined}>
-                {dose.not_given_reason ? `Not given: ${dose.not_given_reason}` : (dose.dose ?? '-')}
+                {dose.not_given_reason
+                  ? `Not given: ${dose.not_given_reason}`
+                  : [dose.dose, dose.route].filter(Boolean).join(' · ') || '-'}
               </span>
-              <span role="cell">{dose.giver?.full_name ?? 'staff'}</span>
+              <span role="cell">{dose.signer?.full_name ?? dose.giver?.full_name ?? 'staff'}</span>
             </div>
           ))}
         </div>
@@ -270,6 +281,7 @@ function ChartRow({
       medication_id: medication.id,
       medicine: medication.medicine,
       dose: dose.trim() || null,
+      route: medication.route ?? null,
       // "Yes, given" without Change: the time is now.
       given_at: step === 'changing' ? new Date(givenAt).toISOString() : new Date().toISOString(),
       given_by: staffId,
@@ -289,14 +301,17 @@ function ChartRow({
     <div className={styles.chartRow} role="row">
       <span role="cell" className={styles.chartMedicine}>
         <b>{medication.medicine}</b>
-        <small>{[medication.dose, medication.how_often].filter(Boolean).join(' · ') || ' '}</small>
+        <small>
+          {[medication.dose, medication.route, medication.how_often].filter(Boolean).join(' · ') ||
+            ' '}
+        </small>
       </span>
       <span role="cell" className={styles.chartCell}>
         <small className={styles.chartLabel}>Last given</small>
         {last ? (
           <>
             {shortTime(new Date(last.given_at))}
-            <small>{last.giver?.full_name ?? 'staff'}</small>
+            <small>{last.signer?.full_name ?? last.giver?.full_name ?? 'staff'}</small>
           </>
         ) : (
           'Not yet'

@@ -27,11 +27,18 @@
  * PDF from the print window) or "Attachments only" (each file to the
  * device).
  *
- * Never: show any part of the record before openRecord succeeds.
+ * With no network (request 224): a record not already in memory opens from
+ * the copy kept on this device for patients with a visit open now
+ * (lib/offline/recordCopy.ts), under a banner saying so. That opening is
+ * noted and written in the activity log when the network is back.
+ *
+ * Never: show any part of the record before openRecord succeeds, except
+ * the device copy, whose saving was itself logged.
  */
 'use client'
 
 import { markDispensedSeenFor } from '@/lib/pharmacy/pharmacy'
+import { noteOfflineView, readSavedRecord, type SavedRecord } from '@/lib/offline/recordCopy'
 import { AntenatalSection, ConsentSection } from './_parts/Antenatal'
 import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useState } from 'react'
@@ -103,6 +110,9 @@ function PatientRecord() {
     recall<MedicalRecord>(auth.staff?.id, `record:${id}`),
   )
   const [refused, setRefused] = useState(false)
+  // The copy kept for no network (request 224): shown, with a banner, when
+  // the record cannot be read now.
+  const [saved, setSaved] = useState<(SavedRecord & { savedAt: number }) | null>(null)
   // The files on the record, for Download (Files section tells us).
   const [files, setFiles] = useState<PatientFile[]>([])
   const [choosing, setChoosing] = useState(false)
@@ -115,15 +125,41 @@ function PatientRecord() {
   useEffect(() => {
     if (!client || !id || auth.status !== 'ready' || !allowed) return
     let current = true
+    // Nothing in memory: the copy kept for no network shows at once, while
+    // the network is tried (request 224).
+    const fromCopy = async () => {
+      if (!staffId || recall(staffId, `record:${id}`)) return null
+      const copy = await readSavedRecord(staffId, id)
+      if (copy && current) {
+        setPatient((now) => now ?? copy.patient)
+        setRecord((now) => now ?? copy.record)
+        setSaved(copy)
+      }
+      return copy
+    }
+    // The network failed and the copy is showing: noted, and written in the
+    // activity log when the network is back.
+    const offline = (copy: SavedRecord | null) => {
+      if (copy && staffId) noteOfflineView(staffId, id)
+    }
     ;(async () => {
+      const copy = await fromCopy()
       const found = await getPatient(client, id)
       if (!current) return
+      if (!found && copy) {
+        offline(copy)
+        return
+      }
       // A patient not found while one is already showing (no network) keeps
       // what is showing.
       if (found || !recall(staffId ?? undefined, `patient:${id}`)) setPatient(found)
       if (!found) return
       const opened = await openRecord(client, id)
       if (!current) return
+      if (!opened && copy) {
+        offline(copy)
+        return
+      }
       if (!opened) {
         // Not opened, and nothing loaded before: the screen says so. If the
         // record is already showing, it stays.
@@ -131,12 +167,20 @@ function PatientRecord() {
         return
       }
       const loaded = await loadRecord(client, id)
+      if (!loaded && copy) {
+        offline(copy)
+        return
+      }
       if (!loaded) {
         if (!recall(staffId ?? undefined, `record:${id}`)) setRefused(true)
         return
       }
       if (staffId) remember(staffId, `record:${id}`, loaded)
-      if (current) setRecord(loaded)
+      if (current) {
+        setRecord(loaded)
+        // Read from the database: the copy is no longer what shows.
+        setSaved(null)
+      }
       // Opening the record clears this doctor's "dispensed" notices for
       // this patient (request 171c).
       if (staffId) void markDispensedSeenFor(client, staffId, id)
@@ -346,6 +390,16 @@ function PatientRecord() {
         {!stop && props && patient ? (
           <>
             <NotSent staffId={staff.id} patientId={props.patientId} />
+            {saved ? (
+              <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
+                No network. This is the copy kept on this device at{' '}
+                {new Date(saved.savedAt).toLocaleTimeString('en-GB', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+                . New entries wait here and are sent when the network is back.
+              </div>
+            ) : null}
             <AllergyBanner record={props.record} />
             <SummaryCard record={props.record} />
             {/* The doctor's plan, at the top for everybody but the doctor
@@ -362,7 +416,12 @@ function PatientRecord() {
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
                   />
-                  <LabSection client={client} patientId={props.patientId} sex={patient.sex} />
+                  <LabSection
+                    client={client}
+                    patientId={props.patientId}
+                    sex={patient.sex}
+                    saved={saved?.lab}
+                  />
                   <PrescriptionsSection client={client} patientId={props.patientId} />
                   <MedicationChart {...props} />
                   <VitalsSection {...props} />
@@ -374,6 +433,7 @@ function PatientRecord() {
                     patientId={props.patientId}
                     fromOldFile={patient.from_old_file}
                     onLoaded={setFiles}
+                    saved={saved?.files}
                   />
                 </div>
               ) : (
@@ -386,7 +446,12 @@ function PatientRecord() {
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
                   />
-                  <LabSection client={client} patientId={props.patientId} sex={patient.sex} />
+                  <LabSection
+                    client={client}
+                    patientId={props.patientId}
+                    sex={patient.sex}
+                    saved={saved?.lab}
+                  />
                   <PrescriptionsSection client={client} patientId={props.patientId} />
                   <VisitsSection record={props.record} />
                   <FilesSection
@@ -395,6 +460,7 @@ function PatientRecord() {
                     patientId={props.patientId}
                     fromOldFile={patient.from_old_file}
                     onLoaded={setFiles}
+                    saved={saved?.files}
                   />
                 </div>
               )}

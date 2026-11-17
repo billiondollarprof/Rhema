@@ -53,6 +53,8 @@ export type Condition = Voidable & {
 export type Medication = Voidable & {
   medicine: string
   dose: string | null
+  // IV, IM, Oral... (request 224); older lines have none.
+  route?: string | null
   how_often: string | null
   status: MedicationStatus
   created_at: string
@@ -73,6 +75,9 @@ export type DoseGiven = Voidable & {
   medicine: string
   // A dose that was due and not given, and why (request 219c); null when given.
   not_given_reason: string | null
+  // IV, IM, Oral... and the nurse who signed (request 224).
+  route?: string | null
+  signer?: { full_name: string } | null
   dose: string | null
   given_at: string
   note: string | null
@@ -89,6 +94,8 @@ export type Vitals = Voidable & {
   height_cm: number | null
   recorded_at: string
   recorder: { full_name: string } | null
+  // The nurse who took them, when another person typed (request 224).
+  signer?: { full_name: string } | null
 }
 export type Note = Voidable & {
   // A short heading for the note (request 214, 2026-11-16); older notes have none.
@@ -105,6 +112,8 @@ export type Consultation = Voidable & {
   plan: string | null
   created_at: string
   author: { full_name: string } | null
+  // The clinician who saw the patient (request 224).
+  signer?: { full_name: string } | null
 }
 
 // An "Other" vital sign: a measure that has no box of its own (Anthony,
@@ -203,7 +212,7 @@ export async function loadRecord(
     ),
     byPatient(
       'patient_medications',
-      `${VOID}, medicine, dose, how_often, status, created_at, author:staff!added_by(full_name)`,
+      `${VOID}, medicine, dose, route, how_often, status, created_at, author:staff!added_by(full_name)`,
       'created_at',
     ),
     byPatient(
@@ -213,14 +222,14 @@ export async function loadRecord(
     ),
     byPatient(
       'medications_given',
-      `${VOID}, medication_id, medicine, dose, given_at, note, not_given_reason, giver:staff!given_by(full_name)`,
+      `${VOID}, medication_id, medicine, dose, route, given_at, note, not_given_reason, giver:staff!given_by(full_name), signer:staff!signed_by(full_name)`,
       'given_at',
-    ).limit(50),
+    ).limit(200),
     byPatient(
       'vital_signs',
-      `${VOID}, systolic, diastolic, pulse, temperature_c, breathing_rate, spo2, weight_kg, height_cm, recorded_at, recorder:staff!recorded_by(full_name)`,
+      `${VOID}, systolic, diastolic, pulse, temperature_c, breathing_rate, spo2, weight_kg, height_cm, recorded_at, recorder:staff!recorded_by(full_name), signer:staff!signed_by(full_name)`,
       'recorded_at',
-    ).limit(30),
+    ).limit(100),
     byPatient(
       'nursing_notes',
       `${VOID}, title, note, created_at, author:staff!written_by(full_name)`,
@@ -228,7 +237,7 @@ export async function loadRecord(
     ).limit(50),
     byPatient(
       'consultation_notes',
-      `${VOID}, title, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name)`,
+      `${VOID}, title, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name), signer:staff!signed_by(full_name)`,
       'created_at',
     ).limit(30),
     byPatient(

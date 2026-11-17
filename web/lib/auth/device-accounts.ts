@@ -24,6 +24,10 @@ export type DeviceAccount = {
   role: string
   lastActive: number
   locked: boolean
+  // The last staff details read, and whether a PIN is set, so the app keeps
+  // working when it is opened with no network (request 224). Never a PIN.
+  member?: unknown
+  hasPin?: boolean
 }
 
 const LIST_KEY = 'rhema-device-accounts'
