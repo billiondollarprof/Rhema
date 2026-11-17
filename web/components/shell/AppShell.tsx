@@ -31,7 +31,8 @@ import Icon from './Icon'
 import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import OutboxSender from '@/components/offline/OutboxSender'
-import { loadNotices, totalOf } from '@/lib/notifications/notifications'
+import { loadNotices } from '@/lib/notifications/notifications'
+import { bubbleOf, seenKeys } from '@/lib/notifications/seen'
 import { onChange, refreshHere } from '@/lib/live/changes'
 import { playNoticeSound } from '@/lib/live/sound'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
@@ -117,8 +118,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const check = () =>
       void loadNotices(client, staff).then((notices) => {
         if (!current) return
-        const total = totalOf(notices)
-        const messages = totalOf(notices.filter((notice) => notice.key.startsWith('messages-')))
+        // Seen messages and notices stop counting (request 222).
+        const seen = seenKeys(staff.id)
+        const total = bubbleOf(notices, seen)
+        const messages = bubbleOf(
+          notices.filter((notice) => notice.key.startsWith('messages-')),
+          seen,
+        )
         // Something new waiting: the notification sound (request 171d). Not
         // on the first count, and not for a message while Messages is open
         // (that screen plays its own pom).
@@ -136,7 +142,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     // A message sent anywhere: count again at once (request 157).
     const stopListening = onChange(client, 'messages', check)
     const stopRecords = onChange(client, 'records', check)
+    // Something just seen on this device: count again at once.
+    window.addEventListener('rhema-seen', check)
     return () => {
+      window.removeEventListener('rhema-seen', check)
       stopListening()
       stopRecords()
       current = false

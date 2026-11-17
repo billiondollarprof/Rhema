@@ -29,7 +29,8 @@ import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import LabCard from '@/components/work/LabCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
-import { markAnnouncementRead } from '@/lib/messages/messages'
+import { markAnnouncementRead, markRead } from '@/lib/messages/messages'
+import { markSeen, seenKeys } from '@/lib/notifications/seen'
 import {
   cachedNotices,
   loadNotices,
@@ -78,7 +79,25 @@ export default function NotificationsPage() {
 
   function toggle(key: string) {
     setOpen((now) => (now.includes(key) ? now.filter((one) => one !== key) : [...now, key]))
+    // Unfolded is seen (request 222): a message is marked read (the
+    // sender's ticks turn), an announcement, result or dispensed note stops
+    // counting in the bubble. Work waiting is left alone.
+    const notice = notices?.find((one) => one.key === key)
+    if (!notice?.info || !staff || !client || open.includes(key)) return
+    markSeen(
+      staff.id,
+      notice.items.map((item) => item.key),
+    )
+    if (key.startsWith('messages-')) {
+      const ids = notice.items.map((item) => Number(item.key.replace('message-', '')))
+      void markRead(
+        client,
+        ids.filter((id) => id > 0),
+      )
+    }
   }
+  // Which info notices still hold something new, for the dot (request 222).
+  const seen = staff ? seenKeys(staff.id) : new Set<string>()
 
   // ===== 2. The list of folds =====
   return (
@@ -102,6 +121,9 @@ export default function NotificationsPage() {
               >
                 <Icon name="bell" size={18} />
                 <span>{notice.words}</span>
+                {notice.info && notice.items.every((item) => seen.has(item.key)) ? (
+                  <small className={styles.seen}>Seen</small>
+                ) : null}
                 <span className={`${styles.chevron} ${unfolded ? styles.up : ''}`} aria-hidden>
                   <Icon name="chevron" size={18} />
                 </span>
