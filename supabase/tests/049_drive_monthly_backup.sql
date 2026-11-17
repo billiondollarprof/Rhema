@@ -3,7 +3,8 @@
 --
 -- What this proves:
 --   1. Only an admin starts a link; the Front Desk is refused.
---   2. The Worker (anon, public key) finishes a link with a fresh code; the
+--   2. The admin's page finishes a link with a fresh code (anon until
+--      migration 20261117215423; the admin who started it since); the
 --      key is kept and the connection is logged; the same code twice, an
 --      old code and an unknown code all answer expired.
 --   3. Only an admin sees the link's state; nobody can read the key itself
@@ -45,9 +46,9 @@ reset role;
 \echo 'PASS 1: only an admin starts'
 
 
--- ===== 2. The Worker finishes, once =====
-select set_config('request.jwt.claims', '{}', true);
-set local role anon;
+-- ===== 2. The admin's page finishes, once =====
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000491"}', true);
+set local role authenticated;
 do $$
 declare code uuid := (select t.code from t049 t);
 begin
@@ -79,7 +80,7 @@ begin
   )
   insert into t049 select code from made;
 end $$;
-set local role anon;
+set local role authenticated;
 do $$
 declare old_code uuid := (select code from t049);
 begin
@@ -88,7 +89,7 @@ begin
   end if;
 end $$;
 reset role;
-\echo 'PASS 2: the Worker finishes once, with a fresh code'
+\echo 'PASS 2: the admin page finishes once, with a fresh code'
 
 
 -- ===== 3. State, the key, and Disconnect =====
