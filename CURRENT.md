@@ -849,6 +849,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+225. **Sheets: automatic name and time, tidy buttons, a running sheet.** (2026-11-17)
+    a. Buttons: "the way you put save and cancel like that... on the desktop,
+       it's too cluttered... I thought I told you to be screenshotting every
+       page... check other areas where the buttons are not okay on a desktop."
+    b. "The system should automatically take the name of the nurse that is
+       logged in as the person who entered the data... including the
+       consultants... which consultant is logged in, their name, and which
+       room... they don't need to manually select who did what. System keeps
+       the audit trail." (Replaces his earlier "picker that contains only
+       nurses".)
+    c. Time: "the moment they save, the time automatically takes the time
+       from the internet... not the time in the system, in case the system
+       is not correct."
+    d. Vital signs and other records "like Excel spreadsheets... signs that
+       change... the BP reading for today is no longer the same as
+       yesterday... they are supposed to add... as time goes on. Currently it
+       looks as though it's just one of something."
+
 224. **Records ready offline; instant moves; spreadsheet notes; lag.** (2026-11-17)
     a. "When you load the page for the first time, the most current patient
        data in the last 30 days... should load into the system and stay,
