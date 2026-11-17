@@ -849,6 +849,20 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+226. **Nigeria time on screen; monthly text backup to the hospital's Drive.** (2026-11-17)
+    a. Yes to always showing Nigeria time: "when the app does its own, it
+       still maintains the server time... within the app it just uses the
+       Nigeria time on its own. So if we deploy this same for a hospital in
+       India... it still uses server time regardless, and everything is
+       still correct... if the hospital downloads its data... still correct."
+    b. "Directly connect their Google Drive [the rhemamedical7 account]...
+       the system automatically downloads the data into their Google Drive
+       ... once before we enter a new month... strip off every other thing
+       and download the data based on text... create folders year by year,
+       year 2026, year 2027... inside of year 2026, a zip file month by
+       month... attached files will just be only in... Cloudflare." Asked
+       whether a connector or API is needed. PLAN SENT, WAITING FOR HIS YES.
+
 225. **Sheets: automatic name and time, tidy buttons, a running sheet.** (2026-11-17)
     a. Buttons: "the way you put save and cancel like that... on the desktop,
        it's too cluttered... I thought I told you to be screenshotting every
