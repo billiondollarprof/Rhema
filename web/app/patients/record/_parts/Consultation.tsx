@@ -10,7 +10,8 @@
  *   1. In a consulting room the note sits open at the top of the record.
  *   2. Four boxes in the order a doctor thinks: Symptoms and history,
  *      Examination findings, Diagnosis, Treatment plan. Under each box are
- *      the common words to tap (lib/record/phrases.ts); typing still works.
+ *      the common words to tap (lib/record/phrases.ts), the first 8 with
+ *      More for the rest; typing still works.
  *   3. Medicines for the chart: choose the medicine, the dose and how often,
  *      once. They go onto the medication chart when the note is saved, so a
  *      nurse never picks them again.
@@ -92,6 +93,10 @@ export default function ConsultationsSection({
   const [medicines, setMedicines] = useState<NewMedicine[]>([])
   const [problem, setProblem] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // The note is saved but some medicines were not: Save then adds only those.
+  const [noteSaved, setNoteSaved] = useState(false)
+  // The boxes whose tap words show in full (the first 8 show otherwise).
+  const [allWords, setAllWords] = useState<string[]>([])
   // After saving: offer Send to the nurses.
   const [saved, setSaved] = useState(false)
   const [sending, setSending] = useState(false)
@@ -145,6 +150,7 @@ export default function ConsultationsSection({
       // The note is saved; only these medicines are not.
       setParts(empty)
       setMedicines(left)
+      setNoteSaved(true)
       setProblem('The note is saved. These medicines were not added; try Save again.')
       return
     }
@@ -156,8 +162,7 @@ export default function ConsultationsSection({
   }
 
   // A medicines-only retry after a failed medicine (the note is already saved).
-  const onlyMedicines =
-    adding && medicines.length > 0 && Object.values(parts).every((v) => !v.trim())
+  const onlyMedicines = noteSaved && medicines.length > 0
 
   async function saveMedicinesOnly() {
     setBusy(true)
@@ -177,6 +182,7 @@ export default function ConsultationsSection({
     setMedicines(left)
     if (left.length) setProblem('These medicines were not added. Check the internet and try again.')
     else {
+      setNoteSaved(false)
       setProblem(null)
       setAdding(false)
       setSaved(true)
@@ -213,7 +219,10 @@ export default function ConsultationsSection({
                 onChange={(e) => setParts({ ...parts, [part.key]: e.target.value })}
               />
               <div className={styles.phrases} aria-label={`Common words for ${part.label}`}>
-                {PHRASES[part.key].map((phrase) => (
+                {(allWords.includes(part.key)
+                  ? PHRASES[part.key]
+                  : PHRASES[part.key].slice(0, 8)
+                ).map((phrase) => (
                   <button
                     key={phrase}
                     type="button"
@@ -225,6 +234,15 @@ export default function ConsultationsSection({
                     + {phrase}
                   </button>
                 ))}
+                {PHRASES[part.key].length > 8 && !allWords.includes(part.key) ? (
+                  <button
+                    type="button"
+                    className={`${styles.phrase} ${styles.phraseMore}`}
+                    onClick={() => setAllWords([...allWords, part.key])}
+                  >
+                    More…
+                  </button>
+                ) : null}
               </div>
             </div>
           ))}
@@ -321,6 +339,7 @@ export default function ConsultationsSection({
               onClick={() => {
                 setAdding(false)
                 setMedicines([])
+                setNoteSaved(false)
                 setProblem(null)
               }}
             >
