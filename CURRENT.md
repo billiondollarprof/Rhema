@@ -898,6 +898,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        disconnected; IVF in mls; routes IV, IM, Infusion, Orally) and vital
        signs (Time, Temp, Pulse, Resp, BP, Sign). No patient details were in
        the photos; none were copied into the repo.
+    STATUS: LIVE 2026-11-17 (SQL first, 0 new warnings on both; then the
+    screens; the full walkthrough passed). Records of open visits kept,
+    scrambled, on clinical staff's devices (logged; wiped at sign out and
+    after 24 hours); a record with no network opens from it under a banner
+    and the opening is logged later. FIXED on the way: opening the app with
+    no network signed people out as "switched off"; unsent entries were
+    wiped at sign out. Treatment and vital signs sheets full page (Sign
+    picked from nurses); the consultation full page (Seen by from consulting
+    rooms, midwife included); route on medicines and doses; privacy notice.
+    KNOWN LIMITS, told to him: unlocking the PIN screen needs the network
+    (the PIN is checked by the database); a phone that has not been opened
+    online for over an hour may still need the network to renew sign in.
     NEXT after this: registration in one trip (one function), offered and
     accepted with "all your recommendations are good".
 

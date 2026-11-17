@@ -975,3 +975,7 @@ this file.
   always in view, clearer fold arrows, compact summary. Light and dark checked.
 - **222 (2026-11-17): bubbles clear once seen.** Work waiting still counts until
   done. Also confirmed: the backup timer starts the backup on time.
+- **224 (2026-11-17): records with no network, ward sheets, consultation page.**
+  Open visits kept scrambled on clinical devices and logged; the treatment and
+  vital signs sheets like the ward's paper; the full-page consultation with Seen
+  by; route; signed by; fewer background requests. Checked on testing and live.
