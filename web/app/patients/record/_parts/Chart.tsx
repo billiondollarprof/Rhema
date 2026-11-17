@@ -16,6 +16,9 @@
  *   2. The row asks "Give 1 g now?". Tap "Yes, given". The time is now, the
  *      dose is the charted dose, and the nurse is the person signed in.
  *   3. Different dose or an earlier time? Tap Change first.
+ *   4. Not given (request 219c, number 2)? Tap Not given and the reason
+ *      (refused, vomited...). It is written down, never left blank, and the
+ *      next dose is worked out from that time.
  *
  * Adding, suspending or stopping a medicine stays in Current medications,
  * with its reasons (the database insists on them).
@@ -124,7 +127,9 @@ export default function MedicationChart({ client, staffId, patientId, record, re
               <span role="cell" className={styles.doseMedicine}>
                 {dose.medicine}
               </span>
-              <span role="cell">{dose.dose ?? '-'}</span>
+              <span role="cell" className={dose.not_given_reason ? styles.chartLate : undefined}>
+                {dose.not_given_reason ? `Not given: ${dose.not_given_reason}` : (dose.dose ?? '-')}
+              </span>
               <span role="cell">{dose.giver?.full_name ?? 'staff'}</span>
             </div>
           ))}
@@ -141,6 +146,16 @@ export default function MedicationChart({ client, staffId, patientId, record, re
   )
 }
 
+// The usual reasons a due dose is not given; Other is typed.
+const NOT_GIVEN_REASONS = [
+  'Refused',
+  'Vomited',
+  'Asleep or away',
+  'Not in stock',
+  'Doctor said to hold',
+  'Nil by mouth',
+]
+
 // ===== 2. One medicine: last dose, next due, Given =====
 function ChartRow({
   client,
@@ -152,15 +167,46 @@ function ChartRow({
 }: Props & { medication: Medication }) {
   // closed: only the Given button. asking: "Give 1 g now?". changing: the
   // dose and time boxes are open.
-  const [step, setStep] = useState<'closed' | 'asking' | 'changing'>('closed')
+  const [step, setStep] = useState<'closed' | 'asking' | 'changing' | 'notGiven'>('closed')
+  const [otherReason, setOtherReason] = useState('')
   const [dose, setDose] = useState(medication.dose ?? '')
   const [givenAt, setGivenAt] = useState(localNow())
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
 
   const last = lastDoseOf(medication, record.doses)
-  const due = nextDue(medication, last)
+  // The newest entry, given or not given: the next dose is worked out from it.
+  const lastTry = lastDoseOf(medication, record.doses, false)
+  const skipped = lastTry && lastTry.not_given_reason ? lastTry : null
+  const due = nextDue(medication, lastTry)
   const late = isLate(due)
+
+  // Not given: written down with its reason, now, with no dose.
+  async function notGiven(reason: string) {
+    if (reason.trim().length < 2) {
+      setProblem('Type the reason.')
+      return
+    }
+    setBusy(true)
+    const result = await addLine(client, 'medications_given', {
+      patient_id: patientId,
+      medication_id: medication.id,
+      medicine: medication.medicine,
+      dose: null,
+      not_given_reason: reason.trim(),
+      given_at: new Date().toISOString(),
+      given_by: staffId,
+    })
+    setBusy(false)
+    if (result) {
+      setProblem(result)
+      return
+    }
+    setProblem(null)
+    setOtherReason('')
+    setStep('closed')
+    reload()
+  }
 
   async function give() {
     setBusy(true)
@@ -200,6 +246,11 @@ function ChartRow({
         ) : (
           'Not yet'
         )}
+        {skipped ? (
+          <small className={styles.chartLate}>
+            Not given {shortTime(new Date(skipped.given_at))}: {skipped.not_given_reason}
+          </small>
+        ) : null}
       </span>
       <span role="cell" className={`${styles.chartCell} ${late ? styles.chartLate : ''}`}>
         <small className={styles.chartLabel}>Next due</small>
@@ -222,7 +273,34 @@ function ChartRow({
 
       {step !== 'closed' ? (
         <div className={styles.chartConfirm}>
-          {step === 'asking' ? (
+          {step === 'notGiven' ? (
+            <>
+              <b>Why was it not given?</b>
+              <div className={styles.phrases}>
+                {NOT_GIVEN_REASONS.map((reason) => (
+                  <button
+                    key={reason}
+                    type="button"
+                    className={styles.phrase}
+                    disabled={busy}
+                    onClick={() => notGiven(reason)}
+                  >
+                    {reason}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.field}>
+                <label htmlFor={`chart-why-${medication.id}`}>Another reason</label>
+                <input
+                  id={`chart-why-${medication.id}`}
+                  className={styles.input}
+                  maxLength={120}
+                  value={otherReason}
+                  onChange={(event) => setOtherReason(event.target.value)}
+                />
+              </div>
+            </>
+          ) : step === 'asking' ? (
             <b>
               Give {medication.dose ? `${medication.dose} of ` : ''}
               {medication.medicine} now?
@@ -254,19 +332,39 @@ function ChartRow({
           )}
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.actions}>
-            <button className={`${styles.small} ${styles.primary}`} disabled={busy} onClick={give}>
-              {busy ? 'Saving…' : 'Yes, given'}
-            </button>
-            {step === 'asking' ? (
-              <button className={styles.small} onClick={() => setStep('changing')}>
-                Change dose or time
+            {step === 'notGiven' ? (
+              <button
+                className={`${styles.small} ${styles.primary}`}
+                disabled={busy || otherReason.trim().length < 2}
+                onClick={() => notGiven(otherReason)}
+              >
+                {busy ? 'Saving…' : 'Save the reason'}
               </button>
+            ) : (
+              <button
+                className={`${styles.small} ${styles.primary}`}
+                disabled={busy}
+                onClick={give}
+              >
+                {busy ? 'Saving…' : 'Yes, given'}
+              </button>
+            )}
+            {step === 'asking' ? (
+              <>
+                <button className={styles.small} onClick={() => setStep('changing')}>
+                  Change dose or time
+                </button>
+                <button className={styles.small} onClick={() => setStep('notGiven')}>
+                  Not given
+                </button>
+              </>
             ) : null}
             <button
               className={styles.small}
               onClick={() => {
                 setStep('closed')
                 setProblem(null)
+                setOtherReason('')
                 setDose(medication.dose ?? '')
               }}
             >

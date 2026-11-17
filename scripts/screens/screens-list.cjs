@@ -36,6 +36,18 @@ const RECORD_DAY = {
     },
   ],
   'rest/v1/medications_given': [
+    // A dose that was due and not given (request 219c, number 2).
+    {
+      id: 3,
+      ...NOT_VOIDED,
+      medication_id: 2,
+      medicine: 'Paracetamol 500 mg tablet',
+      dose: null,
+      not_given_reason: 'Vomited',
+      given_at: hoursAgo(1),
+      note: null,
+      giver: NURSE,
+    },
     {
       id: 1,
       ...NOT_VOIDED,
@@ -55,6 +67,22 @@ const RECORD_DAY = {
       given_at: hoursAgo(2),
       note: null,
       giver: NURSE,
+    },
+  ],
+  // A lab result with values outside the normal range (request 219c, number 3).
+  'rest/v1/lab_results': [
+    {
+      id: 1,
+      request_id: null,
+      test: 'Full Blood Count',
+      result:
+        'HB: 10.2 g/dl (normal M 14 to 18, F 12 to 14)\nWBC: 12.5 x10³/mm³ (normal 4 to 10)\nNeutrophils: 62 % (normal 50 to 70)',
+      file_key: null,
+      file_name: null,
+      file_type: null,
+      file_size: null,
+      recorded_at: hoursAgo(5),
+      recorder: { full_name: 'Lab Scientist Uche' },
     },
   ],
   'rest/v1/consultation_notes': [
@@ -84,6 +112,86 @@ const RECORD_DAY = {
       height_cm: null,
       recorded_at: hoursAgo(14),
       recorder: NURSE,
+    },
+  ],
+}
+
+// The queue with an emergency and an urgent patient (request 219c, number 1).
+const QUEUE_PRIORITY = {
+  'rest/v1/queue_entries': [
+    {
+      id: 11,
+      patient_id: 1,
+      status: 'waiting',
+      note: null,
+      created_at: hoursAgo(1),
+      priority: 'normal',
+      room: { id: 6, name: 'Nursing Station 1', kind: 'nursing' },
+      patient: { patient_number: 'RMC-000001', full_name: 'Adaeze Okafor', category: 'individual' },
+    },
+    {
+      id: 12,
+      patient_id: 2,
+      status: 'waiting',
+      note: null,
+      created_at: hoursAgo(0.2),
+      priority: 'emergency',
+      room: { id: 6, name: 'Nursing Station 1', kind: 'nursing' },
+      patient: { patient_number: 'RMC-000002', full_name: 'Tunde Bello', category: 'individual' },
+    },
+    {
+      id: 13,
+      patient_id: 3,
+      status: 'waiting',
+      note: null,
+      created_at: hoursAgo(0.5),
+      priority: 'urgent',
+      room: { id: 6, name: 'Nursing Station 1', kind: 'nursing' },
+      patient: { patient_number: 'RMC-000003', full_name: 'Ngozi Eze', category: 'family' },
+    },
+  ],
+}
+// The Pharmacy's list with a line running low and stock expiring (number 6).
+const PHARMACY_ALERTS = {
+  'rest/v1/stock_moves': [
+    {
+      id: 1,
+      medicine_id: 7,
+      change: 200,
+      expiry_date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+      medicine: { name: 'Amoxicillin', strength: '500 mg capsule', in_stock: 150, unit: 'capsule' },
+    },
+  ],
+  'rest/v1/medicine_list': [
+    {
+      id: 7,
+      name: 'Amoxicillin',
+      strength: '500 mg capsule',
+      kind: 'medicine',
+      status: 'standard',
+      source: 'pharmacy',
+      is_active: true,
+      added_by: null,
+      created_at: hoursAgo(100),
+      adder: null,
+      unit: 'capsule',
+      in_stock: 150,
+      low_level: 50,
+    },
+    {
+      id: 8,
+      name: 'Paracetamol',
+      strength: '500 mg tablet',
+      kind: 'medicine',
+      status: 'standard',
+      source: 'pharmacy',
+      is_active: true,
+      added_by: null,
+      created_at: hoursAgo(100),
+      adder: null,
+      unit: 'tablet',
+      in_stock: 12,
+      low_level: 100,
     },
   ],
 }
@@ -138,6 +246,17 @@ module.exports.SCREENS = [
   { path: '/lab/patient/', waitFor: "Find a patient's tests", role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
   { path: '/pharmacy/list/', waitFor: 'Medicine list', role: 'pharmacy' },
+  // Request 219c: Running low and Expiring soon at the top.
+  { path: '/pharmacy/list/', waitFor: 'Running low', role: 'pharmacy', extra: PHARMACY_ALERTS },
+  // Request 219c: the queue shows emergencies first.
+  {
+    path: '/',
+    waitFor: 'Emergency',
+    role: 'nurse',
+    medical: true,
+    roomId: 6,
+    extra: QUEUE_PRIORITY,
+  },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },
   { path: '/messages/', waitFor: 'From Front Desk' },
   { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },

@@ -22,8 +22,9 @@
  *     lines of text, which is what the record already shows. A test not found
  *     here keeps the one free text box.
  *
- * Never: decide a diagnosis, or mark a value as good or bad. It only writes
- * what the Laboratory entered, with the unit and the normal range beside it.
+ * Never: decide a diagnosis. It only writes what the Laboratory entered,
+ * with the unit and the normal range beside it. Marking a value above or
+ * below its range is done in lib/lab/ranges.ts (request 219c).
  * Never: put anything about a real patient in this file.
  */
 

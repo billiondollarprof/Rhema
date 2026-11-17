@@ -27,6 +27,8 @@ export type LabRequest = {
   status: LabStatus
   requested_at: string
   completed_at: string | null
+  // When the Laboratory took the sample (request 219c); null before.
+  sample_taken_at: string | null
   patient: { full_name: string; patient_number: string } | null
   requester: { full_name: string } | null
 }
@@ -61,7 +63,7 @@ export const PAYMENT_MODES: [PaymentMode, string][] = [
 ]
 
 const REQUEST_COLUMNS =
-  'id, patient_id, tests, note, status, requested_at, completed_at, ' +
+  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, ' +
   'patient:patients(full_name, patient_number), requester:staff!lab_requests_requested_by_fkey(full_name)'
 
 // "₦7,500.50", "₦7,500".
@@ -307,4 +309,17 @@ export async function loadPatientLab(
     results: (results.data as unknown as LabResult[] | null) ?? [],
     open: (open.data as unknown as LabRequest[] | null) ?? [],
   }
+}
+
+// ===== Sample taken (request 219c, number 4) =====
+// The Laboratory taps it once; the doctor then sees the test is in progress.
+// A second tap changes nothing. Answers null when it is done.
+export async function markSampleTaken(
+  client: SupabaseClient,
+  requestId: number,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('mark_sample_taken', { request: requestId })
+  if (error) return 'That did not save. Check the internet and try again.'
+  if (data === 'not_paid') return 'This test has not been paid for yet.'
+  return null
 }

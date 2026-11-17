@@ -16,7 +16,8 @@
  *      once. They go onto the medication chart when the note is saved, so a
  *      nurse never picks them again.
  *   4. Save. Then "Send to the nurses" moves the patient to a nursing room;
- *      the nurses see the treatment plan at the top of the record.
+ *      the nurses see the treatment plan at the top of the record. "Request
+ *      lab" sits beside it (request 219c, number 5).
  *
  * The four boxes are the same four the database always had (complaint,
  * findings, assessment, plan), so old notes read with the new names.
@@ -30,6 +31,7 @@
  */
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -388,6 +390,10 @@ export default function ConsultationsSection({
               >
                 Send to the nurses
               </button>
+              {/* Tests from the same place as the note (request 219c, number 5). */}
+              <Link className={styles.small} href={`/lab/request/?p=${patientId}`}>
+                Request lab
+              </Link>
               <button className={styles.small} onClick={() => setSaved(false)}>
                 Not now
               </button>

@@ -71,6 +71,8 @@ export type DoseGiven = Voidable & {
   // The medicine's line in the chart; null for a dose not on the list.
   medication_id: number | null
   medicine: string
+  // A dose that was due and not given, and why (request 219c); null when given.
+  not_given_reason: string | null
   dose: string | null
   given_at: string
   note: string | null
@@ -211,7 +213,7 @@ export async function loadRecord(
     ),
     byPatient(
       'medications_given',
-      `${VOID}, medication_id, medicine, dose, given_at, note, giver:staff!given_by(full_name)`,
+      `${VOID}, medication_id, medicine, dose, given_at, note, not_given_reason, giver:staff!given_by(full_name)`,
       'given_at',
     ).limit(50),
     byPatient(

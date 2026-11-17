@@ -8,6 +8,9 @@
  * doctor calls..."): the visit there ends with the time, and a new one
  * starts in the chosen room, so a patient is never in two rooms at once.
  *
+ * How urgent (request 219c, 2026-11-17): Normal, Urgent or Emergency, Normal
+ * unless somebody taps another. The room's queue shows emergencies first.
+ *
  * Never: put clinical detail in the note. Everyone at that desk reads it.
  */
 'use client'
@@ -15,7 +18,7 @@
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
-import { loadRooms, sendToRoom } from '@/lib/patients/patients'
+import { loadRooms, PRIORITIES, sendToRoom, type Priority } from '@/lib/patients/patients'
 import { movePatient } from '@/lib/queue/queue'
 
 type SendProps = {
@@ -45,6 +48,9 @@ export default function SendToRoom({
   const [rooms, setRooms] = useState<{ id: number; name: string; kind: string }[]>([])
   const [roomId, setRoomId] = useState<number | null>(null)
   const [note, setNote] = useState('')
+  // How urgent (request 219c): Normal unless somebody says otherwise. A
+  // patient who is moved keeps the priority they already have.
+  const [priority, setPriority] = useState<Priority>('normal')
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
 
@@ -71,7 +77,7 @@ export default function SendToRoom({
     setProblem(null)
     const result = openVisit
       ? await movePatient(client, openVisit.id, roomId, note)
-      : await sendToRoom(client, patientId, roomId, note, staffId)
+      : await sendToRoom(client, patientId, roomId, note, staffId, priority)
     setBusy(false)
     if (result) setProblem(result)
     else onSent(rooms.find((room) => room.id === roomId)?.name ?? '')
@@ -103,6 +109,27 @@ export default function SendToRoom({
           ))}
         </select>
       </div>
+      {!openVisit ? (
+        <div className={styles.field}>
+          <span id="send-priority" className={styles.fieldName}>
+            How urgent?
+          </span>
+          <div className={styles.priorities} role="group" aria-labelledby="send-priority">
+            {PRIORITIES.map(([value, words]) => (
+              <button
+                key={value}
+                type="button"
+                className={styles.priority}
+                data-level={value}
+                aria-pressed={priority === value}
+                onClick={() => setPriority(value)}
+              >
+                {words}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className={styles.field}>
         <label htmlFor="send-note">Note for the staff there (optional)</label>
         <input

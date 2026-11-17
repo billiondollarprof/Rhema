@@ -15,6 +15,11 @@
  *   4. the whole list, searched by the first letters, each line editable or
  *      switched off (never deleted).
  *
+ * At the top (request 219c, 2026-11-17): Running low (counted lines at or
+ * below their warning level) and Expiring soon (new stock that expires
+ * within 90 days). Tapping one opens that medicine's stock. New stock can
+ * carry its expiry date.
+ *
  * Never: let anybody but the Pharmacy open this page's buttons. The database
  * refuses the writes too.
  */
@@ -30,11 +35,13 @@ import {
   groupMedicines,
   findMedicines,
   knownMedicines,
+  loadExpiring,
   loadMedicines,
   moveStock,
   setStockSettings,
   stockWords,
   updateMedicine,
+  type ExpiringBatch,
   type MedicineLine,
 } from '@/lib/medicines/medicines'
 import SearchSelect from '@/components/options/SearchSelect'
@@ -63,11 +70,15 @@ export default function MedicineListPage() {
   // The line whose stock is open (request 214).
   const [stockFor, setStockFor] = useState<number | null>(null)
 
+  // Stock that expires within 90 days (request 219c).
+  const [expiring, setExpiring] = useState<ExpiringBatch[]>([])
+
   const staffId = staff?.id
   const reload = useCallback(async () => {
     if (!client || !staffId) return
-    const fresh = await loadMedicines(client, staffId)
+    const [fresh, soon] = await Promise.all([loadMedicines(client, staffId), loadExpiring(client)])
     if (fresh) setLines(fresh)
+    setExpiring(soon)
   }, [client, staffId])
 
   useEffect(() => {
@@ -82,6 +93,18 @@ export default function MedicineListPage() {
     [mine],
   )
   const starter = useMemo(() => lines.filter((line) => line.source === 'starter'), [lines])
+  // Counted lines at or below their warning level (request 219c, number 6).
+  const low = useMemo(
+    () =>
+      lines.filter(
+        (line) =>
+          line.is_active &&
+          line.in_stock !== null &&
+          line.low_level !== null &&
+          Number(line.in_stock) <= Number(line.low_level),
+      ),
+    [lines],
+  )
   const names = useMemo(() => groupMedicines(mine.filter((l) => l.status === 'standard')), [mine])
   const shown = useMemo(() => findMedicines(names, search, 60), [names, search])
   // Switched off lines, shown to the Pharmacy only, to switch back on.
@@ -153,6 +176,74 @@ export default function MedicineListPage() {
             : 'Syringes, plaster and other things that are not drugs. Only the Pharmacy sees this list.'}
         </p>
         {problem ? <p className={styles.error}>{problem}</p> : null}
+
+        {/* ----- Running low and expiring soon (request 219c, number 6) ----- */}
+        {low.length > 0 ? (
+          <div className={`${styles.card} ${styles.alertCard}`}>
+            <div className={styles.sectionHead}>
+              <b>Running low ({low.length})</b>
+            </div>
+            {low.map((line) => (
+              <button
+                key={line.id}
+                type="button"
+                className={styles.alertRow}
+                onClick={() => {
+                  setTab(line.kind)
+                  setSearch(line.name)
+                  setStockFor(line.id)
+                }}
+              >
+                <span>
+                  <b>{line.name}</b>
+                  {line.strength ? ` · ${line.strength}` : ''}
+                </span>
+                <small>
+                  {stockWords(line)}, warning at {Number(line.low_level)}
+                </small>
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {expiring.length > 0 ? (
+          <div className={`${styles.card} ${styles.alertCard}`}>
+            <div className={styles.sectionHead}>
+              <b>Expiring soon ({expiring.length})</b>
+            </div>
+            <p className={styles.muted}>
+              Stock that expires within 90 days. Check the shelf, and use Correct the count with
+              Expired for any that has gone off.
+            </p>
+            {expiring.map((batch) => {
+              const past = batch.expiry_date < new Date().toISOString().slice(0, 10)
+              return (
+                <button
+                  key={batch.id}
+                  type="button"
+                  className={styles.alertRow}
+                  onClick={() => {
+                    setSearch(batch.medicine?.name ?? '')
+                    setStockFor(batch.medicine_id)
+                  }}
+                >
+                  <span>
+                    <b>{batch.medicine?.name ?? 'Medicine'}</b>
+                    {batch.medicine?.strength ? ` · ${batch.medicine.strength}` : ''}
+                  </span>
+                  <small className={past ? styles.expired : undefined}>
+                    {past ? 'Expired' : 'Expires'}{' '}
+                    {new Date(batch.expiry_date).toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}{' '}
+                    · {Number(batch.change)} added
+                  </small>
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
 
         {/* ----- Waiting for the Pharmacy ----- */}
         {pending.length > 0 ? (
@@ -432,6 +523,8 @@ function StockEditor({
   const [unit, setUnit] = useState(line.unit ?? '')
   const [low, setLow] = useState(line.low_level !== null ? String(line.low_level) : '')
   const [added, setAdded] = useState('')
+  // The new stock's expiry date (request 219c); optional.
+  const [expires, setExpires] = useState('')
   const [count, setCount] = useState('')
   const [why, setWhy] = useState('correction')
   const [busy, setBusy] = useState(false)
@@ -499,10 +592,22 @@ function StockEditor({
             onChange={(event) => setAdded(event.target.value.replace(/[^\d.]/g, ''))}
           />
         </div>
+        <div>
+          <label htmlFor={`expires-${line.id}`}>Expiry date (optional)</label>
+          <input
+            id={`expires-${line.id}`}
+            className={styles.input}
+            type="date"
+            value={expires}
+            onChange={(event) => setExpires(event.target.value)}
+          />
+        </div>
         <button
           className={`${styles.button} ${styles.small}`}
           disabled={busy || !(Number(added) > 0)}
-          onClick={() => act(() => moveStock(client, line.id, Number(added), 'restock', null))}
+          onClick={() =>
+            act(() => moveStock(client, line.id, Number(added), 'restock', null, expires || null))
+          }
         >
           Add to stock
         </button>

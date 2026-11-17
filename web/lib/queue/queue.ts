@@ -24,6 +24,8 @@ export type QueueEntry = {
   status: QueueStatus
   note: string | null
   created_at: string
+  // Emergency, urgent or normal (request 219c).
+  priority: 'emergency' | 'urgent' | 'normal'
   room: { id: number; name: string; kind: string } | null
   patient: { patient_number: string; full_name: string; category: string } | null
 }
@@ -106,7 +108,7 @@ export async function loadOpenQueue(client: SupabaseClient): Promise<QueueEntry[
   const { data } = await client
     .from('queue_entries')
     .select(
-      'id, patient_id, status, note, created_at, room:rooms(id, name, kind), patient:patients(patient_number, full_name, category)',
+      'id, patient_id, status, note, created_at, priority, room:rooms(id, name, kind), patient:patients(patient_number, full_name, category)',
     )
     .neq('status', 'done')
     .order('created_at', { ascending: true })

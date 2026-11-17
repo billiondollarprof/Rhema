@@ -39,6 +39,7 @@ import {
   type ResultItem,
 } from '@/lib/lab/lab'
 import { LAB_SECTIONS, composeResult, findLabTest, type LabTest } from '@/lib/lab/catalogue'
+import { markOf } from '@/lib/lab/ranges'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
 import { addOption } from '@/lib/options/options'
 import { choiceKey, loadAddedChoices, saveAddedChoice } from '@/lib/lab/addedChoices'
@@ -458,6 +459,16 @@ function ResultBoxes({
                 </button>
               ) : null}
               {field.range ? <small>Normal: {field.range}</small> : null}
+              {/* Out of range as it is typed (request 219c, number 3), so a
+                  slip of the finger shows at once. Ranges for men and women
+                  are marked in the record, where the patient's sex is known. */}
+              {field.range && markOf(`${field.name}: ${value} (normal ${field.range})`, null) ? (
+                <small className={styles.outOfRange}>
+                  {markOf(`${field.name}: ${value} (normal ${field.range})`, null) === 'high'
+                    ? '↑ Above the normal range'
+                    : '↓ Below the normal range'}
+                </small>
+              ) : null}
             </div>
           </Fragment>
         )

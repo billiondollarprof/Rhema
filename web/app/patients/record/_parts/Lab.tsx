@@ -10,6 +10,9 @@
  * A result with an attached printout (slice 2) has an "Open attached file"
  * button; the Worker asks the database before it hands the file over.
  *
+ * A value outside its normal range shows an arrow and High or Low beside
+ * it (request 219c, number 3; lib/lab/ranges.ts).
+ *
  * Never: show a result anywhere outside the opened record. Opening the
  * record is what puts the reading in the activity log.
  */
@@ -24,13 +27,17 @@ import styles from './record.module.css'
 import { STATUS_WORDS, loadPatientLab, type LabRequest, type LabResult } from '@/lib/lab/lab'
 import { when } from '@/lib/record/record'
 import { openFile } from '@/lib/lab/files'
+import { markOf } from '@/lib/lab/ranges'
 
 export default function LabSection({
   client,
   patientId,
+  sex = null,
 }: {
   client: SupabaseClient
   patientId: number
+  // For the ranges that differ for men and women.
+  sex?: string | null
 }) {
   // fresh: a test is waiting, or a result came in within a day. Then the
   // section opens by itself.
@@ -84,7 +91,10 @@ export default function LabSection({
             what={<b>{request.tests.join(', ')}</b>}
             status={
               <span className={`${styles.pill} ${styles.orange}`}>
-                {STATUS_WORDS[request.status]}
+                {/* Request 219c, number 4: the Laboratory has the sample. */}
+                {request.sample_taken_at && request.status === 'awaiting_test'
+                  ? `Sample taken ${when(request.sample_taken_at)}`
+                  : STATUS_WORDS[request.status]}
               </span>
             }
             meta={`Asked by ${request.requester?.full_name ?? 'staff'} · ${when(request.requested_at)}`}
@@ -101,13 +111,32 @@ export default function LabSection({
             meta={`${result.recorder?.full_name ?? 'Laboratory'} · ${when(result.recorded_at)}`}
             voided={null}
           >
-            <p className={styles.resultText}>{result.result}</p>
+            <ResultLines text={result.result} sex={sex} />
             {result.file_key ? (
               <OpenFile client={client} fileKey={result.file_key} name={result.file_name} />
             ) : null}
           </Line>
         ))}
       </Section>
+    </div>
+  )
+}
+
+// ===== A result, one line at a time, with High or Low where it is out of range =====
+function ResultLines({ text, sex }: { text: string; sex: string | null }) {
+  return (
+    <div className={styles.resultText}>
+      {text.split('\n').map((line, at) => {
+        const mark = markOf(line, sex)
+        return (
+          <div key={at} className={mark ? styles.resultOut : undefined}>
+            {line}
+            {mark ? (
+              <span className={styles.resultMark}>{mark === 'high' ? ' ↑ High' : ' ↓ Low'}</span>
+            ) : null}
+          </div>
+        )
+      })}
     </div>
   )
 }

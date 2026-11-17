@@ -362,7 +362,7 @@ function PatientRecord() {
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
                   />
-                  <LabSection client={client} patientId={props.patientId} />
+                  <LabSection client={client} patientId={props.patientId} sex={patient.sex} />
                   <PrescriptionsSection client={client} patientId={props.patientId} />
                   <MedicationChart {...props} />
                   <VitalsSection {...props} />
@@ -388,7 +388,7 @@ function PatientRecord() {
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
                   />
-                  <LabSection client={client} patientId={props.patientId} />
+                  <LabSection client={client} patientId={props.patientId} sex={patient.sex} />
                   <PrescriptionsSection client={client} patientId={props.patientId} />
                   <MedicationsSection {...props} open={false} />
                   <DosesSection {...props} open={false} />
