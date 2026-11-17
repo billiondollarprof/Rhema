@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-17 (afternoon): request 224 LIVE. Records for no network, the
+  ward's sheets, the full-page consultation, route and signed by. Fixed:
+  no-network sign out, unsent entries wiped at sign out. Next: registration
+  in one trip; then 223 (eye comfort research) when he asks.
+
 - 2026-11-17 (morning): request 221 LIVE: the record page reworked so nothing
   scrolls away. Backup token saved as a Secret; first timer run due 07:17 UTC.
 

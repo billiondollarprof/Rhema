@@ -103,30 +103,10 @@
 }
 
 /* ===== 3. The empty line to fill in ===== */
-.entry {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border-radius: 16px;
-  border: 2px solid var(--bl);
-  background: var(--card);
-}
-
-.entryGrid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  align-items: end;
-}
-
 .cell {
   display: grid;
   gap: 4px;
   min-width: 0;
-}
-
-.wide {
-  grid-column: span 2;
 }
 
 .label {
@@ -236,14 +216,6 @@
 
 /* ===== 5. Phones ===== */
 @media (max-width: 640px) {
-  .wide {
-    grid-column: 1 / -1;
-  }
-
-  .entryGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .headRow {
     display: none;
   }
@@ -280,5 +252,114 @@
 
   .vitalRow > span:nth-child(5) {
     grid-column: 2;
+  }
+}
+
+/* ===== 6. One running sheet (request 225) ===== */
+/* The new line, inside the table under the headings, shaded so it reads as
+   the line to fill in. Its labels show only on a phone, where there are no
+   headings. */
+.entryRow {
+  background: var(--tint-1);
+  align-items: start;
+  border-top: 2px solid var(--bl);
+}
+
+.entryRow .label {
+  display: none;
+}
+
+.entryFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--tint-1);
+  border-bottom: 2px solid var(--bl);
+}
+
+.entryFoot .entryButtons {
+  margin-left: auto;
+}
+
+.me {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  overflow-wrap: normal;
+}
+
+.bp {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.dayRow {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--tint-2);
+  border-top: 1px solid var(--line);
+}
+
+.none {
+  margin: 0;
+  padding: 14px 12px;
+  color: var(--mut);
+}
+
+.drugRow.entryRow {
+  grid-template-columns: 110px minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.4fr);
+}
+
+.drugRow.headRow,
+.drugRow {
+  grid-template-columns: 110px minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.4fr);
+}
+
+.vitalRow,
+.vitalRow.entryRow {
+  grid-template-columns: 90px repeat(3, minmax(0, 0.8fr)) minmax(0, 1.5fr) minmax(0, 0.8fr) minmax(
+      0,
+      1.4fr
+    );
+}
+
+@media (max-width: 900px) {
+  .entryRow .label {
+    display: block;
+  }
+
+  .drugRow.entryRow,
+  .vitalRow.entryRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .drugRow.entryRow > .cell:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Phones: the written lines in two columns, the name never broken letter by
+   letter (request 225). These come last so they win over the wide layout. */
+@media (max-width: 640px) {
+  .drugRow:not(.entryRow):not(.headRow) {
+    grid-template-columns: 52px minmax(0, 1fr) minmax(0, 32%);
+  }
+
+  .drugRow:not(.entryRow) > span:last-child {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .vitalRow:not(.entryRow):not(.headRow) {
+    grid-template-columns: 52px repeat(3, minmax(0, 1fr));
   }
 }

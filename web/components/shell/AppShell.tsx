@@ -33,6 +33,7 @@ import AttentionAlerts from '@/components/attention/AttentionAlerts'
 import OutboxSender from '@/components/offline/OutboxSender'
 import { loadNotices } from '@/lib/notifications/notifications'
 import { bubbleOf, seenKeys } from '@/lib/notifications/seen'
+import { syncClock } from '@/lib/time/serverTime'
 import { onChange, refreshHere } from '@/lib/live/changes'
 import { playNoticeSound } from '@/lib/live/sound'
 import { AttentionMenuContext } from '@/components/attention/AttentionContext'
@@ -125,6 +126,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // The back button (request 171b): back to the previous screen of the
   // app; when this screen was opened first (a link, a refresh), to Home.
   const router = useRouter()
+  // The right time, from the internet, once per visit (request 225).
+  useEffect(() => {
+    void syncClock()
+  }, [])
   useEffect(() => {
     if (screensFetched) return
     screensFetched = true

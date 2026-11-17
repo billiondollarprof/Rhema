@@ -45,7 +45,7 @@ import SearchSelect from '@/components/options/SearchSelect'
 import { medicineWords } from '@/lib/medicines/medicines'
 import { addPhrase, NOTE_PARTS, PHRASES } from '@/lib/record/phrases'
 import { addLine, when, type MedicalRecord } from '@/lib/record/record'
-import { clinicianOptions, ROUTES, type Signer } from '@/lib/record/signers'
+import { ROUTES } from '@/lib/record/signers'
 
 type Props = {
   client: SupabaseClient
@@ -57,7 +57,8 @@ type Props = {
   canWrite: boolean
   // The full page (request 224): the note fills the screen, with Seen by.
   fullPage?: boolean
-  signers?: Signer[]
+  // The person signed in, with their room, for Seen by (request 225).
+  me?: string
 }
 
 // A medicine the doctor charts with the note.
@@ -101,16 +102,14 @@ export default function ConsultationsSection({
   reload,
   canWrite,
   fullPage = false,
-  signers = [],
+  me = '',
 }: Props) {
   const empty = { title: '', complaint: '', findings: '', assessment: '', plan: '' }
   // On the full page the note is open to write at once.
   const [adding, setAdding] = useState(fullPage && canWrite)
-  // Seen by (request 224): whoever has a consulting room, the midwife in
-  // Consultant Room 2 included; the person signed in when they are one.
-  const clinicians = clinicianOptions(signers)
-  const [chosenSigner, setChosenSigner] = useState('')
-  const seenBy = chosenSigner || (clinicians.some((c) => c.value === staffId) ? staffId : '')
+  // Seen by: the person signed in, with their room (request 225); never
+  // picked by hand. The database records them as the signer too.
+  const seenBy = me
   const [parts, setParts] = useState<Record<string, string>>(empty)
   const [medicines, setMedicines] = useState<NewMedicine[]>([])
   const [problem, setProblem] = useState<string | null>(null)
@@ -150,7 +149,6 @@ export default function ConsultationsSection({
         title: parts.title.trim() || null,
         ...values,
         written_by: staffId,
-        signed_by: seenBy || staffId,
       })
       if (result) {
         setBusy(false)
@@ -211,17 +209,13 @@ export default function ConsultationsSection({
               onChange={(e) => setParts({ ...parts, title: e.target.value })}
             />
           </div>
-          {fullPage ? (
-            <div className={styles.field}>
-              <label htmlFor="consult-seen-by">Seen by</label>
-              <SearchSelect
-                id="consult-seen-by"
-                value={seenBy}
-                placeholder="Choose who saw the patient"
-                options={clinicians}
-                onChange={setChosenSigner}
-              />
-            </div>
+          {/* Seen by: the person signed in, with their room, always
+              (request 225: "the system is supposed to know which consultant
+              is logged in, their name, and which room"). */}
+          {fullPage && seenBy ? (
+            <p className={styles.seenBy}>
+              Seen by <b>{seenBy}</b>
+            </p>
           ) : null}
           {NOTE_PARTS.map((part) => (
             <div className={`${styles.field} ${fullPage ? styles.sheetRow : ''}`} key={part.key}>
@@ -256,118 +250,134 @@ export default function ConsultationsSection({
             </div>
           ))}
 
-          {/* ===== 4. Medicines for the chart ===== */}
-          <div className={styles.chartIntro}>
-            <b>Medicines for the chart</b>
-            <p className={styles.muted}>
-              Chosen once here, they go onto the medication chart for the nurses.
-            </p>
-          </div>
-          {medicines.map((medicine, at) => (
-            <div key={at} className={styles.medicineLine}>
-              <div className={styles.fields}>
-                <div className={`${styles.field} ${styles.fieldWide}`}>
-                  <label htmlFor={`consult-med-${at}`}>Medicine</label>
-                  <MedicinePicker
-                    client={client}
-                    staffId={staffId}
-                    id={`consult-med-${at}`}
-                    name={medicine.name}
-                    strength={medicine.strength}
-                    onChange={(name, strength) =>
-                      setMedicines(
-                        medicines.map((m, i) => (i === at ? { ...m, name, strength } : m)),
-                      )
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor={`consult-dose-${at}`}>Dose</label>
-                  <OptionSelect
-                    client={client}
-                    staffId={staffId}
-                    list="dose"
-                    id={`consult-dose-${at}`}
-                    value={medicine.dose}
-                    onChange={(dose) =>
-                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, dose } : m)))
-                    }
-                    placeholder="Choose the dose"
-                    otherLabel="Type the dose"
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor={`consult-route-${at}`}>Route</label>
-                  <SearchSelect
-                    id={`consult-route-${at}`}
-                    value={medicine.route}
-                    placeholder="IV, IM, Oral…"
-                    options={ROUTES.map((route) => ({ value: route, label: route }))}
-                    onChange={(route) =>
-                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
-                    }
-                    onOther={(route) =>
-                      route &&
-                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor={`consult-often-${at}`}>How often</label>
-                  <OptionSelect
-                    client={client}
-                    staffId={staffId}
-                    list="frequency"
-                    id={`consult-often-${at}`}
-                    value={medicine.howOften}
-                    onChange={(howOften) =>
-                      setMedicines(medicines.map((m, i) => (i === at ? { ...m, howOften } : m)))
-                    }
-                    placeholder="Choose how often"
-                    otherLabel="Type how often"
-                  />
-                </div>
+          {/* ===== 4. Medicines for the chart, in their own box ===== */}
+          <div className={styles.medicinesCard}>
+            <div className={styles.medicinesHead}>
+              <div className={styles.chartIntro}>
+                <b>Medicines for the chart</b>
+                <p className={styles.muted}>
+                  Chosen once here, they go onto the medication chart for the nurses.
+                </p>
               </div>
               <button
                 type="button"
                 className={styles.small}
-                onClick={() => setMedicines(medicines.filter((_, i) => i !== at))}
+                onClick={() =>
+                  setMedicines([
+                    ...medicines,
+                    { name: '', strength: '', dose: '', route: '', howOften: '' },
+                  ])
+                }
               >
-                Remove this medicine
+                + Add a medicine
               </button>
             </div>
-          ))}
-          <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.small}
-              onClick={() =>
-                setMedicines([
-                  ...medicines,
-                  { name: '', strength: '', dose: '', route: '', howOften: '' },
-                ])
-              }
-            >
-              + Add a medicine
-            </button>
+            {medicines.map((medicine, at) => (
+              <div key={at} className={styles.medicineLine}>
+                <div className={styles.fields}>
+                  <div className={`${styles.field} ${styles.fieldWide}`}>
+                    <label htmlFor={`consult-med-${at}`}>Medicine</label>
+                    <MedicinePicker
+                      client={client}
+                      staffId={staffId}
+                      id={`consult-med-${at}`}
+                      name={medicine.name}
+                      strength={medicine.strength}
+                      onChange={(name, strength) =>
+                        setMedicines(
+                          medicines.map((m, i) => (i === at ? { ...m, name, strength } : m)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label htmlFor={`consult-dose-${at}`}>Dose</label>
+                    <OptionSelect
+                      client={client}
+                      staffId={staffId}
+                      list="dose"
+                      id={`consult-dose-${at}`}
+                      value={medicine.dose}
+                      onChange={(dose) =>
+                        setMedicines(medicines.map((m, i) => (i === at ? { ...m, dose } : m)))
+                      }
+                      placeholder="Choose the dose"
+                      otherLabel="Type the dose"
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label htmlFor={`consult-route-${at}`}>Route</label>
+                    <SearchSelect
+                      id={`consult-route-${at}`}
+                      value={medicine.route}
+                      placeholder="IV, IM, Oral…"
+                      options={ROUTES.map((route) => ({ value: route, label: route }))}
+                      onChange={(route) =>
+                        setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
+                      }
+                      onOther={(route) =>
+                        route &&
+                        setMedicines(medicines.map((m, i) => (i === at ? { ...m, route } : m)))
+                      }
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label htmlFor={`consult-often-${at}`}>How often</label>
+                    <OptionSelect
+                      client={client}
+                      staffId={staffId}
+                      list="frequency"
+                      id={`consult-often-${at}`}
+                      value={medicine.howOften}
+                      onChange={(howOften) =>
+                        setMedicines(medicines.map((m, i) => (i === at ? { ...m, howOften } : m)))
+                      }
+                      placeholder="Choose how often"
+                      otherLabel="Type how often"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className={styles.small}
+                  onClick={() => setMedicines(medicines.filter((_, i) => i !== at))}
+                >
+                  Remove this medicine
+                </button>
+              </div>
+            ))}
           </div>
 
-          {problem ? <p className={styles.error}>{problem}</p> : null}
-          <div className={styles.actions}>
-            <button className={`${styles.small} ${styles.primary}`} disabled={busy} onClick={save}>
-              {busy ? 'Saving…' : 'Save'}
-            </button>
-            <button
-              className={styles.small}
-              disabled={busy}
-              onClick={() => {
-                setAdding(false)
-                setMedicines([])
-                setProblem(null)
-              }}
-            >
-              Cancel
-            </button>
+          {/* ===== 4b. Save and Cancel, apart from everything else, on the
+              right, and always in view on the full page (request 225). ===== */}
+          <div className={`${styles.formFoot} ${fullPage ? styles.formFootStick : ''}`}>
+            {problem ? <p className={styles.error}>{problem}</p> : <span />}
+            <div className={styles.formButtons}>
+              {fullPage ? (
+                <Link className={styles.small} href={`/patients/record/?p=${patientId}`}>
+                  Cancel
+                </Link>
+              ) : (
+                <button
+                  className={styles.small}
+                  disabled={busy}
+                  onClick={() => {
+                    setAdding(false)
+                    setMedicines([])
+                    setProblem(null)
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                className={`${styles.small} ${styles.primary} ${styles.bigSave}`}
+                disabled={busy}
+                onClick={save}
+              >
+                {busy ? 'Saving…' : 'Save consultation'}
+              </button>
+            </div>
           </div>
         </div>
       ) : canWrite ? (

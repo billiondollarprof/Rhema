@@ -14,6 +14,7 @@
  *
  * Never: log a value from the record. Errors are reported by table and id.
  */
+import { serverNow } from '@/lib/time/serverTime'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '@/lib/offline/outbox'
 
@@ -316,6 +317,15 @@ export async function editMedication(
   return null
 }
 
+// The column holding when a line happened, for lines saved with no network.
+const TIME_COLUMN: Partial<Record<VoidableTable, string>> = {
+  medications_given: 'given_at',
+  vital_signs: 'recorded_at',
+  vital_extras: 'recorded_at',
+  nursing_notes: 'created_at',
+  consultation_notes: 'created_at',
+}
+
 export async function addLine(
   client: SupabaseClient,
   table: Exclude<VoidableTable, never> | 'medical_profiles',
@@ -329,12 +339,19 @@ export async function addLine(
     const { data } = await client.auth.getSession()
     const staffId = data.session?.user.id
     if (staffId) {
+      // Sent later, so the time it happened is written now, from the
+      // corrected clock (request 225), unless a time was given.
+      const timeColumn = TIME_COLUMN[table]
+      const timed =
+        timeColumn && values[timeColumn] === undefined
+          ? { ...values, [timeColumn]: serverNow().toISOString() }
+          : values
       addToOutbox(staffId, {
         kind: 'record',
         label: ENTRY_WORDS[table] ?? 'Entry',
         patientId: Number(values.patient_id),
         table,
-        values,
+        values: timed,
       })
       return null
     }
@@ -377,7 +394,11 @@ export async function voidItem(
   if (!reason.trim()) return 'Give a short reason.'
   const { error } = await client
     .from(table)
-    .update({ voided_at: new Date().toISOString(), voided_by: staffId, void_reason: reason.trim() })
+    .update({
+      voided_at: serverNow().toISOString(),
+      voided_by: staffId,
+      void_reason: reason.trim(),
+    })
     .eq('id', id)
   if (error) {
     console.warn(`${table} ${id} could not be voided: ${error.code}`)

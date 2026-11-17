@@ -20,6 +20,7 @@
  */
 'use client'
 
+import { serverNow } from '@/lib/time/serverTime'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -44,7 +45,8 @@ type Props = { client: SupabaseClient; staffId: string; patientId: number }
 // The last menstrual period, from the profile, for the due date.
 type SectionProps = Props & { lmp?: string | null }
 
-const today = () => new Date().toISOString().slice(0, 10)
+// Today, by the internet's clock (request 225).
+const today = () => serverNow().toISOString().slice(0, 10)
 const dateWords = (iso: string | null) =>
   iso
     ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -188,7 +190,7 @@ function DocumentedBox({
       {
         documented_delivery: yes,
         documented_answered_by: staffId,
-        documented_answered_at: new Date().toISOString(),
+        documented_answered_at: serverNow().toISOString(),
       },
       booking !== null,
     )

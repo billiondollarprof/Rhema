@@ -943,3 +943,119 @@ a.small {
     padding-top: 10px;
   }
 }
+
+/* ===== Request 225: Seen by, the medicines box, Save and Cancel ===== */
+.seenBy {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--tint-1);
+  border: 1px solid var(--line);
+  color: var(--ink2);
+}
+
+.seenBy b {
+  color: var(--ink);
+}
+
+.medicinesCard {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.medicinesHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Save and Cancel on their own line, on the right, a gap between them. */
+.formFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.formButtons {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  align-items: center;
+}
+
+/* Cancel and Save the same height, side by side. */
+.formButtons > * {
+  min-height: 48px;
+  padding-left: 22px;
+  padding-right: 22px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* On the full page the bar stays in view at the bottom while scrolling. */
+.formFootStick {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 12px;
+  margin: 0 -12px;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 759px) {
+  /* Above the bottom menu on a phone. */
+  .formFootStick {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* The full page's Save: the main action, full size. */
+.bigSave {
+  min-height: 48px;
+  padding: 10px 28px;
+  font-size: 16px;
+}
+
+/* A medicine's dose, route and how often side by side on a wide screen. */
+@media (min-width: 900px) {
+  .medicineLine .fields {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+
+  .medicineLine .fields .fieldWide {
+    grid-column: auto;
+  }
+}
+
+/* ===== Every form's Save and Cancel (request 225) =====
+   Anthony, 2026-11-17: "too cluttered... put the three buttons together".
+   The last row of every form is Save and Cancel only: on its own line, on
+   the right, Save last, both full size, a line above them. Buttons such as
+   "+ Other vital sign" stay where they are, apart. */
+.form > .actions:last-child {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: 12px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.form > .actions:last-child > * {
+  min-height: 44px;
+  padding: 8px 20px;
+  font-size: 15px;
+}

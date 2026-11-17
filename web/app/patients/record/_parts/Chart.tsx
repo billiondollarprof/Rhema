@@ -30,6 +30,7 @@
  */
 'use client'
 
+import { inputNow } from '@/lib/time/serverTime'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -47,12 +48,9 @@ type Props = {
   reload: () => void
 }
 
-// "now" in the form a time box expects (local time, to the minute).
-function localNow() {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-}
+// "now" in the form a time box expects, from the internet's time, not the
+// device's clock (request 225).
+const localNow = inputNow
 
 // Just the time today ("14:05"), or the day and time before today.
 function shortTime(date: Date): string {
@@ -260,7 +258,7 @@ function ChartRow({
       medicine: medication.medicine,
       dose: null,
       not_given_reason: reason.trim(),
-      given_at: new Date().toISOString(),
+      // No time sent: the database's clock writes it (request 225).
       given_by: staffId,
     })
     setBusy(false)
@@ -282,8 +280,9 @@ function ChartRow({
       medicine: medication.medicine,
       dose: dose.trim() || null,
       route: medication.route ?? null,
-      // "Yes, given" without Change: the time is now.
-      given_at: step === 'changing' ? new Date(givenAt).toISOString() : new Date().toISOString(),
+      // "Yes, given" without Change: no time is sent, so the database's own
+      // clock writes it (request 225: the internet's time, not the device's).
+      ...(step === 'changing' ? { given_at: new Date(givenAt).toISOString() } : {}),
       given_by: staffId,
     })
     setBusy(false)
