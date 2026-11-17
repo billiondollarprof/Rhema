@@ -849,6 +849,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
+    a. The token goes on the main hospital Cloudflare account (asked which).
+    b. "Check the things that you have put live for the doctor. Check that
+       everything fits well."
+    c. "For the comparison... check if we need the 1 to 6, they are worth it.
+       Then we run all of them, we add all of them, run the SQLs at once."
+    d. "Check the arrangement, apart from the flow... the interface, how clean
+       their own is... ease of use... We are not trying to design a complex,
+       difficult software... even people who are not that savvy, who uses
+       WhatsApp, can still use it well."
+
 218. **Go ahead with the proposal, Next.js, backups, and the whole flow.** (2026-11-16)
     a. Live read allowed: "you have my permission to check the live database"
        for why the doctor cannot write in consultation notes. He thinks the
