@@ -872,7 +872,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        Decided 2026-11-17: NO password on the zip ("pointless adding
        password to the zip... the most important thing is to protect that
        account... add a two factor authenticator"). Two-step sign in on the
-       hospital's Gmail goes in the setup steps. BUILDING.
+       hospital's Gmail goes in the setup steps.
+    b STATUS: BUILT AND LIVE 2026-11-17, WAITING ON THE GOOGLE APP. Admin,
+       Data: "Monthly copy to Google Drive" card (Connect, status,
+       Disconnect). Worker /api/drive/start and /api/drive/callback: the key
+       is sealed (AES-GCM, key from GOOGLE_CLIENT_SECRET) and handed back to
+       the admin's page after a "#"; the page hands it in as the signed in
+       admin (finish_drive_link, only the admin who started the code, 15
+       minutes, once). The live timer starts drive-backup.yml at 21:17 UTC on
+       the last day of the month, and on days 1 and 2 for the past month;
+       it skips a month already saved. Zip: every table as CSV, text only,
+       in "RHEMA backups/<year>/<year>-<mm> <Month>.zip". Privacy notice says
+       so. Live and testing both answer "not set up" until the secrets are in.
+       LEFT FOR ANTHONY: make the Google app under StellaXafe, put
+       GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Cloudflare (both Workers)
+       and GitHub secrets, tap Connect on live, turn on 2-Step Verification
+       on the hospital's Gmail. LEFT FOR US: run drive-backup.yml once by hand
+       and check the zip lands, then move 226b to DONE.
+       Token rights: GOOGLE app asks only drive.file (files it made) and
+       email. GITHUB_BACKUP_TOKEN already could start any workflow; nothing
+       new.
     a STATUS: LIVE 2026-11-17. Moments shown in HOSPITAL_TIME_ZONE
     (Africa/Lagos; NEXT_PUBLIC_TIME_ZONE per hospital); calendar dates never
     moved; days by the hospital's clock; the download's read me says UTC.
