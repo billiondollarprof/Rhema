@@ -862,6 +862,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        year 2026, year 2027... inside of year 2026, a zip file month by
        month... attached files will just be only in... Cloudflare." Asked
        whether a connector or API is needed. PLAN SENT, WAITING FOR HIS YES.
+    a STATUS: LIVE 2026-11-17. Moments shown in HOSPITAL_TIME_ZONE
+    (Africa/Lagos; NEXT_PUBLIC_TIME_ZONE per hospital); calendar dates never
+    moved; days by the hospital's clock; the download's read me says UTC.
 
 225. **Sheets: automatic name and time, tidy buttons, a running sheet.** (2026-11-17)
     a. Buttons: "the way you put save and cancel like that... on the desktop,
