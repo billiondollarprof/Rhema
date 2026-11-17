@@ -860,6 +860,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        have drop downs that you can choose from with a search bar, of which
        the first letter populates only those words that start with their
        first letter. So it's more minimalistic and easier to use."
+    STATUS (2026-11-17): b LIVE (SQL first, then the screens; 0 new
+    warnings on both databases). c LIVE: medicines save with no note. d
+    LIVE: every search shows only names that start with the letters; the
+    note's common words are one drop down per box. a: waiting on the first
+    timer run with his token.
 
 219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
     a. The token goes on the main hospital Cloudflare account (asked which).
@@ -878,7 +883,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     b. LIVE: checked at 320, 360, tablet and desktop with the forms open.
        Fixed: Save could store medicines with no note; tap words now show 8
        with More; boxes stack on phones.
-    c. BUILT, tested, NOT pushed to testing: all 6. SQL is commit 473d245
+    c. LIVE 2026-11-17 (all 6). Was: BUILT, tested, NOT pushed to testing: all 6. SQL is commit 473d245
        (migration 20261117003602, test 047, 9 of 9 breaks caught); screens
        are commit 8041ae3. WAITING FOR HIS YES ON THE SQL. Then: push
        473d245 alone to testing and on to main (the screens read the new

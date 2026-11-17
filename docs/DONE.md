@@ -963,3 +963,10 @@ this file.
   last dose and next due; the summary and the plan banner; each role's work
   first. Next.js 16.4.5. The backup counts rows and files and fails if any is
   missing. Checked on testing and live.
+- **219 and 220 (2026-11-17): the flow from other systems, and simpler picking.**
+  Emergency, Urgent or Normal when sending a patient, emergencies first in the
+  queue; Not given with a reason on the chart; lab values marked High or Low;
+  Sample taken; Request lab beside the saved note; expiry dates, Running low
+  and Expiring soon in the Pharmacy; medicines without a note; searches find
+  only names that start with the letters. The backup timer on the hospital
+  Worker. Checked on testing and live.
