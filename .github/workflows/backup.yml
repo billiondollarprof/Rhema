@@ -42,7 +42,16 @@ on:
     # Every 2 hours, at 17 minutes past: 01:17 UTC (02:17 in Lagos, when the
     # hospital is quietest) is the night run, then 03:17, 05:17 and so on.
     - cron: '17 1-23/2 * * *'
+  # Started by hand (a night run), or by the live Worker's timer at the same
+  # times as the schedule above, because GitHub starts scheduled runs hours
+  # late (request 218d). The timer says whether it is the night run.
   workflow_dispatch:
+    inputs:
+      night:
+        description: 'The night run: keep the nightly copy and do the night housekeeping'
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
 
 permissions:
   contents: read
@@ -99,6 +108,8 @@ jobs:
       # pg_dump from the official Postgres 17 image, the same version as the
       # database, so the copy is exact. Two files, then one bundle.
       - name: Copy the live database
+        env:
+          NIGHT_INPUT: ${{ inputs.night }}
         run: |
           mkdir -p copy
           stamp=$(date -u +%Y-%m-%d)
@@ -106,7 +117,9 @@ jobs:
           # The hour, for the 2-hourly copy's name, and whether this is the
           # night run (01 UTC, or a run started by hand).
           echo "HOUR=$(date -u +%H)" >> "$GITHUB_ENV"
-          if [ "$(date -u +%H)" = "01" ] || [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          # A run by hand is a night run unless it says otherwise; the timer
+          # says "false" except at 01 UTC.
+          if [ "$(date -u +%H)" = "01" ] || { [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$NIGHT_INPUT" != "false" ]; }; then
             echo "NIGHT=true" >> "$GITHUB_ENV"
           else
             echo "NIGHT=false" >> "$GITHUB_ENV"
