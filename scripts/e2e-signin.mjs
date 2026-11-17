@@ -372,7 +372,8 @@ try {
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
   await page.getByText('Choose the medicine', { exact: true }).click()
   await page.getByPlaceholder('Type the first letters').fill('Zorbex')
-  await page.getByRole('option', { name: /Other: add/ }).click()
+  // Other sits under the list as a button, always in view (request 221f).
+  await page.getByRole('button', { name: /Other: add/ }).click()
   await page.getByLabel('Strength or size (optional)').fill('5 mg tablet')
   await page.getByRole('button', { name: 'Add and use' }).click()
   await page.getByText('Zorbex 5 mg tablet', { exact: true }).waitFor()
