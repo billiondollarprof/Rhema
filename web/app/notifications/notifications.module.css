@@ -136,3 +136,11 @@
   opacity: 0.5;
   cursor: default;
 }
+
+/* A notice already seen (request 222): no longer in the bubble. */
+.seen {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  white-space: nowrap;
+}

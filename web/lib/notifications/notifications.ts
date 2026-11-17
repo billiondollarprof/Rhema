@@ -24,7 +24,10 @@
  * place and shows each thing waiting, with one button that goes straight
  * to where it is dealt with (Anthony, 2026-11-04: "just be clicking a maybe
  * a drop down to review all the notification... fold it back, open the
- * next one"). The bubble is the sum of the numbers.
+ * next one"). The bubble is the sum of the numbers, except that a message,
+ * an announcement, a result ready or a prescription dispensed stops counting
+ * once it has been seen (request 222, lib/notifications/seen.ts). Work
+ * waiting counts until it is done.
  *
  * The last list is kept in memory, so opening Notifications shows it at
  * once while a fresh one loads (request 145).
@@ -71,12 +74,16 @@ export type NoticeItem = {
 
 // card: the Lab or Pharmacy card is shown inside the notice instead of the
 // items, so payment, results and dispensing are done right there.
+// info: something to know (a message, an announcement, a result ready, a
+// prescription dispensed); its bubble goes once it is seen (request 222).
+// Every other notice is work waiting and counts until it is done.
 export type Notice = {
   key: string
   count: number
   words: string
   items: NoticeItem[]
   card?: 'lab' | 'pharmacy'
+  info?: boolean
 }
 
 const many = (count: number, one: string, more: string) => `${count} ${count === 1 ? one : more}`
@@ -171,6 +178,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     if (fromRoom.length) {
       notices.push({
         key: `messages-${room.id}`,
+        info: true,
         count: fromRoom.length,
         words: `${many(fromRoom.length, 'new message', 'new messages')} from ${room.name}.`,
         items: fromRoom.map((message) => messageItem(message, `/messages/?c=room:${room.id}`)),
@@ -182,6 +190,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   if (general.length) {
     notices.push({
       key: 'messages-general',
+      info: true,
       count: general.length,
       words: `${many(general.length, 'new message', 'new messages')} in General.`,
       items: general.map((message) => messageItem(message, '/messages/?c=general')),
@@ -193,6 +202,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   if (newAnnouncements.length) {
     notices.push({
       key: 'announcements',
+      info: true,
       count: newAnnouncements.length,
       words: `${many(newAnnouncements.length, 'new announcement', 'new announcements')}.`,
       items: newAnnouncements.map((one) => ({
@@ -210,6 +220,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     notices.push({
       key: 'results',
       card: 'lab',
+      info: true,
       count: ready.length,
       words: `${many(ready.length, 'lab result is', 'lab results are')} ready for tests you asked for.`,
       items: testItems(
@@ -227,6 +238,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
   if (dispensed.length) {
     notices.push({
       key: 'dispensed',
+      info: true,
       count: dispensed.length,
       words: `${many(dispensed.length, 'prescription you wrote was', 'prescriptions you wrote were')} dispensed.`,
       items: dispensed.map((prescription) => ({

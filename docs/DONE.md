@@ -970,3 +970,6 @@ this file.
   and Expiring soon in the Pharmacy; medicines without a note; searches find
   only names that start with the letters. The backup timer on the hospital
   Worker. Checked on testing and live.
+- **221 (2026-11-17): the medical record page.** The chart opens its lists in
+  place, nothing scrolls away after a pick, every medicine is listed, Other is
+  always in view, clearer fold arrows, compact summary. Light and dark checked.
