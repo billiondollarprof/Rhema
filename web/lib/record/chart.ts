@@ -27,12 +27,19 @@ export function hoursBetween(howOften: string | null): number | null {
   return null
 }
 
-// ===== 2. The last dose given of one medicine =====
+// ===== 2. The last dose of one medicine =====
 // Matched by the medicine's own line; an older dose with no line is matched
-// by the same name.
-export function lastDoseOf(medication: Medication, doses: DoseGiven[]): DoseGiven | null {
+// by the same name. given: only doses really given (the default); false:
+// also a dose written as not given (request 219c), which still uses up its
+// time, so the next one is worked out from it.
+export function lastDoseOf(
+  medication: Medication,
+  doses: DoseGiven[],
+  given = true,
+): DoseGiven | null {
   const mine = doses
     .filter((dose) => !dose.voided_at)
+    .filter((dose) => !given || !dose.not_given_reason)
     .filter((dose) =>
       dose.medication_id != null
         ? dose.medication_id === medication.id

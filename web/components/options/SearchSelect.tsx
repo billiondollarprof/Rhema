@@ -11,7 +11,8 @@
  * How it goes:
  *   1. The closed box shows the choice (or the placeholder) and an arrow.
  *   2. Tap it: the list opens under it. A long list has a search box at the
- *      top, ready to type in. Names that start with the letters come first.
+ *      top, ready to type in. Only names that start with the letters show
+ *      (request 220d).
  *   3. Tap a line to choose it. Enter chooses the first line found. Escape,
  *      or a tap outside, closes it without changing anything.
  *   4. "Other…" (when the screen offers it) hands back what was typed, so
@@ -107,17 +108,14 @@ export default function SearchSelect({
     }
   }, [open])
 
-  // ===== 3. What the letters find: starts with first, then contains =====
+  // ===== 3. What the letters find: only names that start with them =====
+  // Anthony, 2026-11-17 (request 220d): "the first letter populates only
+  // those words that start with their first letter." Other names (also)
+  // count, so FBC finds Full Blood Count.
   const words = typed.trim().toLowerCase()
   const shown = useMemo(() => {
     if (!words) return options
-    const starts = options.filter((option) =>
-      wordsOf(option).some((word) => word.startsWith(words)),
-    )
-    const contains = options.filter(
-      (option) => !starts.includes(option) && wordsOf(option).some((word) => word.includes(words)),
-    )
-    return [...starts, ...contains]
+    return options.filter((option) => wordsOf(option).some((word) => word.startsWith(words)))
   }, [options, words])
 
   const chosen = options.find((option) => option.value === value)

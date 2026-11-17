@@ -494,7 +494,11 @@ export function DosesSection({
           key={given.id}
           what={<b>{[given.medicine, given.dose].filter(Boolean).join(' · ')}</b>}
           status={<span className={`${styles.pill} ${styles.grey}`}>{when(given.given_at)}</span>}
-          meta={`Given by ${given.giver?.full_name ?? 'staff'}`}
+          meta={
+            given.not_given_reason
+              ? `Not given: ${given.not_given_reason}. Written by ${given.giver?.full_name ?? 'staff'}`
+              : `Given by ${given.giver?.full_name ?? 'staff'}`
+          }
           voided={
             given.voided_at
               ? { reason: given.void_reason, by: given.voider?.full_name ?? null }

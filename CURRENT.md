@@ -849,6 +849,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+220. **SQL yes; medicines without a note; drop downs for long lists.** (2026-11-17)
+    a. "Rhema backup timer is done." Token: 1 year expiry (his choice of
+       steps); renewal reminder in Decided below once the date is known.
+    b. "Run the SQLs first." His yes to the 219c batch (migration
+       20261117003602).
+    c. "If a doctor adds a medicine, doctor must add a note to it. Is it
+       compulsory? Is that how other platforms design it? And why?"
+    d. "If they are picking from a selection, long selections should just
+       have drop downs that you can choose from with a search bar, of which
+       the first letter populates only those words that start with their
+       first letter. So it's more minimalistic and easier to use."
+
 219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
     a. The token goes on the main hospital Cloudflare account (asked which).
     b. "Check the things that you have put live for the doctor. Check that
@@ -859,6 +871,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        their own is... ease of use... We are not trying to design a complex,
        difficult software... even people who are not that savvy, who uses
        WhatsApp, can still use it well."
+    STATUS (2026-11-17, early hours):
+    a. Answered: the main hospital account (rhema-hospital Worker). The
+       timer is LIVE (Cloudflare shows "schedule: 17 1-23/2 * * *"); it
+       sends nothing until he adds GITHUB_BACKUP_TOKEN.
+    b. LIVE: checked at 320, 360, tablet and desktop with the forms open.
+       Fixed: Save could store medicines with no note; tap words now show 8
+       with More; boxes stack on phones.
+    c. BUILT, tested, NOT pushed to testing: all 6. SQL is commit 473d245
+       (migration 20261117003602, test 047, 9 of 9 breaks caught); screens
+       are commit 8041ae3. WAITING FOR HIS YES ON THE SQL. Then: push
+       473d245 alone to testing and on to main (the screens read the new
+       columns, so the database goes first), then 8041ae3.
+    d. Answered in chat: their systems are desktop first and dense; nurses'
+       top complaints about the big ones are clicks, typing twice and
+       warnings. Ours stays phone first, two taps, plain words.
 
 218. **Go ahead with the proposal, Next.js, backups, and the whole flow.** (2026-11-16)
     a. Live read allowed: "you have my permission to check the live database"

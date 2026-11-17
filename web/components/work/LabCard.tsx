@@ -40,6 +40,7 @@ import {
   listAwaitingPayment,
   listAwaitingTest,
   listMyReadyResults,
+  markSampleTaken,
   markSeen,
   payLabRequestLines,
   type LabRequest,
@@ -184,6 +185,8 @@ function LabEntry({
   onPaid: (patientId: number) => void
 }) {
   const [paying, setPaying] = useState(false)
+  const [marking, setMarking] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
   // The price list, read when the form opens, so each test's price is
   // filled in (Settings, 2026-11-16). Empty when there is none or no network.
   const [prices, setPrices] = useState<Price[] | null>(null)
@@ -235,6 +238,31 @@ function LabEntry({
         {view === 'lab' && request.status === 'awaiting_payment' ? (
           <span className={styles.waitingPay}>Waiting for payment at the Front Desk</span>
         ) : null}
+        {/* The sample, one tap (request 219c, number 4). */}
+        {view === 'lab' && request.status === 'awaiting_test' && !request.sample_taken_at ? (
+          <button
+            className={styles.button}
+            disabled={marking}
+            onClick={async () => {
+              setMarking(true)
+              const failed = await markSampleTaken(client, request.id)
+              setMarking(false)
+              setProblem(failed)
+              if (!failed) onDone()
+            }}
+          >
+            {marking ? 'Saving…' : 'Sample taken'}
+          </button>
+        ) : null}
+        {view === 'lab' && request.sample_taken_at && request.status === 'awaiting_test' ? (
+          <span className={styles.sampleTaken}>
+            Sample taken{' '}
+            {new Date(request.sample_taken_at).toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        ) : null}
         {view === 'lab' && request.status !== 'awaiting_payment' ? (
           <Link
             className={`${styles.button} ${styles.primary}`}
@@ -254,6 +282,7 @@ function LabEntry({
         ) : null}
       </div>
 
+      {problem ? <p className={styles.muted}>{problem}</p> : null}
       {paying && prices === null ? <p className={styles.muted}>Loading the prices…</p> : null}
       {paying && prices !== null ? (
         // A price for each test; the app adds them up (2026-10-31).

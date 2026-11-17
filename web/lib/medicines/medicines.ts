@@ -123,12 +123,8 @@ export function groupMedicines(lines: MedicineLine[]): MedicineName[] {
 export function findMedicines(names: MedicineName[], typed: string, limit = 12): MedicineName[] {
   const words = typed.trim().toLowerCase()
   if (!words) return names.slice(0, limit)
-  const starts = names.filter((entry) => entry.name.toLowerCase().startsWith(words))
-  const contains = names.filter(
-    (entry) =>
-      !entry.name.toLowerCase().startsWith(words) && entry.name.toLowerCase().includes(words),
-  )
-  return [...starts, ...contains].slice(0, limit)
+  // Only names that start with the letters (Anthony, 2026-11-17, request 220d).
+  return names.filter((entry) => entry.name.toLowerCase().startsWith(words)).slice(0, limit)
 }
 
 // ===== 4. Add, confirm, correct =====
@@ -203,14 +199,49 @@ export async function moveStock(
   amount: number,
   reason: string,
   note: string | null,
+  // The expiry date of new stock, as YYYY-MM-DD (request 219c); optional.
+  expires: string | null = null,
 ): Promise<string | null> {
   const { error } = await client.rpc('move_stock', {
     medicine: id,
     amount,
     why: reason,
     move_note: note,
+    expires,
   })
   if (error?.code === '23505') return 'That was just saved.'
   if (error?.code === '42501') return 'Only the Pharmacy changes stock.'
   return error ? 'That could not be saved. Check the internet and try again.' : null
+}
+
+// ===== Stock that expires soon (request 219c, number 6) =====
+// New stock whose expiry date is within 90 days, or past, for medicines
+// still in stock, soonest first. Only the Pharmacy can read stock moves.
+export type ExpiringBatch = {
+  id: number
+  medicine_id: number
+  change: number
+  expiry_date: string
+  medicine: {
+    name: string
+    strength: string | null
+    in_stock: number | null
+    unit: string | null
+  } | null
+}
+
+export async function loadExpiring(client: SupabaseClient): Promise<ExpiringBatch[]> {
+  const soon = new Date(Date.now() + 90 * 24 * 3600 * 1000).toISOString().slice(0, 10)
+  const { data } = await client
+    .from('stock_moves')
+    .select(
+      'id, medicine_id, change, expiry_date, medicine:medicine_list(name, strength, in_stock, unit)',
+    )
+    .eq('reason', 'restock')
+    .not('expiry_date', 'is', null)
+    .lte('expiry_date', soon)
+    .order('expiry_date', { ascending: true })
+    .limit(100)
+  const batches = (data as unknown as ExpiringBatch[] | null) ?? []
+  return batches.filter((batch) => Number(batch.medicine?.in_stock ?? 0) > 0)
 }

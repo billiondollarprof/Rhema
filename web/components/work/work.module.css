@@ -320,3 +320,11 @@ a.button {
   margin: 0;
   padding-left: 18px;
 }
+
+/* The Laboratory has the sample (request 219c, number 4). */
+.sampleTaken {
+  align-self: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grn);
+}

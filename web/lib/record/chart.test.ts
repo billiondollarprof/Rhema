@@ -23,6 +23,7 @@ const dose = (given_at: string, medication_id: number | null = 1, voided = false
   voider: null,
   medication_id,
   medicine: 'Paracetamol 500 mg tablet',
+  not_given_reason: null,
   dose: '1 g',
   given_at,
   note: null,
@@ -76,6 +77,18 @@ describe('lastDoseOf and nextDue', () => {
     expect(isLate(due, new Date('2026-11-16T16:40:00Z'))).toBe(true)
     expect(isLate(null)).toBe(false)
     expect(isLate('now')).toBe(true)
+  })
+})
+
+describe('a dose not given', () => {
+  it('is not the last given, but the next is worked out from it', () => {
+    const skipped = { ...dose('2026-11-16T16:00:00Z'), not_given_reason: 'Refused' }
+    const doses = [dose('2026-11-16T08:00:00Z'), skipped]
+    const m = med('Every 8 hours')
+    expect(lastDoseOf(m, doses)?.given_at).toBe('2026-11-16T08:00:00Z')
+    expect(lastDoseOf(m, doses, false)?.given_at).toBe('2026-11-16T16:00:00Z')
+    const due = nextDue(m, lastDoseOf(m, doses, false))
+    expect(due instanceof Date && due.toISOString()).toBe('2026-11-17T00:00:00.000Z')
   })
 })
 

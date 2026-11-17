@@ -103,9 +103,17 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
   const [pending, setPending] = useState<Record<number, QueueStatus>>({})
   const [error, setError] = useState<string | null>(null)
 
+  // Emergencies first, then urgent, then everybody by how long they have
+  // waited (request 219c, as OpenMRS does).
+  const rank = { emergency: 0, urgent: 1, normal: 2 }
   const all = (entries ?? [])
     .map((entry) => ({ ...entry, status: pending[entry.id] ?? entry.status }))
     .filter((entry) => entry.status !== 'done')
+    .sort(
+      (a, b) =>
+        (rank[a.priority] ?? 2) - (rank[b.priority] ?? 2) ||
+        a.created_at.localeCompare(b.created_at),
+    )
   const { title, list, empty } = pick(staff, all)
 
   async function move(entry: QueueEntry, next: Next) {
@@ -148,8 +156,15 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
                 </small>
                 {entry.note ? <small className={styles.note}>Note: {entry.note}</small> : null}
               </div>
-              <span className={styles.status} data-status={entry.status}>
-                {STATUS_LABELS[entry.status]}
+              <span className={styles.badges}>
+                {entry.priority === 'emergency' || entry.priority === 'urgent' ? (
+                  <span className={styles.priority} data-level={entry.priority}>
+                    {entry.priority === 'emergency' ? 'Emergency' : 'Urgent'}
+                  </span>
+                ) : null}
+                <span className={styles.status} data-status={entry.status}>
+                  {STATUS_LABELS[entry.status]}
+                </span>
               </span>
             </div>
             <small className={styles.muted}>{entry.room?.name}</small>

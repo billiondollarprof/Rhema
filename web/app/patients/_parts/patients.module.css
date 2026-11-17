@@ -96,7 +96,8 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.field label {
+.field label,
+.field .fieldName {
   display: block;
   font-size: 12px;
   font-weight: 600;
@@ -1078,4 +1079,39 @@
 .stockOut {
   color: var(--c-9a5b00, #9a5b00);
   font-weight: 600;
+}
+
+/* How urgent, three big buttons (request 219c, number 1). */
+.priorities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.priority {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--field-line);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.priority[aria-pressed='true'] {
+  background: var(--bl);
+  border-color: var(--bl);
+  color: #fff;
+}
+
+.priority[data-level='urgent'][aria-pressed='true'] {
+  background: var(--amb);
+  border-color: var(--amb);
+}
+
+.priority[data-level='emergency'][aria-pressed='true'] {
+  background: var(--c-b42318);
+  border-color: var(--c-b42318);
 }

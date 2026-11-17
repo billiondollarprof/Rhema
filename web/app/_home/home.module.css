@@ -477,3 +477,30 @@ a.button {
 .announceItem small {
   color: var(--mut);
 }
+
+/* Emergency and Urgent beside the status (request 219c, number 1). */
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.priority {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.priority[data-level='emergency'] {
+  background: var(--c-b42318);
+  color: #fff;
+}
+
+.priority[data-level='urgent'] {
+  background: var(--warn-bg-1);
+  color: var(--amb);
+}

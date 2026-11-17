@@ -835,7 +835,19 @@ a.small {
   margin: 0;
 }
 
-.phraseMore {
-  color: var(--ink2);
+/* A lab value outside its normal range (request 219c, number 3). */
+.resultOut {
+  color: var(--c-b42318);
   font-weight: 600;
+}
+
+.resultMark {
+  white-space: nowrap;
+}
+
+/* Not given, in red wherever it sits (the cell styles above set grey). */
+.chartCell small.chartLate,
+.doseRow > span.chartLate {
+  color: var(--c-b42318);
+  font-weight: 700;
 }

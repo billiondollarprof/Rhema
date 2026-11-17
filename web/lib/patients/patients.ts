@@ -469,18 +469,30 @@ export async function updatePatient(
 }
 
 // ===== 6. Sending a patient to a room =====
+// How urgent a visit is (request 219c, number 1). The queue shows
+// emergencies first, then urgent, then everybody else by waiting time.
+export type Priority = 'emergency' | 'urgent' | 'normal'
+export const PRIORITIES: [Priority, string][] = [
+  ['normal', 'Normal'],
+  ['urgent', 'Urgent'],
+  ['emergency', 'Emergency'],
+]
+
 export async function sendToRoom(
   client: SupabaseClient,
   patientId: number,
   roomId: number,
   note: string,
   staffId: string,
+  // How urgent (request 219c, number 1): emergency, urgent or normal.
+  priority: Priority = 'normal',
 ): Promise<string | null> {
   const { error } = await client.from('queue_entries').insert({
     patient_id: patientId,
     room_id: roomId,
     note: note.trim() || null,
     sent_by: staffId,
+    priority,
   })
   if (!error) return null
   if (error.code === '23505')

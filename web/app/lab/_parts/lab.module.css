@@ -523,3 +523,9 @@ textarea.input {
   display: block;
   text-decoration: none;
 }
+
+/* A value outside its normal range, as it is typed (request 219c). */
+.outOfRange {
+  color: var(--c-b42318);
+  font-weight: 600;
+}
