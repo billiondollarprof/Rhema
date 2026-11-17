@@ -641,18 +641,15 @@ export function findLabTest(name: string): LabTest | undefined {
   return ALL_LAB_TESTS.find((test) => wordsOf(test).includes(wanted))
 }
 
-// The tests that match what was typed: names that start with it first, then
-// names that contain it. "fb" finds Full Blood Count by its other name FBC.
+// The tests whose name, or other name, starts with what was typed (Anthony,
+// 2026-11-17, request 220d: only those that start with the letters). "fb"
+// finds Full Blood Count by its other name FBC.
 export function searchLabTests(typed: string, limit = 12): LabTest[] {
   const wanted = typed.trim().toLowerCase()
   if (!wanted) return []
-  const starts = ALL_LAB_TESTS.filter((test) =>
+  return ALL_LAB_TESTS.filter((test) =>
     wordsOf(test).some((word) => word.startsWith(wanted)),
-  )
-  const contains = ALL_LAB_TESTS.filter(
-    (test) => !starts.includes(test) && wordsOf(test).some((word) => word.includes(wanted)),
-  )
-  return [...starts, ...contains].slice(0, limit)
+  ).slice(0, limit)
 }
 
 // ===== 5. Writing the boxes as the result text =====

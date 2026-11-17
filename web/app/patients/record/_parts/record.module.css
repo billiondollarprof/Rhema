@@ -835,11 +835,6 @@ a.small {
   margin: 0;
 }
 
-.phraseMore {
-  color: var(--ink2);
-  font-weight: 600;
-}
-
 /* A lab value outside its normal range (request 219c, number 3). */
 .resultOut {
   color: var(--c-b42318);

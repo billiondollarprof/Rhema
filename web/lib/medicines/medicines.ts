@@ -123,12 +123,8 @@ export function groupMedicines(lines: MedicineLine[]): MedicineName[] {
 export function findMedicines(names: MedicineName[], typed: string, limit = 12): MedicineName[] {
   const words = typed.trim().toLowerCase()
   if (!words) return names.slice(0, limit)
-  const starts = names.filter((entry) => entry.name.toLowerCase().startsWith(words))
-  const contains = names.filter(
-    (entry) =>
-      !entry.name.toLowerCase().startsWith(words) && entry.name.toLowerCase().includes(words),
-  )
-  return [...starts, ...contains].slice(0, limit)
+  // Only names that start with the letters (Anthony, 2026-11-17, request 220d).
+  return names.filter((entry) => entry.name.toLowerCase().startsWith(words)).slice(0, limit)
 }
 
 // ===== 4. Add, confirm, correct =====
