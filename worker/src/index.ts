@@ -9,7 +9,8 @@
  * `wrangler secret put` or from GitHub Actions. Never log patient details,
  * push addresses or keys.
  */
-import { startBackup, type BackupTimerEnv } from './backup-timer'
+import { driveCallback, driveStart, type DriveEnv } from './drive'
+import { startBackup, startDriveBackup, type BackupTimerEnv } from './backup-timer'
 import {
   deleteRecordFile,
   downloadFile,
@@ -23,7 +24,8 @@ import { emailRecord, type RecordsEnv } from './records'
 import { sendToAll, type Device, safeAppPath, safeTag } from './push'
 
 // ===== 1. What the Worker is given by Cloudflare =====
-export interface Env extends FilesEnv, InvitesEnv, ReceiptsEnv, RecordsEnv, BackupTimerEnv {
+export interface Env
+  extends FilesEnv, InvitesEnv, ReceiptsEnv, RecordsEnv, BackupTimerEnv, DriveEnv {
   // The built screens (web/out), served as static files.
   ASSETS: Fetcher
   // Call attention push (set by the push-keys workflow). Until they are
@@ -56,6 +58,14 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
   // uptime watcher. It says only that the Worker is up, nothing more.
   if (url.pathname === '/api/health') {
     return Response.json({ ok: true })
+  }
+
+  // Connect Google Drive for the monthly backup (request 226b).
+  if (url.pathname === '/api/drive/start' && request.method === 'GET') {
+    return driveStart(request, env)
+  }
+  if (url.pathname === '/api/drive/callback' && request.method === 'GET') {
+    return driveCallback(request, env)
   }
 
   // The right time (request 225, Anthony 2026-11-17: "the time from the
@@ -192,8 +202,9 @@ export default {
   // The timer (request 218d): start the live backup every 2 hours, on time.
   // Only the live Worker has a timer (wrangler.jsonc).
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(
-      startBackup(env, new Date(controller.scheduledTime)).then((words) => console.log(words)),
-    )
+    const when = new Date(controller.scheduledTime)
+    ctx.waitUntil(startBackup(env, when).then((words) => console.log(words)))
+    // The monthly Google Drive backup, at the end of the month (226b).
+    ctx.waitUntil(startDriveBackup(env, when).then((words) => console.log(words)))
   },
 }

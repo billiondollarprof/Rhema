@@ -1,6 +1,6 @@
 // backup-timer.test.ts: the timer asks GitHub to start the backup, and only that.
 import { describe, expect, it } from 'vitest'
-import { startBackup } from './backup-timer'
+import { driveMonthFor, startBackup, startDriveBackup } from './backup-timer'
 
 describe('startBackup', () => {
   it('does nothing without the key', async () => {
@@ -41,5 +41,35 @@ describe('startBackup', () => {
     )
     expect(answer).toContain('403')
     expect(answer).not.toContain('secret-value')
+  })
+})
+
+describe('the monthly Drive backup (226b)', () => {
+  it('starts on the last day of the month at 22:17 Nigeria time, for that month', () => {
+    expect(driveMonthFor(new Date('2026-11-30T21:17:00Z'))).toBe('2026-11')
+    expect(driveMonthFor(new Date('2026-12-31T21:17:00Z'))).toBe('2026-12')
+    expect(driveMonthFor(new Date('2027-02-28T21:17:00Z'))).toBe('2027-02')
+  })
+  it('tries the past month again on the first 2 days, and is quiet otherwise', () => {
+    expect(driveMonthFor(new Date('2026-12-01T21:17:00Z'))).toBe('2026-11')
+    expect(driveMonthFor(new Date('2027-01-02T21:17:00Z'))).toBe('2026-12')
+    expect(driveMonthFor(new Date('2026-12-03T21:17:00Z'))).toBeNull()
+    expect(driveMonthFor(new Date('2026-11-29T21:17:00Z'))).toBeNull()
+    expect(driveMonthFor(new Date('2026-11-30T19:17:00Z'))).toBeNull()
+  })
+  it('starts drive-backup.yml with the month', async () => {
+    const sent: { url: string; body: string }[] = []
+    const send = (async (url: string, init: RequestInit) => {
+      sent.push({ url, body: String(init.body) })
+      return new Response(null, { status: 204 })
+    }) as unknown as typeof fetch
+    const words = await startDriveBackup(
+      { GITHUB_BACKUP_TOKEN: 'k' },
+      new Date('2026-11-30T21:17:00Z'),
+      send,
+    )
+    expect(words).toContain('2026-11')
+    expect(sent[0].url).toContain('/workflows/drive-backup.yml/dispatches')
+    expect(JSON.parse(sent[0].body)).toEqual({ ref: 'main', inputs: { month: '2026-11' } })
   })
 })

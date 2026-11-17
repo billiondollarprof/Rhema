@@ -14,6 +14,9 @@
  * GitHub's own schedule stays in backup.yml as a second chance; a run that
  * starts while another is going waits its turn (one backup at a time).
  *
+ * On the last day of the month it also starts the monthly Google Drive
+ * backup (request 226b), and again on the first 2 days of the next month.
+ *
  * Never: send anything but "start the backup"; run on the testing Worker
  * (wrangler.jsonc gives testing no timer).
  */
@@ -49,4 +52,47 @@ export async function startBackup(
   // 204 is GitHub's "started". Anything else goes in the log, without the key.
   if (response.status === 204) return `Backup timer: started (${night ? 'night' : '2-hourly'} run).`
   return `Backup timer: GitHub answered ${response.status}, the backup did not start.`
+}
+
+// ===== 2. The monthly Drive backup (request 226b) =====
+// At 21:17 UTC (22:17 in Nigeria) on the last day of the month: this month.
+// On the first 2 days of the next month: that month again, as a second
+// chance (the job stops at once if it is already saved). Answers the month
+// to save, or null when this run is not one of those.
+export function driveMonthFor(when: Date): string | null {
+  if (when.getUTCHours() !== 21) return null
+  // Nigeria is one hour ahead of UTC all year (no summer time).
+  const lagos = new Date(when.getTime() + 60 * 60 * 1000)
+  const tomorrow = new Date(lagos.getTime() + 24 * 60 * 60 * 1000)
+  const month = (date: Date) =>
+    `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+  if (tomorrow.getUTCDate() === 1) return month(lagos)
+  if (lagos.getUTCDate() <= 2) {
+    const before = new Date(Date.UTC(lagos.getUTCFullYear(), lagos.getUTCMonth() - 1, 1))
+    return month(before)
+  }
+  return null
+}
+
+export async function startDriveBackup(
+  env: BackupTimerEnv,
+  when: Date,
+  send: typeof fetch = fetch,
+): Promise<string> {
+  const month = driveMonthFor(when)
+  if (!month) return 'Drive backup: not today.'
+  if (!env.GITHUB_BACKUP_TOKEN) return 'Drive backup: GITHUB_BACKUP_TOKEN is not set, nothing sent.'
+  const response = await send(WORKFLOW_URL.replace('backup.yml', 'drive-backup.yml'), {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.GITHUB_BACKUP_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'rhema-backup-timer',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ref: 'main', inputs: { month } }),
+  })
+  if (response.status === 204) return `Drive backup: started for ${month}.`
+  return `Drive backup: GitHub answered ${response.status}, it did not start.`
 }

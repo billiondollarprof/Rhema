@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: '3.13'
       - run: npm ci
+      # The monthly Drive backup unscrambles its key with this library; its
+      # tests need it too (request 226b). Pinned, like every dependency.
+      - run: pip install --quiet cryptography==44.0.0
       - run: npm run verify
       # The AWS template is checked by AWS's own linter (request 74).
       - name: Check the AWS template

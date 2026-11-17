@@ -41,3 +41,11 @@ the file where you can see it working. Read this to revise.
 | `isinstance(x, dict)` | Ask: is this a dictionary? | `aws/uptime_watcher.py` |
 | `ThreadPoolExecutor` and `.map` | Do the same job for many items at the same time, then collect the answers in order. | `aws/uptime_watcher.py` |
 | `unittest` | Python's own tool for tests: each test is a function that checks one thing. | `aws/test_uptime_watcher.py` |
+| `a, b = x.split("-")` | Cut text at each "-", and put the pieces into two names at once. | `ops/drive_backup.py` |
+| slicing `raw[:12]`, `raw[12:]` | The first 12 items, and everything after them. | `ops/drive_backup.py` |
+| `hashlib.sha256(...).digest()` | Make a fixed fingerprint of some text, as 32 raw bytes. | `ops/drive_backup.py` |
+| `base64` | Turn raw bytes into plain letters, and back again, so they can travel as text. | `ops/drive_backup.py` |
+| bytes `b"..."` | Raw bytes, not letters. `.decode()` turns them into text. | `ops/drive_backup.py` |
+| `None` | "Nothing here." Python's empty value. | `ops/drive_backup.py` |
+| `urllib.request` | Python's own tool for sending a request to a web address. | `ops/drive_backup.py` |
+| `open(path, "rb")` | Open a file to read its raw bytes. | `ops/drive_backup.py` |
