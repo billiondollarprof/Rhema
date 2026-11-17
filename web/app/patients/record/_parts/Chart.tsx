@@ -30,7 +30,8 @@
  */
 'use client'
 
-import { inputNow } from '@/lib/time/serverTime'
+import { HOSPITAL_TIME_ZONE, hospitalDay } from '@/lib/time/zone'
+import { inputNow, serverNow } from '@/lib/time/serverTime'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -54,9 +55,14 @@ const localNow = inputNow
 
 // Just the time today ("14:05"), or the day and time before today.
 function shortTime(date: Date): string {
-  const today = new Date().toDateString() === date.toDateString()
+  // Today, by the hospital's clock (request 226a).
+  const today = hospitalDay(serverNow()) === hospitalDay(date)
   return today
-    ? date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    ? date.toLocaleTimeString('en-GB', {
+        timeZone: HOSPITAL_TIME_ZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+      })
     : when(date.toISOString())
 }
 

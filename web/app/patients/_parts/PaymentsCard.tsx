@@ -12,6 +12,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import {
   cardPriceFor,
@@ -451,6 +452,7 @@ export default function PaymentsCard({
                 <small>
                   {receiptCode(payment.receipt_number, payment.received_at)} ·{' '}
                   {new Date(payment.received_at).toLocaleString('en-GB', {
+                    timeZone: HOSPITAL_TIME_ZONE,
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',

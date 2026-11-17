@@ -18,6 +18,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE, hospitalDay } from '@/lib/time/zone'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import { NOTE_PARTS } from '@/lib/record/phrases'
@@ -110,9 +111,9 @@ type Day = {
   doses: number
 }
 
+// The day, by the hospital's clock (request 226a).
 function dayKey(isoTime: string): string {
-  const date = new Date(isoTime)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  return hospitalDay(isoTime)
 }
 
 function daysOf(record: MedicalRecord): Day[] {
@@ -123,6 +124,7 @@ function daysOf(record: MedicalRecord): Day[] {
       days.set(key, {
         key,
         label: new Date(isoTime).toLocaleDateString('en-GB', {
+          timeZone: HOSPITAL_TIME_ZONE,
           weekday: 'short',
           day: 'numeric',
           month: 'short',

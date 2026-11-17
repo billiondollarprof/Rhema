@@ -10,6 +10,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './home.module.css'
@@ -61,6 +62,7 @@ export default function AnnouncementsCard({
           <small>
             {one.sender?.full_name ?? 'Staff'} ·{' '}
             {new Date(one.created_at).toLocaleString('en-GB', {
+              timeZone: HOSPITAL_TIME_ZONE,
               day: 'numeric',
               month: 'short',
               hour: '2-digit',

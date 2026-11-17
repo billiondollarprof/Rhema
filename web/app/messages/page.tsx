@@ -27,6 +27,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -68,6 +69,7 @@ function conversationOf(message: Message, myRoom: number): string {
 
 const time = (iso: string) =>
   new Date(iso).toLocaleString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     day: 'numeric',
     month: 'short',
     hour: '2-digit',

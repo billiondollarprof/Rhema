@@ -23,6 +23,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './admin.module.css'
@@ -324,6 +325,7 @@ function WaitingPrices({
                   {change.amount.toLocaleString('en-GB')} · by{' '}
                   {change.proposer?.full_name ?? 'staff'} · standard on its own{' '}
                   {standardOn(change).toLocaleString('en-GB', {
+                    timeZone: HOSPITAL_TIME_ZONE,
                     day: 'numeric',
                     month: 'short',
                     hour: '2-digit',

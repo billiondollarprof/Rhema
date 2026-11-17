@@ -16,6 +16,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import PatientPicker from '../_parts/PatientPicker'
@@ -81,6 +82,7 @@ export default function LabPatientPage() {
                 <b>{request.tests.join(', ')}</b>
                 <small className={styles.muted}>
                   {new Date(request.requested_at).toLocaleString('en-GB', {
+                    timeZone: HOSPITAL_TIME_ZONE,
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',

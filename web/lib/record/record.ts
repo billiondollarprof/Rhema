@@ -14,7 +14,8 @@
  *
  * Never: log a value from the record. Errors are reported by table and id.
  */
-import { serverNow } from '@/lib/time/serverTime'
+import { HOSPITAL_TIME_ZONE } from '../time/zone'
+import { serverNow } from '../time/serverTime'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '@/lib/offline/outbox'
 
@@ -456,6 +457,7 @@ export const VOID_REASONS = [
 
 export function when(isoTime: string): string {
   return new Date(isoTime).toLocaleString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     day: 'numeric',
     month: 'short',
     hour: '2-digit',

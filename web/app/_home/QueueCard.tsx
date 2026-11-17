@@ -24,6 +24,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -94,7 +95,11 @@ function buttonsFor(staff: StaffMember, status: QueueStatus): [string, Next, boo
 }
 
 function since(isoTime: string) {
-  return new Date(isoTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return new Date(isoTime).toLocaleTimeString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 // ===== 3. The card =====
