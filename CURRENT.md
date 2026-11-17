@@ -862,6 +862,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        year 2026, year 2027... inside of year 2026, a zip file month by
        month... attached files will just be only in... Cloudflare." Asked
        whether a connector or API is needed. PLAN SENT, WAITING FOR HIS YES.
+    b ANSWER (2026-11-17): "Okay, yes, let's do this." Then: "would I have
+       to be repeating the same process for every hospital, or I can just
+       create this thing with StellaXafe accounts instead of Rhema Medical,
+       so that the app just has the connector... when we repurpose the app
+       for another hospital, I won't have to go through the process again."
+       Answered: one Google app under StellaXafe, made once; each hospital
+       only taps Connect Google Drive in Admin and Allow.
+       Decided 2026-11-17: NO password on the zip ("pointless adding
+       password to the zip... the most important thing is to protect that
+       account... add a two factor authenticator"). Two-step sign in on the
+       hospital's Gmail goes in the setup steps. BUILDING.
     a STATUS: LIVE 2026-11-17. Moments shown in HOSPITAL_TIME_ZONE
     (Africa/Lagos; NEXT_PUBLIC_TIME_ZONE per hospital); calendar dates never
     moved; days by the hospital's clock; the download's read me says UTC.
