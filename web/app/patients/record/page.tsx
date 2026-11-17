@@ -20,6 +20,7 @@
  * note (open), lab, prescriptions, then the medication chart. Everybody
  * else: the doctor's treatment plan at the top, then the medication chart,
  * vital signs and nursing notes. Visits by day sits near the bottom.
+ * Current medications and Doses given open inside the chart (request 221a).
  *
  * Files (request 128): scans, results and old paper files sit in their own
  * section. Download asks "Full medical history" (printed, or saved as a
@@ -40,7 +41,6 @@ import AppShell from '@/components/shell/AppShell'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import { AllergiesSection, ConditionsSection, ProfileSection } from './_parts/Background'
-import { DosesSection, MedicationsSection } from './_parts/Medications'
 import AttachmentPicker from './_parts/AttachmentPicker'
 import FilesSection from './_parts/Files'
 import LabSection from './_parts/Lab'
@@ -367,8 +367,6 @@ function PatientRecord() {
                   <MedicationChart {...props} />
                   <VitalsSection {...props} />
                   <NursingNotesSection {...props} />
-                  <MedicationsSection {...props} open={false} />
-                  <DosesSection {...props} open={false} />
                   <VisitsSection record={props.record} />
                   <FilesSection
                     client={client}
@@ -390,8 +388,6 @@ function PatientRecord() {
                   />
                   <LabSection client={client} patientId={props.patientId} sex={patient.sex} />
                   <PrescriptionsSection client={client} patientId={props.patientId} />
-                  <MedicationsSection {...props} open={false} />
-                  <DosesSection {...props} open={false} />
                   <VisitsSection record={props.record} />
                   <FilesSection
                     client={client}

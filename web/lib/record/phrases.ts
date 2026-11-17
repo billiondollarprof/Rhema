@@ -17,16 +17,26 @@ export const NOTE_PARTS = [
   {
     key: 'complaint',
     label: 'Symptoms and history',
-    hint: 'What the patient came with, and for how long',
+    hint: 'Type here: what the patient came with, and for how long',
   },
-  { key: 'findings', label: 'Examination findings', hint: 'What you found on examination' },
-  { key: 'assessment', label: 'Diagnosis', hint: 'What you think it is' },
-  { key: 'plan', label: 'Treatment plan', hint: 'What the nurses should do, tests, next review' },
+  {
+    key: 'findings',
+    label: 'Examination findings',
+    hint: 'Type here: what you found on examination',
+  },
+  { key: 'assessment', label: 'Diagnosis', hint: 'Type here: what you think it is' },
+  {
+    key: 'plan',
+    label: 'Treatment plan',
+    hint: 'Type here: what the nurses should do, tests, next review',
+  },
 ] as const
 
 export type NotePart = (typeof NOTE_PARTS)[number]['key']
 
-// ===== 2. The words to tap for each box =====
+// ===== 2. The common words for each box =====
+// Symptoms only in the first list: how long goes in the doctor's own words
+// (Anthony, 2026-11-17, request 221c, asked why "for 2 days" was there).
 export const PHRASES: Record<NotePart, string[]> = {
   complaint: [
     'Fever',
@@ -44,8 +54,6 @@ export const PHRASES: Record<NotePart, string[]> = {
     'Difficulty breathing',
     'Painful urination',
     'Dizziness',
-    'for 2 days',
-    'for 1 week',
   ],
   findings: [
     'Conscious and alert',
@@ -104,7 +112,7 @@ export function addPhrase(text: string, phrase: string): string {
   if (now.toLowerCase().includes(phrase.toLowerCase())) return text
   if (!now) return phrase
   const join = /[.,;:]$/.test(now) ? ' ' : ', '
-  const next = phrase.startsWith('for ') ? phrase : phrase.charAt(0).toLowerCase() + phrase.slice(1)
+  const next = phrase.charAt(0).toLowerCase() + phrase.slice(1)
   // A new box starts with a capital; after a full stop, the next one does too.
   return now + join + (now.endsWith('.') ? phrase : next)
 }

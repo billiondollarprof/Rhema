@@ -53,16 +53,17 @@ function localNow() {
 }
 
 // ===== 1. Medications =====
-// open: shut when the medication chart above shows the same medicines
-// (request 217c); open everywhere else, as before.
+// bare: shown inside the medication chart, opened in place by "Add,
+// suspend or stop a medicine" (Anthony, 2026-11-17, request 221a: "why
+// doesn't it open the charts?"), so no card of its own.
 export function MedicationsSection({
   client,
   staffId,
   patientId,
   record,
   reload,
-  open = true,
-}: Props & { open?: boolean }) {
+  bare = false,
+}: Props & { bare?: boolean }) {
   const [adding, setAdding] = useState(false)
   // The medicine and its strength come from the picker.
   const [medicine, setMedicine] = useState('')
@@ -104,8 +105,8 @@ export function MedicationsSection({
     }
   }
 
-  return (
-    <Section title="Current medications" count={live} open={open} id="record-medications">
+  const body = (
+    <>
       {sorted.length === 0 ? <EmptyLine text="No medicines recorded." /> : null}
       {sorted.map((medication) => (
         <MedicationLine
@@ -116,6 +117,7 @@ export function MedicationsSection({
           staffId={staffId}
           patientId={patientId}
           reload={reload}
+          canGive={!bare}
         />
       ))}
       {adding ? (
@@ -179,6 +181,15 @@ export function MedicationsSection({
           </button>
         </div>
       )}
+    </>
+  )
+  return bare ? (
+    <div id="record-medications" className={styles.manage}>
+      {body}
+    </div>
+  ) : (
+    <Section title="Current medications" count={live} open id="record-medications">
+      {body}
     </Section>
   )
 }
@@ -190,6 +201,7 @@ function MedicationLine({
   staffId,
   patientId,
   reload,
+  canGive = true,
 }: {
   medication: Medication
   lastChange: MedicalRecord['statusChanges'][number] | undefined
@@ -197,6 +209,9 @@ function MedicationLine({
   staffId: string
   patientId: number
   reload: () => void
+  // false inside the chart, where Given on each row records the dose, so a
+  // dose is never offered two ways in one place (request 221).
+  canGive?: boolean
 }) {
   const [changing, setChanging] = useState<MedicationStatus | null>(null)
   const [giving, setGiving] = useState(false)
@@ -277,7 +292,7 @@ function MedicationLine({
       }}
       actions={
         <>
-          {medication.status === 'active' ? (
+          {medication.status === 'active' && canGive ? (
             <button className={`${styles.small} ${styles.primary}`} onClick={() => setGiving(true)}>
               Give dose
             </button>
@@ -443,14 +458,16 @@ function MedicationLine({
 }
 
 // ===== 2. Doses given =====
+// bare: shown inside the medication chart, opened in place by "Correct or
+// add a dose" (request 221a).
 export function DosesSection({
   client,
   staffId,
   patientId,
   record,
   reload,
-  open = true,
-}: Props & { open?: boolean }) {
+  bare = false,
+}: Props & { bare?: boolean }) {
   const [adding, setAdding] = useState(false)
   const [medicine, setMedicine] = useState('')
   const [strength, setStrength] = useState('')
@@ -481,13 +498,8 @@ export function DosesSection({
     }
   }
 
-  return (
-    <Section
-      title="Doses given"
-      count={record.doses.filter((d) => !d.voided_at).length}
-      open={open}
-      id="record-doses"
-    >
+  const body = (
+    <>
       {record.doses.length === 0 ? <EmptyLine text="No doses recorded yet." /> : null}
       {record.doses.map((given) => (
         <Line
@@ -566,6 +578,20 @@ export function DosesSection({
           </button>
         </div>
       )}
+    </>
+  )
+  return bare ? (
+    <div id="record-doses" className={styles.manage}>
+      {body}
+    </div>
+  ) : (
+    <Section
+      title="Doses given"
+      count={record.doses.filter((d) => !d.voided_at).length}
+      open
+      id="record-doses"
+    >
+      {body}
     </Section>
   )
 }

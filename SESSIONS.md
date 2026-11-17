@@ -4,6 +4,10 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-17 (night): requests 219c and 220 LIVE. SQL went live before the
+  screens that read it. Searches are starts-with only; note words are drop
+  downs; medicines save without a note.
+
 - 2026-11-17 (early): request 219. Backup timer LIVE on the hospital Worker
   (needs his token). Doctor's note save bug fixed and LIVE. All 6 flow
   additions built and tested; SQL waits for his yes, then SQL goes live

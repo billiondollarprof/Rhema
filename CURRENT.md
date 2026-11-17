@@ -849,9 +849,33 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+221. **The medical record page: get it right.** (2026-11-17)
+    a. "When I click the button that says add, suspend, or stop medicine, why
+       does it scroll down?... Why doesn't it open the charts?"
+    b. "We have a drop-down button. This drop-down button itself is not as
+       pronouncing as I expect it."
+    c. Common words: "which one is for 2 days and for 1 week again? Inside of
+       the list of medicine: painful urination, dizziness, chest pain."
+    d. "As I am picking something, the thing is still taking me down to the
+       bottom... You click one button, it will just scroll from the viewport."
+    e. "What if the word is not there? Is there a place for the doctor to type
+       in the word themselves?"
+    f. Medicines: "what if the medication... is too plenty? You have to scroll
+       to the bottom to see Other... I thought it's all the medicine in the
+       pharmacy that will be displayed."
+    g. "I'm on the dark mode. Let me change to light mode. It's not the same
+       design."
+    h. "Please go back to this page, this medical record page. We have to get
+       it right... Check the consultation and... the medical records." Also
+       asked whether records preload for when the internet drops.
+
 220. **SQL yes; medicines without a note; drop downs for long lists.** (2026-11-17)
-    a. "Rhema backup timer is done." Token: 1 year expiry (his choice of
-       steps); renewal reminder in Decided below once the date is known.
+    a. "Rhema backup timer is done." The first token was saved as plain
+       text and wiped by a deploy; it was also partly shown in a screenshot,
+       so he generated a new one (2026-11-17) and saved it as a Secret.
+       RENEW BY 2027-11-17: GitHub, Fine-grained tokens, "Rhema backup
+       timer", Regenerate; then Cloudflare, rhema-hospital, Settings,
+       Variables and Secrets, GITHUB_BACKUP_TOKEN, pencil, paste, Deploy.
     b. "Run the SQLs first." His yes to the 219c batch (migration
        20261117003602).
     c. "If a doctor adds a medicine, doctor must add a note to it. Is it
@@ -860,6 +884,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        have drop downs that you can choose from with a search bar, of which
        the first letter populates only those words that start with their
        first letter. So it's more minimalistic and easier to use."
+    STATUS (2026-11-17): b LIVE (SQL first, then the screens; 0 new
+    warnings on both databases). c LIVE: medicines save with no note. d
+    LIVE: every search shows only names that start with the letters; the
+    note's common words are one drop down per box. a: waiting on the first
+    timer run with his token.
 
 219. **Build 1 to 6, check the doctor's screens, and ease of use.** (2026-11-17)
     a. The token goes on the main hospital Cloudflare account (asked which).
@@ -878,7 +907,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     b. LIVE: checked at 320, 360, tablet and desktop with the forms open.
        Fixed: Save could store medicines with no note; tap words now show 8
        with More; boxes stack on phones.
-    c. BUILT, tested, NOT pushed to testing: all 6. SQL is commit 473d245
+    c. LIVE 2026-11-17 (all 6). Was: BUILT, tested, NOT pushed to testing: all 6. SQL is commit 473d245
        (migration 20261117003602, test 047, 9 of 9 breaks caught); screens
        are commit 8041ae3. WAITING FOR HIS YES ON THE SQL. Then: push
        473d245 alone to testing and on to main (the screens read the new
