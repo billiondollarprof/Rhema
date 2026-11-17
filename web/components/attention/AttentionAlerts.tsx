@@ -24,6 +24,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Icon from '@/components/shell/Icon'
@@ -151,6 +152,7 @@ export default function AttentionAlerts({
             <small>
               {call.caller?.full_name ?? 'Staff'} ·{' '}
               {new Date(call.created_at).toLocaleTimeString('en-GB', {
+                timeZone: HOSPITAL_TIME_ZONE,
                 hour: '2-digit',
                 minute: '2-digit',
               })}

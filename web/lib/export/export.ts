@@ -12,6 +12,7 @@
  *
  * Never: keep a copy anywhere but the admin's own download.
  */
+import { HOSPITAL_TIME_ZONE } from '../time/zone'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PinResult } from '@/lib/admin/admin'
 import { makeZip } from '@/lib/files/zip'
@@ -80,9 +81,11 @@ export async function downloadOurData(
   files.push({
     name: 'READ ME.txt',
     bytes: encoder.encode(
-      `The hospital's data, downloaded ${new Date().toLocaleString('en-GB')}.\r\n` +
+      `The hospital's data, downloaded ${new Date().toLocaleString('en-GB', { timeZone: HOSPITAL_TIME_ZONE })}.\r\n` +
         'spreadsheets: one file for each part of the records, opened with Excel.\r\n' +
         'files: the scans, photos and lab result files, named as in the spreadsheets.\r\n' +
+        // Request 226a: the exact moment, the same wherever it is opened.
+        'Times are written in UTC (+00:00 at the end). Nigeria time is one hour ahead.\r\n' +
         (missed ? `${missed} file(s) could not be fetched; try the download again.\r\n` : '') +
         'This holds every patient. Keep it on a hospital device and never share it.\r\n',
     ),

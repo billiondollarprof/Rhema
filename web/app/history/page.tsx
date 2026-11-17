@@ -26,6 +26,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useEffect, useState } from 'react'
 import AppShell from '@/components/shell/AppShell'
 import styles from './history.module.css'
@@ -57,6 +58,7 @@ function timeWords(iso: string): string {
   const at = new Date(iso)
   const today = at.toDateString() === new Date().toDateString()
   return at.toLocaleString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     ...(today ? {} : { weekday: 'short', day: 'numeric', month: 'short' }),
     hour: '2-digit',
     minute: '2-digit',
@@ -168,6 +170,7 @@ export default function HistoryPage() {
             <b>
               Since you signed in:{' '}
               {shiftStart.toLocaleString('en-GB', {
+                timeZone: HOSPITAL_TIME_ZONE,
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',
@@ -237,8 +240,17 @@ export default function HistoryPage() {
         ) : null}
         {range ? (
           <p className={styles.muted}>
-            {range.from.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })} to{' '}
-            {range.to.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+            {range.from.toLocaleString('en-GB', {
+              timeZone: HOSPITAL_TIME_ZONE,
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })}{' '}
+            to{' '}
+            {range.to.toLocaleString('en-GB', {
+              timeZone: HOSPITAL_TIME_ZONE,
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })}
             {loading ? ' · loading…' : ''}
           </p>
         ) : null}

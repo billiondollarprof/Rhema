@@ -24,6 +24,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { inputNow } from '@/lib/time/serverTime'
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
@@ -50,9 +51,18 @@ import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
 // device's clock (request 225).
 const localNow = inputNow
 const dayWords = (iso: string) =>
-  new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+  new Date(iso).toLocaleDateString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
 const timeWords = (iso: string) =>
-  new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  new Date(iso).toLocaleTimeString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 
 // Lines grouped by day, newest day first.
 function byDay<T>(lines: T[], when: (line: T) => string): [string, T[]][] {

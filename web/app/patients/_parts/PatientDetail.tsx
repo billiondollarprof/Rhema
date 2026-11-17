@@ -20,6 +20,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -55,6 +56,7 @@ type DetailProps = {
 export function lastSeenWords(isoTime: string | null): string {
   if (!isoTime) return 'Not seen yet'
   return new Date(isoTime).toLocaleDateString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -63,7 +65,11 @@ export function lastSeenWords(isoTime: string | null): string {
 
 // "10:42", for the Today list.
 function clock(isoTime: string): string {
-  return new Date(isoTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return new Date(isoTime).toLocaleTimeString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 export default function PatientDetail({

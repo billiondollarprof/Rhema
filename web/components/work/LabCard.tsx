@@ -20,6 +20,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -258,6 +259,7 @@ function LabEntry({
           <span className={styles.sampleTaken}>
             Sample taken{' '}
             {new Date(request.sample_taken_at).toLocaleTimeString('en-GB', {
+              timeZone: HOSPITAL_TIME_ZONE,
               hour: '2-digit',
               minute: '2-digit',
             })}

@@ -11,6 +11,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './admin.module.css'
@@ -30,7 +31,11 @@ const ONLINE_WITHIN_MS = 5 * 60 * 1000
 const LINES_SHOWN = 3
 
 const clock = (when: string) =>
-  new Date(when).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  new Date(when).toLocaleTimeString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 
 // ===== 1. One person's day, worked out from their stretches =====
 function dayFor(sessions: SessionRow[]) {
@@ -122,6 +127,7 @@ export default function ActivityTab({
           <span className={styles.muted}>
             Updates by itself · last at{' '}
             {updatedAt.toLocaleTimeString('en-GB', {
+              timeZone: HOSPITAL_TIME_ZONE,
               hour: '2-digit',
               minute: '2-digit',
               second: '2-digit',

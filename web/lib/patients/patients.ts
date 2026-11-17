@@ -16,6 +16,7 @@
  * Never: log a patient's name, phone or address. Errors are reported by
  * patient number or error code only.
  */
+import { HOSPITAL_TIME_ZONE } from '../time/zone'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '../offline/outbox'
 import { readCopy, searchCopy } from '../offline/patientCopy'
@@ -527,6 +528,7 @@ export function firstRegisteredWords(patient: {
   }
   if (!patient.created_at) return 'Not recorded'
   return new Date(patient.created_at).toLocaleDateString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     day: 'numeric',
     month: 'short',
     year: 'numeric',

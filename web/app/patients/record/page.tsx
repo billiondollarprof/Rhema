@@ -37,6 +37,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { markDispensedSeenFor } from '@/lib/pharmacy/pharmacy'
 import { noteOfflineView, readSavedRecord, type SavedRecord } from '@/lib/offline/recordCopy'
 import { AntenatalSection, ConsentSection } from './_parts/Antenatal'
@@ -394,6 +395,7 @@ function PatientRecord() {
               <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
                 No network. This is the copy kept on this device at{' '}
                 {new Date(saved.savedAt).toLocaleTimeString('en-GB', {
+                  timeZone: HOSPITAL_TIME_ZONE,
                   hour: '2-digit',
                   minute: '2-digit',
                 })}

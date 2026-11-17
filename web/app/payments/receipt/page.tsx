@@ -27,6 +27,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -50,6 +51,7 @@ import { BRAND } from '@/lib/brand/brand'
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-GB', {
+    timeZone: HOSPITAL_TIME_ZONE,
     day: 'numeric',
     month: 'short',
     year: 'numeric',

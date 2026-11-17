@@ -22,6 +22,7 @@
  */
 'use client'
 
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useEffect, useMemo, useState } from 'react'
 import AppShell from '@/components/shell/AppShell'
 import styles from '../_parts/lab.module.css'
@@ -287,6 +288,7 @@ function PriceChanger({
           Waiting for the admin: ₦{waiting.amount.toLocaleString('en-GB')}, sent by{' '}
           {waiting.proposer?.full_name ?? 'staff'}. Standard on its own on{' '}
           {standardOn(waiting).toLocaleString('en-GB', {
+            timeZone: HOSPITAL_TIME_ZONE,
             day: 'numeric',
             month: 'short',
             hour: '2-digit',
