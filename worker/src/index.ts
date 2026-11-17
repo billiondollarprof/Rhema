@@ -58,6 +58,13 @@ export async function handleApi(request: Request, env: Partial<Env> = {}): Promi
     return Response.json({ ok: true })
   }
 
+  // The right time (request 225, Anthony 2026-11-17: "the time from the
+  // internet... not the time in the system, in case the system is not
+  // correct"). Devices set their clock against this. Never cached.
+  if (url.pathname === '/api/time') {
+    return Response.json({ now: Date.now() }, { headers: { 'Cache-Control': 'no-store' } })
+  }
+
   // The public half of the VAPID key. Browsers need it to turn alerts on.
   // It is public by design; the private half never leaves the Worker.
   if (url.pathname === '/api/push/key' && request.method === 'GET') {

@@ -21,6 +21,7 @@
  */
 'use client'
 
+import { serverNow } from '@/lib/time/serverTime'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -50,7 +51,8 @@ const dateWords = (iso: string | null) =>
   iso
     ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : '-'
-const today = () => new Date().toISOString().slice(0, 10)
+// Today, by the internet's clock (request 225).
+const today = () => serverNow().toISOString().slice(0, 10)
 const inDays = (days: number) => {
   const date = new Date()
   date.setDate(date.getDate() + days)

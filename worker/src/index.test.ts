@@ -14,3 +14,14 @@ describe('handleApi', () => {
     expect(response.status).toBe(404)
   })
 })
+
+// Request 225: the time devices set their clock against.
+describe('the time', () => {
+  it('answers the server time, never cached', async () => {
+    const before = Date.now()
+    const response = await handleApi(new Request('https://x.test/api/time'))
+    const body = (await response.json()) as { now: number }
+    expect(body.now).toBeGreaterThanOrEqual(before)
+    expect(response.headers.get('Cache-Control')).toBe('no-store')
+  })
+})

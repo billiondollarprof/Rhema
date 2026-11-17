@@ -17,6 +17,7 @@
  */
 'use client'
 
+import { inputNow } from '@/lib/time/serverTime'
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
@@ -47,12 +48,9 @@ type Props = {
   reload: () => void
 }
 
-// "now" in the form a datetime box expects (local time, to the minute).
-function localNow() {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-}
+// "now" in the form a time box expects, from the internet's time, not the
+// device's clock (request 225).
+const localNow = inputNow
 
 // ===== 1. Medications =====
 // bare: shown inside the medication chart, opened in place by "Add,

@@ -6,8 +6,9 @@
  * clicks consultation... open a complete full page with the different
  * categories like history and symptoms... listed like a spreadsheet... he
  * can decide to use the picker... or type by hand... so he can type in his
- * notes and also see what he's typing." And: Seen by, picked from whoever
- * has a consulting room, the midwife in Consultant Room 2 included.
+ * notes and also see what he's typing." Seen by is the person signed in,
+ * with their room (request 225: the system knows who is logged in; nobody
+ * picks a name).
  *
  * The note itself is the same as on the record page (_parts/Consultation),
  * shown full page: Seen by, the four parts as rows that grow as you type,
@@ -20,7 +21,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import styles from '../../_parts/patients.module.css'
 import ConsultationsSection from '../_parts/Consultation'
@@ -28,7 +29,6 @@ import { useRecord } from '../_parts/useRecord'
 import AppShell from '@/components/shell/AppShell'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
-import { knownSigners, loadSigners, type Signer } from '@/lib/record/signers'
 
 function Consult() {
   const auth = useAuth()
@@ -42,10 +42,6 @@ function Consult() {
     id,
     allowed,
   )
-  const [signers, setSigners] = useState<Signer[]>(() => (staff ? knownSigners(staff.id) : []))
-  useEffect(() => {
-    if (client && staff) void loadSigners(client, staff.id).then(setSigners)
-  }, [client, staff])
 
   if (auth.status !== 'ready' || !client || !staff) return null
   const canWrite = staff.room?.kind === 'consultation'
@@ -88,7 +84,7 @@ function Consult() {
             record={record}
             reload={reload}
             canWrite={canWrite}
-            signers={signers}
+            me={staff.room ? `${staff.full_name} · ${staff.room.name}` : staff.full_name}
             fullPage
           />
         ) : null}

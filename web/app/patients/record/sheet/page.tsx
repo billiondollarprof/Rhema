@@ -6,24 +6,25 @@
  * nurses want "their own... in form of a spreadsheet", free to type or to
  * pick. The treatment sheet has Time, Drug or fluid, Dose, Route and Sign,
  * with the ward's events (Blood connected...) shown in red as on paper. The
- * vital signs sheet has Time, Temp, Pulse, Resp, BP, SpO2 and Sign. "The
- * time... automatically updates": a line's time is when it is saved, unless
- * the nurse changes it. "The nurse can enter their name from a picker that
- * contains only nurses."
+ * vital signs sheet has Time, Temp, Pulse, Resp, BP, SpO2 and Sign. A
+ * line's time is when it is saved, by the database's clock (request 225:
+ * the internet's time, not the device's), unless the nurse changes it. Sign
+ * is the person signed in, with their room: nobody picks a name (request
+ * 225: "the system keeps the audit trail for who did what").
  *
  * How it goes:
- *   1. The top line is empty, ready to fill in. Pick or type each box.
- *   2. Save: the line goes into the sheet with the time and the name.
- *   3. The sheet lists every line, newest first, by day.
- *
- * The person signed in is still recorded as the one who typed it; the
- * name picked is the nurse who did it (signed_by). The database checks both.
+ *   1. Under the headings, the new line is empty, ready to fill in. Pick or
+ *      type each box.
+ *   2. Save: the line joins the sheet with the time and the name.
+ *   3. Every line follows, newest first, by day, so a reading today sits
+ *      above yesterday's and the change shows at a glance.
  *
  * Never: change a saved line (a wrong one is voided on the record page with
  * a reason), or let anybody but clinical staff in.
  */
 'use client'
 
+import { inputNow } from '@/lib/time/serverTime'
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -42,22 +43,12 @@ import {
   medicineWords,
 } from '@/lib/medicines/medicines'
 import { addLine, type MedicalRecord } from '@/lib/record/record'
-import {
-  knownSigners,
-  loadSigners,
-  nurseOptions,
-  ROUTES,
-  WARD_EVENTS,
-  type Signer,
-} from '@/lib/record/signers'
+import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
 
 // ===== 1. Small helpers =====
-// "now" in the form a time box expects (local time, to the minute).
-function localNow() {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-}
+// "now" in the form a time box expects, from the internet's time, not the
+// device's clock (request 225).
+const localNow = inputNow
 const dayWords = (iso: string) =>
   new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 const timeWords = (iso: string) =>
@@ -88,12 +79,9 @@ function Sheet() {
     id,
     allowed,
   )
-  const [signers, setSigners] = useState<Signer[]>(() => (staff ? knownSigners(staff.id) : []))
-  useEffect(() => {
-    if (client && staff) void loadSigners(client, staff.id).then(setSigners)
-  }, [client, staff])
-
   if (auth.status !== 'ready' || !client || !staff) return null
+  // Who signs every line: the person signed in, with their room (225).
+  const me = staff.room ? `${staff.full_name} · ${staff.room.name}` : staff.full_name
 
   return (
     <AppShell>
@@ -151,7 +139,7 @@ function Sheet() {
             staffId={staff.id}
             patientId={id}
             record={record}
-            signers={signers}
+            me={me}
             reload={reload}
           />
         ) : null}
@@ -161,7 +149,7 @@ function Sheet() {
             staffId={staff.id}
             patientId={id}
             record={record}
-            signers={signers}
+            me={me}
             reload={reload}
           />
         ) : null}
@@ -175,25 +163,20 @@ type SheetProps = {
   staffId: string
   patientId: number
   record: MedicalRecord
-  signers: Signer[]
+  // Who signs: the person signed in, and their room (request 225).
+  me: string
   reload: () => void
 }
 
-// The signer list, with the person signed in first when they are a nurse.
-function useSignerList(signers: Signer[], staffId: string) {
-  return useMemo(() => {
-    const list = nurseOptions(signers)
-    const me = list.find((option) => option.value === staffId)
-    return me ? [me, ...list.filter((option) => option !== me)] : list
-  }, [signers, staffId])
-}
-
 // ===== 3. The treatment sheet =====
-function TreatmentSheet({ client, staffId, patientId, record, signers, reload }: SheetProps) {
-  const nurses = useSignerList(signers, staffId)
-  const empty = { drug: '', dose: '', route: '', signer: '', medicationId: null as number | null }
+// One table, like the ward's paper sheet: the headings, the new line to fill
+// in, then every line written, newest first, by day (request 225: "as time
+// goes on... they are supposed to add").
+function TreatmentSheet({ client, staffId, patientId, record, me, reload }: SheetProps) {
+  const empty = { drug: '', dose: '', route: '', medicationId: null as number | null }
   const [line, setLine] = useState(empty)
-  // null: the time is now, when Save is tapped. A value: changed by hand.
+  // null: the time is when Save is tapped (the database's clock). A value:
+  // changed by hand.
   const [time, setTime] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
@@ -201,7 +184,6 @@ function TreatmentSheet({ client, staffId, patientId, record, signers, reload }:
   useEffect(() => {
     void loadMedicines(client, staffId).then((fresh) => fresh && setMedicines(fresh))
   }, [client, staffId])
-  const signer = line.signer || (nurses.some((n) => n.value === staffId) ? staffId : '')
 
   // On the chart first, then the ward's events, then the medicine list.
   const charted = record.medications.filter((m) => !m.voided_at && m.status === 'active')
@@ -242,21 +224,18 @@ function TreatmentSheet({ client, staffId, patientId, record, signers, reload }:
       setProblem('Choose or type the drug, fluid or event.')
       return
     }
-    if (!signer) {
-      setProblem('Choose the nurse who gave it.')
-      return
-    }
     setBusy(true)
     setProblem(null)
+    // Who: the person signed in, always (request 225). When: the database's
+    // clock, unless the time was changed by hand.
     const result = await addLine(client, 'medications_given', {
       patient_id: patientId,
       medication_id: line.medicationId,
       medicine: line.drug.trim(),
       dose: line.dose.trim() || null,
       route: line.route.trim() || null,
-      given_at: time ? new Date(time).toISOString() : new Date().toISOString(),
+      ...(time ? { given_at: new Date(time).toISOString() } : {}),
       given_by: staffId,
-      signed_by: signer,
     })
     setBusy(false)
     if (result) {
@@ -271,94 +250,86 @@ function TreatmentSheet({ client, staffId, patientId, record, signers, reload }:
   const lines = record.doses.filter((dose) => !dose.voided_at)
 
   return (
-    <>
-      {/* ----- The empty line to fill in ----- */}
-      <section className={styles.entry} aria-label="New line">
-        <div className={styles.entryGrid}>
-          <div className={styles.cell}>
-            <span className={styles.label}>Time</span>
-            {time === null ? (
-              <button type="button" className={styles.timeNow} onClick={() => setTime(localNow())}>
-                Now (tap to change)
-              </button>
-            ) : (
-              <input
-                type="datetime-local"
-                className={styles.input}
-                aria-label="Time"
-                max={localNow()}
-                value={time}
-                onChange={(event) => setTime(event.target.value)}
-              />
-            )}
-          </div>
-          <div className={`${styles.cell} ${styles.wide}`}>
-            <label className={styles.label} htmlFor="sheet-drug">
-              Drug, fluid or event
-            </label>
-            <SearchSelect
-              id="sheet-drug"
-              value={line.drug}
-              placeholder="Pick or type"
-              options={options}
-              // Always a search box, so a nurse can type straight away.
-              searchFrom={0}
-              onChange={choose}
-              onOther={(typed) => typed && setLine({ ...line, drug: typed, medicationId: null })}
+    <section className={styles.table} aria-label="Treatment sheet">
+      <div className={`${styles.row} ${styles.drugRow} ${styles.headRow}`} role="row">
+        <span>Time</span>
+        <span>Drug, fluid or event</span>
+        <span>Dose</span>
+        <span>Route</span>
+        <span>Sign</span>
+      </div>
+
+      {/* ----- The new line ----- */}
+      <div className={`${styles.row} ${styles.drugRow} ${styles.entryRow}`} role="row">
+        <div className={styles.cell}>
+          <span className={styles.label}>Time</span>
+          {time === null ? (
+            <button type="button" className={styles.timeNow} onClick={() => setTime(localNow())}>
+              Now
+            </button>
+          ) : (
+            <input
+              type="datetime-local"
+              className={styles.input}
+              aria-label="Time"
+              max={localNow()}
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
             />
-          </div>
-          <div className={styles.cell}>
-            <label className={styles.label} htmlFor="sheet-dose">
-              Dose
-            </label>
-            <OptionSelect
-              client={client}
-              staffId={staffId}
-              list="dose"
-              id="sheet-dose"
-              value={line.dose}
-              onChange={(dose) => setLine({ ...line, dose })}
-              placeholder="Pick or type"
-              otherLabel="Type the dose"
-            />
-          </div>
-          <div className={styles.cell}>
-            <label className={styles.label} htmlFor="sheet-route">
-              Route
-            </label>
-            <SearchSelect
-              id="sheet-route"
-              value={line.route}
-              placeholder="IV, IM, Oral…"
-              options={ROUTES.map((route) => ({ value: route, label: route }))}
-              searchFrom={0}
-              onChange={(route) => setLine({ ...line, route })}
-              onOther={(typed) => typed && setLine({ ...line, route: typed })}
-            />
-          </div>
-          <div className={styles.cell}>
-            <label className={styles.label} htmlFor="sheet-signer">
-              Sign
-            </label>
-            <SearchSelect
-              id="sheet-signer"
-              value={signer}
-              placeholder="Choose the nurse"
-              options={nurses}
-              onChange={(value) => setLine({ ...line, signer: value })}
-            />
-          </div>
+          )}
         </div>
-        {problem ? <p className={styles.error}>{problem}</p> : null}
+        <div className={styles.cell}>
+          <label className={styles.label} htmlFor="sheet-drug">
+            Drug, fluid or event
+          </label>
+          <SearchSelect
+            id="sheet-drug"
+            value={line.drug}
+            placeholder="Pick or type"
+            options={options}
+            // Always a search box, so a nurse can type straight away.
+            searchFrom={0}
+            onChange={choose}
+            onOther={(typed) => typed && setLine({ ...line, drug: typed, medicationId: null })}
+          />
+        </div>
+        <div className={styles.cell}>
+          <label className={styles.label} htmlFor="sheet-dose">
+            Dose
+          </label>
+          <OptionSelect
+            client={client}
+            staffId={staffId}
+            list="dose"
+            id="sheet-dose"
+            value={line.dose}
+            onChange={(dose) => setLine({ ...line, dose })}
+            placeholder="Pick or type"
+            otherLabel="Type the dose"
+          />
+        </div>
+        <div className={styles.cell}>
+          <label className={styles.label} htmlFor="sheet-route">
+            Route
+          </label>
+          <SearchSelect
+            id="sheet-route"
+            value={line.route}
+            placeholder="IV, IM…"
+            options={ROUTES.map((route) => ({ value: route, label: route }))}
+            searchFrom={0}
+            onChange={(route) => setLine({ ...line, route })}
+            onOther={(typed) => typed && setLine({ ...line, route: typed })}
+          />
+        </div>
+        <div className={styles.cell}>
+          <span className={styles.label}>Sign</span>
+          <span className={styles.me}>{me}</span>
+        </div>
+      </div>
+      <div className={styles.entryFoot}>
+        {problem ? <p className={styles.error}>{problem}</p> : <span />}
         <div className={styles.entryButtons}>
-          <button
-            type="button"
-            className={`${styles.button} ${styles.primary}`}
-            disabled={busy}
-            onClick={save}
-          >
-            {busy ? 'Saving…' : 'Save line'}
-          </button>
           {line.drug || time ? (
             <button
               type="button"
@@ -372,28 +343,24 @@ function TreatmentSheet({ client, staffId, patientId, record, signers, reload }:
               Clear
             </button>
           ) : null}
+          <button
+            type="button"
+            className={`${styles.button} ${styles.primary}`}
+            disabled={busy}
+            onClick={save}
+          >
+            {busy ? 'Saving…' : 'Save line'}
+          </button>
         </div>
-      </section>
+      </div>
 
-      {/* ----- The sheet ----- */}
-      {lines.length === 0 ? <p className={styles.muted}>Nothing written yet.</p> : null}
+      {/* ----- Every line written, newest first, by day ----- */}
+      {lines.length === 0 ? <p className={styles.none}>Nothing written yet.</p> : null}
       {byDay(lines, (dose) => dose.given_at).map(([day, rows]) => (
-        <section key={day} className={styles.table} aria-label={day}>
-          <h3>{day}</h3>
-          <div className={`${styles.row} ${styles.drugRow} ${styles.headRow}`} role="row">
-            <span>Time</span>
-            <span>Drug, fluid or event</span>
-            <span>Dose</span>
-            <span>Route</span>
-            <span>Sign</span>
-          </div>
+        <div key={day} role="rowgroup">
+          <div className={styles.dayRow}>{day}</div>
           {rows.map((dose) => {
             const event = WARD_EVENTS.includes(dose.medicine)
-            const signed = dose.signer?.full_name ?? dose.giver?.full_name ?? 'Staff'
-            const typedBy =
-              dose.signer && dose.giver && dose.signer.full_name !== dose.giver.full_name
-                ? dose.giver.full_name
-                : null
             return (
               <div key={dose.id} className={`${styles.row} ${styles.drugRow}`} role="row">
                 <span className={styles.time}>{timeWords(dose.given_at)}</span>
@@ -404,41 +371,29 @@ function TreatmentSheet({ client, staffId, patientId, record, signers, reload }:
                     : (dose.dose ?? '')}
                 </span>
                 <span>{dose.route ?? ''}</span>
-                <span>
-                  {signed}
-                  {typedBy ? <small> (typed by {typedBy})</small> : null}
-                </span>
+                <span>{dose.signer?.full_name ?? dose.giver?.full_name ?? 'Staff'}</span>
               </div>
             )
           })}
-        </section>
+        </div>
       ))}
-    </>
+    </section>
   )
 }
 
 // ===== 4. The vital signs sheet =====
-const VITAL_BOXES = [
-  ['temperature_c', 'Temp °C', '36.5'],
-  ['pulse', 'Pulse', '88'],
-  ['breathing_rate', 'Resp', '20'],
-  ['systolic', 'BP top', '120'],
-  ['diastolic', 'BP bottom', '80'],
-  ['spo2', 'SpO₂ %', '98'],
-] as const
-
-function VitalsSheet({ client, staffId, patientId, record, signers, reload }: SheetProps) {
-  const nurses = useSignerList(signers, staffId)
+// The same: headings, the new line, then every reading, newest first, so a
+// change from yesterday to today shows at a glance.
+function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetProps) {
   const empty: Record<string, string> = {}
   const [values, setValues] = useState(empty)
-  const [chosenSigner, setChosenSigner] = useState('')
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
-  const signer = chosenSigner || (nurses.some((n) => n.value === staffId) ? staffId : '')
+  const KEYS = ['temperature_c', 'pulse', 'breathing_rate', 'systolic', 'diastolic', 'spo2']
 
   async function save() {
     const numbers: Record<string, number> = {}
-    for (const [key] of VITAL_BOXES) {
+    for (const key of KEYS) {
       const typed = (values[key] ?? '').trim()
       if (!typed) continue
       const number = Number(typed.replace(',', '.'))
@@ -452,17 +407,13 @@ function VitalsSheet({ client, staffId, patientId, record, signers, reload }: Sh
       setProblem('Type at least one reading.')
       return
     }
-    if (!signer) {
-      setProblem('Choose the nurse who took them.')
-      return
-    }
     setBusy(true)
     setProblem(null)
+    // Who and when: the person signed in, and the database's clock (225).
     const result = await addLine(client, 'vital_signs', {
       patient_id: patientId,
       ...numbers,
       recorded_by: staffId,
-      signed_by: signer,
     })
     setBusy(false)
     if (result) {
@@ -474,46 +425,64 @@ function VitalsSheet({ client, staffId, patientId, record, signers, reload }: Sh
   }
 
   const rows = record.vitals.filter((vitals) => !vitals.voided_at)
+  // example: shown greyed as "e.g. 36.5"; words (Top, Bottom) as they are.
+  const box = (key: string, label: string, example: string) => (
+    <input
+      id={`vital-${key}`}
+      aria-label={label}
+      className={styles.input}
+      inputMode="decimal"
+      placeholder={/\d/.test(example) ? `e.g. ${example}` : example}
+      value={values[key] ?? ''}
+      onChange={(event) =>
+        setValues({ ...values, [key]: event.target.value.replace(/[^\d.,]/g, '') })
+      }
+    />
+  )
+  const cell = (key: string, label: string, example: string) => (
+    <div className={styles.cell}>
+      <span className={styles.label}>{label}</span>
+      {box(key, label, example)}
+    </div>
+  )
 
   return (
-    <>
-      <section className={styles.entry} aria-label="New readings">
-        <div className={styles.entryGrid}>
-          <div className={styles.cell}>
-            <span className={styles.label}>Time</span>
-            <span className={styles.timeNow}>Now</span>
-          </div>
-          {VITAL_BOXES.map(([key, label, example]) => (
-            <div key={key} className={styles.cell}>
-              <label className={styles.label} htmlFor={`vital-${key}`}>
-                {label}
-              </label>
-              <input
-                id={`vital-${key}`}
-                className={styles.input}
-                inputMode="decimal"
-                placeholder={`e.g. ${example}`}
-                value={values[key] ?? ''}
-                onChange={(event) =>
-                  setValues({ ...values, [key]: event.target.value.replace(/[^\d.,]/g, '') })
-                }
-              />
-            </div>
-          ))}
-          <div className={styles.cell}>
-            <label className={styles.label} htmlFor="vital-signer">
-              Sign
-            </label>
-            <SearchSelect
-              id="vital-signer"
-              value={signer}
-              placeholder="Choose the nurse"
-              options={nurses}
-              onChange={setChosenSigner}
-            />
+    <section className={styles.table} aria-label="Vital signs sheet">
+      <div className={`${styles.row} ${styles.vitalRow} ${styles.headRow}`} role="row">
+        <span>Time</span>
+        <span>Temp °C</span>
+        <span>Pulse</span>
+        <span>Resp</span>
+        <span>BP</span>
+        <span>SpO₂ %</span>
+        <span>Sign</span>
+      </div>
+
+      {/* ----- The new line ----- */}
+      <div className={`${styles.row} ${styles.vitalRow} ${styles.entryRow}`} role="row">
+        <div className={styles.cell}>
+          <span className={styles.label}>Time</span>
+          <span className={styles.timeNow}>Now</span>
+        </div>
+        {cell('temperature_c', 'Temp °C', '36.5')}
+        {cell('pulse', 'Pulse', '88')}
+        {cell('breathing_rate', 'Resp', '20')}
+        <div className={styles.cell}>
+          <span className={styles.label}>BP</span>
+          <div className={styles.bp}>
+            {box('systolic', 'BP top', 'Top')}
+            <span aria-hidden="true">/</span>
+            {box('diastolic', 'BP bottom', 'Bottom')}
           </div>
         </div>
-        {problem ? <p className={styles.error}>{problem}</p> : null}
+        {cell('spo2', 'SpO₂ %', '98')}
+        <div className={styles.cell}>
+          <span className={styles.label}>Sign</span>
+          <span className={styles.me}>{me}</span>
+        </div>
+      </div>
+      <div className={styles.entryFoot}>
+        {problem ? <p className={styles.error}>{problem}</p> : <span />}
         <div className={styles.entryButtons}>
           <button
             type="button"
@@ -524,21 +493,13 @@ function VitalsSheet({ client, staffId, patientId, record, signers, reload }: Sh
             {busy ? 'Saving…' : 'Save readings'}
           </button>
         </div>
-      </section>
+      </div>
 
-      {rows.length === 0 ? <p className={styles.muted}>No readings yet.</p> : null}
+      {/* ----- Every reading, newest first, by day ----- */}
+      {rows.length === 0 ? <p className={styles.none}>No readings yet.</p> : null}
       {byDay(rows, (vitals) => vitals.recorded_at).map(([day, dayRows]) => (
-        <section key={day} className={styles.table} aria-label={day}>
-          <h3>{day}</h3>
-          <div className={`${styles.row} ${styles.vitalRow} ${styles.headRow}`} role="row">
-            <span>Time</span>
-            <span>Temp</span>
-            <span>Pulse</span>
-            <span>Resp</span>
-            <span>BP</span>
-            <span>SpO₂</span>
-            <span>Sign</span>
-          </div>
+        <div key={day} role="rowgroup">
+          <div className={styles.dayRow}>{day}</div>
           {dayRows.map((vitals) => (
             <div key={vitals.id} className={`${styles.row} ${styles.vitalRow}`} role="row">
               <span className={styles.time}>{timeWords(vitals.recorded_at)}</span>
@@ -554,9 +515,9 @@ function VitalsSheet({ client, staffId, patientId, record, signers, reload }: Sh
               <span>{vitals.signer?.full_name ?? vitals.recorder?.full_name ?? 'Staff'}</span>
             </div>
           ))}
-        </section>
+        </div>
       ))}
-    </>
+    </section>
   )
 }
 
