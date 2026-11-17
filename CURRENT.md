@@ -868,8 +868,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        so that the app just has the connector... when we repurpose the app
        for another hospital, I won't have to go through the process again."
        Answered: one Google app under StellaXafe, made once; each hospital
-       only taps Connect Google Drive in Admin and Allow. Waiting on: lock
-       the zip or not.
+       only taps Connect Google Drive in Admin and Allow.
+       Decided 2026-11-17: NO password on the zip ("pointless adding
+       password to the zip... the most important thing is to protect that
+       account... add a two factor authenticator"). Two-step sign in on the
+       hospital's Gmail goes in the setup steps. BUILDING.
     a STATUS: LIVE 2026-11-17. Moments shown in HOSPITAL_TIME_ZONE
     (Africa/Lagos; NEXT_PUBLIC_TIME_ZONE per hospital); calendar dates never
     moved; days by the hospital's clock; the download's read me says UTC.
