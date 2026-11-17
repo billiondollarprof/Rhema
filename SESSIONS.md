@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-17 (early): request 219. Backup timer LIVE on the hospital Worker
+  (needs his token). Doctor's note save bug fixed and LIVE. All 6 flow
+  additions built and tested; SQL waits for his yes, then SQL goes live
+  before the screens.
+
 - 2026-11-16 (late night): request 218. LIVE: the doctor's note with the
   director's four boxes, the medication chart, the summary, the plan banner,
   each role's work first, Visits by day (no SQL); Next.js 16.4.5; the backup
