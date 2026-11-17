@@ -4,6 +4,9 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-17 (morning): request 221 LIVE: the record page reworked so nothing
+  scrolls away. Backup token saved as a Secret; first timer run due 07:17 UTC.
+
 - 2026-11-17 (night): requests 219c and 220 LIVE. SQL went live before the
   screens that read it. Searches are starts-with only; note words are drop
   downs; medicines save without a note.

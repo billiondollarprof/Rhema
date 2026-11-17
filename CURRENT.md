@@ -868,6 +868,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     h. "Please go back to this page, this medical record page. We have to get
        it right... Check the consultation and... the medical records." Also
        asked whether records preload for when the internet drops.
+    STATUS (2026-11-17): LIVE. The chart button opens the medicine list in
+    place (Current medications and Doses given fold into the chart; both
+    still print); drop downs return the field to its place after a pick
+    (measured: 0 movement); Other sits under every list; the medicine picker
+    lists every medicine with Cancel; a word not listed is typed in the drop
+    down; durations left the symptom list; round blue fold arrows; 2 by 2
+    summary on phones. Checked light and dark. Offline: a record opened in
+    this session stays readable; keeping records on the device would be a
+    patient data decision for him (NDPA), not made.
 
 220. **SQL yes; medicines without a note; drop downs for long lists.** (2026-11-17)
     a. "Rhema backup timer is done." The first token was saved as plain
