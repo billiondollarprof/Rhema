@@ -857,6 +857,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     for something, a request or a sent to room... That one stays until the
     person acts on it. But normal message, notification, all those things,
     once the person has seen it, it should not be showing the bubble."
+    STATUS: LIVE 2026-11-17. Messages, announcements, results ready and
+    prescriptions dispensed stop counting once unfolded in Notifications
+    (messages marked read; the rest kept on the device as notice keys);
+    work waiting counts until done. Opening a conversation already cleared
+    its messages. Backup timer CONFIRMED: runs at 07:17 and 09:17 UTC
+    started by the timer, both succeeded.
 
 223. **LATER, REMIND HIM: eye comfort research.** (2026-11-17)
     "Save this for later, so you remind me... search open repos, different

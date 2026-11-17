@@ -973,3 +973,5 @@ this file.
 - **221 (2026-11-17): the medical record page.** The chart opens its lists in
   place, nothing scrolls away after a pick, every medicine is listed, Other is
   always in view, clearer fold arrows, compact summary. Light and dark checked.
+- **222 (2026-11-17): bubbles clear once seen.** Work waiting still counts until
+  done. Also confirmed: the backup timer starts the backup on time.
