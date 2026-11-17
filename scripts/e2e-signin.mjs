@@ -342,8 +342,7 @@ try {
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
 
   step('She picks a medicine from the list, suspends it with a reason, and resumes it')
-  // Current medications sits folded under the medication chart (request
-  // 217c); the chart's button opens it.
+  // The chart's button opens the medicine list in place (requests 217c, 221a).
   await page.getByRole('button', { name: 'Add, suspend or stop a medicine' }).click()
   await page.getByRole('button', { name: '+ Add a medicine' }).click()
   // The medicine box opens with a tap (2026-11-16), then the search.
@@ -387,9 +386,8 @@ try {
 
   // The Other way for a dose: typed once, kept in her own list.
   step('A dose not in the list is added with Other, and is in her list after')
-  // Doses given is folded under the chart (request 217c): she opens it.
-  const doses = page.locator('#record-doses')
-  await doses.locator('summary').click()
+  // The doses' own list opens inside the chart (request 221a).
+  await page.getByRole('button', { name: 'Correct or add a dose' }).click()
   await page.getByRole('button', { name: '+ Record a dose not on the list' }).click()
   await pickFrom(page, 'Dose', 'Other…')
   await page.getByPlaceholder('Type the dose').fill('7 ml')
@@ -402,8 +400,9 @@ try {
   await page.getByRole('button', { name: 'Cancel' }).last().click()
 
   step('She gives a dose; it shows with her name')
-  await page.getByRole('button', { name: 'Give dose' }).click()
-  await page.getByRole('button', { name: 'Record dose' }).click()
+  // On the chart: Given, then Yes (request 221: one way to give a dose).
+  await page.getByRole('button', { name: 'Given', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Yes, given' }).click()
   await page.getByText('Given by Test Nurse One').waitFor()
 
   step('A reading out of range is refused; a normal one saves')
@@ -442,7 +441,7 @@ try {
   step('A refresh shows everything still there')
   await page.reload()
   await page.getByText('Allergic to: Penicillin (severe)').waitFor()
-  await page.locator('#record-doses summary').click()
+  await page.getByRole('button', { name: 'Correct or add a dose' }).click()
   await page.getByText('Given by Test Nurse One').waitFor()
   await page.getByText('Voided by Test Nurse One: Entered by mistake').waitFor()
   await shot(page, 'medical-record')

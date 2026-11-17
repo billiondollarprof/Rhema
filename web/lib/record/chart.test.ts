@@ -96,8 +96,8 @@ describe('addPhrase', () => {
   it('joins tapped words with commas, once each', () => {
     let text = addPhrase('', 'Fever')
     text = addPhrase(text, 'Cough')
-    text = addPhrase(text, 'for 2 days')
-    expect(text).toBe('Fever, cough, for 2 days')
+    text = addPhrase(text, 'Weakness')
+    expect(text).toBe('Fever, cough, weakness')
     expect(addPhrase(text, 'Cough')).toBe(text)
     expect(addPhrase('Seen today.', 'Fever')).toBe('Seen today. Fever')
   })

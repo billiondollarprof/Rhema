@@ -183,3 +183,18 @@
   color: var(--c-9a5b00, #9a5b00);
   font-weight: 600;
 }
+
+/* Other, under the list, always in view (request 221f). */
+.otherBelow {
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.belowRow {
+  display: flex;
+  gap: 8px;
+}
+
+.belowRow > :first-child {
+  flex: 1 1 auto;
+}

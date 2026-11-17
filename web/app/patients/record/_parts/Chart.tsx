@@ -20,8 +20,10 @@
  *      (refused, vomited...). It is written down, never left blank, and the
  *      next dose is worked out from that time.
  *
- * Adding, suspending or stopping a medicine stays in Current medications,
- * with its reasons (the database insists on them).
+ * "Add, suspend or stop a medicine" opens the medicine list here, in place
+ * (request 221a, 2026-11-17: "why doesn't it open the charts?"), with its
+ * reasons (the database insists on them). "Correct or add a dose" opens the
+ * doses' own list here too: void a wrong one, or add a dose not charted.
  *
  * Never: record a dose in another person's name (the database refuses it),
  * or decide a dose. "Next due" is only a reminder from "How often".
@@ -30,6 +32,7 @@
 
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { DosesSection, MedicationsSection } from './Medications'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import { isLate, lastDoseOf, nextDue } from '@/lib/record/chart'
@@ -58,17 +61,13 @@ function shortTime(date: Date): string {
     : when(date.toISOString())
 }
 
-// Opens Current medications further down and scrolls to it.
-function openManage() {
-  const box = document.getElementById('record-medications') as HTMLDetailsElement | null
-  if (!box) return
-  box.open = true
-  box.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
 // ===== 1. The chart =====
 export default function MedicationChart({ client, staffId, patientId, record, reload }: Props) {
   const [showAll, setShowAll] = useState(false)
+  // The medicines' own list (add, suspend, stop) and the doses' own list
+  // (correct, add one not on the chart) open here, in place (request 221a).
+  const [managing, setManaging] = useState(false)
+  const [fixingDoses, setFixingDoses] = useState(false)
   // Active medicines only: a suspended or stopped one is not given.
   const active = record.medications.filter((m) => !m.voided_at && m.status === 'active')
   const doses = record.doses
@@ -104,10 +103,37 @@ export default function MedicationChart({ client, staffId, patientId, record, re
         </div>
       )}
       <div className={styles.actions}>
-        <button className={styles.small} onClick={openManage}>
-          Add, suspend or stop a medicine
+        <button
+          className={styles.small}
+          aria-expanded={managing}
+          onClick={() => setManaging(!managing)}
+        >
+          {managing ? 'Close the medicine list' : 'Add, suspend or stop a medicine'}
         </button>
       </div>
+      {managing ? (
+        <MedicationsSection
+          client={client}
+          staffId={staffId}
+          patientId={patientId}
+          record={record}
+          reload={reload}
+          bare
+        />
+      ) : (
+        // On paper (Full medical history), every medicine with its changes is
+        // printed even when the list is shut on the screen.
+        <div className={styles.printOnly}>
+          <MedicationsSection
+            client={client}
+            staffId={staffId}
+            patientId={patientId}
+            record={record}
+            reload={reload}
+            bare
+          />
+        </div>
+      )}
 
       {/* ===== 3. Every dose given, newest first ===== */}
       <h4 className={styles.chartTitle}>Doses given</h4>
@@ -135,13 +161,42 @@ export default function MedicationChart({ client, staffId, patientId, record, re
           ))}
         </div>
       )}
-      {doses.length > 8 ? (
-        <div className={styles.actions}>
+      <div className={styles.actions}>
+        {doses.length > 8 ? (
           <button className={styles.small} onClick={() => setShowAll(!showAll)}>
             {showAll ? 'Show fewer' : `Show all ${doses.length} doses`}
           </button>
+        ) : null}
+        <button
+          className={styles.small}
+          aria-expanded={fixingDoses}
+          onClick={() => setFixingDoses(!fixingDoses)}
+        >
+          {fixingDoses ? 'Close' : 'Correct or add a dose'}
+        </button>
+      </div>
+      {fixingDoses ? (
+        <DosesSection
+          client={client}
+          staffId={staffId}
+          patientId={patientId}
+          record={record}
+          reload={reload}
+          bare
+        />
+      ) : (
+        // On paper, every dose with its corrections.
+        <div className={styles.printOnly}>
+          <DosesSection
+            client={client}
+            staffId={staffId}
+            patientId={patientId}
+            record={record}
+            reload={reload}
+            bare
+          />
         </div>
-      ) : null}
+      )}
     </Section>
   )
 }

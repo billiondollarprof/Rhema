@@ -208,12 +208,18 @@ export default function ConsultationsSection({
               <SearchSelect
                 id={`consult-words-${part.key}`}
                 value=""
-                placeholder="Pick a common word"
+                placeholder="Or pick a common word"
                 options={PHRASES[part.key].map((phrase) => ({ value: phrase, label: phrase }))}
                 searchFrom={0}
                 onChange={(phrase) =>
                   setParts({ ...parts, [part.key]: addPhrase(parts[part.key], phrase) })
                 }
+                // A word that is not in the list: typed in the search and
+                // added the same way (request 221e).
+                onOther={(typed) => {
+                  if (typed) setParts({ ...parts, [part.key]: addPhrase(parts[part.key], typed) })
+                  else document.getElementById(`consult-${part.key}`)?.focus()
+                }}
               />
             </div>
           ))}

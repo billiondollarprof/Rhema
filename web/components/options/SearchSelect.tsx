@@ -16,7 +16,10 @@
  *   3. Tap a line to choose it. Enter chooses the first line found. Escape,
  *      or a tap outside, closes it without changing anything.
  *   4. "Other…" (when the screen offers it) hands back what was typed, so
- *      the screen can ask for the missing one.
+ *      the screen can ask for the missing one. It sits under the list, not
+ *      at its end (request 221f).
+ *   5. After a pick, the page is put back so the box is where it was on the
+ *      screen; nothing scrolls away from the person (request 221d).
  *
  * Never: save anything. It only hands back the value that was tapped.
  */
@@ -77,6 +80,10 @@ export default function SearchSelect({
   const [typed, setTyped] = useState('')
   const box = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLDivElement>(null)
+  // Where the box sat on the screen before the list opened. After a pick
+  // the page is put back so the box is in the same place (request 221d:
+  // "you click one button, it will just scroll from the viewport").
+  const anchorTop = useRef<number | null>(null)
 
   // ===== 1b. Open at the chosen line, or at the usual one =====
   useEffect(() => {
@@ -88,9 +95,17 @@ export default function SearchSelect({
   }, [open, value, startAt])
 
   // An open list near the bottom of a phone screen is brought into view.
+  // When it closes, the box goes back to where it was on the screen.
   useEffect(() => {
-    if (!open || !list.current) return
-    list.current.parentElement?.scrollIntoView({ block: 'nearest' })
+    if (open) {
+      list.current?.parentElement?.scrollIntoView({ block: 'nearest' })
+      return
+    }
+    const before = anchorTop.current
+    anchorTop.current = null
+    if (before === null || !box.current) return
+    const now = box.current.getBoundingClientRect().top
+    if (Math.abs(now - before) > 2) window.scrollBy({ top: now - before, behavior: 'instant' })
   }, [open])
   const long = options.length > searchFrom
 
@@ -135,6 +150,7 @@ export default function SearchSelect({
 
   function toggle() {
     setTyped('')
+    if (!open && box.current) anchorTop.current = box.current.getBoundingClientRect().top
     setOpen(!open)
   }
 
@@ -210,18 +226,20 @@ export default function SearchSelect({
               )
             })}
             {shown.length === 0 ? <p className={styles.none}>Nothing starts with that.</p> : null}
-            {onOther ? (
-              <button
-                type="button"
-                role="option"
-                aria-selected={false}
-                className={styles.otherLine}
-                onClick={other}
-              >
-                {typed.trim() ? `Other: use "${typed.trim()}"` : 'Other…'}
-              </button>
-            ) : null}
           </div>
+          {/* Other sits under the list, never at the end of a long one
+              (request 221f), so it is always one tap away. */}
+          {onOther ? (
+            <button
+              type="button"
+              role="option"
+              aria-selected={false}
+              className={styles.otherLine}
+              onClick={other}
+            >
+              {typed.trim() ? `Other: use "${typed.trim()}"` : 'Other…'}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

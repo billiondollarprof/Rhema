@@ -8,7 +8,9 @@
  * 'other' and add it."
  *
  * How it goes:
- *   1. Type the first letters. The names that start with them come first.
+ *   1. Every medicine shows in a list that scrolls in its own box. Type the
+ *      first letters: only names that start with them stay (request 221f).
+ *      Other sits under the list.
  *   2. Tap the name, then tap one of its strengths.
  *   3. Not there? Tap "Other" and type it. The Pharmacy's addition is standard
  *      at once; a doctor's or nurse's is kept for them (pending) and can be
@@ -87,7 +89,9 @@ export default function MedicinePicker({
     () => groupMedicines(lines.filter((line) => line.kind === kind)),
     [lines, kind],
   )
-  const matches = useMemo(() => findMedicines(names, typed), [names, typed])
+  // Every medicine the Pharmacy has, not only the first few (request 221f);
+  // the list scrolls inside its own box.
+  const matches = useMemo(() => findMedicines(names, typed, Infinity), [names, typed])
   const picked = names.find((entry) => entry.name.toLowerCase() === name.toLowerCase())
   // The chosen line, for its stock.
   const chosenLine = picked?.strengths.find(
@@ -283,14 +287,29 @@ export default function MedicinePicker({
             </button>
           )
         })}
+        {matches.length === 0 && typed.trim() ? (
+          <p className={styles.hint}>No medicine starts with that.</p>
+        ) : null}
+      </div>
+      {/* Other sits under the list, so a long list never hides it (221f). */}
+      <div className={styles.belowRow}>
         <button
           type="button"
-          role="option"
-          aria-selected="false"
-          className={`${styles.row} ${styles.other}`}
+          className={`${styles.row} ${styles.other} ${styles.otherBelow}`}
           onClick={startAdding}
         >
           {typed.trim() ? `Other: add “${typed.trim()}”` : 'Other: add a new one'}
+        </button>
+        {/* Close the list without choosing. */}
+        <button
+          type="button"
+          className={`${styles.row} ${styles.otherBelow}`}
+          onClick={() => {
+            setTyped('')
+            setOpen(false)
+          }}
+        >
+          Cancel
         </button>
       </div>
     </div>
