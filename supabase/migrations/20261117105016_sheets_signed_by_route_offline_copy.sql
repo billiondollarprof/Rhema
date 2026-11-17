@@ -117,8 +117,10 @@ create trigger openings_activity after insert on public.record_openings
 
 
 -- ===== 3b. Copy the records of patients with a visit open now =====
--- Answers the patients copied. A copy made by the same person in the last
--- 25 minutes is not written again (the device refreshes every 30).
+-- Answers the patients copied. A copy of the same patient by the same
+-- person in the last 11 hours is not written again: the device refreshes
+-- every 30 minutes, and the activity log should show the copy, not 20 lines
+-- an hour. (An opening lets the person read the record for 12 hours.)
 create function private.copy_open_visits()
 returns bigint[]
 language plpgsql
@@ -141,7 +143,7 @@ begin
   where not exists (
     select 1 from public.record_openings o
     where o.patient_id = p and o.staff_id = me and o.purpose = 'offline_copy'
-      and o.opened_at > now() - interval '25 minutes'
+      and o.opened_at > now() - interval '11 hours'
   );
   return open_patients;
 end;

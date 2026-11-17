@@ -6,7 +6,7 @@
 --      still records who typed it; nobody can sign as the Front Desk.
 --   2. Signed by fills in with the person typing when it is left out.
 --   3. Clinical staff copy the records of open visits only; the copy is in
---      the activity log as offline_copy; a second copy within 25 minutes is
+--      the activity log as offline_copy; a second copy within 11 hours is
 --      not written again; the Front Desk cannot copy.
 --   4. A record opened from the copy is logged at the time it was opened;
 --      a time older than 24 hours is refused; nobody can backdate an
@@ -93,7 +93,7 @@ do $$
 declare open_one bigint := (select id from public.patients where full_name = 'T48 Open');
 begin
   if (select count(*) from public.record_openings where patient_id = open_one and purpose = 'offline_copy') <> 1 then
-    raise exception 'FAIL 3: a second copy within 25 minutes was written again';
+    raise exception 'FAIL 3: a second copy within 11 hours was written again';
   end if;
   if not exists (select 1 from public.activity_log where patient_id = open_one and action = 'offline_copy'
                  and table_name = 'record_openings') then
