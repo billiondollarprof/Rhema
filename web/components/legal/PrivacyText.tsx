@@ -20,6 +20,8 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 17 November: a monthly text copy can go to the hospital's own online
+// storage (request 226b). Section 6 says so; LEGAL_VERSION stays.
 // 17 November: records of open visits are kept, scrambled, on clinical
 // staff's devices for no network, and backups are every 2 hours (requests
 // 206 and 224). Section 6 says so; LEGAL_VERSION stays.
@@ -167,6 +169,11 @@ export default function PrivacyText() {
         <li>
           A copy of the database is made every 2 hours, locked with a passphrase, and stored
           separately, so the records survive a fault.
+        </li>
+        <li>
+          Once a month, when the hospital switches it on, a text copy of all the records is saved in
+          the hospital&apos;s own online storage account. Pictures and files are not in it. Only the
+          hospital can open that account, and switching it on or off is written in the activity log.
         </li>
         <li>
           So that doctors and nurses can keep working when the network is down, the records of

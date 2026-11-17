@@ -12,6 +12,9 @@
  *   3. The browser saves one file: a spreadsheet for each part of the
  *      records, and every uploaded file.
  *
+ * Below it sits the monthly copy to the hospital's own Google Drive
+ * (DriveCard.tsx, request 226b).
+ *
  * Never: keep a copy, or send it anywhere but the admin's own device.
  */
 'use client'
@@ -19,6 +22,7 @@
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PinCheck from './PinCheck'
+import DriveCard from './DriveCard'
 import styles from './admin.module.css'
 import { downloadOurData } from '@/lib/export/export'
 
@@ -57,7 +61,10 @@ export default function DataTab({ client }: { client: SupabaseClient }) {
         {words ? <p className={styles.good}>{words}</p> : null}
       </div>
 
-      {/* ===== 2. The PIN, then the download ===== */}
+      {/* ===== 2. The monthly copy to the hospital's Google Drive (226b) ===== */}
+      <DriveCard client={client} />
+
+      {/* ===== 3. The PIN, then the download ===== */}
       {asking ? (
         <PinCheck
           title="Download our data?"

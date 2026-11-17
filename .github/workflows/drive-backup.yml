@@ -1,0 +1,154 @@
+# drive-backup.yml: the monthly text backup into the hospital's own Google
+# Drive (request 226b, Anthony 2026-11-17).
+#
+# What it does, in order:
+#   1. Reads the hospital's Drive link (scrambled) from the live database.
+#      Not connected yet: it says so and stops, without failing.
+#   2. Works out the month (given by the live Worker's timer, or this month
+#      in Nigeria when started by hand). Already saved for that month: stops.
+#   3. Makes a spreadsheet (CSV) of every part of the records, text only (no
+#      files, no photos; staff without their PIN), and puts them in one zip.
+#   4. ops/drive_backup.py puts the zip in Drive: <Hospital> backups / year /
+#      "2026-11 November.zip". The same month again replaces it.
+#   5. Writes in the database how it went, which Admin, Data shows.
+#
+# When: the live Worker starts it at 22:17 Nigeria time on the last day of
+# each month, and again on the first 2 days of the next month for that month
+# (a run that already worked stops at step 2). It can be started by hand.
+#
+# It must never: print a key, a token or any patient detail (only counts and
+# the file name); touch the testing database; keep the zip after the run.
+name: Monthly Drive backup
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'The month to save, like 2026-11 (empty: this month in Nigeria)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: drive-backup
+  cancel-in-progress: false
+
+env:
+  LIVE_REF: ntfvckqczpmylskusgft
+  TOP_FOLDER: RHEMA backups
+
+jobs:
+  drive:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      LIVE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v6
+
+      # ===== 0. Stop, without failing, until Google is set up =====
+      - name: Check the keys are set
+        id: keys
+        run: |
+          if [ -z "$GOOGLE_CLIENT_ID" ] || [ -z "$GOOGLE_CLIENT_SECRET" ]; then
+            echo "The StellaXafe Google app is not set up yet (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      # ===== 1. The live database address (same as backup.yml) =====
+      - name: Build the database address
+        if: steps.keys.outputs.ready == 'true'
+        run: |
+          pooler=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$LIVE_REF/config/database/pooler")
+          host=$(echo "$pooler" | jq -r '.[0].db_host')
+          user=$(echo "$pooler" | jq -r '.[0].db_user')
+          pass=$(P="$LIVE_PASSWORD" python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["P"],safe=""))')
+          echo "::add-mask::$pass"
+          echo "LIVE_URL=postgresql://$user:$pass@$host:5432/postgres" >> "$GITHUB_ENV"
+
+      # ===== 1b. The Drive link, and the month =====
+      - name: Read the Drive link and the month
+        id: link
+        if: steps.keys.outputs.ready == 'true'
+        env:
+          ASKED_MONTH: ${{ inputs.month }}
+        run: |
+          ask() { docker run --rm --network host -e URL="$LIVE_URL" -e Q="$1" postgres:17 sh -c 'psql "$URL" -tA -c "$Q"'; }
+          sealed=$(ask "select key_sealed from private.drive_link where id = 1")
+          if [ -z "$sealed" ]; then
+            echo "Google Drive is not connected yet: Admin, Data, Connect Google Drive."
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "::add-mask::$sealed"
+          echo "KEY_SEALED=$sealed" >> "$GITHUB_ENV"
+          # The month: as asked, or this month in Nigeria.
+          if echo "$ASKED_MONTH" | grep -Eq '^[0-9]{4}-[0-9]{2}$'; then month="$ASKED_MONTH"
+          else month=$(TZ=Africa/Lagos date +%Y-%m); fi
+          echo "MONTH=$month" >> "$GITHUB_ENV"
+          name=$(python3 -c "import sys; sys.path.insert(0, 'ops'); import drive_backup; print(drive_backup.names_for('$month')[1])")
+          last=$(ask "select coalesce(last_backup_file, '') from private.drive_link where id = 1")
+          if [ "$last" = "$name" ]; then
+            echo "$name is already in Drive. Nothing to do."
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "FILE_NAME=$name" >> "$GITHUB_ENV"
+          echo "go=true" >> "$GITHUB_OUTPUT"
+
+      # ===== 3. Every part of the records, as spreadsheets, in one zip =====
+      - name: Make the text backup
+        if: steps.link.outputs.go == 'true'
+        run: |
+          mkdir -p sheets
+          tables="patients families rooms queue_entries medical_profiles allergies conditions vital_signs vital_extras nursing_notes consultation_notes patient_medications medications_given medication_status_log antenatal_bookings antenatal_tests antenatal_visits previous_pregnancies operation_consents lab_requests lab_results prescriptions prescription_items payments payment_lines patient_files medicine_list stock_moves price_list record_emails"
+          for t in $tables; do
+            docker run --rm --network host -e URL="$LIVE_URL" -v "$PWD/sheets:/out" postgres:17 \
+              sh -c "psql \"\$URL\" -q -c \"\\copy (select * from public.$t) to '/out/$t.csv' with csv header\""
+          done
+          # Staff without their PIN or anything secret.
+          docker run --rm --network host -e URL="$LIVE_URL" -v "$PWD/sheets:/out" postgres:17 \
+            sh -c "psql \"\$URL\" -q -c \"\\copy (select id, full_name, email, role, is_active, created_at from public.staff) to '/out/staff.csv' with csv header\""
+          printf '%s\r\n' \
+            "The hospital's records at the end of $MONTH, saved $(TZ=Africa/Lagos date '+%d %b %Y %H:%M') Nigeria time." \
+            "One spreadsheet for each part of the records; open them with Excel." \
+            "Text only: scans, photos and lab result files stay in the app." \
+            "Times are written in UTC (+00:00 at the end). Nigeria time is one hour ahead." \
+            "This holds every patient. Keep this Google account safe, with two step sign in." \
+            > "sheets/READ ME.txt"
+          (cd sheets && zip -q -r "../backup.zip" .)
+          echo "Spreadsheets: $(ls sheets/*.csv | wc -l). Zip: $(du -h backup.zip | cut -f1)."
+
+      # ===== 4. Into Google Drive =====
+      - name: Save it in Google Drive
+        id: upload
+        if: steps.link.outputs.go == 'true'
+        run: |
+          pip install --quiet cryptography==44.0.0
+          ZIP_PATH=backup.zip python3 ops/drive_backup.py
+
+      # ===== 5. How it went, for Admin, Data =====
+      - name: Write how it went
+        if: always() && steps.link.outputs.go == 'true'
+        env:
+          RESULT: ${{ steps.upload.outcome }}
+        run: |
+          if [ "$RESULT" = "success" ]; then
+            q="update private.drive_link set last_backup_at = now(), last_backup_file = '$FILE_NAME', last_problem = null where id = 1"
+          else
+            q="update private.drive_link set last_problem = 'The $MONTH backup could not be saved to Google Drive. It tries again tomorrow.' where id = 1"
+          fi
+          docker run --rm --network host -e URL="$LIVE_URL" -e Q="$q" postgres:17 sh -c 'psql "$URL" -q -c "$Q"'
+          if [ "$RESULT" != "success" ]; then exit 1; fi
+
+      - name: Clean up
+        if: always()
+        run: rm -rf sheets backup.zip
