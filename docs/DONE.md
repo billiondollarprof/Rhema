@@ -979,3 +979,6 @@ this file.
   Open visits kept scrambled on clinical devices and logged; the treatment and
   vital signs sheets like the ward's paper; the full-page consultation with Seen
   by; route; signed by; fewer background requests. Checked on testing and live.
+- **225 (2026-11-17): sheets sign and time themselves.** Name and room from the
+  person signed in, internet time, one running table per sheet, tidy Save and
+  Cancel on every record form. Checked on testing and live.

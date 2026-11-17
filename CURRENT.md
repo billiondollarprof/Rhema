@@ -866,6 +866,16 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        change... the BP reading for today is no longer the same as
        yesterday... they are supposed to add... as time goes on. Currently it
        looks as though it's just one of something."
+    STATUS: LIVE 2026-11-17 (no SQL). Sign and Seen by are the person
+    signed in, with their room; no picker. Saves take the database's clock;
+    offline lines, "now" time boxes and dates use the device clock corrected
+    against /api/time (checked live). The sheets are one running table:
+    headings, the new line, then every line newest first by day. Every
+    record form ends with Cancel and Save on their own line on the right;
+    the consultation's medicines in their own box, its Save bar in view.
+    Desktop sweep: record forms fixed; Register, old file, Request lab and
+    Prescribe already had one main button at the bottom. Dark mode checked
+    at phone, iPad landscape and desktop.
 
 224. **Records ready offline; instant moves; spreadsheet notes; lag.** (2026-11-17)
     a. "When you load the page for the first time, the most current patient
