@@ -69,6 +69,38 @@ function isHere(path: string, href: string) {
 let movedInApp = false
 let lastSeenPath = ''
 
+// ===== The counts, kept between screens (request 224) =====
+// When the last count ran, and what it found, so a new screen shows the
+// bubbles at once and does not count again within 10 seconds.
+let lastCountAt = 0
+let lastBubbles = { total: 0, messages: 0 }
+
+// ===== Every screen's code, fetched once while the app is idle =====
+// The bottom menu's screens are fetched ahead by their links; these are the
+// ones reached by buttons (request 224: "sometimes it appears as though the
+// new page is loading"). Once per visit to the app.
+const SCREENS_TO_FETCH = [
+  '/',
+  '/patients/',
+  '/patients/register/',
+  '/patients/record/',
+  '/patients/edit/',
+  '/patients/old-file/',
+  '/messages/',
+  '/notifications/',
+  '/history/',
+  '/lab/request/',
+  '/lab/result/',
+  '/lab/tests/',
+  '/lab/patient/',
+  '/pharmacy/list/',
+  '/pharmacy/prescribe/',
+  '/payments/receipt/',
+  '/announce/',
+  '/admin/',
+]
+let screensFetched = false
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const path = usePathname()
@@ -93,6 +125,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // The back button (request 171b): back to the previous screen of the
   // app; when this screen was opened first (a link, a refresh), to Home.
   const router = useRouter()
+  useEffect(() => {
+    if (screensFetched) return
+    screensFetched = true
+    const fetchAll = () => SCREENS_TO_FETCH.forEach((screen) => router.prefetch(screen))
+    const idle = (window as Window & { requestIdleCallback?: (go: () => void) => number })
+      .requestIdleCallback
+    if (idle) idle(fetchAll)
+    else window.setTimeout(fetchAll, 2000)
+  }, [router])
   // Remembered outside the component, because each screen may mount the
   // shell again: a flag kept inside it forgot every move and always went
   // Home (Anthony, 2026-11-10: "it always takes me straight to the home").
@@ -108,14 +149,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const client = auth.client
   // Everything waiting, checked every 30 seconds: the red bubble on the
   // menu button (all of it, request 132) and on Messages (messages only).
-  const [unread, setUnread] = useState(0)
-  const [waitingTotal, setWaitingTotal] = useState(0)
+  const [unread, setUnread] = useState(() => lastBubbles.messages)
+  const [waitingTotal, setWaitingTotal] = useState(() => lastBubbles.total)
   // The last counts, to hear when something new arrives.
   const lastCount = useRef<{ total: number; messages: number } | null>(null)
+  // The screen now, read by the count without starting it again on every
+  // move (request 224: each move used to fire about 12 requests).
+  const pathNow = useRef(path)
+  useEffect(() => {
+    pathNow.current = path
+  }, [path])
   useEffect(() => {
     if (!client || !staff) return
     let current = true
-    const check = () =>
+    let later: number | undefined
+    // At most one count every 10 seconds, and none while the app is in the
+    // background, so the counting never competes with a save on a weak
+    // network. A change that arrives sooner is counted when the 10 seconds
+    // are up.
+    const check = () => {
+      if (document.hidden) return
+      const wait = lastCountAt + 10_000 - Date.now()
+      if (wait > 0) {
+        window.clearTimeout(later)
+        later = window.setTimeout(check, wait)
+        return
+      }
+      lastCountAt = Date.now()
+      count()
+    }
+    const count = () =>
       void loadNotices(client, staff).then((notices) => {
         if (!current) return
         // Seen messages and notices stop counting (request 222).
@@ -131,9 +194,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         const before = lastCount.current
         if (before && total > before.total) {
           const onlyMessages = total - before.total === messages - before.messages
-          if (!(onlyMessages && path.startsWith('/messages'))) playNoticeSound()
+          if (!(onlyMessages && pathNow.current.startsWith('/messages'))) playNoticeSound()
         }
         lastCount.current = { total, messages }
+        lastBubbles = { total, messages }
         setWaitingTotal(total)
         setUnread(messages)
       })
@@ -143,16 +207,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const stopListening = onChange(client, 'messages', check)
     const stopRecords = onChange(client, 'records', check)
     // Something just seen on this device: count again at once.
-    window.addEventListener('rhema-seen', check)
+    // Seen on this device: count at once, it costs nothing to wait for.
+    const seenNow = () => {
+      lastCountAt = 0
+      check()
+    }
+    window.addEventListener('rhema-seen', seenNow)
+    // Back to the app after a while: count then.
+    document.addEventListener('visibilitychange', check)
     return () => {
-      window.removeEventListener('rhema-seen', check)
+      window.clearTimeout(later)
+      document.removeEventListener('visibilitychange', check)
+      window.removeEventListener('rhema-seen', seenNow)
       stopListening()
       stopRecords()
       current = false
       window.clearTimeout(first)
       window.clearInterval(timer)
     }
-  }, [client, staff, path])
+  }, [client, staff])
   if (!staff || !client) return null
 
   const roleWords =

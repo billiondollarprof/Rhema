@@ -849,6 +849,36 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+224. **Records ready offline; instant moves; spreadsheet notes; lag.** (2026-11-17)
+    a. "When you load the page for the first time, the most current patient
+       data in the last 30 days... should load into the system and stay,
+       excluding attached files, so it's easy when there's no network... if
+       loading everything will be difficult, can we at least do patients for
+       the last seven days, at least those currently receiving treatment or
+       consultation, their records preload so that anyone can easily see
+       those even when the network is bad." (Reverses Decided 2026-10-28,
+       "Medical records are never kept on the computer": needs his yes on
+       the plan, NDPA.)
+    b. "Did you check if the instant opening really works... sometimes it
+       appears as though the new page is loading."
+    c. The doctor: "when he clicks consultation... open a complete full page
+       with the different categories like history and symptoms... listed
+       like a spreadsheet... he can decide to use the picker... or type by
+       hand... Same with nurses... their own... in form of a spreadsheet...
+       a full page... so he can type in his notes and also see what he's
+       typing." He sent text from the ward record book: a treatment sheet
+       (Time, Name of drug, Dosage, Route, Sign) with events such as "Blood
+       connected" and IV fluids in mls, and a vital signs sheet (Time, Temp,
+       BP, Pulse, Sign).
+    d. "Check the system to know if the system has anything that make it lag
+       as they're registering patients."
+    FOUND (b, d): no screen ever reloads in full; typing is 17 to 28 ms a
+    letter on a slowed phone; the database is small and healthy (Paris,
+    eu-west-3). The app recounted every notice on every move and on every
+    save anywhere: requests while moving 82, now 47 (counts at most once in
+    10 seconds, never in the background); every screen's code is fetched
+    ahead once. LIVE with this entry.
+
 222. **A bubble disappears once the message is seen.** (2026-11-17)
     "When someone has already opened a message, even if the person did not
     respond... as long as the person has opened that message and seen it...
