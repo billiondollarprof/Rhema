@@ -16,6 +16,9 @@
  *      once. They go onto the medication chart on Save, so a nurse never
  *      picks them again. A medicine needs no note (request 220c): Save with
  *      only medicines adds them alone.
+ *   3b. Prescription and Request lab (request 227d): each opens in place
+ *      and sends on its own, the same forms as the record's Prescribe and
+ *      Request lab buttons. The note being written is not touched.
  *   4. Save. Then "Send to the nurses" moves the patient to a nursing room;
  *      the nurses see the treatment plan at the top of the record. "Request
  *      lab" sits beside it (request 219c, number 5).
@@ -41,6 +44,8 @@ import styles from './record.module.css'
 import SendToRoom from '../../_parts/SendToRoom'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
 import OptionSelect from '@/components/options/OptionSelect'
+import LabRequestForm from '@/components/orders/LabRequestForm'
+import PrescribeForm from '@/components/orders/PrescribeForm'
 import SearchSelect from '@/components/options/SearchSelect'
 import { medicineWords } from '@/lib/medicines/medicines'
 import { addPhrase, NOTE_PARTS, PHRASES } from '@/lib/record/phrases'
@@ -59,6 +64,10 @@ type Props = {
   fullPage?: boolean
   // The person signed in, with their room, for Seen by (request 225).
   me?: string
+  // Prescription and Request lab inside the note (request 227d): a doctor
+  // prescribes; anybody with medical record access requests a lab test.
+  canPrescribe?: boolean
+  canRequestLab?: boolean
 }
 
 // A medicine the doctor charts with the note.
@@ -103,6 +112,8 @@ export default function ConsultationsSection({
   canWrite,
   fullPage = false,
   me = '',
+  canPrescribe = false,
+  canRequestLab = false,
 }: Props) {
   const empty = { title: '', complaint: '', findings: '', assessment: '', plan: '' }
   // On the full page the note is open to write at once.
@@ -348,6 +359,42 @@ export default function ConsultationsSection({
             ))}
           </div>
 
+          {/* ===== 4a. Prescription and Request lab, sent on their own
+              (request 227d): the same forms as the buttons at the top of
+              the record. Sending one never touches the note above. ===== */}
+          {canPrescribe ? (
+            <OrderBox
+              title="Prescription"
+              explain="Sent on its own to the Front Desk for payment and to the Pharmacy. The note above stays as it is."
+              openLabel="Write a prescription"
+              render={(close) => (
+                <PrescribeForm
+                  client={client}
+                  staffId={staffId}
+                  patient={{ id: patientId, full_name: patientName }}
+                  inConsultation
+                  onClose={close}
+                />
+              )}
+            />
+          ) : null}
+          {canRequestLab ? (
+            <OrderBox
+              title="Request lab"
+              explain="Sent on its own to the Front Desk for payment and to the Lab. The note above stays as it is."
+              openLabel="Request a lab test"
+              render={(close) => (
+                <LabRequestForm
+                  client={client}
+                  staffId={staffId}
+                  patient={{ id: patientId, full_name: patientName }}
+                  inConsultation
+                  onClose={close}
+                />
+              )}
+            />
+          ) : null}
+
           {/* ===== 4b. Save and Cancel, apart from everything else, on the
               right, and always in view on the full page (request 225). ===== */}
           <div className={`${styles.formFoot} ${fullPage ? styles.formFootStick : ''}`}>
@@ -495,5 +542,41 @@ export default function ConsultationsSection({
     <Section title="Consultation notes" count={count} open={canWrite}>
       {body}
     </Section>
+  )
+}
+
+// ===== 7. A box that opens Prescription or Request lab in place =====
+// Closed: a title, one line saying what it does, and the button. Open: the
+// form. "Done" after sending closes it, ready for another.
+function OrderBox({
+  title,
+  explain,
+  openLabel,
+  render,
+}: {
+  title: string
+  explain: string
+  openLabel: string
+  render: (close: () => void) => React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={styles.medicinesCard}>
+      <div className={styles.medicinesHead}>
+        <div className={styles.chartIntro}>
+          <b>{title}</b>
+          <p className={styles.muted}>{explain}</p>
+        </div>
+        <button
+          type="button"
+          className={styles.small}
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          {open ? 'Close' : `+ ${openLabel}`}
+        </button>
+      </div>
+      {open ? <div className={styles.orderForm}>{render(() => setOpen(false))}</div> : null}
+    </div>
   )
 }

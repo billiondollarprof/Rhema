@@ -1,5 +1,5 @@
 /*
- * app/lab/_parts/TestSearch.tsx: add any lab test from one drop down, with a
+ * components/orders/TestSearch.tsx: add any lab test from one drop down, with a
  * search box where they type the first letters.
  *
  * Why: Anthony, 2026-11-16 (requests 196a and 200): "shouldn't it be just
@@ -20,7 +20,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import styles from './lab.module.css'
+import styles from './orders.module.css'
 import SearchSelect, { type SelectOption } from '@/components/options/SearchSelect'
 import { LAB_SECTIONS, findLabTest } from '@/lib/lab/catalogue'
 import { addOption, knownOptions, loadOptions, optionsOf } from '@/lib/options/options'

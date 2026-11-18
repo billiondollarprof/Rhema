@@ -967,6 +967,14 @@ a.small {
   background: var(--card);
 }
 
+/* Prescription and Request lab open inside the note (request 227d). */
+.orderForm {
+  display: grid;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
 .medicinesHead {
   display: flex;
   flex-wrap: wrap;
