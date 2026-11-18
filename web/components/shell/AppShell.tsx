@@ -102,6 +102,9 @@ const SCREENS_TO_FETCH = [
 ]
 let screensFetched = false
 
+// The last screen of the app shown in this window (read by /install/).
+export const LAST_SCREEN = 'rhema-last-screen'
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const path = usePathname()
@@ -130,6 +133,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void syncClock()
   }, [])
+  // Remember this screen, so the installation guide's "Back to the app"
+  // returns exactly here (request 227f). Kept for this window only.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(LAST_SCREEN, path + window.location.search)
+    } catch {
+      // No storage: the guide goes back to Home instead.
+    }
+  }, [path])
   useEffect(() => {
     if (screensFetched) return
     screensFetched = true
