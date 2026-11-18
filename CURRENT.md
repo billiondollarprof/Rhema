@@ -936,6 +936,16 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    LATE 2026-11-18: LIVE: j drafts (consultation, prescription, lab
+    request, nursing note, both sheets; 30 min, scrambled, wiped at sign
+    out) and Correct (consultation notes, nursing notes, vital signs);
+    b + Add another row on the treatment sheet; h Print and Email.
+    g ON HOLD, WAITING FOR HIS YES: the antenatal booking already keeps the
+    mother's and next of kin's details (antenatal_bookings client_* and
+    kin_*). Migration 20261118211434 added 8 duplicate EMPTY columns to
+    patients (live, unused). Proposed: drop them; registration writes the
+    booking's fields (plus tribe) through a function the Front Desk may use
+    for those fields only. Screens stashed ("227g antenatal screens").
     STATUS 2026-11-18 (evening): LIVE and checked: f (Back to the app),
     e (a stuck screen opens in full after 2.5 s; Refresh reloads a newer
     version), d (Prescription and Request lab inside the consultation,
