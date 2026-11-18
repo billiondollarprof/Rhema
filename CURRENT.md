@@ -936,6 +936,15 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    STATUS 2026-11-18 (evening): LIVE and checked: f (Back to the app),
+    e (a stuck screen opens in full after 2.5 s; Refresh reloads a newer
+    version), d (Prescription and Request lab inside the consultation,
+    shared forms in components/orders), k (Waiting for payment on the
+    patient's details and on Home, sent or not, including drugs already
+    given; database migration 20261118170917), n (contrast-audit.cjs, all 45
+    screens readable in both looks; 8 faint spots fixed). NEXT: j drafts and
+    Correct; b + Add another row; g antenatal; h Print and Email; l consent
+    upload; i drug list SQL (show first). Then the security review.
     STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
     a suspended. e: likely cause found (Refresh only refetches data, never
     reloads the app; a screen left on an old version stays stuck); fix
