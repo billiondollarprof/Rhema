@@ -887,6 +887,56 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        after saving: edit for 5, 10 or 15 minutes, then only cancel, shown
        as cancelled? "Or what do you think is the best?" ASKED FOR AN
        OPINION; waiting for his choice.
+    c DECIDED 2026-11-18: nursing notes stay where they are on the record
+       page ("Single nursing note is okay where it is"). No Notes tab on the
+       sheet.
+    k. Front desk sees what to charge without being sent (2026-11-18): "even
+       if they did not send front desk medication or lab... front desk will
+       be able to see those details because they collect money for it...
+       sometimes the doctor will ask them to go and meet front desk without
+       even sending them the prescription... by the time they've not marked
+       it paid, it will just be there... pending payment... Then once it is
+       paid, whether through when it was sent to them or whether they go and
+       search for the patient, it's all the same." Lab: "that one is
+       different", request lab already does it. Plan sent, waiting.
+    k DECIDED 2026-11-18: "So the front desk sees everything, sees what to
+       be paid for, and once it marks paid, it marks everywhere." On the
+       patient's details, separate from the biodata. Admitted patients too:
+       "Even if the drug is dispensed, it should also show that they have
+       not made payment for it until the front desk marks it."
+    d DECIDED 2026-11-18: inside the consultation, a Prescription part that
+       drops down: pick drugs, send; it goes to the Front Desk (take
+       payment) and the Pharmacy (awaiting payment, then dispense once
+       paid), without touching the rest of the note. The same for Request
+       lab: to the Front Desk and the Lab, awaiting payment until paid.
+    l. Consent: the director wants a place to upload a scanned signature
+       (2026-11-18): "they don't have electronic signature and they can't
+       use fingerprints... They will scan signature, they will now upload."
+    m. Family file, confirm (2026-11-18): one file, add members; each member
+       has their own diagnosis and records; open one member and easily open
+       the others in the group; a member can switch to an individual file;
+       a member can edit their own next of kin and address and stay in the
+       family. "I believe that's how it's already designed... just confirm."
+    YES TO ALL, 2026-11-18: "yes to all of your questions... Take the yes
+       now. Go through it. Anything that involves the design... Screenshot
+       it, and make sure everything aligns well." Order: e History fix;
+       k + d payment card and Prescription and Request lab inside the
+       consultation ("the same prescription, either they take the
+       prescription from the medical record screen, or they take it from
+       the consultation area"); j drafts (30 minutes, wiped at sign out) and
+       Correct (cancel plus a filled in copy); b + Add another row; g
+       antenatal fields; h Print and Email; l consent upload; i drug list
+       (show the SQL batch first).
+    l DECIDED: the app shrinks the scanned signature itself to a few
+       kilobytes, still clear enough to read; anything still over 500 KB
+       after shrinking is refused, with "scan or screenshot, then crop it".
+    NEXT AFTER 227: a security and robustness review ("anything at the
+       database level, anything that will cause any crash or breakage").
+    STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
+    a suspended. e: likely cause found (Refresh only refetches data, never
+    reloads the app; a screen left on an old version stays stuck); fix
+    proposed. i: about 80 names missing (list in the reply), SQL batch to
+    be shown for his yes. b, c, d, g, h, j: plan sent, waiting for his yes.
 
 226. **Nigeria time on screen; monthly text backup to the hospital's Drive.** (2026-11-17)
     a. Yes to always showing Nigeria time: "when the app does its own, it

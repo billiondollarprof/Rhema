@@ -30,6 +30,7 @@ import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon'
 import MainMenu from './MainMenu'
 import AttentionAlerts from '@/components/attention/AttentionAlerts'
+import { newVersionWaiting, screenShown } from './AppFreshness'
 import OutboxSender from '@/components/offline/OutboxSender'
 import { loadNotices } from '@/lib/notifications/notifications'
 import { bubbleOf, seenKeys } from '@/lib/notifications/seen'
@@ -119,9 +120,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // It no longer reloads the app (Anthony, 2026-11-09: "as if nothing
   // happened... updates will appear"): every screen fetches again in the
   // background, and the person's own details too. The arrow turns once.
+  // When a newer version of the app is live, Refresh reloads the app
+  // itself, so a screen stuck on the old version opens again (request 227e).
   function refreshApp() {
     if (refreshing || !client) return
     setRefreshing(true)
+    void newVersionWaiting().then((newer) => {
+      if (newer) window.location.reload()
+    })
     refreshHere(client)
     void auth.refreshStaff()
     window.setTimeout(() => setRefreshing(false), 700)
@@ -136,6 +142,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // Remember this screen, so the installation guide's "Back to the app"
   // returns exactly here (request 227f). Kept for this window only.
   useEffect(() => {
+    // Tell the stuck screen check that this screen has drawn (227e).
+    screenShown(path)
     try {
       sessionStorage.setItem(LAST_SCREEN, path + window.location.search)
     } catch {

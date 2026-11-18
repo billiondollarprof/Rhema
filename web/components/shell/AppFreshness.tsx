@@ -15,6 +15,13 @@
  *      nobody ever loses what they are typing.
  *   2. If a screen file still fails to load, the app reloads itself (at
  *      most once a minute, so a real outage cannot loop).
+ *   3. A tap on a link that has not opened its screen after 2.5 seconds
+ *      becomes a full page load of that screen (request 227e, 2026-11-18:
+ *      History "did not open... I had to close the app, open it again").
+ *      A screen that fails quietly, with no error, is caught this way too.
+ *   4. newVersionWaiting() lets the Refresh button reload the app when a
+ *      newer version is live, because Refresh on its own only fetches the
+ *      data again.
  *
  * Never: reload while somebody is typing.
  */
@@ -60,13 +67,42 @@ async function liveBuild(): Promise<string | null> {
   }
 }
 
+// The screen the app last drew, told by AppShell each time a screen shows.
+// A tap is only "opened" once the new screen has drawn itself: the address
+// can change while the screen itself never arrives.
+let shownPath = ''
+export function screenShown(path: string) {
+  shownPath = path
+}
+
+// Screens drawn without AppShell, which never call screenShown.
+const WITHOUT_SHELL = ['/install/', '/lock/', '/sign-in/', '/terms/', '/privacy/']
+
+// Asked by the Refresh button: is a newer version of the app live? Never
+// true on a local build.
+export async function newVersionWaiting(): Promise<boolean> {
+  if (MINE === 'local') return false
+  const live = await liveBuild()
+  return Boolean(live && live !== MINE)
+}
+
+// The address a link goes to, as path and query, or null when it is not a
+// screen of this app opened in this window.
+function screenOf(link: HTMLAnchorElement): string | null {
+  if (link.target && link.target !== '_self') return null
+  if (link.hasAttribute('download')) return null
+  const url = new URL(link.href, window.location.href)
+  if (url.origin !== window.location.origin) return null
+  return url.pathname + url.search
+}
+
 export default function AppFreshness() {
   useEffect(() => {
-    // A local build never reloads itself.
-    if (MINE === 'local') return
     let stale = false
 
     async function check(comingBack: boolean) {
+      // A local build never checks for a new version.
+      if (MINE === 'local') return
       const live = await liveBuild()
       if (!live || live === MINE) return
       stale = true
@@ -78,12 +114,33 @@ export default function AppFreshness() {
     }
 
     // While stale, a tap on a link inside the app becomes a full page load.
+    // Otherwise the screen opens as usual, and if it has not opened after
+    // 2.5 seconds, it is loaded in full (section 3 of the header).
+    let watching: number | null = null
     function tapped(event: MouseEvent) {
-      if (!stale) return
-      const link = (event.target as Element | null)?.closest?.('a[href^="/"]')
+      if (event.defaultPrevented || event.button !== 0) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      const link = (event.target as Element | null)?.closest?.(
+        'a[href]',
+      ) as HTMLAnchorElement | null
       if (!link) return
-      event.preventDefault()
-      window.location.assign((link as HTMLAnchorElement).href)
+      const wanted = screenOf(link)
+      if (!wanted) return
+      if (stale) {
+        event.preventDefault()
+        window.location.assign(link.href)
+        return
+      }
+      const here = window.location.pathname + window.location.search
+      if (wanted === here) return
+      const wantedPath = new URL(link.href).pathname
+      if (WITHOUT_SHELL.includes(wantedPath)) return
+      if (watching) window.clearTimeout(watching)
+      watching = window.setTimeout(() => {
+        watching = null
+        // The new screen has not drawn itself: open it in full.
+        if (shownPath !== wantedPath) window.location.assign(link.href)
+      }, 2500)
     }
 
     // A screen file that will not load: reload.
@@ -111,6 +168,7 @@ export default function AppFreshness() {
       window.removeEventListener('error', onError)
       window.removeEventListener('unhandledrejection', onRejection)
       window.clearInterval(timer)
+      if (watching) window.clearTimeout(watching)
     }
   }, [])
 
