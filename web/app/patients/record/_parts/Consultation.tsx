@@ -51,6 +51,8 @@ import { medicineWords } from '@/lib/medicines/medicines'
 import { addPhrase, NOTE_PARTS, PHRASES } from '@/lib/record/phrases'
 import { addLine, when, type MedicalRecord } from '@/lib/record/record'
 import { ROUTES } from '@/lib/record/signers'
+import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
 type Props = {
   client: SupabaseClient
@@ -133,6 +135,22 @@ export default function ConsultationsSection({
   const [visit, setVisit] = useState<{ id: number; room: string } | null>(null)
   const [sentTo, setSentTo] = useState<string | null>(null)
 
+  // ===== 2b. The unsaved draft (request 227j) =====
+  // Leaving without saving keeps what was typed for 30 minutes, scrambled
+  // on this device. Coming back puts it back; Save and Cancel clear it.
+  const draft = useDraft({
+    staffId,
+    name: canWrite ? `consult-${patientId}` : null,
+    value: { parts, medicines },
+    isEmpty: (typed) =>
+      Object.values(typed.parts).every((words) => !words.trim()) && typed.medicines.length === 0,
+    restore: (typed) => {
+      setParts({ ...empty, ...typed.parts })
+      setMedicines(typed.medicines ?? [])
+      setAdding(true)
+    },
+  })
+
   useEffect(() => {
     if (!sending) return
     openVisitOf(client, patientId).then(setVisit)
@@ -197,6 +215,7 @@ export default function ConsultationsSection({
     setAdding(false)
     setParts(empty)
     setMedicines([])
+    draft.clear()
     setSavedWords(noNote ? 'Medicines added to the chart.' : 'Consultation saved.')
     setSaved(true)
     setSentTo(null)
@@ -209,6 +228,22 @@ export default function ConsultationsSection({
       {/* ===== 3. Write a consultation ===== */}
       {adding ? (
         <div className={styles.form}>
+          {draft.restoredAt ? (
+            <p className={styles.draftBack}>
+              {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
+              <button
+                type="button"
+                className={`${styles.small} ${styles.link}`}
+                onClick={() => {
+                  setParts(empty)
+                  setMedicines([])
+                  draft.clear()
+                }}
+              >
+                Discard draft
+              </button>
+            </p>
+          ) : null}
           <div className={styles.field}>
             <label htmlFor="consult-title">Title (optional)</label>
             <input
@@ -401,7 +436,11 @@ export default function ConsultationsSection({
             {problem ? <p className={styles.error}>{problem}</p> : <span />}
             <div className={styles.formButtons}>
               {fullPage ? (
-                <Link className={styles.small} href={`/patients/record/?p=${patientId}`}>
+                <Link
+                  className={styles.small}
+                  href={`/patients/record/?p=${patientId}`}
+                  onClick={() => draft.clear()}
+                >
                   Cancel
                 </Link>
               ) : (
@@ -410,8 +449,10 @@ export default function ConsultationsSection({
                   disabled={busy}
                   onClick={() => {
                     setAdding(false)
+                    setParts(empty)
                     setMedicines([])
                     setProblem(null)
+                    draft.clear()
                   }}
                 >
                   Cancel
@@ -520,7 +561,27 @@ export default function ConsultationsSection({
           voided={voidedOf(line)}
           voidable={
             canWrite
-              ? { client, table: 'consultation_notes', id: line.id, staffId, onDone: reload }
+              ? {
+                  client,
+                  table: 'consultation_notes',
+                  id: line.id,
+                  staffId,
+                  onDone: reload,
+                  // Correct: the same words, ready to fix (request 227j).
+                  onCorrect: () => {
+                    setParts({
+                      title: line.title ?? '',
+                      complaint: line.complaint ?? '',
+                      findings: line.findings ?? '',
+                      assessment: line.assessment ?? '',
+                      plan: line.plan ?? '',
+                    })
+                    setMedicines([])
+                    setSaved(false)
+                    setAdding(true)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  },
+                }
               : undefined
           }
         >

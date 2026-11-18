@@ -19,6 +19,8 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
+import { draftWords, useDraft } from '@/lib/drafts/drafts'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import {
@@ -252,7 +254,23 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
           what={<b>{when(vitals.recorded_at)}</b>}
           meta={`Taken by ${vitals.signer?.full_name ?? vitals.recorder?.full_name ?? 'staff'}`}
           voided={voidedOf(vitals)}
-          voidable={{ client, table: 'vital_signs', id: vitals.id, staffId, onDone: reload }}
+          voidable={{
+            client,
+            table: 'vital_signs',
+            id: vitals.id,
+            staffId,
+            onDone: reload,
+            // Correct: the same readings, ready to fix (request 227j).
+            onCorrect: () => {
+              const filled: Record<string, string> = { ...empty }
+              for (const key of Object.keys(empty)) {
+                const value = (vitals as unknown as Record<string, unknown>)[key]
+                filled[key] = value === null || value === undefined ? '' : String(value)
+              }
+              setValues(filled)
+              setAdding(true)
+            },
+          }}
         >
           <VitalsReadings vitals={vitals} />
         </Line>
@@ -375,6 +393,19 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
   const [note, setNote] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
 
+  // The unsaved note, kept 30 minutes on this device (request 227j).
+  const draft = useDraft({
+    staffId,
+    name: `nursing-${patientId}`,
+    value: { title, note },
+    isEmpty: (typed) => !typed.title.trim() && !typed.note.trim(),
+    restore: (typed) => {
+      setTitle(typed.title)
+      setNote(typed.note)
+      setAdding(true)
+    },
+  })
+
   async function add() {
     if (!note.trim()) {
       setProblem('Write the note first.')
@@ -392,6 +423,7 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
       setTitle('')
       setNote('')
       setProblem(null)
+      draft.clear()
       reload()
     }
   }
@@ -410,11 +442,39 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
           }
           meta={`${line.author?.full_name ?? 'Staff'}, ${when(line.created_at)}`}
           voided={voidedOf(line)}
-          voidable={{ client, table: 'nursing_notes', id: line.id, staffId, onDone: reload }}
+          voidable={{
+            client,
+            table: 'nursing_notes',
+            id: line.id,
+            staffId,
+            onDone: reload,
+            // Correct: the same words, ready to fix (request 227j).
+            onCorrect: () => {
+              setTitle(line.title ?? '')
+              setNote(line.note)
+              setAdding(true)
+            },
+          }}
         />
       ))}
       {adding ? (
         <div className={styles.form}>
+          {draft.restoredAt ? (
+            <p className={styles.draftBack}>
+              {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
+              <button
+                type="button"
+                className={`${styles.small} ${styles.link}`}
+                onClick={() => {
+                  setTitle('')
+                  setNote('')
+                  draft.clear()
+                }}
+              >
+                Discard draft
+              </button>
+            </p>
+          ) : null}
           <div className={styles.field}>
             <label htmlFor="nursing-title">Title (optional)</label>
             <input
@@ -441,7 +501,15 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
             <button className={`${styles.small} ${styles.primary}`} onClick={add}>
               Save note
             </button>
-            <button className={styles.small} onClick={() => setAdding(false)}>
+            <button
+              className={styles.small}
+              onClick={() => {
+                setAdding(false)
+                setTitle('')
+                setNote('')
+                draft.clear()
+              }}
+            >
               Cancel
             </button>
           </div>

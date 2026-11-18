@@ -4,6 +4,10 @@
  * then its buttons. A voided line stays, greyed and crossed out, with who
  * voided it and why.
  *
+ * Correct (request 227j, 2026-11-18): voids the line with the reason and
+ * opens the section's form with the same words, so a mistake is fixed in
+ * one step and the first version stays on the record, crossed out.
+ *
  * Never: remove a voided line from view. Seeing what was corrected, and by
  * whom, is part of the record.
  */
@@ -27,6 +31,9 @@ type LineProps = {
     id: number
     staffId: string
     onDone: () => void
+    // Correct (request 227j): the line is voided with the reason, and the
+    // section's form opens with the same words filled in, to fix and save.
+    onCorrect?: () => void
   }
   actions?: React.ReactNode
   // Shown under the line in place of its buttons, e.g. the Give dose form.
@@ -45,6 +52,7 @@ export default function Line({
   children,
 }: LineProps) {
   const [voiding, setVoiding] = useState(false)
+  const [correcting, setCorrecting] = useState(false)
 
   return (
     <div className={`${styles.line} ${voided ? styles.voided : ''}`}>
@@ -60,6 +68,29 @@ export default function Line({
         </span>
       ) : null}
       {!voided && form ? form : null}
+      {!voided && !form && correcting && voidable?.onCorrect ? (
+        <ReasonForm
+          question="What was wrong? This one is voided, and a filled in copy opens to fix and save."
+          choices={VOID_REASONS.filter((reason) => reason !== 'Wrong patient')}
+          confirmLabel="Void and correct"
+          onCancel={() => setCorrecting(false)}
+          onConfirm={async (reason) => {
+            const problem = await voidItem(
+              voidable.client,
+              voidable.table,
+              voidable.id,
+              reason,
+              voidable.staffId,
+            )
+            if (!problem) {
+              setCorrecting(false)
+              voidable.onCorrect?.()
+              voidable.onDone()
+            }
+            return problem
+          }}
+        />
+      ) : null}
       {!voided && !form && voiding && voidable ? (
         <ReasonForm
           question="Why void this?"
@@ -82,9 +113,17 @@ export default function Line({
           }}
         />
       ) : null}
-      {!voided && !form && !voiding && (actions || voidable) ? (
+      {!voided && !form && !voiding && !correcting && (actions || voidable) ? (
         <div className={styles.actions}>
           {actions}
+          {voidable?.onCorrect ? (
+            <button
+              className={`${styles.small} ${styles.link}`}
+              onClick={() => setCorrecting(true)}
+            >
+              Correct
+            </button>
+          ) : null}
           {voidable ? (
             <button className={`${styles.small} ${styles.link}`} onClick={() => setVoiding(true)}>
               Void

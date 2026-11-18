@@ -33,6 +33,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { EXPIRE_AFTER_MS, LOCK_AFTER_MS, isConfigured } from './config'
 import { wipeRecordCopy } from '@/lib/offline/recordCopy'
+import { wipeDrafts } from '@/lib/drafts/drafts'
 import { wipeCopy } from '@/lib/offline/patientCopy'
 import { isNetworkFailure } from '@/lib/offline/outbox'
 import { rememberEmail } from '@/lib/auth/known-emails'
@@ -178,6 +179,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // want them to lose data").
     wipeCopy(id)
     void wipeRecordCopy(id)
+    // Unsaved drafts go too (request 227j: "if they log out, it wipes").
+    void wipeDrafts(id)
     // And what the screens kept in memory (request 145).
     forgetAll(id)
     removeAccount(id)

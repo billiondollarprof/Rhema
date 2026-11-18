@@ -24,6 +24,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import TestSearch from './TestSearch'
 import styles from './orders.module.css'
 import { COMMON_TESTS, requestLab } from '@/lib/lab/lab'
+import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import type { PatientResult } from '@/lib/patients/patients'
 
 type SendTo = 'front_desk' | 'laboratory'
@@ -49,6 +51,19 @@ export default function LabRequestForm({
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState<string | null>(null)
 
+  // The unsaved request, kept 30 minutes on this device (227j).
+  const draft = useDraft({
+    staffId,
+    name: `lab-${patient.id}`,
+    value: { tests, note, sendTo },
+    isEmpty: (typed) => typed.tests.length === 0 && !typed.note.trim(),
+    restore: (typed) => {
+      setTests(typed.tests)
+      setNote(typed.note)
+      setSendTo(typed.sendTo)
+    },
+  })
+
   // ===== 1. Choosing tests =====
   function toggle(test: string) {
     setTests((chosen) =>
@@ -66,6 +81,7 @@ export default function LabRequestForm({
       setError(problem)
       return
     }
+    draft.clear()
     setSent(
       sendTo === 'front_desk'
         ? `Sent to the Lab, and to the Front Desk for payment: ${tests.join(', ')}.`
@@ -113,6 +129,22 @@ export default function LabRequestForm({
   // ===== 4. The form =====
   return (
     <>
+      {draft.restoredAt ? (
+        <p className={styles.draftBack}>
+          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
+          <button
+            type="button"
+            className={`${styles.button} ${styles.small}`}
+            onClick={() => {
+              setTests([])
+              setNote('')
+              draft.clear()
+            }}
+          >
+            Discard draft
+          </button>
+        </p>
+      ) : null}
       {/* ----- The tests ----- */}
       <div>
         <span className={styles.label}>Common tests</span>
