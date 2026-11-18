@@ -887,6 +887,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        after saving: edit for 5, 10 or 15 minutes, then only cancel, shown
        as cancelled? "Or what do you think is the best?" ASKED FOR AN
        OPINION; waiting for his choice.
+    STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
+    a suspended. e: likely cause found (Refresh only refetches data, never
+    reloads the app; a screen left on an old version stays stuck); fix
+    proposed. i: about 80 names missing (list in the reply), SQL batch to
+    be shown for his yes. b, c, d, g, h, j: plan sent, waiting for his yes.
 
 226. **Nigeria time on screen; monthly text backup to the hospital's Drive.** (2026-11-17)
     a. Yes to always showing Nigeria time: "when the app does its own, it
