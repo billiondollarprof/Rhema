@@ -125,7 +125,9 @@ end $$;
 \echo 'PASS 3: paid once at the Front Desk; status kept; ordinary payment unchanged'
 
 
--- ===== 4. Not sent also, straight to the Pharmacy: nothing to pay =====
+-- ===== 4. Not sent also, straight to the Pharmacy: still paid once =====
+-- Changed by request 227k (Anthony, 2026-11-18): "Anything awaiting payment
+-- will always show", so the Front Desk now takes payment for it too.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000d1"}', true);
 set local role authenticated;
 select public.prescribe((select id from public.patients where full_name = 'Sa Made Up'),
@@ -135,12 +137,15 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 do $$
 begin
+  if public.pay_prescription((select max(id) from public.prescriptions), '[{"label": "Ibuprofen", "amount": 800}]', 'cash') <> 'paid' then
+    raise exception 'FAIL 4: a prescription sent straight to the Pharmacy could not be paid';
+  end if;
   if public.pay_prescription((select max(id) from public.prescriptions), '[{"label": "Ibuprofen", "amount": 800}]', 'cash') <> 'already_paid' then
-    raise exception 'FAIL 4: a prescription never sent to the Front Desk was paid';
+    raise exception 'FAIL 4: a prescription sent straight to the Pharmacy was paid twice';
   end if;
 end $$;
 reset role;
-\echo 'PASS 4: nothing to pay unless it was sent to the Front Desk'
+\echo 'PASS 4: straight to the Pharmacy, paid once (request 227k)'
 
 
 -- ===== 5. Nothing for somebody not signed in =====
