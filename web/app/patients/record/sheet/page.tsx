@@ -15,7 +15,9 @@
  * How it goes:
  *   1. Under the headings, the new line is empty, ready to fill in. Pick or
  *      type each box.
- *   2. Save: the line joins the sheet with the time and the name.
+ *   2. Save: the line joins the sheet with the time and the name. On the
+ *      treatment sheet, "+ Add another row" adds rows, saved together
+ *      (request 227b); unsaved rows are kept 30 minutes (227j).
  *   3. Every line follows, newest first, by day, so a reading today sits
  *      above yesterday's and the change shows at a glance.
  *
@@ -45,6 +47,7 @@ import {
 } from '@/lib/medicines/medicines'
 import { addLine, type MedicalRecord } from '@/lib/record/record'
 import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
+import { draftWords, useDraft } from '@/lib/drafts/drafts'
 
 // ===== 1. Small helpers =====
 // "now" in the form a time box expects, from the internet's time, not the
@@ -183,17 +186,47 @@ type SheetProps = {
 // in, then every line written, newest first, by day (request 225: "as time
 // goes on... they are supposed to add").
 function TreatmentSheet({ client, staffId, patientId, record, me, reload }: SheetProps) {
-  const empty = { drug: '', dose: '', route: '', medicationId: null as number | null }
-  const [line, setLine] = useState(empty)
-  // null: the time is when Save is tapped (the database's clock). A value:
-  // changed by hand.
-  const [time, setTime] = useState<string | null>(null)
+  // One entry row; "+ Add another row" adds more, saved together (request
+  // 227b, 2026-11-18: "a place where they can add plus to add another row").
+  // time null: the time is when Save is tapped (the database's clock). A
+  // value: changed by hand.
+  type Entry = {
+    key: number
+    drug: string
+    dose: string
+    route: string
+    medicationId: number | null
+    time: string | null
+  }
+  const blank = (key: number): Entry => ({
+    key,
+    drug: '',
+    dose: '',
+    route: '',
+    medicationId: null,
+    time: null,
+  })
+  const [entries, setEntries] = useState<Entry[]>([blank(0)])
+  const [nextKey, setNextKey] = useState(1)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const [medicines, setMedicines] = useState(() => knownMedicines(staffId))
   useEffect(() => {
     void loadMedicines(client, staffId).then((fresh) => fresh && setMedicines(fresh))
   }, [client, staffId])
+
+  // Unsaved rows, kept 30 minutes on this device (request 227j).
+  const draft = useDraft({
+    staffId,
+    name: `sheet-drugs-${patientId}`,
+    value: entries,
+    isEmpty: (rows) => rows.every((row) => !row.drug.trim() && !row.time),
+    restore: (rows) => {
+      if (!rows.length) return
+      setEntries(rows)
+      setNextKey(Math.max(...rows.map((row) => row.key)) + 1)
+    },
+  })
 
   // On the chart first, then the ward's events, then the medicine list.
   const charted = record.medications.filter((m) => !m.voided_at && m.status === 'active')
@@ -218,43 +251,60 @@ function TreatmentSheet({ client, staffId, patientId, record, me, reload }: Shee
     return [...chart, ...events, ...list]
   }, [charted, medicines])
 
-  function choose(drug: string) {
+  // Change one row, by its key.
+  function change(key: number, part: Partial<Entry>) {
+    setEntries((rows) => rows.map((row) => (row.key === key ? { ...row, ...part } : row)))
+  }
+
+  function choose(row: Entry, drug: string) {
     const fromChart = charted.find((m) => m.medicine === drug)
-    setLine({
-      ...line,
+    change(row.key, {
       drug,
       medicationId: fromChart?.id ?? null,
-      dose: fromChart?.dose ?? line.dose,
-      route: fromChart?.route ?? line.route,
+      dose: fromChart?.dose ?? row.dose,
+      route: fromChart?.route ?? row.route,
     })
   }
 
+  // Save every filled row, top to bottom. A row that fails stays, so
+  // nothing typed is lost; the saved ones go.
   async function save() {
-    if (line.drug.trim().length < 2) {
-      setProblem('Choose or type the drug, fluid or event.')
+    const filled = entries.filter((row) => row.drug.trim() || row.dose.trim() || row.time)
+    if (filled.length === 0 || filled.some((row) => row.drug.trim().length < 2)) {
+      setProblem('Choose or type the drug, fluid or event on each row.')
       return
     }
     setBusy(true)
     setProblem(null)
-    // Who: the person signed in, always (request 225). When: the database's
-    // clock, unless the time was changed by hand.
-    const result = await addLine(client, 'medications_given', {
-      patient_id: patientId,
-      medication_id: line.medicationId,
-      medicine: line.drug.trim(),
-      dose: line.dose.trim() || null,
-      route: line.route.trim() || null,
-      ...(time ? { given_at: new Date(time).toISOString() } : {}),
-      given_by: staffId,
-    })
+    const left: Entry[] = []
+    let failure: string | null = null
+    for (const row of filled) {
+      // Who: the person signed in, always (request 225). When: the
+      // database's clock, unless the time was changed by hand.
+      const result = await addLine(client, 'medications_given', {
+        patient_id: patientId,
+        medication_id: row.medicationId,
+        medicine: row.drug.trim(),
+        dose: row.dose.trim() || null,
+        route: row.route.trim() || null,
+        ...(row.time ? { given_at: new Date(row.time).toISOString() } : {}),
+        given_by: staffId,
+      })
+      if (result) {
+        left.push(row)
+        failure = result
+      }
+    }
     setBusy(false)
-    if (result) {
-      setProblem(result)
+    reload()
+    if (left.length) {
+      setEntries(left)
+      setProblem(failure)
       return
     }
-    setLine(empty)
-    setTime(null)
-    reload()
+    setEntries([blank(nextKey)])
+    setNextKey(nextKey + 1)
+    draft.clear()
   }
 
   const lines = record.doses.filter((dose) => !dose.voided_at)
@@ -269,85 +319,132 @@ function TreatmentSheet({ client, staffId, patientId, record, me, reload }: Shee
         <span>Sign</span>
       </div>
 
-      {/* ----- The new line ----- */}
-      <div className={`${styles.row} ${styles.drugRow} ${styles.entryRow}`} role="row">
-        <div className={styles.cell}>
-          <span className={styles.label}>Time</span>
-          {time === null ? (
-            <button type="button" className={styles.timeNow} onClick={() => setTime(localNow())}>
-              Now
-            </button>
-          ) : (
-            <input
-              type="datetime-local"
-              className={styles.input}
-              aria-label="Time"
-              max={localNow()}
-              value={time}
-              onChange={(event) => setTime(event.target.value)}
+      {/* ----- The new rows ----- */}
+      {draft.restoredAt ? (
+        <p className={styles.draftBack}>
+          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
+          <button
+            type="button"
+            className={styles.button}
+            onClick={() => {
+              setEntries([blank(nextKey)])
+              setNextKey(nextKey + 1)
+              draft.clear()
+            }}
+          >
+            Discard draft
+          </button>
+        </p>
+      ) : null}
+      {entries.map((row, at) => (
+        <div
+          key={row.key}
+          className={`${styles.row} ${styles.drugRow} ${styles.entryRow}`}
+          role="row"
+        >
+          <div className={styles.cell}>
+            <span className={styles.label}>Time</span>
+            {row.time === null ? (
+              <button
+                type="button"
+                className={styles.timeNow}
+                onClick={() => change(row.key, { time: localNow() })}
+              >
+                Now
+              </button>
+            ) : (
+              <input
+                type="datetime-local"
+                className={styles.input}
+                aria-label={`Time, row ${at + 1}`}
+                max={localNow()}
+                value={row.time}
+                onChange={(event) => change(row.key, { time: event.target.value })}
+              />
+            )}
+          </div>
+          <div className={styles.cell}>
+            <label className={styles.label} htmlFor={`sheet-drug-${row.key}`}>
+              Drug, fluid or event
+            </label>
+            <SearchSelect
+              id={`sheet-drug-${row.key}`}
+              value={row.drug}
+              placeholder="Pick or type"
+              options={options}
+              // Always a search box, so a nurse can type straight away.
+              searchFrom={0}
+              onChange={(drug) => choose(row, drug)}
+              onOther={(typed) => typed && change(row.key, { drug: typed, medicationId: null })}
             />
-          )}
+          </div>
+          <div className={styles.cell}>
+            <label className={styles.label} htmlFor={`sheet-dose-${row.key}`}>
+              Dose
+            </label>
+            <OptionSelect
+              client={client}
+              staffId={staffId}
+              list="dose"
+              id={`sheet-dose-${row.key}`}
+              value={row.dose}
+              onChange={(dose) => change(row.key, { dose })}
+              placeholder="Pick or type"
+              otherLabel="Type the dose"
+            />
+          </div>
+          <div className={styles.cell}>
+            <label className={styles.label} htmlFor={`sheet-route-${row.key}`}>
+              Route
+            </label>
+            <SearchSelect
+              id={`sheet-route-${row.key}`}
+              value={row.route}
+              placeholder="IV, IM…"
+              options={ROUTES.map((route) => ({ value: route, label: route }))}
+              searchFrom={0}
+              onChange={(route) => change(row.key, { route })}
+              onOther={(typed) => typed && change(row.key, { route: typed })}
+            />
+          </div>
+          <div className={styles.cell}>
+            <span className={styles.label}>Sign</span>
+            <span className={styles.me}>{me}</span>
+            {entries.length > 1 ? (
+              <button
+                type="button"
+                className={`${styles.button} ${styles.removeRow}`}
+                onClick={() => setEntries(entries.filter((one) => one.key !== row.key))}
+              >
+                Remove row
+              </button>
+            ) : null}
+          </div>
         </div>
-        <div className={styles.cell}>
-          <label className={styles.label} htmlFor="sheet-drug">
-            Drug, fluid or event
-          </label>
-          <SearchSelect
-            id="sheet-drug"
-            value={line.drug}
-            placeholder="Pick or type"
-            options={options}
-            // Always a search box, so a nurse can type straight away.
-            searchFrom={0}
-            onChange={choose}
-            onOther={(typed) => typed && setLine({ ...line, drug: typed, medicationId: null })}
-          />
-        </div>
-        <div className={styles.cell}>
-          <label className={styles.label} htmlFor="sheet-dose">
-            Dose
-          </label>
-          <OptionSelect
-            client={client}
-            staffId={staffId}
-            list="dose"
-            id="sheet-dose"
-            value={line.dose}
-            onChange={(dose) => setLine({ ...line, dose })}
-            placeholder="Pick or type"
-            otherLabel="Type the dose"
-          />
-        </div>
-        <div className={styles.cell}>
-          <label className={styles.label} htmlFor="sheet-route">
-            Route
-          </label>
-          <SearchSelect
-            id="sheet-route"
-            value={line.route}
-            placeholder="IV, IM…"
-            options={ROUTES.map((route) => ({ value: route, label: route }))}
-            searchFrom={0}
-            onChange={(route) => setLine({ ...line, route })}
-            onOther={(typed) => typed && setLine({ ...line, route: typed })}
-          />
-        </div>
-        <div className={styles.cell}>
-          <span className={styles.label}>Sign</span>
-          <span className={styles.me}>{me}</span>
-        </div>
-      </div>
+      ))}
       <div className={styles.entryFoot}>
         {problem ? <p className={styles.error}>{problem}</p> : <span />}
         <div className={styles.entryButtons}>
-          {line.drug || time ? (
+          <button
+            type="button"
+            className={styles.button}
+            disabled={entries.length >= 20}
+            onClick={() => {
+              setEntries([...entries, blank(nextKey)])
+              setNextKey(nextKey + 1)
+            }}
+          >
+            + Add another row
+          </button>
+          {entries.some((row) => row.drug || row.time || row.dose) ? (
             <button
               type="button"
               className={styles.button}
               onClick={() => {
-                setLine(empty)
-                setTime(null)
+                setEntries([blank(nextKey)])
+                setNextKey(nextKey + 1)
                 setProblem(null)
+                draft.clear()
               }}
             >
               Clear
@@ -359,7 +456,7 @@ function TreatmentSheet({ client, staffId, patientId, record, me, reload }: Shee
             disabled={busy}
             onClick={save}
           >
-            {busy ? 'Saving…' : 'Save line'}
+            {busy ? 'Saving…' : entries.length > 1 ? `Save ${entries.length} lines` : 'Save line'}
           </button>
         </div>
       </div>
@@ -400,6 +497,14 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const KEYS = ['temperature_c', 'pulse', 'breathing_rate', 'systolic', 'diastolic', 'spo2']
+  // Unsaved readings, kept 30 minutes on this device (request 227j).
+  const draft = useDraft({
+    staffId,
+    name: `sheet-vitals-${patientId}`,
+    value: values,
+    isEmpty: (typed) => Object.values(typed).every((one) => !String(one).trim()),
+    restore: setValues,
+  })
 
   async function save() {
     const numbers: Record<string, number> = {}
@@ -431,6 +536,7 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
       return
     }
     setValues(empty)
+    draft.clear()
     reload()
   }
 

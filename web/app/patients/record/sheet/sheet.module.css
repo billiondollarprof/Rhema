@@ -363,3 +363,25 @@
     grid-template-columns: 52px repeat(3, minmax(0, 1fr));
   }
 }
+
+/* "Remove row" under the name, when there is more than one (227b). */
+.removeRow {
+  justify-self: start;
+  width: fit-content;
+  margin-top: 6px;
+  min-height: 36px;
+  font-size: 13px;
+}
+
+/* "Your unsaved draft from 14:05 is back." (request 227j) */
+.draftBack {
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--tint-3);
+  color: var(--ink);
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

@@ -23,7 +23,7 @@
  * Current medications and Doses given open inside the chart (request 221a).
  *
  * Files (request 128): scans, results and old paper files sit in their own
- * section. Download asks "Full medical history" (printed, or saved as a
+ * section. Print (was Download, request 227h) asks "Full medical history" (printed, or saved as a
  * PDF from the print window) or "Attachments only" (each file to the
  * device).
  *
@@ -259,10 +259,14 @@ function PatientRecord() {
             setChoosing(!choosing)
           }}
         >
-          Download
+          Print
         </button>
       ) : null}
-      {allowed && record && patient?.email ? (
+      {/* Print and Email (request 227h, 2026-11-18: "normally it should be
+          print, and if the person adds their email, it should also be sent
+          to email"). Email always shows; with no email on file it says who
+          adds one. */}
+      {allowed && record && patient ? (
         <button
           className={buttons.button}
           onClick={() => {
@@ -313,7 +317,7 @@ function PatientRecord() {
         {/* ----- Download: which part ----- */}
         {choosing ? (
           <div className={`${styles.choice} ${styles.noPrint}`}>
-            <b>What do you want to download?</b>
+            <b>What do you want to print?</b>
             <div className={buttons.buttons}>
               <button className={`${buttons.button} ${buttons.primary}`} onClick={printHistory}>
                 Full medical history
@@ -326,7 +330,7 @@ function PatientRecord() {
                     setPicking(true)
                   }}
                 >
-                  Attachments ({liveFiles.length})
+                  Download attachments ({liveFiles.length})
                 </button>
               ) : null}
               <button className={buttons.button} onClick={() => setChoosing(false)}>
@@ -334,6 +338,22 @@ function PatientRecord() {
               </button>
             </div>
             <small className={styles.muted}>To keep a file, choose Save as PDF.</small>
+          </div>
+        ) : null}
+        {/* ----- No email on file: who adds one (only the Front Desk changes a
+            patient's details, Anthony's rule of 2026-11-11) ----- */}
+        {emailStep && patient && !patient.email ? (
+          <div className={`${styles.choice} ${styles.noPrint}`}>
+            <b>{patient.full_name} has no email address yet.</b>
+            <small className={styles.muted}>
+              Ask the Front Desk to add it on the patient&apos;s details, under Edit details. Then
+              tap Email record again.
+            </small>
+            <div className={buttons.buttons}>
+              <button className={buttons.button} onClick={() => setEmailStep(null)}>
+                Close
+              </button>
+            </div>
           </div>
         ) : null}
         {/* ----- Email the record, to the patient's own email only ----- */}
