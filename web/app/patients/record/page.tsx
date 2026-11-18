@@ -417,6 +417,8 @@ function PatientRecord() {
                     {...props}
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
+                    canPrescribe={staff.role === 'doctor'}
+                    canRequestLab={staff.can_medical}
                   />
                   <LabSection
                     client={client}
@@ -447,6 +449,8 @@ function PatientRecord() {
                     {...props}
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
+                    canPrescribe={staff.role === 'doctor'}
+                    canRequestLab={staff.can_medical}
                   />
                   <LabSection
                     client={client}

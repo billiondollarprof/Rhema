@@ -85,6 +85,8 @@ function Consult() {
             reload={reload}
             canWrite={canWrite}
             me={staff.room ? `${staff.full_name} · ${staff.room.name}` : staff.full_name}
+            canPrescribe={staff.role === 'doctor'}
+            canRequestLab={staff.can_medical}
             fullPage
           />
         ) : null}

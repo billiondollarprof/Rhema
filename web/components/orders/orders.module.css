@@ -1,0 +1,201 @@
+/*
+ * components/orders/orders.module.css: the look of Prescribe and Request
+ * lab, shared by their own pages and by the consultation (request 227d), so
+ * both roads look the same. Copied from the Pharmacy and Lab styles.
+ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 34, 56, 0.04),
+    0 14px 30px -20px rgba(15, 34, 56, 0.3);
+}
+.sectionHead {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.sectionHead i {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #efe7fb, #ddd0f5);
+  color: var(--c-7e57c2);
+  flex-shrink: 0;
+}
+.sectionHead div {
+  min-width: 0;
+}
+.sectionHead b {
+  display: block;
+  font-size: 15px;
+}
+.sectionHead small {
+  color: var(--mut);
+}
+.muted {
+  color: var(--mut);
+  margin: 0;
+  font-size: 13px;
+}
+.error {
+  color: var(--red);
+  margin: 0;
+}
+.good {
+  color: var(--grn);
+  margin: 0;
+  font-weight: 600;
+}
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin: 0 0 5px;
+}
+.input {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 10px;
+  min-height: 42px;
+  border: 1px solid var(--field-line);
+  border-radius: 10px;
+  background: var(--card);
+}
+textarea.input {
+  min-height: 70px;
+  resize: vertical;
+}
+.input:focus {
+  outline: 0;
+  border-color: #4a86ee;
+  box-shadow: 0 0 0 4px rgba(31, 95, 208, 0.12);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+.chip[aria-pressed='true'] {
+  background: #7e57c2;
+  border-color: #7e57c2;
+  color: #fff;
+}
+.segments {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+}
+.segments button {
+  font: inherit;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: var(--mut);
+  cursor: pointer;
+}
+.segments button[aria-pressed='true'] {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+.buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  /* A secondary button looks like a button: blue outline, blue words
+     (Anthony, 2026-11-09: "a white button on a white screen... looking
+     like you just wrote a text"). Primary and danger set their own. */
+  border: 1.5px solid var(--link);
+  background: var(--card);
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.button:hover:not(:disabled) {
+  background: var(--tint-3);
+}
+.primary {
+  background: linear-gradient(180deg, #2a74e6, #1f5fd0);
+  border-color: var(--link);
+  color: #fff;
+  box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
+}
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.drug {
+  display: grid;
+  gap: 8px;
+  border-left: 3px solid var(--c-b2dfdb);
+  padding-left: 10px;
+}
+.drugTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drugTop b {
+  flex: 1;
+}
+.grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.wide {
+  grid-column: 1 / -1;
+}
+.small {
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 13px;
+}
+.soft {
+  background: var(--c-eef2f7);
+  border-color: var(--c-dfe5ee);
+  color: var(--c-3b4a5e);
+}
+.search {
+  display: grid;
+  gap: 10px;
+}
