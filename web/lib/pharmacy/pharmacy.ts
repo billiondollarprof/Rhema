@@ -97,22 +97,19 @@ export async function prescribe(
 }
 
 // ===== 3. Lists =====
-async function listWhere(client: SupabaseClient, filter: string) {
-  const { data } = await client
-    .from('prescriptions')
-    .select(COLUMNS)
-    .or(filter)
-    .order('prescribed_at')
+async function listWhere(client: SupabaseClient, filter: string, patientId?: number) {
+  let query = client.from('prescriptions').select(COLUMNS).or(filter)
+  if (patientId) query = query.eq('patient_id', patientId)
+  const { data } = await query.order('prescribed_at')
   return (data as unknown as Prescription[] | null) ?? []
 }
 
-// The Front Desk: waiting for payment, or sent straight to the Pharmacy and
-// also to the Front Desk, not paid yet.
-export const listAwaitingPayment = (client: SupabaseClient) =>
-  listWhere(
-    client,
-    'status.eq.awaiting_payment,and(also_sent.is.true,payment_id.is.null,status.in.(awaiting_dispense,dispensed))',
-  )
+// The Front Desk: every prescription not paid and not cancelled, however it
+// was sent, even one already given to an admitted patient (request 227k,
+// 2026-11-18: "Anything awaiting payment will always show"). With a patient:
+// that patient's only, for their details page.
+export const listAwaitingPayment = (client: SupabaseClient, patientId?: number) =>
+  listWhere(client, 'and(payment_id.is.null,status.neq.voided)', patientId)
 
 // The Pharmacy: ready to dispense, or sent to the Front Desk and also to
 // the Pharmacy (shown as waiting for payment until it is paid).

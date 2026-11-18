@@ -62,25 +62,32 @@ export default function PharmacyCard({
   client,
   staff,
   bare = false,
+  patientId,
 }: {
   client: SupabaseClient
   staff: StaffMember
   // Inside a notice: no frame and no heading, the notice is the heading.
   bare?: boolean
+  // On a patient's details page (request 227k): only that patient's, and
+  // only for the people who take payment.
+  patientId?: number
 }) {
-  const view = viewFor(staff)
+  const view = patientId ? (takesPayments(staff) ? 'pay' : null) : viewFor(staff)
   // The last list shown, at once, while a fresh one loads (request 145).
   const [list, setList] = useState<Prescription[] | null>(() =>
-    recall(staff.id, `pharmacy-${view}`),
+    recall(staff.id, patientId ? `pharmacy-pay-${patientId}` : `pharmacy-${view}`),
   )
 
   // The patient just paid for, to offer their receipt.
   const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
-    const keep = (found: Prescription[]) => setList(remember(staff.id, `pharmacy-${view}`, found))
-    if (view === 'pay') keep(await listAwaitingPayment(client))
+    const keep = (found: Prescription[]) =>
+      setList(
+        remember(staff.id, patientId ? `pharmacy-pay-${patientId}` : `pharmacy-${view}`, found),
+      )
+    if (view === 'pay') keep(await listAwaitingPayment(client, patientId))
     else if (view === 'dispense') keep(await listAwaitingDispense(client))
-  }, [client, staff.id, view])
+  }, [client, staff.id, view, patientId])
 
   // Load now, then every 30 seconds, like the rest of Home.
   useEffect(() => {
@@ -102,10 +109,17 @@ export default function PharmacyCard({
   }, [view, load])
 
   if (!view) return null
+  // On a patient's page, nothing unpaid: no card at all (request 227k).
+  if (patientId && list && list.length === 0) return null
   const [title, empty] = TITLES[view]
 
   return (
-    <div className={bare ? styles.bare : styles.card} id={bare ? undefined : 'pharmacy'}>
+    <div
+      className={
+        bare ? styles.bare : patientId ? `${styles.bare} ${styles.inPatient}` : styles.card
+      }
+      id={bare || patientId ? undefined : 'pharmacy'}
+    >
       {bare ? null : (
         <h3>
           {title}
@@ -186,6 +200,14 @@ function Entry({
             {prescription.prescriber?.full_name ?? 'the doctor'} ·{' '}
             {waitedSince(prescription.prescribed_at)} ago
           </small>
+          {/* Sent straight to the Pharmacy: say so, so nobody waits for it
+              to be released (request 227k). */}
+          {view === 'pay' && prescription.status === 'dispensed' ? (
+            <small className={styles.note}>Already given. Not paid yet.</small>
+          ) : null}
+          {view === 'pay' && prescription.status === 'awaiting_dispense' ? (
+            <small className={styles.note}>Sent straight to the Pharmacy. Not paid yet.</small>
+          ) : null}
         </div>
       </div>
       <ul className={styles.drugs}>
