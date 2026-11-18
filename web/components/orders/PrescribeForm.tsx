@@ -28,6 +28,8 @@ import styles from './orders.module.css'
 import { knownMedicines } from '@/lib/medicines/medicines'
 import type { PatientResult } from '@/lib/patients/patients'
 import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
+import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
 type SendTo = 'front_desk' | 'pharmacy'
 
@@ -82,6 +84,20 @@ export default function PrescribeForm({
   const [alsoSent, setAlsoSent] = useState(false)
   const [alsoProblem, setAlsoProblem] = useState<string | null>(null)
 
+  // The unsaved prescription, kept 30 minutes on this device (227j).
+  const draft = useDraft({
+    staffId,
+    name: `rx-${patient.id}`,
+    value: { drafts, note, sendTo },
+    isEmpty: (typed) => !typed.note.trim() && typed.drafts.every((one) => !one.drug.trim()),
+    restore: (typed) => {
+      setDrafts(typed.drafts)
+      setNextKey(Math.max(0, ...typed.drafts.map((one) => one.key)) + 1)
+      setNote(typed.note)
+      setSendTo(typed.sendTo)
+    },
+  })
+
   // ===== 2. Changing one drug =====
   function change(index: number, part: keyof Draft, value: string) {
     setDrafts((all) => all.map((draft, at) => (at === index ? { ...draft, [part]: value } : draft)))
@@ -129,6 +145,7 @@ export default function PrescribeForm({
     }
     setBusy(false)
     setSent(true)
+    draft.clear()
   }
 
   // ===== 4. Sent =====
@@ -187,6 +204,23 @@ export default function PrescribeForm({
   // ===== 5. The form =====
   return (
     <>
+      {draft.restoredAt ? (
+        <p className={styles.draftBack}>
+          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
+          <button
+            type="button"
+            className={`${styles.button} ${styles.small}`}
+            onClick={() => {
+              setDrafts([{ ...EMPTY, key: nextKey }])
+              setNextKey(nextKey + 1)
+              setNote('')
+              draft.clear()
+            }}
+          >
+            Discard draft
+          </button>
+        </p>
+      ) : null}
       {/* ----- One block per drug ----- */}
       {drafts.map((draft, index) => (
         <div key={draft.key} className={styles.drug}>

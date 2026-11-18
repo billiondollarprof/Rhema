@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-18: request 227 started. LIVE: install guide back button, stuck
+  screens open in full, Prescription and Request lab inside the consultation,
+  Waiting for payment for the Front Desk, readable in both looks (new
+  contrast check). Next: drafts and Correct, then the rest of 227.
+
 - 2026-11-17 (late): request 226b built and LIVE: monthly copy to the
   hospital's own Google Drive. The testing check refused a signed out door
   with the owner's rights, so a second migration made the admin's own page

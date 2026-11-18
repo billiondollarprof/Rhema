@@ -1067,3 +1067,17 @@ a.small {
   padding: 8px 20px;
   font-size: 15px;
 }
+
+/* "Your unsaved draft from 14:05 is back." (request 227j) */
+.draftBack {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--tint-3);
+  color: var(--ink);
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
