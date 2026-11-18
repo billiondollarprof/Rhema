@@ -849,6 +849,45 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
+    a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
+       be like part of the last things... when we are done with the major
+       things that the hospital needs for day-to-day activities, then we
+       will come back to this one."
+    b. Sheets, more rows: "it's just one row... Can they add another row...
+       if they are putting drugs... there should be... a place where they
+       can add plus to add another row." Vital signs: "when they click add
+       vital sign, they will add a new vital sign to the vital sign?"
+    c. Freehand nurse notes: "I changed my role to a nursing role, but it
+       still did not give me a place for freehand notes... showing nothing
+       written yet, and there's no place to add notes."
+    d. Consultation and prescribing: "prescription button is okay where it
+       is... inside the consultation note, let that same prescription still
+       be there... If that medicine chart... is serving the same purpose,
+       then do it in a way that they will know that it's serving the same
+       purpose as the prescription button at the top."
+    e. History in the menu would not open (front desk account, on a
+       patient's edit page): "I click other keys. They open, but history
+       did not... even when I refresh... I had to close the app, open it
+       again."
+    f. Installation guide: "there should be a button... that takes you back
+       to the app. And it should take you exactly to the previous page."
+    g. Antenatal registration: front desk says antenatal has extra details
+       (client details and next of kin from their card: marital status,
+       religion, level of education, occupation; next of kin occupation,
+       religion, education, age). "once they toggle antenatal, those extra
+       information can populate."
+    h. Record page "Download" button: "normally it should be print, and if
+       the person adds their email, it should also be sent to email."
+    i. Pharmacy's drug list (photos 2026-11-18): add every one missing from
+       the system; "if there's anyone in the system that is not in the
+       list, still leave it... better to be more than to be less."
+    j. Drafts and editing: "when somebody add medication and they do not
+       save it and go back... save it as draft... maybe 30 minutes." And
+       after saving: edit for 5, 10 or 15 minutes, then only cancel, shown
+       as cancelled? "Or what do you think is the best?" ASKED FOR AN
+       OPINION; waiting for his choice.
+
 226. **Nigeria time on screen; monthly text backup to the hospital's Drive.** (2026-11-17)
     a. Yes to always showing Nigeria time: "when the app does its own, it
        still maintains the server time... within the app it just uses the
@@ -872,7 +911,33 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        Decided 2026-11-17: NO password on the zip ("pointless adding
        password to the zip... the most important thing is to protect that
        account... add a two factor authenticator"). Two-step sign in on the
-       hospital's Gmail goes in the setup steps. BUILDING.
+       hospital's Gmail goes in the setup steps.
+    b STATUS: BUILT AND LIVE 2026-11-17, WAITING ON THE GOOGLE APP. Admin,
+       Data: "Monthly copy to Google Drive" card (Connect, status,
+       Disconnect). Worker /api/drive/start and /api/drive/callback: the key
+       is sealed (AES-GCM, key from GOOGLE_CLIENT_SECRET) and handed back to
+       the admin's page after a "#"; the page hands it in as the signed in
+       admin (finish_drive_link, only the admin who started the code, 15
+       minutes, once). The live timer starts drive-backup.yml at 21:17 UTC on
+       the last day of the month, and on days 1 and 2 for the past month;
+       it skips a month already saved. Zip: every table as CSV, text only,
+       in "RHEMA backups/<year>/<year>-<mm> <Month>.zip". Privacy notice says
+       so. Live and testing both answer "not set up" until the secrets are in.
+       LEFT FOR ANTHONY: make the Google app under StellaXafe, put
+       GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Cloudflare (both Workers)
+       and GitHub secrets, tap Connect on live, turn on 2-Step Verification
+       on the hospital's Gmail. LEFT FOR US: run drive-backup.yml once by hand
+       and check the zip lands, then move 226b to DONE.
+    b ASKED 2026-11-17 (late): "encryption is the word. So we can scramble
+       it, then they'll not understand anything. But how do you now get the
+       file to be readable eventually? ... it has to be scrambled with a key
+       kept outside... outside the Google Drive." Explained: AES-256 zip
+       (opens in free 7-Zip), long random key, kept as a GitHub secret for
+       the job and on a printed recovery sheet in the hospital safe, plus a
+       StellaXafe copy. WAITING FOR HIS YES. Not built.
+       Token rights: GOOGLE app asks only drive.file (files it made) and
+       email. GITHUB_BACKUP_TOKEN already could start any workflow; nothing
+       new.
     a STATUS: LIVE 2026-11-17. Moments shown in HOSPITAL_TIME_ZONE
     (Africa/Lagos; NEXT_PUBLIC_TIME_ZONE per hospital); calendar dates never
     moved; days by the hospital's clock; the download's read me says UTC.

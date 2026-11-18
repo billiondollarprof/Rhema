@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-17 (late): request 226b built and LIVE: monthly copy to the
+  hospital's own Google Drive. The testing check refused a signed out door
+  with the owner's rights, so a second migration made the admin's own page
+  hand in the key. Waits on Anthony's Google app and secrets. Next:
+  registration in one trip; then remind him of 223.
+
 - 2026-11-17 (evening): request 225 LIVE: automatic sign and time, running
   sheets, tidy form buttons. Next: registration in one trip; then 223.
 

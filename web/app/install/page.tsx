@@ -7,14 +7,20 @@
  * the admin can send this page to new staff, and it helps when RHEMA is
  * offered to other hospitals.
  *
+ * Back to the app (request 227f, 2026-11-18): an installed app has no
+ * browser tab to go back to, so a button at the top returns to the page
+ * the person came from, or to Home when they opened this page directly.
+ *
  * Never: ask anybody to sign in here, or show any hospital data.
  */
 'use client'
 
 import Logo from '@/components/brand/Logo'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useSyncExternalStore } from 'react'
 import InstallGuide from '@/components/onboarding/InstallGuide'
+import { LAST_SCREEN } from '@/components/shell/AppShell'
 import card from '@/components/onboarding/onboarding.module.css'
 import styles from './install.module.css'
 import { detectPlatform, type Platform } from '@/lib/install/device'
@@ -41,9 +47,27 @@ export default function InstallPage() {
   )
   const [picked, setDevice] = useState<Device | null>(null)
   const device: Device = picked ?? (holding === 'other' ? 'android' : holding)
+  const router = useRouter()
+
+  // Back to the exact screen the person was on (the app remembers it in
+  // this window). Opened on its own, from a link: Home instead.
+  function backToApp() {
+    let last: string | null = null
+    try {
+      last = sessionStorage.getItem(LAST_SCREEN)
+    } catch {
+      last = null
+    }
+    router.push(last && last.startsWith('/') && !last.startsWith('//') ? last : '/')
+  }
 
   return (
     <main className={styles.page}>
+      <div className={styles.top}>
+        <button type="button" className={styles.back} onClick={backToApp}>
+          <span aria-hidden="true">‹</span> Back to the app
+        </button>
+      </div>
       <div className={`${card.badge} ${card.badgeLogo}`}>
         <Logo size={58} />
       </div>
