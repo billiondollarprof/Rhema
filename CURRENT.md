@@ -899,6 +899,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        paid, whether through when it was sent to them or whether they go and
        search for the patient, it's all the same." Lab: "that one is
        different", request lab already does it. Plan sent, waiting.
+    k DECIDED 2026-11-18: "So the front desk sees everything, sees what to
+       be paid for, and once it marks paid, it marks everywhere." On the
+       patient's details, separate from the biodata. Admitted patients too:
+       "Even if the drug is dispensed, it should also show that they have
+       not made payment for it until the front desk marks it."
+    d DECIDED 2026-11-18: inside the consultation, a Prescription part that
+       drops down: pick drugs, send; it goes to the Front Desk (take
+       payment) and the Pharmacy (awaiting payment, then dispense once
+       paid), without touching the rest of the note. The same for Request
+       lab: to the Front Desk and the Lab, awaiting payment until paid.
+    l. Consent: the director wants a place to upload a scanned signature
+       (2026-11-18): "they don't have electronic signature and they can't
+       use fingerprints... They will scan signature, they will now upload."
+    m. Family file, confirm (2026-11-18): one file, add members; each member
+       has their own diagnosis and records; open one member and easily open
+       the others in the group; a member can switch to an individual file;
+       a member can edit their own next of kin and address and stay in the
+       family. "I believe that's how it's already designed... just confirm."
     STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
     a suspended. e: likely cause found (Refresh only refetches data, never
     reloads the app; a screen left on an old version stays stuck); fix
