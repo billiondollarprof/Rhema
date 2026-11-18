@@ -14,7 +14,8 @@
   --red: #d32f2f;
   /* The hospital's own red, from its letterhead. Accents only (request 114). */
   --brand-red: #d9232d;
-  --amb: #ef6c00;
+  /* Amber deep enough to read on the pale amber behind it (227n). */
+  --amb: #b45309;
   /* Named colours for cards, tints, text and borders (dark mode, request
      196g, 2026-11-16). In the light look each one is exactly the colour the
      screens used before, so the light look did not change. */
@@ -182,7 +183,8 @@
   --grn: #2e7d5b;
   --red: #d32f2f;
   --brand-red: #d9232d;
-  --amb: #ef6c00;
+  /* Amber deep enough to read on the pale amber behind it (227n). */
+  --amb: #b45309;
   --card: #fff;
   --tint-1: #f8fafc;
   --tint-2: #f4f8ff;

@@ -25,6 +25,15 @@ looking without a real database, so no patient data can reach a picture.
    `scripts/screens/screens-list.cjs` first (with `extra` rows if it needs
    data to show). Since 2026-11-02, after the receipt's letterhead was
    squeezed at 320 and the old check could not see it.
+2a. **Run the readability check, light and dark:**
+   ```
+   node scripts/contrast-audit.cjs
+   ```
+   Every screen in the light look and the dark look; it fails on any text
+   below 3 to 1 against what is behind it. Since 2026-11-18 (request 227n:
+   "no text or design disappears simply because someone toggles dark
+   mode"). A colour that must stay the same in both looks (white words on a
+   coloured badge) is a fixed colour, not a token the dark look changes.
 2b. **Press every button with the click-through check:**
    ```
    node scripts/screens/clickthrough.cjs

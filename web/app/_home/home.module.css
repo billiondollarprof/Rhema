@@ -496,7 +496,9 @@ a.button {
 }
 
 .priority[data-level='emergency'] {
-  background: var(--c-b42318);
+  /* The same deep red in both looks: the dark look turns var(--c-b42318)
+     into a light red for text, and white words faded on it (request 227n). */
+  background: #b42318;
   color: #fff;
 }
 

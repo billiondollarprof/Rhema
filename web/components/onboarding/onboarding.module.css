@@ -363,7 +363,8 @@ a.help {
   font-size: 12px;
   font-weight: 700;
   color: #fff;
-  background: #94a3b8;
+  /* Dark enough for the white number to read, in both looks (227n). */
+  background: #64748b;
 }
 
 .stepItem[aria-current='step'] .stepNumber {
