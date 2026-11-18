@@ -917,6 +917,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        the others in the group; a member can switch to an individual file;
        a member can edit their own next of kin and address and stay in the
        family. "I believe that's how it's already designed... just confirm."
+    YES TO ALL, 2026-11-18: "yes to all of your questions... Take the yes
+       now. Go through it. Anything that involves the design... Screenshot
+       it, and make sure everything aligns well." Order: e History fix;
+       k + d payment card and Prescription and Request lab inside the
+       consultation ("the same prescription, either they take the
+       prescription from the medical record screen, or they take it from
+       the consultation area"); j drafts (30 minutes, wiped at sign out) and
+       Correct (cancel plus a filled in copy); b + Add another row; g
+       antenatal fields; h Print and Email; l consent upload; i drug list
+       (show the SQL batch first).
+    l DECIDED: the app shrinks the scanned signature itself to a few
+       kilobytes, still clear enough to read; anything still over 500 KB
+       after shrinking is refused, with "scan or screenshot, then crop it".
+    NEXT AFTER 227: a security and robustness review ("anything at the
+       database level, anything that will cause any crash or breakage").
     STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
     a suspended. e: likely cause found (Refresh only refetches data, never
     reloads the app; a screen left on an old version stays stuck); fix
