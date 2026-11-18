@@ -887,6 +887,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        after saving: edit for 5, 10 or 15 minutes, then only cancel, shown
        as cancelled? "Or what do you think is the best?" ASKED FOR AN
        OPINION; waiting for his choice.
+    c DECIDED 2026-11-18: nursing notes stay where they are on the record
+       page ("Single nursing note is okay where it is"). No Notes tab on the
+       sheet.
+    k. Front desk sees what to charge without being sent (2026-11-18): "even
+       if they did not send front desk medication or lab... front desk will
+       be able to see those details because they collect money for it...
+       sometimes the doctor will ask them to go and meet front desk without
+       even sending them the prescription... by the time they've not marked
+       it paid, it will just be there... pending payment... Then once it is
+       paid, whether through when it was sent to them or whether they go and
+       search for the patient, it's all the same." Lab: "that one is
+       different", request lab already does it. Plan sent, waiting.
     STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
     a suspended. e: likely cause found (Refresh only refetches data, never
     reloads the app; a screen left on an old version stays stuck); fix
