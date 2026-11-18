@@ -94,12 +94,19 @@ export async function requestLab(
 }
 
 // ===== 3. The Front Desk: tests waiting for payment, and the payment =====
-export async function listAwaitingPayment(client: SupabaseClient): Promise<LabRequest[]> {
-  const { data } = await client
+// Every test not paid and not cancelled, however it was sent, even one
+// already tested (request 227k). With a patient: that patient's only.
+export async function listAwaitingPayment(
+  client: SupabaseClient,
+  patientId?: number,
+): Promise<LabRequest[]> {
+  let query = client
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
-    .eq('status', 'awaiting_payment')
-    .order('requested_at')
+    .is('payment_id', null)
+    .neq('status', 'voided')
+  if (patientId) query = query.eq('patient_id', patientId)
+  const { data } = await query.order('requested_at')
   return (data as unknown as LabRequest[] | null) ?? []
 }
 

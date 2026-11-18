@@ -262,6 +262,7 @@ function FindPatient() {
                   canMedical={staff.can_medical}
                   // Payments: the Front Desk and admins (request 123, part 2).
                   canPay={takesPayments(staff)}
+                  staff={staff}
                   // Only the Front Desk registers patients (Anthony, 2026-11-10).
                   canRegister={staff.role === 'front_desk'}
                   showMedicines={staff.role === 'pharmacy'}

@@ -932,6 +932,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        after shrinking is refused, with "scan or screenshot, then crop it".
     NEXT AFTER 227: a security and robustness review ("anything at the
        database level, anything that will cause any crash or breakage").
+    n. Dark mode on every page (2026-11-18): "make sure every page is dark
+       mode suitable and readable as well as light mode, so no text or
+       design disappears simply because someone toggles dark mode." Also
+       noted the words "dark look/light look": "seems okay though".
     STATUS 2026-11-18: f LIVE (Back to the app, to the exact screen left).
     a suspended. e: likely cause found (Refresh only refetches data, never
     reloads the app; a screen left on an old version stays stuck); fix

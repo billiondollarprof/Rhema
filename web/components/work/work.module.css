@@ -79,6 +79,13 @@
 .queue {
   display: grid;
   gap: 8px;
+  min-width: 0;
+}
+
+/* A grid item grows to fit its widest content unless told otherwise; this
+   keeps an open price form inside the screen on a phone (request 227k). */
+.queue > * {
+  min-width: 0;
 }
 
 .entry {
@@ -327,4 +334,19 @@ a.button {
   font-size: 13px;
   font-weight: 600;
   color: var(--grn);
+}
+
+/* On a patient's details page (request 227k): no second frame inside the
+   patient's card, so nothing spills off a phone; a line above instead. */
+.inPatient {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.inPatient h3 {
+  margin: 0;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

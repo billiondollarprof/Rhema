@@ -71,26 +71,31 @@ export default function LabCard({
   client,
   staff,
   bare = false,
+  patientId,
 }: {
   client: SupabaseClient
   staff: StaffMember
   // Inside a notice: no frame and no heading, the notice is the heading.
   bare?: boolean
+  // On a patient's details page (request 227k): only that patient's, and
+  // only for the people who take payment.
+  patientId?: number
 }) {
-  const view = viewFor(staff)
+  const view = patientId ? (takesPayments(staff) ? 'pay' : null) : viewFor(staff)
   // The last list shown, at once, while a fresh one loads (request 145).
   const [requests, setRequests] = useState<LabRequest[] | null>(() =>
-    recall(staff.id, `lab-${view}`),
+    recall(staff.id, patientId ? `lab-pay-${patientId}` : `lab-${view}`),
   )
 
   // The patient just paid for, to offer their receipt.
   const [paidFor, setPaidFor] = useState<number | null>(null)
   const load = useCallback(async () => {
-    const keep = (found: LabRequest[]) => setRequests(remember(staff.id, `lab-${view}`, found))
-    if (view === 'pay') keep(await listAwaitingPayment(client))
+    const keep = (found: LabRequest[]) =>
+      setRequests(remember(staff.id, patientId ? `lab-pay-${patientId}` : `lab-${view}`, found))
+    if (view === 'pay') keep(await listAwaitingPayment(client, patientId))
     else if (view === 'lab') keep(await listAwaitingTest(client))
     else if (view === 'mine') keep(await listMyReadyResults(client, staff.id))
-  }, [client, staff.id, view])
+  }, [client, staff.id, view, patientId])
 
   // Load now, then every 30 seconds, like the rest of Home.
   useEffect(() => {
@@ -112,12 +117,19 @@ export default function LabCard({
   }, [view, load])
 
   if (!view) return null
+  // On a patient's page, nothing unpaid: no card at all (request 227k).
+  if (patientId && requests && requests.length === 0) return null
   // A doctor with nothing new sees no card at all, so Home stays quiet.
   if (view === 'mine' && (!requests || requests.length === 0)) return null
 
   const [title, empty] = TITLES[view]
   return (
-    <div className={bare ? styles.bare : styles.card} id={bare ? undefined : 'lab'}>
+    <div
+      className={
+        bare ? styles.bare : patientId ? `${styles.bare} ${styles.inPatient}` : styles.card
+      }
+      id={bare || patientId ? undefined : 'lab'}
+    >
       {bare ? null : (
         <h3>
           {title}
@@ -224,6 +236,13 @@ function LabEntry({
             Asked by {request.requester?.full_name ?? 'staff'} · {waitedSince(request.requested_at)}{' '}
             ago
           </small>
+          {/* Sent straight to the Lab: say so (request 227k). */}
+          {view === 'pay' && request.status === 'completed' ? (
+            <small className={styles.note}>Already tested. Not paid yet.</small>
+          ) : null}
+          {view === 'pay' && request.status === 'awaiting_test' ? (
+            <small className={styles.note}>Sent straight to the Lab. Not paid yet.</small>
+          ) : null}
           {request.note && view === 'lab' ? (
             <small className={styles.note}>Note: {request.note}</small>
           ) : null}

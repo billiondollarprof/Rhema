@@ -27,6 +27,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import FamilyCard from './FamilyCard'
 import PharmacyMedicines from './PharmacyMedicines'
 import PaymentsCard from './PaymentsCard'
+import LabCard from '@/components/work/LabCard'
+import PharmacyCard from '@/components/work/PharmacyCard'
+import type { StaffMember } from '@/lib/auth/session'
 import SendToRoom from './SendToRoom'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
@@ -46,6 +49,8 @@ type DetailProps = {
   staffId: string
   canMedical: boolean
   canPay: boolean
+  // The person signed in, for the Waiting for payment cards (request 227k).
+  staff?: StaffMember
   canRegister: boolean
   // The Pharmacy sees the medicines this patient has taken (2026-11-12).
   showMedicines: boolean
@@ -77,6 +82,7 @@ export default function PatientDetail({
   staffId,
   canMedical,
   canPay,
+  staff,
   canRegister,
   showMedicines,
   patient,
@@ -205,6 +211,16 @@ export default function PatientDetail({
       {/* The Pharmacy: what this patient has taken, current, suspended or stopped. */}
       {showMedicines ? (
         <PharmacyMedicines client={client} staffId={staffId} patientId={patient.id} />
+      ) : null}
+
+      {/* Waiting for payment (request 227k): every drug and lab test of this
+          patient not paid yet, sent to the Front Desk or not. Hidden when
+          nothing is waiting. */}
+      {canPay && staff ? (
+        <>
+          <PharmacyCard client={client} staff={staff} patientId={patient.id} />
+          <LabCard client={client} staff={staff} patientId={patient.id} />
+        </>
       ) : null}
 
       {/* The family: its number, the other members, Add family member. */}
