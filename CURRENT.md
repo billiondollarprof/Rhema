@@ -942,6 +942,17 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        be able to create a family group just like the normal registration
        behaves?... adding extra family members on the register from old
        file." Checked: neither did. Building both like normal registration.
+    SECURITY REVIEW 2026-11-19 (his yes): database clean (every table RLS
+    on, nothing for anon, no public owner's-rights functions, no deletes,
+    search_path fixed everywhere); live security advisor: only the accepted
+    leaked-password warning; Worker checks sign in with the database on
+    every file route, 10 MB cap, real file type checked, no caching; 0
+    package problems; no secrets in the repo; record emails refuse a double
+    send; the Drive job skips quietly until connected. FIXED and LIVE: a
+    crash screen (app/error.tsx, app/global-error.tsx) instead of a blank
+    page. ASKED: 4 indexes for speed (payments.received_by,
+    prescriptions.payment_id, lab_requests.payment_id,
+    stock_moves.prescription_id), SQL writes, waiting for his yes.
     2026-11-19 ALL OF 227 LIVE AND CHECKED: i drug list (98 medicines, 5
     supplies, migration 20261119015150, his yes); o old file antenatal
     details and Add family member. NEXT: the security and robustness
