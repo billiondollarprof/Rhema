@@ -20,6 +20,8 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 18 November: antenatal registration keeps the antenatal card's details
+// (request 227g). Section 2 says so; LEGAL_VERSION stays.
 // 17 November: a monthly text copy can go to the hospital's own online
 // storage (request 226b). Section 6 says so; LEGAL_VERSION stays.
 // 17 November: records of open visits are kept, scrambled, on clinical
@@ -64,6 +66,11 @@ export default function PrivacyText() {
         <li>
           <b>Who you are:</b> name, patient number, date of birth, sex, phone, email, address, and
           your next of kin.
+        </li>
+        <li>
+          <b>For antenatal care only:</b> marital status, religion, level of education and
+          occupation, and the same for your next of kin, with their age, as the antenatal card
+          asks.
         </li>
         <li>
           <b>Your care:</b> visits, vital signs, conditions, allergies, consultation notes,

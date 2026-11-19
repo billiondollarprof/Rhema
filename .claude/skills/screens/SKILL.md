@@ -34,6 +34,16 @@ looking without a real database, so no patient data can reach a picture.
    "no text or design disappears simply because someone toggles dark
    mode"). A colour that must stay the same in both looks (white words on a
    coloured badge) is a fixed colour, not a token the dark look changes.
+2c. **Run the can-it-be-seen check:**
+   ```
+   node scripts/visible-audit.cjs
+   ```
+   Each screen's `mustSee` words (in `scripts/screens/screens-list.cjs`)
+   must be on the page, not hidden, not zero size, inside the page, at a
+   phone and a desktop width. `press` taps a button first. Since 2026-11-19
+   (request 227: "check that each button created, each section created can
+   be seen"). **Every new button or section goes in `mustSee` in the same
+   change that builds it.**
 2b. **Press every button with the click-through check:**
    ```
    node scripts/screens/clickthrough.cjs

@@ -20,6 +20,7 @@
 
 import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import SearchSelect from '@/components/options/SearchSelect'
 import OptionSelect from '@/components/options/OptionSelect'
 import type { PickList } from '@/lib/options/options'
 import Icon from '@/components/shell/Icon'
@@ -50,6 +51,14 @@ export const EMPTY_DETAILS: PatientDetails = {
   next_of_kin_name: null,
   next_of_kin_relationship: null,
   next_of_kin_phone: null,
+  marital_status: null,
+  religion: null,
+  education_level: null,
+  occupation: null,
+  next_of_kin_occupation: null,
+  next_of_kin_religion: null,
+  next_of_kin_education_level: null,
+  next_of_kin_age: null,
   family_id: null,
 }
 
@@ -113,8 +122,43 @@ function tidy(details: PatientDetails): PatientDetails {
     country: blankToNull(details.country) ?? 'Nigeria',
     next_of_kin_name: blankToNull(details.next_of_kin_name),
     next_of_kin_relationship: blankToNull(details.next_of_kin_relationship),
+    // The antenatal details: kept only for an antenatal patient (227g).
+    ...(details.category === 'antenatal'
+      ? {
+          marital_status: blankToNull(details.marital_status ?? null),
+          religion: blankToNull(details.religion ?? null),
+          education_level: blankToNull(details.education_level ?? null),
+          occupation: blankToNull(details.occupation ?? null),
+          next_of_kin_occupation: blankToNull(details.next_of_kin_occupation ?? null),
+          next_of_kin_religion: blankToNull(details.next_of_kin_religion ?? null),
+          next_of_kin_education_level: blankToNull(details.next_of_kin_education_level ?? null),
+          next_of_kin_age: details.next_of_kin_age ?? null,
+        }
+      : {
+          marital_status: null,
+          religion: null,
+          education_level: null,
+          occupation: null,
+          next_of_kin_occupation: null,
+          next_of_kin_religion: null,
+          next_of_kin_education_level: null,
+          next_of_kin_age: null,
+        }),
   }
 }
+
+// ===== 1b. The antenatal card's answers (request 227g) =====
+// Usual answers in a drop down; "Other" lets the Front Desk type any.
+const MARITAL = ['Single', 'Married', 'Divorced', 'Separated', 'Widowed']
+const RELIGION = ['Christian', 'Muslim', 'Traditional']
+const EDUCATION = [
+  'None',
+  'Primary',
+  'Secondary (SSCE)',
+  'OND / NCE',
+  'HND / Degree',
+  'Postgraduate',
+]
 
 // What is wrong, field by field, in words. Empty when all is well.
 function check(details: PatientDetails): Record<string, string> {
@@ -244,7 +288,27 @@ export default function PatientForm({
     )
   }
 
+  // A drop down of usual answers, with Other to type any (request 227g).
+  // allowOther false: only these answers (marital status, which the
+  // antenatal booking keeps to the five on the card).
+  function choose(key: keyof PatientDetails, label: string, answers: string[], allowOther = true) {
+    return (
+      <div className={styles.field}>
+        <label htmlFor={`field-${key}`}>{label}</label>
+        <SearchSelect
+          id={`field-${key}`}
+          value={(details[key] as string | null) ?? ''}
+          placeholder="Choose"
+          options={answers.map((answer) => ({ value: answer, label: answer }))}
+          onChange={(value) => set(key, value as never)}
+          onOther={allowOther ? (typed) => typed && set(key, typed as never) : undefined}
+        />
+      </div>
+    )
+  }
+
   const age = details.date_of_birth ? ageFrom(details.date_of_birth) : ''
+  const antenatal = details.category === 'antenatal'
 
   return (
     <div className={styles.page}>
@@ -357,6 +421,27 @@ export default function PatientForm({
             </div>
           </section>
 
+          {/* ===== 3b. The antenatal card's details (request 227g): shown
+              once Antenatal is chosen, right under the biodata (2026-11-19) ===== */}
+          {antenatal ? (
+            <section className={styles.card}>
+              <div className={styles.sectionHead}>
+                <i>
+                  <Icon name="users" />
+                </i>
+                <div>
+                  <b>Antenatal details</b>
+                  <small>From the antenatal card.</small>
+                </div>
+              </div>
+              <div className={styles.fields}>
+                {choose('marital_status', 'Marital status', MARITAL, false)}
+                {choose('religion', 'Religion', RELIGION)}
+                {choose('education_level', 'Level of education', EDUCATION)}
+                {text('occupation', 'Occupation', 'e.g. Trader')}
+              </div>
+            </section>
+          ) : null}
           {/* ===== 4. Contact and address ===== */}
           <section className={styles.card}>
             <div className={styles.sectionHead}>
@@ -400,6 +485,28 @@ export default function PatientForm({
               'Choose the relationship',
             )}
             {text('next_of_kin_phone', 'Phone / WhatsApp number', '', 'tel')}
+            {/* The antenatal card also asks these of the next of kin. */}
+            {antenatal ? (
+              <>
+                {text('next_of_kin_occupation', 'Occupation', 'e.g. Trader')}
+                {choose('next_of_kin_religion', 'Religion', RELIGION)}
+                {choose('next_of_kin_education_level', 'Level of education', EDUCATION)}
+                <div className={styles.field}>
+                  <label htmlFor="field-next_of_kin_age">Age</label>
+                  <input
+                    id="field-next_of_kin_age"
+                    className={styles.input}
+                    inputMode="numeric"
+                    placeholder="e.g. 40"
+                    value={details.next_of_kin_age ?? ''}
+                    onChange={(event) => {
+                      const digits = event.target.value.replace(/\D/g, '').slice(0, 3)
+                      set('next_of_kin_age', (digits ? Number(digits) : null) as never)
+                    }}
+                  />
+                </div>
+              </>
+            ) : null}
           </div>
         </section>
       </div>

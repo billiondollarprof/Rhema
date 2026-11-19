@@ -33,6 +33,7 @@ import PatientForm, { EMPTY_DETAILS, type CardFee } from '../_parts/PatientForm'
 import styles from '../_parts/patients.module.css'
 import {
   getPatient,
+  loadAntenatalDetails,
   updatePatient,
   type PatientDetails,
   type PatientResult,
@@ -57,8 +58,12 @@ function EditPatient() {
   useEffect(() => {
     if (!client || !id || auth.status !== 'ready') return
     let current = true
-    getPatient(client, id).then((found) => {
-      if (current) setPatient(found)
+    getPatient(client, id).then(async (found) => {
+      // An antenatal patient: the card's details from the antenatal booking,
+      // so the form opens with them filled in (request 227g).
+      const extra =
+        found && found.category === 'antenatal' ? await loadAntenatalDetails(client, found.id) : {}
+      if (current) setPatient(found ? { ...found, ...extra } : found)
     })
     return () => {
       current = false
@@ -146,6 +151,15 @@ function EditPatient() {
                 next_of_kin_name: patient.next_of_kin_name,
                 next_of_kin_relationship: patient.next_of_kin_relationship,
                 next_of_kin_phone: patient.next_of_kin_phone,
+                // The antenatal card's details (request 227g).
+                marital_status: patient.marital_status ?? null,
+                religion: patient.religion ?? null,
+                education_level: patient.education_level ?? null,
+                occupation: patient.occupation ?? null,
+                next_of_kin_occupation: patient.next_of_kin_occupation ?? null,
+                next_of_kin_religion: patient.next_of_kin_religion ?? null,
+                next_of_kin_education_level: patient.next_of_kin_education_level ?? null,
+                next_of_kin_age: patient.next_of_kin_age ?? null,
                 family_id: patient.family_id,
               }}
               saveLabel="Save changes"
