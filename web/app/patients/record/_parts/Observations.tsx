@@ -66,8 +66,8 @@ const READINGS: { key: keyof Vitals; label: string; unit: string }[] = [
 // Anthony, 2026-11-16 (request 212): "pickers + Other on each of the box, so
 // they can pick from options without typing." The list opens at the usual
 // value; Other types anything outside the list.
-type Range = { from: number; to: number; step: number; start: string; decimals: number }
-const RANGES: Record<string, Range> = {
+export type Range = { from: number; to: number; step: number; start: string; decimals: number }
+export const RANGES: Record<string, Range> = {
   systolic: { from: 60, to: 250, step: 2, start: '120', decimals: 0 },
   diastolic: { from: 30, to: 150, step: 2, start: '80', decimals: 0 },
   temperature_c: { from: 34, to: 42, step: 0.1, start: '36.8', decimals: 1 },
@@ -517,7 +517,7 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
 }
 
 // ===== One vital sign box: pick a number, or type one with Other =====
-function VitalPick({
+export function VitalPick({
   id,
   range,
   value,

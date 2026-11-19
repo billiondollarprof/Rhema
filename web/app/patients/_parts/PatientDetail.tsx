@@ -14,6 +14,9 @@
  * the patient has left; and Today lists where the patient has been, from
  * when to when, and how each visit ended.
  *
+ * Take vitals (request 228c, 2026-11-19): the Front Desk takes vital signs
+ * here, and they go into the medical record for the doctor and nurses.
+ *
  * Never: show the medical record here. It gets its own page, open only to
  * doctors, nurses and the matron, and every opening is logged. This card
  * only shows the "Medical record" button to staff with that access.
@@ -31,6 +34,7 @@ import LabCard from '@/components/work/LabCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import type { StaffMember } from '@/lib/auth/session'
 import SendToRoom from './SendToRoom'
+import TakeVitals from './TakeVitals'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
@@ -94,6 +98,8 @@ export default function PatientDetail({
   onChanged,
 }: DetailProps) {
   const [sending, setSending] = useState(false)
+  // Take vitals is open (the Front Desk only, request 228c).
+  const [takingVitals, setTakingVitals] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
   const [leaving, setLeaving] = useState(false)
   const [leaveProblem, setLeaveProblem] = useState<string | null>(null)
@@ -285,7 +291,15 @@ export default function PatientDetail({
       ) : null}
 
       {/* ===== 2. What can be done from here ===== */}
-      {sending ? (
+      {takingVitals ? (
+        <TakeVitals
+          client={client}
+          staffId={staffId}
+          patientId={patient.id}
+          patientName={patient.full_name}
+          onClose={() => setTakingVitals(false)}
+        />
+      ) : sending ? (
         <SendToRoom
           client={client}
           staffId={staffId}
@@ -324,6 +338,18 @@ export default function PatientDetail({
             <Link className={styles.button} href={`/patients/edit/?p=${patient.id}`}>
               Edit details
             </Link>
+          ) : null}
+          {/* The Front Desk takes vital signs for the medical record (request 228c). */}
+          {canRegister ? (
+            <button
+              className={styles.button}
+              onClick={() => {
+                setSentTo(null)
+                setTakingVitals(true)
+              }}
+            >
+              Take vitals
+            </button>
           ) : null}
         </div>
       )}

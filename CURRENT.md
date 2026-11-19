@@ -880,7 +880,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        medication chart and the dose form write medications_given, which the
        treatment sheet lists; vital signs on the record write vital_signs,
        which the vital signs sheet lists. Asked him to check on testing.
-    Said back 2026-11-19, waiting for his yes and his answers.
+    Said back 2026-11-19. HIS YES TO ALL, 2026-11-19: "yes to all, start
+    with take vitals". Order: c, then a, then b.
+    a DECIDED: "If the drug is already given, show it as a payment that is
+       owed. If it is not given, expire it and grey it out. That they did
+       not pay, that's why they were not given." 24 hours. Not deleted.
+    b DECIDED: Register from old file works the same way. "restructure the
+       category... at the top left corner, show a drop down of category...
+       before they even start filling anything... individual followed by
+       family followed by antenatal." Family: the surname is compulsory, the
+       address is important, the time is marked by the system on save; a
+       phone number under the address, not compulsory; only fields that can
+       belong to a family. "personal information like birthday and next of
+       kin and other stuff only shows when they click add family member."
+    c DECIDED: Take vitals as said back: the Front Desk adds vital signs
+       only, into the same vital signs in the record, and never opens the
+       medical record.
+    "do not take any job that the other agent was doing before... make sure
+    the security of the platform is kept intact." Repository stays public
+    for now (GitHub cost); private at the end.
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
