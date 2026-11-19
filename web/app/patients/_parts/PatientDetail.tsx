@@ -22,7 +22,7 @@
 
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import FamilyCard from './FamilyCard'
 import PharmacyMedicines from './PharmacyMedicines'
@@ -35,7 +35,12 @@ import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
-import { firstRegisteredWords, sexWords, type PatientResult } from '@/lib/patients/patients'
+import {
+  firstRegisteredWords,
+  loadAntenatalDetails,
+  sexWords,
+  type PatientResult,
+} from '@/lib/patients/patients'
 import {
   CATEGORY_LABELS,
   FINISH_WORDS,
@@ -107,6 +112,21 @@ export default function PatientDetail({
     }
   }
 
+  // ===== 0. The antenatal card's details, from the antenatal booking
+  // (request 227g): read for an antenatal patient only =====
+  const [antenatal, setAntenatal] = useState<Partial<PatientResult>>({})
+  useEffect(() => {
+    if (patient.category !== 'antenatal') return
+    let current = true
+    void loadAntenatalDetails(client, patient.id).then((found) => {
+      if (current) setAntenatal(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, patient.id, patient.category])
+  const card = { ...patient, ...antenatal }
+
   // ===== 1. The facts, in the order the front desk asks for them =====
   const groups: { title: string; facts: [string, string][] }[] = [
     {
@@ -146,8 +166,36 @@ export default function PatientDetail({
         ['Name', patient.next_of_kin_name ?? 'Not given'],
         ['Relationship', patient.next_of_kin_relationship ?? 'Not given'],
         ['Phone', patient.next_of_kin_phone ?? 'Not given'],
+        // The antenatal card's details of the next of kin (request 227g).
+        ...((patient.category === 'antenatal'
+          ? [
+              ['Occupation', card.next_of_kin_occupation ?? 'Not given'],
+              ['Religion', card.next_of_kin_religion ?? 'Not given'],
+              ['Level of education', card.next_of_kin_education_level ?? 'Not given'],
+              [
+                'Age',
+                card.next_of_kin_age !== null && card.next_of_kin_age !== undefined
+                  ? `${card.next_of_kin_age} years`
+                  : 'Not given',
+              ],
+            ]
+          : []) as [string, string][]),
       ],
     },
+    // The antenatal card's details of the patient (request 227g).
+    ...(patient.category === 'antenatal'
+      ? [
+          {
+            title: 'Antenatal details',
+            facts: [
+              ['Marital status', card.marital_status ?? 'Not given'],
+              ['Religion', card.religion ?? 'Not given'],
+              ['Level of education', card.education_level ?? 'Not given'],
+              ['Occupation', card.occupation ?? 'Not given'],
+            ] as [string, string][],
+          },
+        ]
+      : []),
   ]
 
   const where = patient.open_visit

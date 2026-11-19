@@ -44,6 +44,18 @@ export type PatientCard = {
   next_of_kin_name: string | null
   next_of_kin_relationship: string | null
   next_of_kin_phone: string | null
+  // The antenatal card's extra details (request 227g): asked only when the
+  // category is Antenatal. Never columns of the patient: they are kept in
+  // the antenatal booking (save_antenatal_details), read back with
+  // loadAntenatalDetails.
+  marital_status?: string | null
+  religion?: string | null
+  education_level?: string | null
+  occupation?: string | null
+  next_of_kin_occupation?: string | null
+  next_of_kin_religion?: string | null
+  next_of_kin_education_level?: string | null
+  next_of_kin_age?: number | null
   // Registered with only a name, a phone and the old paper file.
   from_old_file: boolean
   // The family this patient belongs to, and its card number (FAM-000012).
@@ -311,22 +323,28 @@ export async function registerPatient(
   details: PatientDetails,
   staffId: string,
 ): Promise<{ patient: PatientCard | null; problem: string | null; queued?: boolean }> {
+  const { patient: values, antenatal } = splitAntenatal(details)
   const { data, error } = await client
     .from('patients')
-    .insert({ ...details, created_by: staffId })
+    .insert({ ...values, created_by: staffId })
     .select(CARD_COLUMNS)
     .single()
+  // The antenatal card's details go into the booking (request 227g).
+  if (!error && data && antenatal) {
+    await saveAntenatalDetails(client, (data as unknown as PatientCard).id, antenatal)
+  }
   if (error && isDoubleTap(error)) {
     const first = await justRegistered(client, staffId, details.full_name)
     if (first) return { patient: first, problem: null }
   }
   // No network: keep it on this device; it registers when the network is
-  // back (request 128, step 3).
+  // back (request 128, step 3). Only the patient's own details go in the
+  // queue: the antenatal card's details are added later with Edit details.
   if (isNetworkFailure(error)) {
     addToOutbox(staffId, {
       kind: 'register',
       label: details.full_name,
-      values: { ...details, created_by: staffId },
+      values: { ...values, created_by: staffId },
     })
     return { patient: null, problem: null, queued: true }
   }
@@ -461,7 +479,12 @@ export async function updatePatient(
   id: number,
   details: PatientDetails,
 ): Promise<string | null> {
-  const { error } = await client.from('patients').update(details).eq('id', id)
+  const { patient: values, antenatal } = splitAntenatal(details)
+  const { error } = await client.from('patients').update(values).eq('id', id)
+  if (!error && antenatal) {
+    const problem = await saveAntenatalDetails(client, id, antenatal)
+    if (problem) return problem
+  }
   if (error) {
     console.warn(`Patient ${id} could not be updated: ${error.code}`)
     return 'The changes could not be saved. Check the details and try again.'
@@ -533,4 +556,63 @@ export function firstRegisteredWords(patient: {
     month: 'short',
     year: 'numeric',
   })
+}
+
+// ===== The antenatal card's details, kept in the antenatal booking =====
+// (request 227g, 2026-11-19: "saving what the front desk types into the
+// same antenatal booking so the nurse sees it already filled in").
+const ANTENATAL_KEYS = {
+  marital_status: 'client_marital_status',
+  religion: 'client_religion',
+  education_level: 'client_education',
+  occupation: 'client_occupation',
+  next_of_kin_occupation: 'kin_occupation',
+  next_of_kin_religion: 'kin_religion',
+  next_of_kin_education_level: 'kin_education',
+  next_of_kin_age: 'kin_age',
+} as const
+type AntenatalKey = keyof typeof ANTENATAL_KEYS
+
+// Takes the antenatal details off the patient's own details. antenatal is
+// null for anybody not antenatal, so nothing is sent for them.
+export function splitAntenatal(details: PatientDetails): {
+  patient: PatientDetails
+  antenatal: Record<string, string | number | null> | null
+} {
+  const patient = { ...details }
+  const antenatal: Record<string, string | number | null> = {}
+  for (const key of Object.keys(ANTENATAL_KEYS) as AntenatalKey[]) {
+    antenatal[ANTENATAL_KEYS[key]] = details[key] ?? null
+    delete patient[key]
+  }
+  return { patient, antenatal: details.category === 'antenatal' ? antenatal : null }
+}
+
+export async function saveAntenatalDetails(
+  client: SupabaseClient,
+  patientId: number,
+  antenatal: Record<string, string | number | null>,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('save_antenatal_details', {
+    patient: patientId,
+    details: antenatal,
+  })
+  return error || data !== 'saved'
+    ? 'The antenatal details could not be saved. Open Edit details and try again.'
+    : null
+}
+
+// The details back, in the patient form's names, for Edit patient. Empty
+// when there are none yet (or this person may not read them).
+export async function loadAntenatalDetails(
+  client: SupabaseClient,
+  patientId: number,
+): Promise<Partial<PatientDetails>> {
+  const { data } = await client.rpc('antenatal_details', { patient: patientId })
+  const found = (data ?? {}) as Record<string, string | number | null>
+  const back: Partial<PatientDetails> = {}
+  for (const key of Object.keys(ANTENATAL_KEYS) as AntenatalKey[]) {
+    ;(back as Record<string, unknown>)[key] = found[ANTENATAL_KEYS[key]] ?? null
+  }
+  return back
 }

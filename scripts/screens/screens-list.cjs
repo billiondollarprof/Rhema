@@ -226,6 +226,8 @@ module.exports.SCREENS = [
     role: 'doctor',
     roomId: 2,
     extra: RECORD_DAY,
+    // Request 227: Print and Email at the top; Void on a saved note.
+    mustSee: ['Prescribe', 'Request lab', 'Print', 'Email record', 'Void'],
   },
   // Request 224: the ward's sheets and the consultation, full page.
   {
@@ -235,6 +237,8 @@ module.exports.SCREENS = [
     role: 'nurse',
     roomId: 6,
     extra: RECORD_DAY,
+    // Request 227b.
+    mustSee: ['+ Add another row', 'Save line'],
   },
   {
     path: '/patients/record/sheet/?p=1&s=vitals',
@@ -251,6 +255,8 @@ module.exports.SCREENS = [
     role: 'doctor',
     roomId: 2,
     extra: RECORD_DAY,
+    // Request 227d: Prescription and Request lab inside the note.
+    mustSee: ['+ Write a prescription', '+ Request a lab test', 'Save consultation'],
   },
   // Request 170: an antenatal patient's record, with the booking and the consent.
   {
@@ -259,7 +265,48 @@ module.exports.SCREENS = [
     medical: true,
     extra: { 'rest/v1/patients': { ...require('./mock.cjs').PATIENT, category: 'antenatal' } },
   },
-  { path: '/install/', waitFor: 'Get RHEMA on every device' },
+  { path: '/install/', waitFor: 'Get RHEMA on every device', mustSee: ['Back to the app'] },
+  // Request 227g: choosing Antenatal shows the antenatal card's details.
+  {
+    path: '/patients/register/',
+    waitFor: 'Register patient',
+    press: 'Antenatal',
+    mustSee: ['Antenatal details', 'Marital status', 'Occupation', 'Age'],
+  },
+  // Request 227k: the Front Desk sees what is waiting for payment.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Adaeze Okafor',
+    extra: {
+      'rest/v1/prescriptions': [
+        {
+          id: 1,
+          patient_id: 1,
+          note: null,
+          status: 'dispensed',
+          prescribed_at: '2026-11-18T08:00:00Z',
+          dispensed_at: null,
+          also_sent: false,
+          payment_id: null,
+          patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+          prescriber: { full_name: 'Dr Bello' },
+          items: [
+            {
+              id: 10,
+              drug: 'Amoxicillin',
+              strength: '500 mg capsule',
+              dose: null,
+              how_often: null,
+              days: null,
+              quantity: '15',
+              note: null,
+            },
+          ],
+        },
+      ],
+    },
+    mustSee: ['Drugs to pay for', 'Already given. Not paid yet.', 'Take payment'],
+  },
   // Request 156: the two documents, open without signing in.
   { path: '/privacy/', waitFor: 'Your rights' },
   { path: '/terms/', waitFor: 'Your account is yours alone' },
@@ -429,7 +476,13 @@ module.exports.SCREENS = [
   { path: '/admin/?tab=invite', waitFor: 'Invite a new staff member', admin: true },
   { path: '/admin/?tab=rooms', waitFor: 'Add a room', admin: true },
   { path: '/admin/?tab=activity', waitFor: 'activities today', admin: true },
-  { path: '/admin/?tab=data', waitFor: 'This file holds every patient', admin: true },
+  {
+    path: '/admin/?tab=data',
+    waitFor: 'This file holds every patient',
+    admin: true,
+    // Request 226b.
+    mustSee: ['Download our data', 'Monthly copy to Google Drive', 'Connect Google Drive'],
+  },
   // Settings part 1 (2026-11-16): the price list, with made up prices.
   {
     path: '/admin/?tab=prices',
