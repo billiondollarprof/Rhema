@@ -1115,3 +1115,13 @@
   background: var(--c-b42318);
   border-color: var(--c-b42318);
 }
+
+/* Register from old file: the antenatal card's details (request 227o). */
+.anteBox {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--tint-1);
+}

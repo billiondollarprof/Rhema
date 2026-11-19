@@ -376,6 +376,8 @@ export type OldFileExtras = Partial<
     | 'next_of_kin_relationship'
     | 'next_of_kin_phone'
     | 'first_registered_on'
+    // Joining a family started on another old file (request 227o).
+    | 'family_id'
   >
 >
 
@@ -616,3 +618,16 @@ export async function loadAntenatalDetails(
   }
   return back
 }
+
+// ===== 1b. The antenatal card's answers (request 227g) =====
+// Usual answers in a drop down; "Other" lets the Front Desk type any.
+export const ANTENATAL_MARITAL = ['Single', 'Married', 'Divorced', 'Separated', 'Widowed']
+export const ANTENATAL_RELIGION = ['Christian', 'Muslim', 'Traditional']
+export const ANTENATAL_EDUCATION = [
+  'None',
+  'Primary',
+  'Secondary (SSCE)',
+  'OND / NCE',
+  'HND / Degree',
+  'Postgraduate',
+]

@@ -28,6 +28,9 @@ import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
 import { PAYMENT_MODES, type PaymentMode } from '@/lib/lab/lab'
 import {
+  ANTENATAL_EDUCATION as EDUCATION,
+  ANTENATAL_MARITAL as MARITAL,
+  ANTENATAL_RELIGION as RELIGION,
   cleanPhone,
   phoneLooksRight,
   type Category,
@@ -147,18 +150,7 @@ function tidy(details: PatientDetails): PatientDetails {
   }
 }
 
-// ===== 1b. The antenatal card's answers (request 227g) =====
-// Usual answers in a drop down; "Other" lets the Front Desk type any.
-const MARITAL = ['Single', 'Married', 'Divorced', 'Separated', 'Widowed']
-const RELIGION = ['Christian', 'Muslim', 'Traditional']
-const EDUCATION = [
-  'None',
-  'Primary',
-  'Secondary (SSCE)',
-  'OND / NCE',
-  'HND / Degree',
-  'Postgraduate',
-]
+// ===== 1b. The antenatal card's answers: lib/patients (request 227g) =====
 
 // What is wrong, field by field, in words. Empty when all is well.
 function check(details: PatientDetails): Record<string, string> {
