@@ -331,6 +331,13 @@ module.exports.SCREENS = [
     extra: QUEUE_PRIORITY,
   },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },
+  // Request 227o: Antenatal on an old file shows the antenatal card's details.
+  {
+    path: '/patients/old-file/',
+    waitFor: 'Register from old file',
+    press: 'Antenatal',
+    mustSee: ['Antenatal details', 'Marital status', 'Occupation', 'Age'],
+  },
   { path: '/messages/', waitFor: 'From Front Desk' },
   { path: '/messages/?c=room:8', waitFor: 'Write the first one below' },
   { path: '/announce/', waitFor: 'Show on Home until', medical: true },

@@ -1,0 +1,146 @@
+-- =============================================================================
+-- 20261119015150_pharmacy_drug_list_2026_11_18.sql
+--
+-- What this is: the medicines and supplies on the Pharmacy's handwritten
+-- list (photos of 2026-11-18) that the medicine list did not have yet,
+-- added as standard lines. Nothing already there is changed or removed.
+--
+-- Why: Anthony, 2026-11-18 (request 227i): "If there's anyone in these
+-- screenshots... that is not in the system... include those... And if
+-- there's anyone in the system that is not in the list, still leave it...
+-- better to be more than to be less." Brand names (Augmentin, Flagyl...)
+-- are added under their own names, so a search finds what is typed.
+--
+-- Rules: insert only; a line already there (same name and strength, any
+-- letter case) is skipped, so running it twice adds nothing.
+--
+-- Never: change or remove a line already on the list.
+-- =============================================================================
+
+insert into public.medicine_list (name, strength, kind, status, source, added_by)
+select v.name, v.strength, v.kind, 'standard', 'starter', null
+from (values
+  ('Pefloxacin', '400 mg tablet', 'medicine'),
+  ('Celecoxib', '200 mg capsule', 'medicine'),
+  ('Novamentine', '375 mg tablet', 'medicine'),
+  ('Novamentine', '625 mg tablet', 'medicine'),
+  ('Methocarbamol', '500 mg tablet', 'medicine'),
+  ('Amoksiklav', '500 mg tablet', 'medicine'),
+  ('Augmentin', '625 mg tablet', 'medicine'),
+  ('Rabeprazole', '20 mg capsule', 'medicine'),
+  ('Bromazepam', '3 mg tablet', 'medicine'),
+  ('Aceclofenac', '100 mg tablet', 'medicine'),
+  ('Camosunate', 'tablet', 'medicine'),
+  ('Acel Plus', 'tablet', 'medicine'),
+  ('Prazosin', 'tablet', 'medicine'),
+  ('Zinc sulfate', '10 mg dispersible tablet', 'medicine'),
+  ('Cafergot', '100 mg tablet', 'medicine'),
+  ('Voltaren', '100 mg suppository', 'medicine'),
+  ('Citicoline', '500 mg tablet', 'medicine'),
+  ('Dulcolax', '10 mg suppository', 'medicine'),
+  ('Voltaren', 'gel', 'medicine'),
+  ('Diaflush loperamide', '2 mg tablet', 'medicine'),
+  ('Zinc sulfate', '20 mg tablet', 'medicine'),
+  ('Limotin loperamide', '2 mg tablet', 'medicine'),
+  ('Avomine', '25 mg tablet', 'medicine'),
+  ('Krishat multivitamin', 'capsule', 'medicine'),
+  ('Flora Norm', 'tablet', 'medicine'),
+  ('Cod liver oil', '100 mg capsule', 'medicine'),
+  ('Glucophage', '1000 mg tablet', 'medicine'),
+  ('Glucophage', '500 mg tablet', 'medicine'),
+  ('Diabetmin', '500 mg tablet', 'medicine'),
+  ('Glanil', '5 mg tablet', 'medicine'),
+  ('Stugeron', '25 mg tablet', 'medicine'),
+  ('Timpral', 'tablet', 'medicine'),
+  ('Cefpodoxime proxetil', '200 mg tablet', 'medicine'),
+  ('Artemether-lumefantrine', '80/480 mg tablet', 'medicine'),
+  ('Amatem softgel', '80/480 mg capsule', 'medicine'),
+  ('Losartan potassium', '100 mg tablet', 'medicine'),
+  ('Losartan potassium', '50 mg tablet', 'medicine'),
+  ('Cardiotan', '80/10 mg tablet', 'medicine'),
+  ('Normoretic', '5 mg tablet', 'medicine'),
+  ('Aldocure', '25 mg tablet', 'medicine'),
+  ('Vasoprin', '75 mg tablet', 'medicine'),
+  ('Baclofen', '10 mg tablet', 'medicine'),
+  ('Diamicron MR', '60 mg tablet', 'medicine'),
+  ('Carzepin', '200 mg tablet', 'medicine'),
+  ('Neurovit Forte', 'tablet', 'medicine'),
+  ('Crystalline penicillin', 'injection', 'medicine'),
+  ('Diclofenac sodium', '75 mg injection', 'medicine'),
+  ('Vitamin K', 'injection', 'medicine'),
+  ('Tiniflox', '600/200 mg tablet', 'medicine'),
+  ('Dynamogen', 'syrup', 'medicine'),
+  ('Magnesium sulfate', 'injection', 'medicine'),
+  ('Tonomycin', 'injection', 'medicine'),
+  ('Phenytoin sodium', '100 mg injection', 'medicine'),
+  ('Dopamine', '200 mg injection', 'medicine'),
+  ('Phenobarbitone', '100 mg injection', 'medicine'),
+  ('Ferrous sulfate', '200 mg tablet', 'medicine'),
+  ('Calcium', '300 mg tablet', 'medicine'),
+  ('Emal', '150 mg injection', 'medicine'),
+  ('Fynamed', 'cream', 'medicine'),
+  ('Fynamed', 'tablet', 'medicine'),
+  ('Klovinal', 'tablet', 'medicine'),
+  ('Combicleer', 'cream', 'medicine'),
+  ('Neurogesic', 'cream', 'medicine'),
+  ('Neoskin', 'cream', 'medicine'),
+  ('Lofnac', 'gel cream', 'medicine'),
+  ('Visita Plus', 'cream', 'medicine'),
+  ('Rosean', 'cream', 'medicine'),
+  ('Nasal cannula', 'nose mask', 'item'),
+  ('Drip set', 'set', 'item'),
+  ('Kilmal', 'tablet', 'medicine'),
+  ('ACT', '24 tablet', 'medicine'),
+  ('Tribotan', 'cream', 'medicine'),
+  ('Disposable syringe', 'catheter', 'item'),
+  ('Flagyl', '500 mg infusion', 'medicine'),
+  ('Normal saline', 'infusion', 'medicine'),
+  ('Cannula', 'blue', 'item'),
+  ('Cannula', 'yellow', 'item'),
+  ('Cannula', 'pink', 'item'),
+  ('Cannula', 'green', 'item'),
+  ('Diastop', '200 mg suspension', 'medicine'),
+  ('Augmentin', '228.5 mg suspension', 'medicine'),
+  ('Sizart', '125 mg suspension', 'medicine'),
+  ('Oxispa', '125 mg syrup', 'medicine'),
+  ('Brustan-N', '100 mg suspension', 'medicine'),
+  ('Combifen', 'syrup', 'medicine'),
+  ('Ciprotab', 'eye and ear drops', 'medicine'),
+  ('Tanzol', 'suspension', 'medicine'),
+  ('Wormin', 'tablet', 'medicine'),
+  ('Nasodyne', 'adult syrup', 'medicine'),
+  ('Nasodyne', 'children syrup', 'medicine'),
+  ('Honey cof Beeliève', 'syrup', 'medicine'),
+  ('Emvite multivitamin', 'syrup', 'medicine'),
+  ('Cypril Gold', 'syrup', 'medicine'),
+  ('M&B paracetamol', 'syrup', 'medicine'),
+  ('Emzor paracetamol', 'syrup', 'medicine'),
+  ('Panda paracetamol', '125 mg syrup', 'medicine'),
+  ('Amodiaquine', 'suspension', 'medicine'),
+  ('Cotton gauze', 'roll', 'item'),
+  ('Penicillin', 'ointment', 'medicine'),
+  ('Cof N Cold', 'syrup', 'medicine'),
+  ('Broncholyte', 'syrup', 'medicine'),
+  ('Flu-J', 'syrup', 'medicine'),
+  ('Cattefed', 'syrup', 'medicine'),
+  ('Haemaron', 'syrup', 'medicine'),
+  ('Antacid', 'suspension', 'medicine'),
+  ('Dextrose', '10% water', 'medicine'),
+  ('Dextrose', '5% water', 'medicine'),
+  ('Dextrose saline', '5%', 'medicine'),
+  ('Dextrose saline', '4.3%', 'medicine'),
+  ('Normal saline', '0.9%', 'medicine'),
+  ('Ringer''s lactate', 'infusion', 'medicine'),
+  ('Mannitol', '20% infusion', 'medicine'),
+  ('Natal Gold', 'tablet', 'medicine'),
+  ('Suprafem Plus', 'tablet', 'medicine'),
+  ('Peptikit', 'tablet', 'medicine'),
+  ('Augmentin', 'tablet', 'medicine'),
+  ('Livolin', 'tablet', 'medicine'),
+  ('Hemzl', 'tablet', 'medicine')
+) as v(name, strength, kind)
+where not exists (
+  select 1 from public.medicine_list m
+  where lower(m.name) = lower(v.name)
+    and lower(coalesce(m.strength, '')) = lower(coalesce(v.strength, ''))
+);

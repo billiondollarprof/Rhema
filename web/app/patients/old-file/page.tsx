@@ -23,6 +23,11 @@
  *   3. the patient is saved, then each file is sent and recorded. A file
  *      that fails can be sent again without saving the patient twice.
  *
+ * Antenatal and Family (request 227o, 2026-11-19): choosing Antenatal shows
+ * the antenatal card's details (saved into the antenatal booking); a Family
+ * patient gets "Add family member" after saving, which starts the family
+ * and opens a fresh old file form that joins it (?family=12).
+ *
  * Never: register silently over a patient with the same phone. Never show
  * the old file's contents here: only somebody with the medical record may
  * open it.
@@ -30,21 +35,28 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import FilePicker from '../_parts/FilePicker'
 import OptionSelect from '@/components/options/OptionSelect'
+import SearchSelect from '@/components/options/SearchSelect'
 import styles from '../_parts/patients.module.css'
 import { lastSeenWords } from '../_parts/PatientDetail'
 import type { ReadyFile } from '@/lib/files/files'
 import { attachFiles } from '@/lib/patients/patientFiles'
 import {
+  ANTENATAL_EDUCATION,
+  ANTENATAL_MARITAL,
+  ANTENATAL_RELIGION,
   cleanPhone,
+  familyNumber,
   findSamePhone,
   phoneLooksRight,
   registerFromOldFile,
+  saveAntenatalDetails,
+  startFamily,
   type Category,
   type PatientCard,
   type PatientResult,
@@ -66,7 +78,11 @@ export default function OldFilePage() {
   const [born, setBorn] = useState('')
   const [sex, setSex] = useState<Sex | null>(null)
   // The front desk asked for it (2026-11-16): individual, family or antenatal.
-  const [category, setCategory] = useState<Category>('individual')
+  const [category, setCategory] = useState<Category>(() =>
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('family')
+      ? 'family'
+      : 'individual',
+  )
   // The month the old file was first opened (Anthony, 2026-11-16: "they're
   // registering the patients month by month"). Kept after Register another,
   // because the next file is usually from the same month.
@@ -93,6 +109,44 @@ export default function OldFilePage() {
   const [saved, setSaved] = useState<PatientCard | null>(null)
   const [failed, setFailed] = useState<ReadyFile[]>([])
   const [sentCount, setSentCount] = useState(0)
+
+  // ===== 0a. The antenatal card's details (request 227o, 2026-11-19: "when
+  // the person selects antenatal, did the person have the extra field...").
+  // Saved into the antenatal booking, as on Register patient. =====
+  const emptyAntenatal = {
+    client_marital_status: '',
+    client_religion: '',
+    client_education: '',
+    client_occupation: '',
+    kin_occupation: '',
+    kin_religion: '',
+    kin_education: '',
+    kin_age: '',
+  }
+  const [antenatal, setAntenatal] = useState(emptyAntenatal)
+  const setAnte = (key: keyof typeof emptyAntenatal) => (value: string) =>
+    setAntenatal((now) => ({ ...now, [key]: value }))
+
+  // ===== 0b. A family started on another old file (request 227o: "adding
+  // extra family members on the register from old file"). The address says
+  // which family (?family=12); this patient joins it. =====
+  const [familyId, setFamilyId] = useState<number | null>(() =>
+    typeof window === 'undefined'
+      ? null
+      : Number(new URLSearchParams(window.location.search).get('family')) || null,
+  )
+  const [familyCard, setFamilyCard] = useState<string | null>(null)
+  const [joining, setJoining] = useState(false)
+  useEffect(() => {
+    if (!client || !familyId) return
+    let current = true
+    void familyNumber(client, familyId).then((found) => {
+      if (current) setFamilyCard(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, familyId])
 
   if (auth.status !== 'ready' || !client || !staff) return null
 
@@ -176,12 +230,24 @@ export default function OldFilePage() {
         next_of_kin_relationship: more.kinRelationship || null,
         next_of_kin_phone: kinPhone || null,
         first_registered_on: month ? `${month}-01` : null,
+        ...(familyId && category === 'family' ? { family_id: familyId } : {}),
       },
     )
     if (result.problem || !result.patient) {
       setBusy(false)
       setProblem(result.problem)
       return
+    }
+    // The antenatal card's details go into the booking (request 227o).
+    if (category === 'antenatal') {
+      const typed = Object.fromEntries(
+        Object.entries(antenatal).map(([key, value]) => [
+          key,
+          key === 'kin_age' ? (value ? Number(value) : null) : value.trim() || null,
+        ]),
+      )
+      const problem = await saveAntenatalDetails(client, result.patient.id, typed)
+      if (problem) setProblem(problem)
     }
     setSaved(result.patient)
     if (files.length > 0) await sendFiles(result.patient, files)
@@ -193,7 +259,8 @@ export default function OldFilePage() {
     setPhone('')
     setBorn('')
     setSex(null)
-    setCategory('individual')
+    setCategory(familyId ? 'family' : 'individual')
+    setAntenatal(emptyAntenatal)
     setMore({
       email: '',
       address: '',
@@ -258,6 +325,30 @@ export default function OldFilePage() {
                 Try again
               </button>
             ) : null}
+            {/* A family: add the next member from their old file too
+                (request 227o), the same as on Register patient. */}
+            {saved.category === 'family' ? (
+              <button
+                className={`${styles.button} ${styles.primary}`}
+                disabled={busy || joining}
+                onClick={async () => {
+                  setJoining(true)
+                  const family = await startFamily(client, saved.id)
+                  setJoining(false)
+                  if (!family) {
+                    setProblem('The family could not be started. Check the network and try again.')
+                    return
+                  }
+                  router.push(`/patients/old-file/?family=${family}`)
+                  setFamilyId(family)
+                  startAgain()
+                  setCategory('family')
+                }}
+              >
+                <Icon name="users" size={16} /> {joining ? 'Starting…' : 'Add family member'}
+              </button>
+            ) : null}
+            {problem ? <p className={styles.error}>{problem}</p> : null}
             <button className={styles.button} disabled={busy} onClick={startAgain}>
               Register another old file
             </button>
@@ -416,6 +507,96 @@ export default function OldFilePage() {
               ))}
             </div>
           </div>
+          {familyCard ? (
+            <p className={styles.familyNote}>
+              Joining family <b>{familyCard}</b>. Choose another category to register this person on
+              their own.
+            </p>
+          ) : null}
+          {/* ===== The antenatal card's details, when Antenatal is chosen
+              (request 227o) ===== */}
+          {category === 'antenatal' ? (
+            <div className={styles.anteBox}>
+              <b>Antenatal details</b>
+              <div className={styles.fields2}>
+                {(
+                  [
+                    ['client_marital_status', 'Marital status', ANTENATAL_MARITAL, false],
+                    ['client_religion', 'Religion', ANTENATAL_RELIGION, true],
+                    ['client_education', 'Level of education', ANTENATAL_EDUCATION, true],
+                  ] as [keyof typeof emptyAntenatal, string, string[], boolean][]
+                ).map(([key, label, answers, other]) => (
+                  <div key={key} className={styles.field}>
+                    <label htmlFor={`old-${key}`}>{label}</label>
+                    <SearchSelect
+                      id={`old-${key}`}
+                      value={antenatal[key]}
+                      placeholder="Choose"
+                      options={answers.map((answer) => ({ value: answer, label: answer }))}
+                      onChange={setAnte(key)}
+                      onOther={other ? (typed) => typed && setAnte(key)(typed) : undefined}
+                    />
+                  </div>
+                ))}
+                <div className={styles.field}>
+                  <label htmlFor="old-client_occupation">Occupation</label>
+                  <input
+                    id="old-client_occupation"
+                    className={styles.input}
+                    maxLength={80}
+                    placeholder="e.g. Trader"
+                    value={antenatal.client_occupation}
+                    onChange={(event) => setAnte('client_occupation')(event.target.value)}
+                  />
+                </div>
+              </div>
+              <b>Next of kin</b>
+              <div className={styles.fields2}>
+                <div className={styles.field}>
+                  <label htmlFor="old-kin_occupation">Occupation</label>
+                  <input
+                    id="old-kin_occupation"
+                    className={styles.input}
+                    maxLength={80}
+                    placeholder="e.g. Driver"
+                    value={antenatal.kin_occupation}
+                    onChange={(event) => setAnte('kin_occupation')(event.target.value)}
+                  />
+                </div>
+                {(
+                  [
+                    ['kin_religion', 'Religion', ANTENATAL_RELIGION],
+                    ['kin_education', 'Level of education', ANTENATAL_EDUCATION],
+                  ] as [keyof typeof emptyAntenatal, string, string[]][]
+                ).map(([key, label, answers]) => (
+                  <div key={key} className={styles.field}>
+                    <label htmlFor={`old-${key}`}>{label}</label>
+                    <SearchSelect
+                      id={`old-${key}`}
+                      value={antenatal[key]}
+                      placeholder="Choose"
+                      options={answers.map((answer) => ({ value: answer, label: answer }))}
+                      onChange={setAnte(key)}
+                      onOther={(typed) => typed && setAnte(key)(typed)}
+                    />
+                  </div>
+                ))}
+                <div className={styles.field}>
+                  <label htmlFor="old-kin_age">Age</label>
+                  <input
+                    id="old-kin_age"
+                    className={styles.input}
+                    inputMode="numeric"
+                    placeholder="e.g. 40"
+                    value={antenatal.kin_age}
+                    onChange={(event) =>
+                      setAnte('kin_age')(event.target.value.replace(/\D/g, '').slice(0, 3))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null}
           {/* ===== More details, folded (2026-11-16) ===== */}
           <details className={styles.more}>
             <summary>More details (optional): address, next of kin, email</summary>
