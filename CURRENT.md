@@ -936,6 +936,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    2026-11-19, his notes after checking:
+    - g layout: "put it below the patient bio data at the top... the moment
+      the person selects antenatal, then that antenatal detail will just
+      appear below it... before contact address... Then the same with next
+      of kin, the extra information will just appear as part of the next of
+      kin." Storage (booking, drop the 8 empty columns) still to confirm.
+    - f: keep "Open RHEMA" at the bottom too.
+    - d: only those who prescribe (doctors) see Prescription in the note;
+      nurses see what was prescribed.
+    - k: confirmed; the Pharmacy may dispense before payment (straight to
+      the Pharmacy) and the Front Desk still sees it unpaid.
+    - j drafts: the banner offers "Continue your consultation note" (or
+      nursing note...) and "Discard draft". Discard deletes everything.
+    - j Correct: "Let the [vital] sign just have void only." Correct
+      expires: "30 minutes might even be too long, maybe 15 minutes.
+      Otherwise, it's void."
     LATE 2026-11-18: LIVE: j drafts (consultation, prescription, lab
     request, nursing note, both sheets; 30 min, scrambled, wiped at sign
     out) and Correct (consultation notes, nursing notes, vital signs);
