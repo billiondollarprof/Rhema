@@ -267,6 +267,13 @@ module.exports.SCREENS = [
     extra: { 'rest/v1/patients': { ...require('./mock.cjs').PATIENT, category: 'antenatal' } },
   },
   { path: '/install/', waitFor: 'Get RHEMA on every device', mustSee: ['Back to the app'] },
+  // Request 228c: the Front Desk's Take vitals, and its form.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Adaeze Okafor',
+    press: 'Take vitals',
+    mustSee: ['Take vitals for Adaeze Okafor', 'Temperature °C', 'Save vital signs'],
+  },
   // Request 227g: choosing Antenatal shows the antenatal card's details.
   {
     path: '/patients/register/',

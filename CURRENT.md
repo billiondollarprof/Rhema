@@ -849,6 +849,61 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+228. **Front desk: payments that expire, the family file first, Take vitals;
+    Given fills the nursing sheet.** (2026-11-19, in a new session; "I don't
+    want you to do any tasks that the other agent was doing before.")
+    a. Expiry: "a payment that has not been taken maybe after 24 hours. I
+       want it to expire and clean off by itself, since front desk did not
+       take that payment, because the person who was in session have left."
+    b. Family file first: "when you choose a family, you just fill in the
+       first details of that family... their family name, which is the
+       surname only... the system will automatically enter the date that
+       family was created... Then the family's own address... which include
+       the state and whatever. Then below it, you now see add family
+       member. So the system must insist, after you create that family...
+       that you add at least one family member... the full name of the
+       person. Let's say Lillian James... date of birth, all those stuff...
+       family would keep its category just the way it is, but the
+       information that is entered at first is shorter and it's not a
+       personal individual information." (This replaces "No family last
+       name needed", 2026-11-02.)
+    c. Take vitals for the Front Desk: "front desk used to enter vital signs
+       too... front desk will only see edit details button and sometimes
+       take payments. I want you to add a button where it says take vitals.
+       That take vitals is the same vital that will populate the vitals that
+       is inside of the medical record... so doctor can see the vitals that
+       the front desk has taken."
+    d. Given fills the nursing sheet: "once the nurse click on given... it
+       automatically populates that nursing chart there. So the nurse does
+       not have to manually come and type in the treatment... Same thing
+       with vitals." Checked in the code 2026-11-19: already so. Given on the
+       medication chart and the dose form write medications_given, which the
+       treatment sheet lists; vital signs on the record write vital_signs,
+       which the vital signs sheet lists. Asked him to check on testing.
+    Said back 2026-11-19. HIS YES TO ALL, 2026-11-19: "yes to all, start
+    with take vitals". Order: c, then a, then b.
+    a DECIDED: "If the drug is already given, show it as a payment that is
+       owed. If it is not given, expire it and grey it out. That they did
+       not pay, that's why they were not given." 24 hours. Not deleted.
+    b DECIDED: Register from old file works the same way. "restructure the
+       category... at the top left corner, show a drop down of category...
+       before they even start filling anything... individual followed by
+       family followed by antenatal." Family: the surname is compulsory, the
+       address is important, the time is marked by the system on save; a
+       phone number under the address, not compulsory; only fields that can
+       belong to a family. "personal information like birthday and next of
+       kin and other stuff only shows when they click add family member."
+    c DECIDED: Take vitals as said back: the Front Desk adds vital signs
+       only, into the same vital signs in the record, and never opens the
+       medical record.
+    c BUILT 2026-11-19: Take vitals on the patient's details (TakeVitals.tsx),
+       migration 20261119132802 (Front Desk adds readings in its own name,
+       reads back only its own, cannot void), test 057, 6 breaks caught.
+       HIS YES ON THE SQL, 2026-11-19. Shipping to testing.
+    "do not take any job that the other agent was doing before... make sure
+    the security of the platform is kept intact." Repository stays public
+    for now (GitHub cost); private at the end.
+
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major
