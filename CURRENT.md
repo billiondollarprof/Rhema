@@ -936,6 +936,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    o. Register from old file (2026-11-19): "When the person selects
+       antenatal, did the person have the extra field to fill in those extra
+       antenatal information?... the family. Is it also enabled for them to
+       be able to create a family group just like the normal registration
+       behaves?... adding extra family members on the register from old
+       file." Checked: neither did. Building both like normal registration.
     2026-11-19 LIVE: l consent signature (shrunk on the phone: a 2 MB photo
     sent as 118 KB; refused over 500 KB; View signature; migration
     20261119014627). i drug list READY, NOT RUN: 98 medicines and 5 supplies
