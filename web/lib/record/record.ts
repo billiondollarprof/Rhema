@@ -448,6 +448,14 @@ export const MEDICATION_STATUS: Record<MedicationStatus, { label: string; colour
   stopped: { label: 'Stopped', colour: 'red' },
 }
 
+// Correct is offered for 15 minutes after a note is written; after that,
+// only Void (Anthony, 2026-11-19, request 227j: "in case the nurses are
+// already working on it, you can't change it again... maybe 15 minutes").
+export const CORRECT_MINUTES = 15
+export function stillCorrectable(createdAt: string): boolean {
+  return Date.now() - new Date(createdAt).getTime() < CORRECT_MINUTES * 60 * 1000
+}
+
 export const VOID_REASONS = [
   'Entered by mistake',
   'Wrong patient',

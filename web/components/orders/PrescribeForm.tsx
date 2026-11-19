@@ -28,7 +28,8 @@ import styles from './orders.module.css'
 import { knownMedicines } from '@/lib/medicines/medicines'
 import type { PatientResult } from '@/lib/patients/patients'
 import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
-import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { useDraft } from '@/lib/drafts/drafts'
+import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
 type SendTo = 'front_desk' | 'pharmacy'
@@ -205,21 +206,17 @@ export default function PrescribeForm({
   return (
     <>
       {draft.restoredAt ? (
-        <p className={styles.draftBack}>
-          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
-          <button
-            type="button"
-            className={`${styles.button} ${styles.small}`}
-            onClick={() => {
-              setDrafts([{ ...EMPTY, key: nextKey }])
-              setNextKey(nextKey + 1)
-              setNote('')
-              draft.clear()
-            }}
-          >
-            Discard draft
-          </button>
-        </p>
+        <DraftBack
+          savedAt={draft.restoredAt}
+          what="prescription"
+          onContinue={draft.keep}
+          onDiscard={() => {
+            setDrafts([{ ...EMPTY, key: nextKey }])
+            setNextKey(nextKey + 1)
+            setNote('')
+            draft.clear()
+          }}
+        />
       ) : null}
       {/* ----- One block per drug ----- */}
       {drafts.map((draft, index) => (
