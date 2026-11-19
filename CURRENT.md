@@ -901,7 +901,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        reads back only its own, cannot void), test 057, 6 breaks caught.
        HIS YES ON THE SQL, 2026-11-19. LIVE 2026-11-19: CI, deploy and smoke
        test green on testing and live; 0 security warnings on both.
-    NEXT: a (expiry after 24 hours), then b (family file first).
+    a BUILT 2026-11-19: migration 20261119211756 (expire_unpaid, run by the
+       lists as they load; the database refuses to pay, dispense, take a
+       sample or record a result for one due to expire), test 058, 9 breaks
+       tried (2 conditions that only repeated the status check removed; the
+       anon grant break is still refused by the inner function). Record
+       shows "Expired, not paid" in grey; cards say "Owed: already given, not
+       paid yet." WAITING FOR HIS YES ON THE SQL.
+    NEXT: b (family file first).
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public
     for now (GitHub cost); private at the end.

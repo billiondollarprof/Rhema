@@ -238,7 +238,7 @@ function LabEntry({
           </small>
           {/* Sent straight to the Lab: say so (request 227k). */}
           {view === 'pay' && request.status === 'completed' ? (
-            <small className={styles.note}>Already tested. Not paid yet.</small>
+            <small className={styles.note}>Owed: already tested, not paid yet.</small>
           ) : null}
           {view === 'pay' && request.status === 'awaiting_test' ? (
             <small className={styles.note}>Sent straight to the Lab. Not paid yet.</small>

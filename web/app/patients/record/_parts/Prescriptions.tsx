@@ -62,11 +62,16 @@ export default function PrescriptionsSection({
           key={prescription.id}
           what={<b>{prescription.items.map((item) => item.drug).join(', ')}</b>}
           status={
-            <span
-              className={`${styles.pill} ${prescription.status === 'dispensed' ? styles.green : styles.orange}`}
-            >
-              {STATUS_WORDS[prescription.status]}
-            </span>
+            // Not paid within 24 hours, never given: grey (request 228a).
+            prescription.expired_at ? (
+              <span className={`${styles.pill} ${styles.grey}`}>Expired, not paid</span>
+            ) : (
+              <span
+                className={`${styles.pill} ${prescription.status === 'dispensed' ? styles.green : styles.orange}`}
+              >
+                {STATUS_WORDS[prescription.status]}
+              </span>
+            )
           }
           meta={`By ${prescription.prescriber?.full_name ?? 'the doctor'} · ${when(prescription.prescribed_at)}${
             prescription.dispensed_at ? ` · dispensed ${when(prescription.dispensed_at)}` : ''

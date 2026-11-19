@@ -9,8 +9,8 @@
  *
  * How:
  *   1. A screen in screens/screens-list.cjs lists, in mustSee, the words of
- *      each button or heading it must show. press names a button to tap
- *      first (for example Antenatal, to show what it opens).
+ *      each button or heading it must show. press names a button to tap,
+ *      or a folded record section to open, first (for example Antenatal).
  *   2. Each screen opens at a phone width and a desktop width, as the right
  *      person. For each word: found on the page, not hidden, not of zero
  *      size, not see-through, and reachable by scrolling (not cut off
@@ -90,7 +90,11 @@ function seen(words) {
       try {
         await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
         if (screen.press) {
-          await page.getByRole('button', { name: screen.press, exact: true }).first().click()
+          // A button by its words, or else a folded record section by its
+          // heading (request 228a: what is inside a section must be seen too).
+          const button = page.getByRole('button', { name: screen.press, exact: true }).first()
+          if (await button.count()) await button.click()
+          else await page.locator('summary', { hasText: screen.press }).first().click()
         }
         await page.waitForTimeout(1200)
       } catch {

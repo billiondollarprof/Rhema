@@ -58,8 +58,9 @@ export default function LabSection({
       // down, so the copy stays.
       if (saved && found.results.length + found.open.length === 0) return
       const dayAgo = Date.now() - 24 * 60 * 60 * 1000
+      // An expired test (request 228a) is not waiting, so it does not count.
       const fresh =
-        found.open.length > 0 ||
+        found.open.some((request) => !request.expired_at) ||
         found.results.some((result) => new Date(result.recorded_at).getTime() > dayAgo)
       setLab({ ...found, fresh })
     })
@@ -98,12 +99,17 @@ export default function LabSection({
             key={`open-${request.id}`}
             what={<b>{request.tests.join(', ')}</b>}
             status={
-              <span className={`${styles.pill} ${styles.orange}`}>
-                {/* Request 219c, number 4: the Laboratory has the sample. */}
-                {request.sample_taken_at && request.status === 'awaiting_test'
-                  ? `Sample taken ${when(request.sample_taken_at)}`
-                  : STATUS_WORDS[request.status]}
-              </span>
+              // Not paid within 24 hours, never tested: grey (request 228a).
+              request.expired_at ? (
+                <span className={`${styles.pill} ${styles.grey}`}>Expired, not paid</span>
+              ) : (
+                <span className={`${styles.pill} ${styles.orange}`}>
+                  {/* Request 219c, number 4: the Laboratory has the sample. */}
+                  {request.sample_taken_at && request.status === 'awaiting_test'
+                    ? `Sample taken ${when(request.sample_taken_at)}`
+                    : STATUS_WORDS[request.status]}
+                </span>
+              )
             }
             meta={`Asked by ${request.requester?.full_name ?? 'staff'} · ${when(request.requested_at)}`}
             voided={null}

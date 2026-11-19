@@ -14,6 +14,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { COMMON_LAB_TESTS } from './catalogue'
+import { EXPIRED_WORDS, expireUnpaid, isExpiredRefusal } from '@/lib/payments/expiry'
 
 // ===== 1. Shapes and words =====
 export type LabStatus = 'awaiting_payment' | 'awaiting_test' | 'completed' | 'voided'
@@ -29,6 +30,8 @@ export type LabRequest = {
   completed_at: string | null
   // When the Laboratory took the sample (request 219c); null before.
   sample_taken_at: string | null
+  // Not paid within 24 hours and never tested (request 228a); null otherwise.
+  expired_at: string | null
   patient: { full_name: string; patient_number: string } | null
   requester: { full_name: string } | null
 }
@@ -63,7 +66,7 @@ export const PAYMENT_MODES: [PaymentMode, string][] = [
 ]
 
 const REQUEST_COLUMNS =
-  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, ' +
+  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, ' +
   'patient:patients(full_name, patient_number), requester:staff!lab_requests_requested_by_fkey(full_name)'
 
 // "₦7,500.50", "₦7,500".
@@ -100,6 +103,8 @@ export async function listAwaitingPayment(
   client: SupabaseClient,
   patientId?: number,
 ): Promise<LabRequest[]> {
+  // First the database expires what was not paid in 24 hours (request 228a).
+  await expireUnpaid(client)
   let query = client
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
@@ -121,6 +126,7 @@ export async function payLabRequest(
     amount_paid: amount,
     paid_by: mode,
   })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   // "already_paid": somebody else at the desk paid it a moment ago. The
   // list refreshes and it drops off, so there is nothing to say.
   if (error || (data !== 'paid' && data !== 'already_paid')) {
@@ -142,6 +148,7 @@ export async function payLabRequestLines(
     lines,
     paid_by: mode,
   })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }
@@ -154,6 +161,7 @@ export async function payLabRequestLines(
 // goes to lab and front desk simultaneously"). An unpaid one shows as
 // waiting for payment and turns ready the moment it is paid.
 export async function listAwaitingTest(client: SupabaseClient): Promise<LabRequest[]> {
+  await expireUnpaid(client)
   const { data } = await client
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
@@ -195,6 +203,7 @@ export async function recordResults(
     patient: patientId,
     items,
   })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error) return 'The results could not be saved. Check the internet and try again.'
   if (data === 'not_paid') return 'This test has not been paid for yet. Ask the Front Desk.'
   if (data === 'missing_tests')
@@ -295,6 +304,7 @@ export async function loadPatientLab(
   client: SupabaseClient,
   patientId: number,
 ): Promise<{ results: LabResult[]; open: LabRequest[] }> {
+  await expireUnpaid(client)
   const [results, open] = await Promise.all([
     client
       .from('lab_results')
@@ -309,7 +319,8 @@ export async function loadPatientLab(
       .from('lab_requests')
       .select(REQUEST_COLUMNS)
       .eq('patient_id', patientId)
-      .in('status', ['awaiting_payment', 'awaiting_test'])
+      // Still waiting, or expired (shown in grey, request 228a).
+      .or('status.in.(awaiting_payment,awaiting_test),expired_at.not.is.null')
       .order('requested_at', { ascending: false }),
   ])
   return {
@@ -326,6 +337,7 @@ export async function markSampleTaken(
   requestId: number,
 ): Promise<string | null> {
   const { data, error } = await client.rpc('mark_sample_taken', { request: requestId })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error) return 'That did not save. Check the internet and try again.'
   if (data === 'not_paid') return 'This test has not been paid for yet.'
   return null

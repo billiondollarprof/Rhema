@@ -13,6 +13,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
+import { EXPIRED_WORDS, expireUnpaid, isExpiredRefusal } from '@/lib/payments/expiry'
 
 // ===== 1. Shapes and words =====
 export type PrescriptionStatus = 'awaiting_payment' | 'awaiting_dispense' | 'dispensed' | 'voided'
@@ -35,6 +36,8 @@ export type Prescription = {
   status: PrescriptionStatus
   prescribed_at: string
   dispensed_at: string | null
+  // Not paid within 24 hours and never given (request 228a); null otherwise.
+  expired_at: string | null
   // Sent also to the other place (request 130c), and whether it is paid.
   also_sent: boolean
   payment_id: number | null
@@ -74,7 +77,7 @@ export function itemWords(item: PrescriptionItem): string {
 }
 
 const COLUMNS =
-  'id, patient_id, note, status, prescribed_at, dispensed_at, also_sent, payment_id, ' +
+  'id, patient_id, note, status, prescribed_at, dispensed_at, expired_at, also_sent, payment_id, ' +
   'patient:patients(full_name, patient_number), ' +
   'prescriber:staff!prescriptions_prescribed_by_fkey(full_name), ' +
   'items:prescription_items(id, drug, strength, dose, how_often, days, quantity, note)'
@@ -97,7 +100,10 @@ export async function prescribe(
 }
 
 // ===== 3. Lists =====
+// Each list first lets the database expire what was not paid in 24 hours
+// (request 228a), so an expired one never shows as waiting.
 async function listWhere(client: SupabaseClient, filter: string, patientId?: number) {
+  await expireUnpaid(client)
   let query = client.from('prescriptions').select(COLUMNS).or(filter)
   if (patientId) query = query.eq('patient_id', patientId)
   const { data } = await query.order('prescribed_at')
@@ -145,6 +151,7 @@ export async function loadPatientPrescriptions(
   client: SupabaseClient,
   patientId: number,
 ): Promise<Prescription[]> {
+  await expireUnpaid(client)
   const { data } = await client
     .from('prescriptions')
     .select(COLUMNS)
@@ -167,6 +174,7 @@ export async function payPrescription(
     lines,
     paid_by: mode,
   })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }
@@ -178,6 +186,7 @@ export async function dispense(client: SupabaseClient, prescriptionId: number) {
   const { data, error } = await client.rpc('dispense_prescription', {
     prescription: prescriptionId,
   })
+  if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error) return 'It could not be saved. Check the internet and try again.'
   if (data === 'not_paid') return 'This prescription has not been paid for yet.'
   return null
