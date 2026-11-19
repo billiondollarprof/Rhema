@@ -899,7 +899,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     c BUILT 2026-11-19: Take vitals on the patient's details (TakeVitals.tsx),
        migration 20261119132802 (Front Desk adds readings in its own name,
        reads back only its own, cannot void), test 057, 6 breaks caught.
-       HIS YES ON THE SQL, 2026-11-19. Shipping to testing.
+       HIS YES ON THE SQL, 2026-11-19. LIVE 2026-11-19: CI, deploy and smoke
+       test green on testing and live; 0 security warnings on both.
+    NEXT: a (expiry after 24 hours), then b (family file first).
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public
     for now (GitHub cost); private at the end.
