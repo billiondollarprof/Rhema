@@ -12,6 +12,7 @@
  * opened medical record (the database refuses both).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { prepareSignature, uploadFile } from '../files/files'
 
 // ===== 1. Shapes and words =====
 export const TEST_WORDS: [string, string][] = [
@@ -166,6 +167,8 @@ export type Consent = Voided & {
   witnessed_on: string | null
   created_at: string
   recorder: { full_name: string } | null
+  // The scanned signature, one of the patient's files (request 227l).
+  signature_key?: string | null
 }
 
 const VOID = 'voided_at, void_reason, voider:staff!voided_by(full_name)'
@@ -215,7 +218,7 @@ export async function loadConsents(client: SupabaseClient, patientId: number): P
   const { data } = await client
     .from('operation_consents')
     .select(
-      `id, consenting_name, operation, relationship, address, consented_on, witness_name, witnessed_on, created_at, recorder:staff!recorded_by(full_name), ${VOID}`,
+      `id, consenting_name, operation, relationship, address, consented_on, witness_name, witnessed_on, created_at, signature_key, recorder:staff!recorded_by(full_name), ${VOID}`,
     )
     .eq('patient_id', patientId)
     .order('created_at', { ascending: false })
@@ -249,4 +252,33 @@ export async function saveBooking(
 // ===== 4. The doctor's dispensed notice (request 171c) =====
 export async function markDispenseSeen(client: SupabaseClient, prescriptionId: number) {
   await client.rpc('mark_dispense_seen', { prescription: prescriptionId })
+}
+
+// ===== The scanned signature of a consent (request 227l) =====
+// Shrinks it, stores it with the patient's files, and answers its key for
+// the consent, or the words to show when it cannot be used.
+export async function storeSignature(
+  client: SupabaseClient,
+  patientId: number,
+  file: File,
+  operation: string,
+): Promise<{ key: string } | string> {
+  const ready = await prepareSignature(file)
+  if (typeof ready === 'string') return ready
+  const named = {
+    ...ready,
+    name: `Consent signature, ${operation.trim().slice(0, 60)}${ready.name.slice(ready.name.lastIndexOf('.'))}`,
+  }
+  const stored = await uploadFile(client, named, 'record')
+  if (typeof stored === 'string') return stored
+  const { data, error } = await client.rpc('add_patient_file', {
+    patient: patientId,
+    key: stored.key,
+    name: named.name,
+    type: named.type,
+    size: named.size,
+  })
+  if (error || (data !== 'added' && data !== 'already_added'))
+    return 'The signature could not be saved. Check the internet and try again.'
+  return { key: stored.key }
 }

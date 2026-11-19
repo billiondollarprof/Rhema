@@ -263,6 +263,7 @@ module.exports.SCREENS = [
     path: '/patients/record/?p=1',
     waitFor: 'Antenatal booking',
     medical: true,
+    mustSee: ['Consent for an operation'],
     extra: { 'rest/v1/patients': { ...require('./mock.cjs').PATIENT, category: 'antenatal' } },
   },
   { path: '/install/', waitFor: 'Get RHEMA on every device', mustSee: ['Back to the app'] },

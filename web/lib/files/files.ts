@@ -224,3 +224,60 @@ export async function deleteFile(client: SupabaseClient, key: string): Promise<s
     return 'No network. Try again.'
   }
 }
+
+// ===== 9. A scanned signature: as small as it can be and still read =====
+// Anthony, 2026-11-18 (request 227l): "the system tries as much as possible
+// to reduce the signature... just a few kilobytes... refuse anything above
+// ... 500 kilobyte... tell them to scan or screenshot and then crop it...
+// the system should try to... reduce it itself before rejecting... visible
+// enough that you can see it". So: shrink step by step (smaller and lighter
+// each time) until it is about 150 KB or less, never below 600 pixels on
+// its longest side (still clear to read). Still over 500 KB: refused.
+export const SIGNATURE_MOST = 500 * 1024
+const SIGNATURE_AIM = 150 * 1024
+const TOO_BIG = 'This scan is too big. Scan or screenshot the signature, crop it, then try again.'
+
+export async function prepareSignature(file: File): Promise<ReadyFile | string> {
+  if (file.type === 'application/pdf') {
+    if (file.size > SIGNATURE_MOST) return TOO_BIG
+    return { blob: file, name: file.name, type: file.type, size: file.size }
+  }
+  if (!file.type.startsWith('image/')) return 'Choose a photo or a scan of the signature.'
+  let picture: ImageBitmap
+  try {
+    picture = await createImageBitmap(file)
+  } catch {
+    return 'This picture could not be opened. Take it again.'
+  }
+  // Tried in this order until one is small enough.
+  const steps: [number, number][] = [
+    [1200, 0.7],
+    [1000, 0.6],
+    [800, 0.5],
+    [600, 0.45],
+  ]
+  let best: Blob | null = null
+  for (const [side, quality] of steps) {
+    const scale = Math.min(1, side / Math.max(picture.width, picture.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(picture.width * scale)
+    canvas.height = Math.round(picture.height * scale)
+    const draw = canvas.getContext('2d')
+    if (!draw) break
+    // A white page under it, so a see-through scan never turns black.
+    draw.fillStyle = '#fff'
+    draw.fillRect(0, 0, canvas.width, canvas.height)
+    draw.drawImage(picture, 0, 0, canvas.width, canvas.height)
+    const shrink = (type: string) =>
+      new Promise<Blob | null>((done) => canvas.toBlob(done, type, quality))
+    let blob = await shrink('image/webp')
+    if (!blob || blob.type !== 'image/webp') blob = await shrink('image/jpeg')
+    if (blob && (!best || blob.size < best.size)) best = blob
+    if (best && best.size <= SIGNATURE_AIM) break
+  }
+  picture.close()
+  if (!best) return 'This picture could not be prepared. Try again.'
+  if (best.size > SIGNATURE_MOST) return TOO_BIG
+  const extension = best.type === 'image/webp' ? 'webp' : 'jpg'
+  return { blob: best, name: `Consent signature.${extension}`, type: best.type, size: best.size }
+}
