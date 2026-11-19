@@ -52,7 +52,11 @@ function seen(words) {
     let hidden = false
     for (let node = el; node; node = node.parentElement) {
       const style = getComputedStyle(node)
-      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) < 0.1) {
+      if (
+        style.display === 'none' ||
+        style.visibility === 'hidden' ||
+        Number(style.opacity) < 0.1
+      ) {
         hidden = true
         break
       }
@@ -107,5 +111,7 @@ function seen(words) {
     for (const problem of problems) console.log('  ' + problem)
     process.exit(1)
   }
-  console.log(`Visible audit passed: ${checked} buttons and sections seen, at a phone and a desktop width.`)
+  console.log(
+    `Visible audit passed: ${checked} buttons and sections seen, at a phone and a desktop width.`,
+  )
 })()

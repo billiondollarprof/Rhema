@@ -69,8 +69,7 @@ export default function PrivacyText() {
         </li>
         <li>
           <b>For antenatal care only:</b> marital status, religion, level of education and
-          occupation, and the same for your next of kin, with their age, as the antenatal card
-          asks.
+          occupation, and the same for your next of kin, with their age, as the antenatal card asks.
         </li>
         <li>
           <b>Your care:</b> visits, vital signs, conditions, allergies, consultation notes,
