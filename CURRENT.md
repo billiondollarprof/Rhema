@@ -936,6 +936,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    2026-11-19 LIVE: l consent signature (shrunk on the phone: a 2 MB photo
+    sent as 118 KB; refused over 500 KB; View signature; migration
+    20261119014627). i drug list READY, NOT RUN: 98 medicines and 5 supplies
+    not yet on the list, migration 20261119015150 kept in a git stash
+    ("227i drug list"), waiting for his yes on the list. Then the security
+    review.
     2026-11-19 LIVE: g antenatal (his yes: the 8 copied columns dropped by
     20261119011959; the Front Desk fills the antenatal booking's nine card
     details through save_antenatal_details, shown under the biodata when
