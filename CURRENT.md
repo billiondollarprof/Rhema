@@ -942,6 +942,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        be able to create a family group just like the normal registration
        behaves?... adding extra family members on the register from old
        file." Checked: neither did. Building both like normal registration.
+    2026-11-19 ALL OF 227 LIVE AND CHECKED: i drug list (98 medicines, 5
+    supplies, migration 20261119015150, his yes); o old file antenatal
+    details and Add family member. NEXT: the security and robustness
+    review he asked for.
     2026-11-19 LIVE: l consent signature (shrunk on the phone: a 2 MB photo
     sent as 118 KB; refused over 500 KB; View signature; migration
     20261119014627). i drug list READY, NOT RUN: 98 medicines and 5 supplies
