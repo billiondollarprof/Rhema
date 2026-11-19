@@ -15,6 +15,10 @@
  *      tests; previous pregnancies (and the baby if it died).
  *   3. ConsentSection (every patient): consents saved, and a new one.
  *
+ * Consent (request 227l, 2026-11-18): the signed form or the signature can
+ * be added as a photo or scan, shrunk on the phone first; View signature
+ * opens it.
+ *
  * Never: save a consent without its tick, or change one after it is saved
  * (a wrong one is voided with a reason, and a new one is saved).
  */
@@ -32,6 +36,7 @@ import {
   loadAntenatal,
   loadConsents,
   saveBooking,
+  storeSignature,
   testWords,
   type Booking,
   type Consent,
@@ -39,6 +44,7 @@ import {
   type AntenatalTest,
 } from '@/lib/record/antenatal'
 import { onChange } from '@/lib/live/changes'
+import { openFile } from '@/lib/files/files'
 import { ClientPart, DueDate, HistoryPart, VisitsPart } from './AntenatalVisits'
 
 type Props = { client: SupabaseClient; staffId: string; patientId: number }
@@ -666,6 +672,9 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
   const [ticked, setTicked] = useState(false)
   const [witnessTicked, setWitnessTicked] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // The scanned signature or signed form, optional (request 227l).
+  const [scan, setScan] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
   const set = (key: keyof typeof empty) => (value: string) =>
     setValues((now) => ({ ...now, [key]: value }))
 
@@ -683,6 +692,18 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
       setProblem('Tick the witness box, or leave the witness name empty.')
       return
     }
+    // The scan first: shrunk on this phone, kept with the patient's files.
+    setSaving(true)
+    let signatureKey: string | null = null
+    if (scan) {
+      const stored = await storeSignature(client, patientId, scan, values.operation)
+      if (typeof stored === 'string') {
+        setSaving(false)
+        setProblem(stored)
+        return
+      }
+      signatureKey = stored.key
+    }
     const answer = await addLine(client, 'operation_consents', {
       patient_id: patientId,
       consenting_name: values.consenting_name.trim(),
@@ -695,13 +716,16 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
       witness_ticked: Boolean(witness) && witnessTicked,
       witnessed_on: witness ? today() : null,
       recorded_by: staffId,
+      ...(signatureKey ? { signature_key: signatureKey } : {}),
     })
+    setSaving(false)
     setProblem(answer)
     if (!answer) {
       setAdding(false)
       setValues(empty)
       setTicked(false)
       setWitnessTicked(false)
+      setScan(null)
       void load()
     }
   }
@@ -732,6 +756,17 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
           status={<span className={`${styles.pill} ${styles.green}`}>Consented</span>}
           meta={`Recorded by ${line.recorder?.full_name ?? 'staff'}, ${when(line.created_at)}`}
           voided={voidedOf(line)}
+          actions={
+            line.signature_key ? (
+              <button
+                type="button"
+                className={styles.small}
+                onClick={() => void openFile(client, line.signature_key as string)}
+              >
+                View signature
+              </button>
+            ) : undefined
+          }
           voidable={{
             client,
             table: 'operation_consents',
@@ -788,6 +823,21 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
               onChange={set('witness_name')}
             />
           </div>
+          {/* The scanned signature or signed form (request 227l): shrunk to
+              a few kilobytes on this phone; still over 500 KB, refused. */}
+          <div className={styles.field}>
+            <label htmlFor="oc-scan">Signed form or signature (optional)</label>
+            <input
+              id="oc-scan"
+              type="file"
+              accept="image/*,application/pdf"
+              className={styles.input}
+              onChange={(event) => setScan(event.target.files?.[0] ?? null)}
+            />
+            <small className={styles.muted}>
+              A photo or scan. It is made small before it is sent.
+            </small>
+          </div>
           {values.witness_name.trim() ? (
             <label className={styles.checkbox}>
               <input
@@ -804,8 +854,8 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
       <div className={styles.actions}>
         {adding ? (
           <>
-            <button className={`${styles.small} ${styles.primary}`} onClick={add}>
-              Save consent
+            <button className={`${styles.small} ${styles.primary}`} disabled={saving} onClick={add}>
+              {saving ? 'Saving…' : 'Save consent'}
             </button>
             <button className={styles.small} onClick={() => setAdding(false)}>
               Cancel
