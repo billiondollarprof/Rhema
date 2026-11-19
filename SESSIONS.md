@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-19: request 227 finished and LIVE: drafts with Continue or
+  Discard, Correct for 15 minutes, antenatal details into the booking (the 8
+  copied columns removed), consent signature upload, old file antenatal and
+  family, the Pharmacy drug list, and two new checks (contrast in both
+  looks; every button and section can be seen). Next: the security review.
+
 - 2026-11-18: request 227 started. LIVE: install guide back button, stuck
   screens open in full, Prescription and Request lab inside the consultation,
   Waiting for payment for the Front Desk, readable in both looks (new

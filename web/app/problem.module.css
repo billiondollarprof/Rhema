@@ -1,0 +1,63 @@
+/*
+ * problem.module.css: the crash screen (app/error.tsx). Plain, readable
+ * in both looks.
+ */
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.card {
+  max-width: 460px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.card h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.card p {
+  margin: 0;
+  color: var(--mut);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  background: var(--bl);
+  color: #fff;
+}
+
+.secondary {
+  border: 1px solid var(--field-line);
+  background: var(--card);
+  color: var(--link);
+}
