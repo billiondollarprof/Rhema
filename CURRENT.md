@@ -936,6 +936,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        mode suitable and readable as well as light mode, so no text or
        design disappears simply because someone toggles dark mode." Also
        noted the words "dark look/light look": "seems okay though".
+    2026-11-19 LIVE: g antenatal (his yes: the 8 copied columns dropped by
+    20261119011959; the Front Desk fills the antenatal booking's nine card
+    details through save_antenatal_details, shown under the biodata when
+    Antenatal is chosen; Edit and the patient's page read them back); j draft
+    Continue/Discard, Correct 15 minutes, vital signs Void only; new
+    scripts/visible-audit.cjs ("check that each button created, each section
+    created can be seen"), in the screens skill. LEFT: l consent upload,
+    i drug list (show SQL first), then the security review.
     2026-11-19, his notes after checking:
     - g layout: "put it below the patient bio data at the top... the moment
       the person selects antenatal, then that antenatal detail will just
