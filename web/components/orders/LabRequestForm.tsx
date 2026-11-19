@@ -24,7 +24,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import TestSearch from './TestSearch'
 import styles from './orders.module.css'
 import { COMMON_TESTS, requestLab } from '@/lib/lab/lab'
-import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { useDraft } from '@/lib/drafts/drafts'
+import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import type { PatientResult } from '@/lib/patients/patients'
 
@@ -130,20 +131,16 @@ export default function LabRequestForm({
   return (
     <>
       {draft.restoredAt ? (
-        <p className={styles.draftBack}>
-          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
-          <button
-            type="button"
-            className={`${styles.button} ${styles.small}`}
-            onClick={() => {
-              setTests([])
-              setNote('')
-              draft.clear()
-            }}
-          >
-            Discard draft
-          </button>
-        </p>
+        <DraftBack
+          savedAt={draft.restoredAt}
+          what="lab request"
+          onContinue={draft.keep}
+          onDiscard={() => {
+            setTests([])
+            setNote('')
+            draft.clear()
+          }}
+        />
       ) : null}
       {/* ----- The tests ----- */}
       <div>

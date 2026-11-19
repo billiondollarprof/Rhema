@@ -47,7 +47,8 @@ import {
 } from '@/lib/medicines/medicines'
 import { addLine, type MedicalRecord } from '@/lib/record/record'
 import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
-import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { useDraft } from '@/lib/drafts/drafts'
+import DraftBack from '@/components/drafts/DraftBack'
 
 // ===== 1. Small helpers =====
 // "now" in the form a time box expects, from the internet's time, not the
@@ -321,20 +322,16 @@ function TreatmentSheet({ client, staffId, patientId, record, me, reload }: Shee
 
       {/* ----- The new rows ----- */}
       {draft.restoredAt ? (
-        <p className={styles.draftBack}>
-          {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
-          <button
-            type="button"
-            className={styles.button}
-            onClick={() => {
-              setEntries([blank(nextKey)])
-              setNextKey(nextKey + 1)
-              draft.clear()
-            }}
-          >
-            Discard draft
-          </button>
-        </p>
+        <DraftBack
+          savedAt={draft.restoredAt}
+          what="treatment sheet"
+          onContinue={draft.keep}
+          onDiscard={() => {
+            setEntries([blank(nextKey)])
+            setNextKey(nextKey + 1)
+            draft.clear()
+          }}
+        />
       ) : null}
       {entries.map((row, at) => (
         <div

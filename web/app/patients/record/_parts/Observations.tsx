@@ -20,7 +20,8 @@ import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
-import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { useDraft } from '@/lib/drafts/drafts'
+import DraftBack from '@/components/drafts/DraftBack'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import {
@@ -31,6 +32,7 @@ import {
   type MedicalRecord,
   type VitalMeasure,
   type Vitals,
+  stillCorrectable,
 } from '@/lib/record/record'
 import { recall, remember } from '@/lib/cache/memory'
 import SearchSelect from '@/components/options/SearchSelect'
@@ -260,16 +262,6 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
             id: vitals.id,
             staffId,
             onDone: reload,
-            // Correct: the same readings, ready to fix (request 227j).
-            onCorrect: () => {
-              const filled: Record<string, string> = { ...empty }
-              for (const key of Object.keys(empty)) {
-                const value = (vitals as unknown as Record<string, unknown>)[key]
-                filled[key] = value === null || value === undefined ? '' : String(value)
-              }
-              setValues(filled)
-              setAdding(true)
-            },
           }}
         >
           <VitalsReadings vitals={vitals} />
@@ -448,32 +440,31 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
             id: line.id,
             staffId,
             onDone: reload,
-            // Correct: the same words, ready to fix (request 227j).
-            onCorrect: () => {
-              setTitle(line.title ?? '')
-              setNote(line.note)
-              setAdding(true)
-            },
+            // Correct: the same words, ready to fix, for 15 minutes after
+            // writing (request 227j); after that only Void.
+            onCorrect: stillCorrectable(line.created_at)
+              ? () => {
+                  setTitle(line.title ?? '')
+                  setNote(line.note)
+                  setAdding(true)
+                }
+              : undefined,
           }}
         />
       ))}
       {adding ? (
         <div className={styles.form}>
           {draft.restoredAt ? (
-            <p className={styles.draftBack}>
-              {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
-              <button
-                type="button"
-                className={`${styles.small} ${styles.link}`}
-                onClick={() => {
-                  setTitle('')
-                  setNote('')
-                  draft.clear()
-                }}
-              >
-                Discard draft
-              </button>
-            </p>
+            <DraftBack
+              savedAt={draft.restoredAt}
+              what="nursing note"
+              onContinue={draft.keep}
+              onDiscard={() => {
+                setTitle('')
+                setNote('')
+                draft.clear()
+              }}
+            />
           ) : null}
           <div className={styles.field}>
             <label htmlFor="nursing-title">Title (optional)</label>

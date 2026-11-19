@@ -160,7 +160,7 @@ export function useDraft<T>({
   value: T
   isEmpty: (value: T) => boolean
   restore: (value: T) => void
-}): { restoredAt: number | null; clear: () => void } {
+}): { restoredAt: number | null; clear: () => void; keep: () => void } {
   const [restoredAt, setRestoredAt] = useState<number | null>(null)
   // Saving waits until the draft has been looked for, so an empty form
   // never overwrites a draft before it is put back.
@@ -202,6 +202,9 @@ export function useDraft<T>({
 
   return {
     restoredAt,
+    // Continue: the words stay in the form, and the line about the draft
+    // goes (request 227j, 2026-11-19).
+    keep: () => setRestoredAt(null),
     clear: () => {
       setRestoredAt(null)
       if (staffId && name) void clearDraft(staffId, name)

@@ -49,9 +49,10 @@ import PrescribeForm from '@/components/orders/PrescribeForm'
 import SearchSelect from '@/components/options/SearchSelect'
 import { medicineWords } from '@/lib/medicines/medicines'
 import { addPhrase, NOTE_PARTS, PHRASES } from '@/lib/record/phrases'
-import { addLine, when, type MedicalRecord } from '@/lib/record/record'
+import { addLine, stillCorrectable, when, type MedicalRecord } from '@/lib/record/record'
 import { ROUTES } from '@/lib/record/signers'
-import { draftWords, useDraft } from '@/lib/drafts/drafts'
+import { useDraft } from '@/lib/drafts/drafts'
+import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
 type Props = {
@@ -229,20 +230,16 @@ export default function ConsultationsSection({
       {adding ? (
         <div className={styles.form}>
           {draft.restoredAt ? (
-            <p className={styles.draftBack}>
-              {draftWords(draft.restoredAt, HOSPITAL_TIME_ZONE)}{' '}
-              <button
-                type="button"
-                className={`${styles.small} ${styles.link}`}
-                onClick={() => {
-                  setParts(empty)
-                  setMedicines([])
-                  draft.clear()
-                }}
-              >
-                Discard draft
-              </button>
-            </p>
+            <DraftBack
+              savedAt={draft.restoredAt}
+              what="consultation note"
+              onContinue={draft.keep}
+              onDiscard={() => {
+                setParts(empty)
+                setMedicines([])
+                draft.clear()
+              }}
+            />
           ) : null}
           <div className={styles.field}>
             <label htmlFor="consult-title">Title (optional)</label>
@@ -567,20 +564,23 @@ export default function ConsultationsSection({
                   id: line.id,
                   staffId,
                   onDone: reload,
-                  // Correct: the same words, ready to fix (request 227j).
-                  onCorrect: () => {
-                    setParts({
-                      title: line.title ?? '',
-                      complaint: line.complaint ?? '',
-                      findings: line.findings ?? '',
-                      assessment: line.assessment ?? '',
-                      plan: line.plan ?? '',
-                    })
-                    setMedicines([])
-                    setSaved(false)
-                    setAdding(true)
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  },
+                  // Correct: the same words, ready to fix, for 15 minutes
+                  // after writing (request 227j); after that only Void.
+                  onCorrect: !stillCorrectable(line.created_at)
+                    ? undefined
+                    : () => {
+                        setParts({
+                          title: line.title ?? '',
+                          complaint: line.complaint ?? '',
+                          findings: line.findings ?? '',
+                          assessment: line.assessment ?? '',
+                          plan: line.plan ?? '',
+                        })
+                        setMedicines([])
+                        setSaved(false)
+                        setAdding(true)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      },
                 }
               : undefined
           }

@@ -1,0 +1,45 @@
+/*
+ * draftBack.module.css: the "your unsaved draft is back" line (227j).
+ */
+.box {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--tint-3);
+  border: 1px solid var(--line);
+}
+
+.box p {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.continue,
+.discard {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.continue {
+  border: 1px solid var(--bl);
+  background: var(--bl);
+  color: #fff;
+}
+
+.discard {
+  border: 1px solid var(--field-line);
+  background: var(--card);
+  color: var(--ink);
+}
