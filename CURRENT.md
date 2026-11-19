@@ -1182,6 +1182,21 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     lights... That's why I actually added dark mode. Then evaluate the rate at
     which people say that dark mode helps the eye... whether dark mode is just
     enough." Research only, after the current work; he decides later.
+    RESEARCH DONE 2026-11-19 (sent to him, waiting for his choice):
+    - No reliable "rate": people often SAY dark mode helps, but measured
+      studies are mixed. Dark text on light reads more accurately (the
+      "positive polarity advantage"); whether dark mode eases strain
+      depends on the room's light. So dark mode alone is not enough.
+    - Main causes of screen eye strain (American Academy of Ophthalmology):
+      people blink half as much at screens; long staring; glare; small
+      text. Blue light glasses: no evidence, not recommended.
+    - Older screens dimmed low can flicker (PWM), which can cause strain and
+      headaches; better to keep the screen bright and dim inside the app.
+    - Proposed options (device setting, no cost, no database): 1 a Warm
+      paper look (off-white, softer black, less glare, still sharp);
+      2 Text size Normal / Larger; 3 Dim inside the app instead of turning
+      the screen down; 4 Automatic look by Nigeria time (light by day, dark
+      at night); 5 an optional rest reminder (20-20-20), off by default.
 
 221. **The medical record page: get it right.** (2026-11-17)
     a. "When I click the button that says add, suspend, or stop medicine, why
