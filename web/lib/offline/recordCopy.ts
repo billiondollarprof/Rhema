@@ -1,7 +1,7 @@
 /*
- * lib/offline/recordCopy.ts: the medical records of patients with a visit
- * open now, kept on this device so doctors and nurses can read them with no
- * network.
+ * lib/offline/recordCopy.ts: the medical records of the patients seen in
+ * this person's own room in the last 7 days (the newest 50), kept on this
+ * device so doctors and nurses can read them with no network.
  *
  * Why: Anthony, 2026-11-17 (request 224, his yes): "anyone with a visit now";
  * text only, files shown as there but opened with the network; "front desk
@@ -9,8 +9,12 @@
  * "we just don't want them to lose data"; it may not slow the system.
  *
  * How:
- *   1. For staff with medical access only. The database lists the open
- *      visits and writes each copy in the activity log (copy_open_visits).
+ *   1. For staff with medical access only. The database lists the patients
+ *      seen in their own room in the last 7 days, newest first, at most 50,
+ *      and writes each copy in the activity log (copy_room_visits; request
+ *      230c, 2026-11-20: "7 days for both doctors and nurses, and it should
+ *      be their own room... to keep everything light"). Before that it was
+ *      every visit open anywhere (copy_open_visits, request 224).
  *   2. Each record is read the normal way (the same screens' loaders), then
  *      the whole set is scrambled (AES-GCM) with a key made on this device
  *      that cannot be read out of the browser, and kept in IndexedDB.
@@ -136,17 +140,17 @@ async function readSet(staffId: string): Promise<SavedSet | null> {
   }
 }
 
-// ===== 4. Refresh: the open visits, read the normal way =====
+// ===== 4. Refresh: my room's last 7 days, read the normal way =====
 // Quiet: any failure leaves the last copy as it is. One at a time, so it
 // never competes with the screen the person is using.
 export async function refreshRecordCopy(client: SupabaseClient, staffId: string): Promise<void> {
-  const { data, error } = await client.rpc('copy_open_visits')
+  const { data, error } = await client.rpc('copy_room_visits')
   if (error || !Array.isArray(data)) return
   const records: Record<number, SavedRecord> = {}
   for (const patientId of data as number[]) {
     const patient = await getPatient(client, patientId)
     if (!patient) continue
-    // The copy itself was logged by copy_open_visits; this keeps the
+    // The copy itself was logged by copy_room_visits; this keeps the
     // record readable for the next 12 hours like any opening.
     const record = await loadRecord(client, patientId)
     if (!record) continue

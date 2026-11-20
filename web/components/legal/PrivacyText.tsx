@@ -20,6 +20,10 @@
  */
 import { BRAND } from '@/lib/brand/brand'
 
+// 20 November: the device copy for no network is the patients seen in the
+// person's own room in the last 7 days, at most 50 (request 230c, his yes).
+// Section 6 says so; LEGAL_VERSION stays (the same kind of copy, the same
+// protections, for a few more records).
 // 18 November: antenatal registration keeps the antenatal card's details
 // (request 227g). Section 2 says so; LEGAL_VERSION stays.
 // 17 November: a monthly text copy can go to the hospital's own online
@@ -37,7 +41,7 @@ import { BRAND } from '@/lib/brand/brand'
 export const LEGAL_EFFECTIVE = '9 November 2026'
 // 9 November: the providers are no longer named (his decision below). The
 // promises did not change, so LEGAL_VERSION stays and nobody re-agrees.
-export const LEGAL_UPDATED = '17 November 2026'
+export const LEGAL_UPDATED = '20 November 2026'
 // Saved with each staff agreement, so we know which words they agreed to.
 export const LEGAL_VERSION = '2026-11-08'
 
@@ -182,11 +186,11 @@ export default function PrivacyText() {
           hospital can open that account, and switching it on or off is written in the activity log.
         </li>
         <li>
-          So that doctors and nurses can keep working when the network is down, the records of
-          patients with a visit open right now are kept, scrambled, on the devices of signed in
-          clinical staff. Pictures and files are not kept. The copy is deleted when the person signs
-          out, and after 24 hours. Keeping it, and every record opened from it, is written in the
-          activity log.
+          So that doctors and nurses can keep working when the network is down, the records of the
+          patients seen in their own room in the last 7 days (at most 50) are kept, scrambled, on
+          the devices of signed in clinical staff. Pictures and files are not kept. The copy is
+          deleted when the person signs out, and after 24 hours. Keeping it, and every record opened
+          from it, is written in the activity log.
         </li>
         <li>
           Anything typed while the network is down waits on that device, and is sent as soon as the
