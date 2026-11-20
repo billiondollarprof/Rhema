@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-19 (afternoon, new session): request 228 recorded and said back;
+  his yes to all. 228c LIVE: Take vitals for the Front Desk (readings go into
+  the record; Front Desk adds in its own name, reads back only its own,
+  cannot void). 0 security warnings on testing and live. Next: 228a payments
+  that expire after 24 hours, then 228b family file first.
+
 - 2026-11-19: request 227 finished and LIVE: drafts with Continue or
   Discard, Correct for 15 minutes, antenatal details into the booking (the 8
   copied columns removed), consent signature upload, old file antenatal and

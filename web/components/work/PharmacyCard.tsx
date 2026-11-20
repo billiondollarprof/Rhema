@@ -203,7 +203,7 @@ function Entry({
           {/* Sent straight to the Pharmacy: say so, so nobody waits for it
               to be released (request 227k). */}
           {view === 'pay' && prescription.status === 'dispensed' ? (
-            <small className={styles.note}>Already given. Not paid yet.</small>
+            <small className={styles.note}>Owed: already given, not paid yet.</small>
           ) : null}
           {view === 'pay' && prescription.status === 'awaiting_dispense' ? (
             <small className={styles.note}>Sent straight to the Pharmacy. Not paid yet.</small>

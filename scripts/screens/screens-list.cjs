@@ -229,6 +229,46 @@ module.exports.SCREENS = [
     // Request 227: Print and Email at the top; Void on a saved note.
     mustSee: ['Prescribe', 'Request lab', 'Print', 'Email record', 'Void'],
   },
+  // Request 228a: a drug and a lab test not paid in 72 hours, in grey.
+  {
+    path: '/patients/record/?p=1',
+    waitFor: 'Write a consultation',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    press: 'Prescriptions',
+    extra: {
+      ...RECORD_DAY,
+      'rest/v1/prescriptions': [
+        {
+          id: 7,
+          patient_id: 1,
+          note: null,
+          status: 'voided',
+          prescribed_at: hoursAgo(30),
+          dispensed_at: null,
+          expired_at: hoursAgo(6),
+          also_sent: false,
+          payment_id: null,
+          patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+          prescriber: DOCTOR,
+          items: [
+            {
+              id: 1,
+              drug: 'Amoxicillin',
+              strength: '500 mg',
+              dose: '1 capsule',
+              how_often: 'Three times daily',
+              days: 5,
+              quantity: null,
+              note: null,
+            },
+          ],
+        },
+      ],
+    },
+    mustSee: ['Expired, not paid'],
+  },
   // Request 224: the ward's sheets and the consultation, full page.
   {
     path: '/patients/record/sheet/?p=1&s=drugs',
@@ -313,7 +353,7 @@ module.exports.SCREENS = [
         },
       ],
     },
-    mustSee: ['Drugs to pay for', 'Already given. Not paid yet.', 'Take payment'],
+    mustSee: ['Drugs to pay for', 'Owed: already given, not paid yet.', 'Take payment'],
   },
   // Request 156: the two documents, open without signing in.
   { path: '/privacy/', waitFor: 'Your rights' },
