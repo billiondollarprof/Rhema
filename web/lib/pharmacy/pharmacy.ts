@@ -36,7 +36,7 @@ export type Prescription = {
   status: PrescriptionStatus
   prescribed_at: string
   dispensed_at: string | null
-  // Not paid within 24 hours and never given (request 228a); null otherwise.
+  // Not paid within 72 hours and never given (request 228a); null otherwise.
   expired_at: string | null
   // Sent also to the other place (request 130c), and whether it is paid.
   also_sent: boolean
@@ -100,7 +100,7 @@ export async function prescribe(
 }
 
 // ===== 3. Lists =====
-// Each list first lets the database expire what was not paid in 24 hours
+// Each list first lets the database expire what was not paid in 72 hours
 // (request 228a), so an expired one never shows as waiting.
 async function listWhere(client: SupabaseClient, filter: string, patientId?: number) {
   await expireUnpaid(client)

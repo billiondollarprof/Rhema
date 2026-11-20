@@ -229,7 +229,7 @@ module.exports.SCREENS = [
     // Request 227: Print and Email at the top; Void on a saved note.
     mustSee: ['Prescribe', 'Request lab', 'Print', 'Email record', 'Void'],
   },
-  // Request 228a: a drug and a lab test not paid in 24 hours, in grey.
+  // Request 228a: a drug and a lab test not paid in 72 hours, in grey.
   {
     path: '/patients/record/?p=1',
     waitFor: 'Write a consultation',

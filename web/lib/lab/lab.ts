@@ -30,7 +30,7 @@ export type LabRequest = {
   completed_at: string | null
   // When the Laboratory took the sample (request 219c); null before.
   sample_taken_at: string | null
-  // Not paid within 24 hours and never tested (request 228a); null otherwise.
+  // Not paid within 72 hours and never tested (request 228a); null otherwise.
   expired_at: string | null
   patient: { full_name: string; patient_number: string } | null
   requester: { full_name: string } | null
@@ -103,7 +103,7 @@ export async function listAwaitingPayment(
   client: SupabaseClient,
   patientId?: number,
 ): Promise<LabRequest[]> {
-  // First the database expires what was not paid in 24 hours (request 228a).
+  // First the database expires what was not paid in 72 hours (request 228a).
   await expireUnpaid(client)
   let query = client
     .from('lab_requests')

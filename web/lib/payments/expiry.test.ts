@@ -5,7 +5,7 @@ import { expireUnpaid, isExpiredRefusal } from './expiry'
 
 describe('isExpiredRefusal', () => {
   it('knows the database refusing an expired one', () => {
-    expect(isExpiredRefusal({ message: 'expired: not paid within 24 hours' })).toBe(true)
+    expect(isExpiredRefusal({ message: 'expired: not paid within 72 hours' })).toBe(true)
   })
   it('does not mistake any other failure for it', () => {
     expect(isExpiredRefusal({ message: 'Failed to fetch' })).toBe(false)

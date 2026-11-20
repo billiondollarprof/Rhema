@@ -1,8 +1,8 @@
 -- =============================================================================
--- 20261119211756_unpaid_expire_after_24_hours.sql
+-- 20261119211756_unpaid_expire_after_72_hours.sql
 --
 -- What this is: a drug or lab test that nobody paid for, and that was never
--- given or tested, expires 24 hours after the doctor sent it. It leaves the
+-- given or tested, expires 72 hours after the doctor sent it. It leaves the
 -- Front Desk's, the Pharmacy's and the Lab's lists, and the record shows it
 -- in grey as "Expired, not paid". Nothing is deleted.
 --
@@ -12,9 +12,11 @@
 -- session have left." And: "If the drug is already given, show it as a
 -- payment that is owed. If it is not given, expire it and grey it out. That
 -- they did not pay, that's why they were not given."
+-- 72 hours, his choice on 2026-11-20 (it was 24): patients who go to look
+-- for money can come back a day or two later.
 --
 -- Rules:
---   - Expires: not paid, not cancelled, and older than 24 hours, and
+--   - Expires: not paid, not cancelled, and older than 72 hours (3 days), and
 --       a prescription: never dispensed (status not dispensed);
 --       a lab request: no sample taken and no result (status not completed).
 --     It becomes cancelled (status voided), with the time it expired.
@@ -46,7 +48,7 @@ set search_path = ''
 as $$
   select p.payment_id is null
      and p.status in ('awaiting_payment', 'awaiting_dispense')
-     and p.prescribed_at < now() - interval '24 hours';
+     and p.prescribed_at < now() - interval '72 hours';
 $$;
 
 create function private.lab_request_due_to_expire(r public.lab_requests)
@@ -58,7 +60,7 @@ as $$
   select r.payment_id is null
      and r.status in ('awaiting_payment', 'awaiting_test')
      and r.sample_taken_at is null
-     and r.requested_at < now() - interval '24 hours';
+     and r.requested_at < now() - interval '72 hours';
 $$;
 
 revoke execute on function private.prescription_due_to_expire(public.prescriptions) from public, anon;
@@ -120,7 +122,7 @@ as $$
 begin
   if private.prescription_due_to_expire(old)
      and (new.payment_id is not null or new.dispensed_at is not null or new.status = 'dispensed') then
-    raise exception 'expired: not paid within 24 hours' using errcode = '22023';
+    raise exception 'expired: not paid within 72 hours' using errcode = '22023';
   end if;
   return new;
 end;
@@ -136,7 +138,7 @@ begin
   if private.lab_request_due_to_expire(old)
      and (new.payment_id is not null or new.sample_taken_at is not null
           or new.completed_at is not null or new.status = 'completed') then
-    raise exception 'expired: not paid within 24 hours' using errcode = '22023';
+    raise exception 'expired: not paid within 72 hours' using errcode = '22023';
   end if;
   return new;
 end;

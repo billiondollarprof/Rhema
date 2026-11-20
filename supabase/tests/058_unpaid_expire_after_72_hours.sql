@@ -1,15 +1,15 @@
 -- =============================================================================
--- 058_unpaid_expire_after_24_hours.sql: tests for unpaid_expire_after_24_hours
+-- 058_unpaid_expire_after_72_hours.sql: tests for unpaid_expire_after_72_hours
 -- (request 228a, 2026-11-19).
 --
 -- What this proves:
 --   1. Before expiring: one due to expire cannot be paid, dispensed or have
 --      its sample taken; a young one can still be paid.
 --   2. expire_unpaid() expires only the unpaid ones never given or tested
---      and older than 24 hours, as cancelled with the time; it answers how
+--      and older than 72 hours, as cancelled with the time; it answers how
 --      many; it writes the activity log.
 --   3. Never expired: paid, dispensed (owed), sample taken, tested (owed),
---      or younger than 24 hours.
+--      or younger than 72 hours (a 2 hour and a 2 day old one).
 --   4. Gone from the Front Desk's waiting list.
 --   5. Nobody signed out, and no suspended staff, may run it; running it
 --      twice changes nothing more.
@@ -43,12 +43,13 @@ insert into public.prescriptions (patient_id, note, prescribed_by, prescribed_at
 select p.id, x.note, '00000000-0000-0000-0000-000000000582', now() - x.age, x.status::public.prescription_status, x.dispensed
 from public.patients p,
   (values
-    ('T58 old waiting',        interval '25 hours', 'awaiting_payment',  null::timestamptz),
-    ('T58 old straight',       interval '25 hours', 'awaiting_dispense', null),
-    ('T58 old straight second', interval '25 hours', 'awaiting_dispense', null),
-    ('T58 old given',          interval '25 hours', 'dispensed',         now() - interval '24 hours'),
-    ('T58 old paid',           interval '25 hours', 'awaiting_payment',  null),
-    ('T58 young',              interval '2 hours',  'awaiting_payment',  null)
+    ('T58 old waiting',        interval '73 hours', 'awaiting_payment',  null::timestamptz),
+    ('T58 old straight',       interval '73 hours', 'awaiting_dispense', null),
+    ('T58 old straight second', interval '73 hours', 'awaiting_dispense', null),
+    ('T58 old given',          interval '73 hours', 'dispensed',         now() - interval '24 hours'),
+    ('T58 old paid',           interval '73 hours', 'awaiting_payment',  null),
+    ('T58 young',              interval '2 hours',  'awaiting_payment',  null),
+    ('T58 two days',           interval '48 hours', 'awaiting_payment',  null)
   ) as x(note, age, status, dispensed)
 where p.full_name = 'T58 Patient';
 insert into public.prescription_items (prescription_id, drug)
@@ -60,11 +61,12 @@ select p.id, array['Malaria parasite'], x.note, '00000000-0000-0000-0000-0000000
        x.status::public.lab_status, x.sample, x.done
 from public.patients p,
   (values
-    ('T58 lab old waiting', interval '25 hours', 'awaiting_payment', null::timestamptz, null::timestamptz),
-    ('T58 lab old straight', interval '25 hours', 'awaiting_test',   null, null),
-    ('T58 lab old sample',  interval '25 hours', 'awaiting_test',    now() - interval '24 hours', null),
-    ('T58 lab old tested',  interval '25 hours', 'completed',        now() - interval '24 hours', now() - interval '23 hours'),
-    ('T58 lab young',       interval '2 hours',  'awaiting_payment', null, null)
+    ('T58 lab old waiting', interval '73 hours', 'awaiting_payment', null::timestamptz, null::timestamptz),
+    ('T58 lab old straight', interval '73 hours', 'awaiting_test',   null, null),
+    ('T58 lab old sample',  interval '73 hours', 'awaiting_test',    now() - interval '24 hours', null),
+    ('T58 lab old tested',  interval '73 hours', 'completed',        now() - interval '24 hours', now() - interval '23 hours'),
+    ('T58 lab young',       interval '2 hours',  'awaiting_payment', null, null),
+    ('T58 lab two days',    interval '48 hours', 'awaiting_payment', null, null)
   ) as x(note, age, status, sample, done)
 where p.full_name = 'T58 Patient';
 
@@ -165,7 +167,7 @@ begin
     raise exception 'FAIL 2: the expiring is not in the activity log';
   end if;
 end $$;
-\echo 'PASS 2: only unpaid ones never given or tested, older than 24 hours, expire'
+\echo 'PASS 2: only unpaid ones never given or tested, older than 72 hours, expire'
 \echo 'PASS 3: paid, given, sampled, tested and young ones stay'
 
 

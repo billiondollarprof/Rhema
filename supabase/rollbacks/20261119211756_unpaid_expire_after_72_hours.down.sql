@@ -1,5 +1,5 @@
 -- =============================================================================
--- Undo 20261119211756_unpaid_expire_after_24_hours.sql: nothing expires any
+-- Undo 20261119211756_unpaid_expire_after_72_hours.sql: nothing expires any
 -- more. Ones that already expired stay cancelled; only the expiry time goes.
 -- =============================================================================
 

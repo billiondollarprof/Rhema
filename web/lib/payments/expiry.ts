@@ -1,11 +1,11 @@
 /*
- * lib/payments/expiry.ts: drugs and lab tests not paid within 24 hours
+ * lib/payments/expiry.ts: drugs and lab tests not paid within 72 hours
  * expire (request 228a).
  *
  * Why: Anthony, 2026-11-19: "a payment that has not been taken maybe after
  * 24 hours. I want it to expire and clean off by itself... If the drug is
  * already given, show it as a payment that is owed. If it is not given,
- * expire it and grey it out."
+ * expire it and grey it out." 72 hours, his choice on 2026-11-20 (it was 24).
  *
  * How: the database decides what expires (expire_unpaid, migration
  * 20261119211756). The lists ask it to run just before they load, so what
@@ -33,7 +33,7 @@ export function expireUnpaid(client: SupabaseClient): Promise<void> {
 }
 
 // ===== 2. The words when the database refuses one that has expired =====
-export const EXPIRED_WORDS = 'This has expired. It was not paid within 24 hours.'
+export const EXPIRED_WORDS = 'This has expired. It was not paid within 72 hours.'
 
 export function isExpiredRefusal(error: { message?: string } | null): boolean {
   return Boolean(error?.message?.startsWith('expired'))

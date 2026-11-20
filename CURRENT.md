@@ -849,6 +849,19 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+229. **Consultants share patients; the matron as midwife.** (2026-11-20)
+    "consultants in room one have started seeing a patient... if they come
+    back for follow-up, consultants in room one is not around. Then
+    consultant in room two continues the consultation... but cannot delete,
+    cancel, or edit what consultant in room one has already done... is that
+    okay? Or... consultant in room two will not be able to attend to that
+    patient? What's your advice? I believe the first is better though...
+    Same with consultant in room two, room three, or room four." And: "the
+    consultant in room two tends to be the matron, who is also a midwife...
+    we did not even put any column for midwife in the system, but I believe
+    the database already trying to contain whatever the midwife needs as per
+    pregnancy, antenatal patients." ASKED FOR ADVICE; answered in chat.
+
 228. **Front desk: payments that expire, the family file first, Take vitals;
     Given fills the nursing sheet.** (2026-11-19, in a new session; "I don't
     want you to do any tasks that the other agent was doing before.")
@@ -907,7 +920,12 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        tried (2 conditions that only repeated the status check removed; the
        anon grant break is still refused by the inner function). Record
        shows "Expired, not paid" in grey; cards say "Owed: already given, not
-       paid yet." WAITING FOR HIS YES ON THE SQL.
+       paid yet."
+    a DECIDED 2026-11-20: 72 hours, not 24 ("what in case the person now said
+       they don't have money... they come back 2 days later?"). Migration
+       renamed 20261119211756_unpaid_expire_after_72_hours (never run
+       anywhere before). HIS YES ON THE SQL, 2026-11-20: "you can now go ahead
+       and run the SQL".
     NEXT: b (family file first).
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public
