@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-20: 228a LIVE: unpaid drugs and lab tests never given or tested
+  expire after 72 hours (his change from 24), grey in the record, owed ones
+  stay; 0 security warnings on testing and live. Recorded 229 (consultants
+  sharing patients, matron as midwife), advice given. Next: 228b family file.
+
 - 2026-11-19 (afternoon, new session): request 228 recorded and said back;
   his yes to all. 228c LIVE: Take vitals for the Front Desk (readings go into
   the record; Front Desk adds in its own name, reads back only its own,
