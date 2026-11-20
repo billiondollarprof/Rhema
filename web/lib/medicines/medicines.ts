@@ -72,19 +72,29 @@ export function knownMedicines(staffId: string | undefined): MedicineLine[] {
   }
 }
 
+const PAGE = 1000
+
 export async function loadMedicines(
   client: SupabaseClient,
   staffId: string,
 ): Promise<MedicineLine[] | null> {
-  const { data, error } = await client
-    .from('medicine_list')
-    .select(COLUMNS)
-    .order('name')
-    .order('strength')
-    .limit(5000)
-  // No network (or not set up yet): the caller keeps what it shows.
-  if (error || !data) return null
-  const lines = data as unknown as MedicineLine[]
+  // The database answers at most 1,000 rows at a time (Supabase's limit),
+  // so the list is read 1,000 at a time until it is all in (request 231,
+  // 2026-11-20: the list will pass 1,000 lines as the Pharmacy adds).
+  const lines: MedicineLine[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await client
+      .from('medicine_list')
+      .select(COLUMNS)
+      .order('name')
+      .order('strength')
+      .order('id')
+      .range(from, from + PAGE - 1)
+    // No network (or not set up yet): the caller keeps what it shows.
+    if (error || !data) return null
+    lines.push(...(data as unknown as MedicineLine[]))
+    if (data.length < PAGE) break
+  }
   remember(staffId, 'medicines', lines)
   try {
     localStorage.setItem(deviceKey(staffId), JSON.stringify(lines))

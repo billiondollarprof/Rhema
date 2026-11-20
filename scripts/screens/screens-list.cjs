@@ -223,6 +223,20 @@ const FAMILY_PATIENT = oneOrAll({
   family: { family_number: 'FAM-000012' },
 })
 
+// 80 made up medicine names, two strengths each (request 231).
+const MANY_MEDICINES = Array.from({ length: 160 }, (_, at) => ({
+  id: at + 1,
+  name: `Zz Medicine ${String(Math.floor(at / 2) + 1).padStart(2, '0')}`,
+  strength: at % 2 ? '500 mg tablet' : '250 mg tablet',
+  kind: 'medicine',
+  status: 'standard',
+  source: 'pharmacy',
+  is_active: true,
+  in_stock: null,
+  low_level: null,
+  unit: null,
+}))
+
 module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today' },
   // Home is different for every role (review pass, 2026-11-02).
@@ -420,6 +434,14 @@ module.exports.SCREENS = [
   { path: '/lab/patient/', waitFor: "Find a patient's tests", role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
   { path: '/pharmacy/list/', waitFor: 'Medicine list', role: 'pharmacy' },
+  // Request 231: every name shows (not only 60), each with Add another strength.
+  {
+    path: '/pharmacy/list/',
+    waitFor: 'Medicine list',
+    role: 'pharmacy',
+    extra: { 'rest/v1/medicine_list': MANY_MEDICINES },
+    mustSee: ['The list (80 medicines)', 'Zz Medicine 80', '+ Add another strength'],
+  },
   // Request 219c: Running low and Expiring soon at the top.
   { path: '/pharmacy/list/', waitFor: 'Running low', role: 'pharmacy', extra: PHARMACY_ALERTS },
   // Request 219c: the queue shows emergencies first.

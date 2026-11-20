@@ -849,6 +849,31 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+231. **The Pharmacy sees only a few medicines; add a strength or a size.**
+    (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
+    same ones given to the other agent for 227i) "the pharmacy is saying
+    that the drugs, they are not enough, they are not complete... There is
+    not enough medicine to choose from in the medicine list for the
+    pharmacist... I want the pharmacist to be able to see the list of all
+    the medicine that has been added into the system. But there are just a
+    few they are seeing, the supplies and all of those. So I'll need you to
+    check that." And: "on that row for a medicine that has been added
+    already, put a row that says add strength... cimetidine might have 400
+    milligram, 200 milligram... add another strength... Same thing with
+    supplies too... there may be like 5 sizes in the system currently, and
+    they want to add an additional size. They should be able to add."
+    (Earlier platforms he named for the lists: Swift Practice, Bama in
+    India, Epic in the United States, open repositories.)
+    FOUND 2026-11-20: every medicine on his 4 photos is already on the list
+    (some under another name: Augmentin, Cotrimoxazole for Septrin,
+    Cafergot, Vitamin C, Chlorpheniramine; cimetidine 200 and 400 mg;
+    syringes in 6 sizes). The cause: the Pharmacy's list showed only the
+    first 60 names until something was typed. BUILT (no SQL): every name
+    shows, with the count; "+ Add another strength" (supplies: "+ Add
+    another size") under each name, using add_medicine; the list is read
+    1,000 rows at a time (Supabase answers at most 1,000), so it never stops
+    short as it grows. Ships with the families SQL after his yes.
+
 230. **Run through everything; instant loading; drafts with no network.**
     (2026-11-20) "run through everything that you did. Ensure that nothing
     got broken... the app loads well. There's no lagging, and all the
