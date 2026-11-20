@@ -98,18 +98,26 @@ reset role;
 \echo 'PASS 2: bad requests are refused'
 
 
--- ===== 3. The lab cannot record a result before payment =====
+-- ===== 3. The lab may record a result before payment (request 232) =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c4"}', true);
 set local role authenticated;
 do $$
 begin
-  if public.record_lab_results((select id from public.lab_requests), null,
-       '[{"test": "Malaria test", "result": "Negative"}]'::jsonb) <> 'not_paid' then
-    raise exception 'FAIL 3: a result was recorded before payment';
-  end if;
+  begin
+  -- Since 2026-11-20 (request 232) this works before payment; the block
+  -- undoes itself so the steps below still start from an unpaid one.
+    if public.record_lab_results((select id from public.lab_requests), null,
+         '[{"test": "Malaria test", "result": "Negative"},
+           {"test": "Full Blood Count", "result": "Normal"}]'::jsonb) <> 'saved' then
+      raise exception 'FAIL 3: a result could not be recorded before payment';
+    end if;
+    raise exception 'undo';
+  exception when raise_exception then
+    if sqlerrm <> 'undo' then raise; end if;
+  end;
 end $$;
 reset role;
-\echo 'PASS 3: no result before payment'
+\echo 'PASS 3: a result can be recorded before payment'
 
 
 -- ===== 4. Only the Front Desk takes payment, once, in naira with its mode =====

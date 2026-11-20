@@ -76,20 +76,27 @@ reset role;
 \echo 'PASS 1: only the doctor who wrote it sends it also, once'
 
 
--- ===== 2. The Pharmacy still cannot dispense an unpaid one =====
+-- ===== 2. The Pharmacy may dispense an unpaid one (request 232) =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000d4"}', true);
 set local role authenticated;
 do $$
 begin
-  if public.dispense_prescription((select to_desk from t)) <> 'not_paid' then
-    raise exception 'FAIL 2: the Pharmacy dispensed before payment';
-  end if;
+  begin
+  -- Since 2026-11-20 (request 232) this works before payment; the block
+  -- undoes itself so the steps below still start from an unpaid one.
+    if public.dispense_prescription((select to_desk from t)) <> 'dispensed' then
+      raise exception 'FAIL 2: the Pharmacy could not dispense one waiting for payment';
+    end if;
+    raise exception 'undo';
+  exception when raise_exception then
+    if sqlerrm <> 'undo' then raise; end if;
+  end;
   if public.dispense_prescription((select to_pharmacy from t)) <> 'dispensed' then
     raise exception 'FAIL 2: one sent straight to the Pharmacy could not be dispensed';
   end if;
 end $$;
 reset role;
-\echo 'PASS 2: no dispensing before payment; straight to the Pharmacy still dispenses'
+\echo 'PASS 2: dispensing before payment works; straight to the Pharmacy still dispenses'
 
 
 -- ===== 3. One sent straight to the Pharmacy is paid once, status kept =====

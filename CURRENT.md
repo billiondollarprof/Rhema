@@ -849,6 +849,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+233. **Where prescriptions and lab requests go.** (2026-11-20) "you can
+    either send a medicine straight to the front desk only, or you send both
+    to the front desk and the pharmacist. When it comes to lab tests, you
+    either send to the front desk only, or you send both to the lab and the
+    front desk... There's no time you will send to lab or pharmacy, straight
+    to lab or straight to pharmacy without it sending to front desk... What
+    is sent to only the front desk, the pharmacist will not get any
+    notification. But if they search the patient and see, they will see...
+    something that is waiting... to be dispensed or carried out as a test.
+    But if it was sent to them, they will see the notification... if it's
+    sent to only front desk... Once the front desk click take payment...
+    The system automatically just sends it to lab... Same with pharmacy. But
+    if it was sent to both sides, then the system only updates the pharmacy
+    of the payment as well as lab of the payment." To check against the
+    code and say back.
+
 232. **Dispense and test before payment; the options; drafts never lost.**
     (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
     confirm that the lab and the pharmacy can dispense medicine or take a
@@ -871,6 +887,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     the computer they are using, something happens to it? So the drafts...
     should load into the system within the next 5 minutes or something like
     that. The system should try it until it's uploaded to the database."
+    LIVE 2026-11-20: families details only and the full Pharmacy list (0
+    security warnings on testing and live).
+    CHECKED 2026-11-20: NOT as he thought. One sent to the Front Desk first
+    (waiting for payment) could not be dispensed, sampled or tested until
+    paid (dispense_prescription, mark_sample_taken, record_lab_results,
+    add_lab_result answered not_paid; the buttons were hidden). Only one sent
+    straight to the Pharmacy or Lab could. The owed and 72 hour parts were
+    already as he says. BUILT: migration 20261120130854 (all four allow
+    waiting for payment; cancelled still refused), test 062, tests 009, 010,
+    013 and 047 now check the new rule (each in a block that undoes itself),
+    6 breaks caught; screens show "Not paid yet" with Dispensed, Sample taken
+    and Enter results. HIS YES ON THE SQL, 2026-11-20.
+    DECIDED 2026-11-20 on 230: (a) and (b) yes. (d): only what was SAVED with
+    no network must never be lost and must keep trying until it reaches the
+    database (already so; add a new family). Drafts typed but not saved stay
+    as they are: 30 minutes, wiped at sign out, never into the record ("let
+    it expire... if the computer turns off... no problem, since they didn't
+    save it"). No server copy of drafts. (c) yes: "7 days for both doctors
+    and nurses, and it should be their own room... light, scrambled, and
+    then it should wipe out as they log out."
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
