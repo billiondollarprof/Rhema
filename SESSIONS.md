@@ -4,6 +4,14 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-20 (afternoon): 228b LIVE: category drop down first on both
+  registration screens; a family registered with its own name, phone and
+  address, saved with its first member in one step; no card fee for later
+  members; Edit family details; families found by name. 0 security warnings
+  on testing and live. All screen checks now pick drop down options
+  (mock.cjs pressFirst). 228 and 229 moved to docs/DONE.md. Nothing of
+  228/229 left open.
+
 - 2026-11-20 (morning): 229 own notes only, his yes. Slip: a stray "do $$
   begin" in test 059 broke the file; mutate.sh then called every break
   CAUGHT, and my grep hid its "tests fail on the restored file" line. CI on
