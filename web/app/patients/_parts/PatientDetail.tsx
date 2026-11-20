@@ -17,6 +17,9 @@
  * Take vitals (request 228c, 2026-11-19): the Front Desk takes vital signs
  * here, and they go into the medical record for the doctor and nurses.
  *
+ * Drugs to give (request 233, 2026-11-20): the Pharmacy sees this patient's
+ * drugs still to give, paid or not, and dispenses them here.
+ *
  * Never: show the medical record here. It gets its own page, open only to
  * doctors, nurses and the matron, and every opening is logged. This card
  * only shows the "Medical record" button to staff with that access.
@@ -275,6 +278,13 @@ export default function PatientDetail({
           <PharmacyCard client={client} staff={staff} patientId={patient.id} />
           <LabCard client={client} staff={staff} patientId={patient.id} />
         </>
+      ) : null}
+
+      {/* Drugs to give (request 233, 2026-11-20): the Pharmacy finds a
+          patient's drugs, paid or not, even one sent to the Front Desk only,
+          and dispenses them here. */}
+      {!canPay && staff?.role === 'pharmacy' ? (
+        <PharmacyCard client={client} staff={staff} patientId={patient.id} />
       ) : null}
 
       {/* The family: its number, the other members, Add family member. */}

@@ -11,9 +11,9 @@
  * How it goes:
  *   1. One block per drug: name and strength, dose, how often, how many
  *      days, quantity, a note. "Add another drug" adds a block.
- *   2. Send to the Pharmacy and the Front Desk (payment), or straight to
- *      the Pharmacy (for example, an admitted patient).
- *   3. Sent: what happened, and "Also send to" the other place.
+ *   2. Send to the Front Desk and the Pharmacy (the default), or to the
+ *      Front Desk only: the Pharmacy gets it once it is paid (request 233).
+ *   3. Sent: what happened; Front Desk only offers "Also send to Pharmacy".
  *
  * Never: let anybody but a doctor send it. The database refuses it too.
  */
@@ -32,7 +32,11 @@ import { useDraft } from '@/lib/drafts/drafts'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
-type SendTo = 'front_desk' | 'pharmacy'
+// The Front Desk and the Pharmacy at once (the default), or the Front Desk
+// only: the Pharmacy then gets it once it is paid. Never straight to the
+// Pharmacy (request 233, 2026-11-20: "There's no time you will send... straight
+// to pharmacy without it sending to front desk").
+type SendTo = 'both' | 'front_desk'
 
 // ===== 1. What the doctor types for one drug, kept as text until sent =====
 type Draft = {
@@ -76,7 +80,7 @@ export default function PrescribeForm({
   const [drafts, setDrafts] = useState<Draft[]>([{ ...EMPTY, key: 0 }])
   const [nextKey, setNextKey] = useState(1)
   const [note, setNote] = useState('')
-  const [sendTo, setSendTo] = useState<SendTo>('front_desk')
+  const [sendTo, setSendTo] = useState<SendTo>('both')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
@@ -95,7 +99,8 @@ export default function PrescribeForm({
       setDrafts(typed.drafts)
       setNextKey(Math.max(0, ...typed.drafts.map((one) => one.key)) + 1)
       setNote(typed.note)
-      setSendTo(typed.sendTo)
+      // A draft from before 2026-11-20 may say 'pharmacy': now both.
+      setSendTo(typed.sendTo === 'front_desk' ? 'front_desk' : 'both')
     },
   })
 
@@ -129,7 +134,8 @@ export default function PrescribeForm({
       quantity: draft.quantity.trim() || null,
       note: draft.note.trim() || null,
     }))
-    const problem = await prescribe(client, patient.id, items, note, sendTo)
+    // Always to the Front Desk for payment; then to the Pharmacy too, if asked.
+    const problem = await prescribe(client, patient.id, items, note, 'front_desk')
     if (problem) {
       setBusy(false)
       setError(problem)
@@ -139,7 +145,7 @@ export default function PrescribeForm({
     // "pharmacy request too, simultaneously send to pharmacy and front desk
     // for payment"): the pharmacy sees it at once while the Front Desk
     // takes the payment.
-    if (sendTo === 'front_desk') {
+    if (sendTo === 'both') {
       const also = await sendAlso(client, patient.id, staffId)
       if (also) setAlsoProblem(also)
       else setAlsoSent(true)
@@ -154,16 +160,13 @@ export default function PrescribeForm({
     return (
       <div className={styles.card}>
         <p className={styles.good}>
-          {sendTo === 'front_desk'
+          {sendTo === 'both' || alsoSent
             ? 'Sent to the Front Desk for payment and to the Pharmacy.'
-            : 'Sent to the Pharmacy.'}
+            : 'Sent to the Front Desk for payment. The Pharmacy gets it once it is paid.'}
         </p>
         <p className={styles.muted}>
           Once dispensed, the drugs join {patient.full_name}&apos;s current medications.
         </p>
-        {alsoSent && sendTo === 'pharmacy' ? (
-          <p className={styles.good}>Also sent to the Front Desk.</p>
-        ) : null}
         {alsoProblem ? <p className={styles.error}>{alsoProblem}</p> : null}
         <div className={styles.buttons}>
           {inConsultation ? (
@@ -182,6 +185,7 @@ export default function PrescribeForm({
               Back to the record
             </Link>
           )}
+          {/* Front Desk only: the Pharmacy can still be sent it now. */}
           {!alsoSent ? (
             <button
               className={`${styles.button} ${styles.soft}`}
@@ -195,7 +199,7 @@ export default function PrescribeForm({
                 else setAlsoSent(true)
               }}
             >
-              {sendTo === 'front_desk' ? 'Also send to Pharmacy' : 'Also send to Front Desk'}
+              Also send to Pharmacy
             </button>
           ) : null}
         </div>
@@ -360,11 +364,11 @@ export default function PrescribeForm({
       <div>
         <span className={styles.label}>Send to</span>
         <div className={styles.segments} role="group" aria-label="Send to">
-          <button aria-pressed={sendTo === 'front_desk'} onClick={() => setSendTo('front_desk')}>
-            Pharmacy and Front Desk (payment)
+          <button aria-pressed={sendTo === 'both'} onClick={() => setSendTo('both')}>
+            Front Desk and Pharmacy
           </button>
-          <button aria-pressed={sendTo === 'pharmacy'} onClick={() => setSendTo('pharmacy')}>
-            Straight to the pharmacy
+          <button aria-pressed={sendTo === 'front_desk'} onClick={() => setSendTo('front_desk')}>
+            Front Desk only
           </button>
         </div>
       </div>

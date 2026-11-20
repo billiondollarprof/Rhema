@@ -11,15 +11,16 @@
  *   - announcements you have not tapped Got it on
  *   - lab results ready for tests you asked for
  *   - work waiting for your role: tests to pay for and drugs to pay for
- *     (Front Desk), tests that are paid and ready (Laboratory), prescriptions
- *     that are paid and ready (Pharmacy)
+ *     (Front Desk), tests sent to the Lab or paid (Laboratory), prescriptions
+ *     sent to the Pharmacy or paid (Pharmacy)
  *   - patients waiting in your room (doctors, nurses, matron, Lab, Pharmacy)
  * Anthony, 2026-11-10: "everyone gets their appropriate notifications...
  * admins should not get bubbles that belong to pharmacy, lab or front desk."
  * So the work lists follow the person's ROLE, and an admin (who has no
  * role of their own in those jobs) gets none of them. An unpaid test or
- * prescription does not count for the Lab or Pharmacy: it counts the moment
- * it is paid, so they know to proceed.
+ * prescription sent to the Front Desk only does not count for the Lab or
+ * Pharmacy until it is paid; one sent to them too counts at once (request
+ * 233, 2026-11-20).
  * Each line says what it is in a whole sentence. Tapped, it unfolds in
  * place and shows each thing waiting, with one button that goes straight
  * to where it is dealt with (Anthony, 2026-11-04: "just be clicking a maybe
@@ -280,9 +281,11 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
       })),
     })
   }
-  // Only tests that are paid: an unpaid one waits at the Front Desk.
-  const paidTests = testsToDo.filter((request) => request.status === 'awaiting_test')
-  const paidDrugs = toDispense.filter((prescription) => prescription.status === 'awaiting_dispense')
+  // Request 233 (2026-11-20): what was sent to the Lab or the Pharmacy, paid
+  // or not, and what was sent to the Front Desk only once it is paid. The
+  // lists already hold exactly that (listAwaitingTest, listAwaitingDispense).
+  const paidTests = testsToDo
+  const paidDrugs = toDispense
 
   // ----- d00. Medicines doctors and nurses added, waiting for the Pharmacy -----
   const toConfirm = medicines.filter((line) => line.status === 'pending' && line.is_active)
@@ -336,7 +339,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
       key: 'do-tests',
       card: 'lab',
       count: paidTests.length,
-      words: `${many(paidTests.length, 'lab request is', 'lab requests are')} paid and ready to test.`,
+      words: `${many(paidTests.length, 'lab request is', 'lab requests are')} waiting for you to test.`,
       items: testItems(
         paidTests,
         (request) => ({ label: 'Enter results', href: `/lab/result/?r=${request.id}` }),
@@ -349,7 +352,7 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
       key: 'dispense',
       card: 'pharmacy',
       count: paidDrugs.length,
-      words: `${many(paidDrugs.length, 'prescription is', 'prescriptions are')} paid and ready to dispense.`,
+      words: `${many(paidDrugs.length, 'prescription is', 'prescriptions are')} waiting for you to dispense.`,
       items: paidDrugs.map((prescription) => ({
         key: `rx-${prescription.id}`,
         title: patientWords(prescription),

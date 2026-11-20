@@ -30,6 +30,8 @@ export type LabRequest = {
   completed_at: string | null
   // When the Laboratory took the sample (request 219c); null before.
   sample_taken_at: string | null
+  // Sent to the Lab too, not the Front Desk only (request 233).
+  sent_to_lab?: boolean
   // Not paid within 72 hours and never tested (request 228a); null otherwise.
   expired_at: string | null
   patient: { full_name: string; patient_number: string } | null
@@ -66,7 +68,7 @@ export const PAYMENT_MODES: [PaymentMode, string][] = [
 ]
 
 const REQUEST_COLUMNS =
-  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, ' +
+  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, sent_to_lab, ' +
   'patient:patients(full_name, patient_number), requester:staff!lab_requests_requested_by_fkey(full_name)'
 
 // "₦7,500.50", "₦7,500".
@@ -85,7 +87,8 @@ export async function requestLab(
   patientId: number,
   tests: string[],
   note: string,
-  sendTo: 'front_desk' | 'laboratory',
+  // The Front Desk only, or the Front Desk and the Lab (request 233).
+  sendTo: 'front_desk' | 'both',
 ): Promise<string | null> {
   const { error } = await client.rpc('request_lab', {
     patient: patientId,
@@ -167,6 +170,8 @@ export async function listAwaitingTest(client: SupabaseClient): Promise<LabReque
       .from('lab_requests')
       .select(REQUEST_COLUMNS)
       .in('status', ['awaiting_test', 'awaiting_payment'])
+      // Sent to the Lab, or paid (sent to the Front Desk only), request 233.
+      .or('sent_to_lab.eq.true,payment_id.not.is.null')
       .order('requested_at')
     return (data as unknown as LabRequest[] | null) ?? []
   })
@@ -267,7 +272,7 @@ export async function cancelResult(
   return null
 }
 
-// A patient's paid lab requests (waiting for the Lab, or finished), newest first.
+// A patient's lab requests, paid or not (waiting, or finished), newest first.
 export async function listPaidRequests(
   client: SupabaseClient,
   patientId: number,
@@ -276,7 +281,9 @@ export async function listPaidRequests(
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
     .eq('patient_id', patientId)
-    .in('status', ['awaiting_test', 'completed'])
+    // Paid or not (requests 232 and 233): the Lab finds a patient's tests to
+    // do even when they were sent to the Front Desk only.
+    .in('status', ['awaiting_payment', 'awaiting_test', 'completed'])
     .order('requested_at', { ascending: false })
     .limit(50)
   return (data as unknown as LabRequest[] | null) ?? []

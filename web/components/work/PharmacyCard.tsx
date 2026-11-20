@@ -30,6 +30,7 @@ import {
   itemWords,
   listAwaitingDispense,
   listAwaitingPayment,
+  listToGive,
   payPrescription,
   type Prescription,
 } from '@/lib/pharmacy/pharmacy'
@@ -56,6 +57,8 @@ const TITLES: Record<View, [string, string]> = {
   pay: ['Drugs to pay for', 'No drugs waiting for payment.'],
   dispense: ['Prescriptions to dispense', 'No prescriptions waiting.'],
 }
+// On one patient's page, for the Pharmacy (request 233).
+const TO_GIVE: [string, string] = ['Drugs to give', 'Nothing to give.']
 
 // ===== 2. The card =====
 export default function PharmacyCard({
@@ -68,11 +71,18 @@ export default function PharmacyCard({
   staff: StaffMember
   // Inside a notice: no frame and no heading, the notice is the heading.
   bare?: boolean
-  // On a patient's details page (request 227k): only that patient's, and
-  // only for the people who take payment.
+  // On a patient's details page: only that patient's. The Front Desk sees
+  // what to take payment for (request 227k); the Pharmacy sees the drugs to
+  // give, paid or not (request 233).
   patientId?: number
 }) {
-  const view = patientId ? (takesPayments(staff) ? 'pay' : null) : viewFor(staff)
+  const view = patientId
+    ? takesPayments(staff)
+      ? 'pay'
+      : staff.role === 'pharmacy'
+        ? 'dispense'
+        : null
+    : viewFor(staff)
   // The last list shown, at once, while a fresh one loads (request 145).
   const [list, setList] = useState<Prescription[] | null>(() =>
     recall(staff.id, patientId ? `pharmacy-pay-${patientId}` : `pharmacy-${view}`),
@@ -86,6 +96,7 @@ export default function PharmacyCard({
         remember(staff.id, patientId ? `pharmacy-pay-${patientId}` : `pharmacy-${view}`, found),
       )
     if (view === 'pay') keep(await listAwaitingPayment(client, patientId))
+    else if (view === 'dispense' && patientId) keep(await listToGive(client, patientId))
     else if (view === 'dispense') keep(await listAwaitingDispense(client))
   }, [client, staff.id, view, patientId])
 
@@ -111,7 +122,7 @@ export default function PharmacyCard({
   if (!view) return null
   // On a patient's page, nothing unpaid: no card at all (request 227k).
   if (patientId && list && list.length === 0) return null
-  const [title, empty] = TITLES[view]
+  const [title, empty] = patientId && view === 'dispense' ? TO_GIVE : TITLES[view]
 
   return (
     <div
@@ -127,7 +138,7 @@ export default function PharmacyCard({
         </h3>
       )}
       {/* Medicines running low, for the Pharmacy (request 214). */}
-      {view === 'dispense' ? <RunningLow client={client} staffId={staff.id} /> : null}
+      {view === 'dispense' && !patientId ? <RunningLow client={client} staffId={staff.id} /> : null}
       {list === null ? <p className={styles.muted}>Loading…</p> : null}
       {list && list.length === 0 ? <p className={styles.muted}>{empty}</p> : null}
       {/* Straight after a payment: its receipt, one tap away (request 123). */}

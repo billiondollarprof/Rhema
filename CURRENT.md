@@ -869,7 +869,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Lab: every request shows on the Lab's list at once, paid or not (no
     front-desk-only for the lab yet). Notifications count unpaid work for
     neither. The Pharmacy has no patient search for drugs; the Lab's Find a
-    patient's tests shows paid ones only. Said back, waiting for his yes.
+    patient's tests shows paid ones only. Said back.
+    HIS YES 2026-11-20: "Straight to the pharmacy or straight to lab goes
+    away... Front desk only. The test will reach the lab when front desk has
+    taken money... front desk and pharmacy, let it be the default."
+    BUILT: migration 20261120143627 (lab_requests.sent_to_lab; request_lab
+    takes front_desk or both, an older screen's laboratory counts as both;
+    every new request waits for payment), test 063, test 009 section 8 now
+    checks the new rule, 3 breaks caught. Screens: Front Desk and Pharmacy /
+    Front Desk only (and the same for the Lab), default both; the Lab's list
+    and notices hold what was sent to it or is paid; the Pharmacy's notices
+    the same; Drugs to give on the patient's page for the Pharmacy; Find a
+    patient's tests shows unpaid ones. WAITING FOR HIS YES ON THE SQL.
 
 232. **Dispense and test before payment; the options; drafts never lost.**
     (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to

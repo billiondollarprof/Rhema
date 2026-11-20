@@ -303,15 +303,18 @@ end $$;
 \echo 'PASS 7: only the person who asked marks it seen'
 
 
--- ===== 8. Straight to the lab, and a walk in result =====
+-- ===== 8. An older screen's "straight to the lab", and a walk in result =====
+-- Since 2026-11-20 (request 233) every request waits for payment at the Front
+-- Desk; "laboratory" from an older screen also sends it to the Lab.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1"}', true);
 set local role authenticated;
 select public.request_lab((select patient from t), array['Blood sugar'], null, 'laboratory');
 reset role;
 do $$
 begin
-  if (select status from public.lab_requests where tests = array['Blood sugar']) <> 'awaiting_test' then
-    raise exception 'FAIL 8: a request straight to the lab must wait for its test';
+  if (select status from public.lab_requests where tests = array['Blood sugar']) <> 'awaiting_payment'
+     or not (select sent_to_lab from public.lab_requests where tests = array['Blood sugar']) then
+    raise exception 'FAIL 8: an older screen''s request must reach the Front Desk and the Lab';
   end if;
 end $$;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c4"}', true);

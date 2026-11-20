@@ -120,6 +120,12 @@ export const listAwaitingPayment = (client: SupabaseClient, patientId?: number) 
 
 // The Pharmacy: ready to dispense, or sent to the Front Desk and also to
 // the Pharmacy (shown as waiting for payment until it is paid).
+// The Pharmacy, on one patient's page (request 233, 2026-11-20): every drug
+// still to give, paid or not, however it was sent, so one sent to the Front
+// Desk only can be found by searching the patient.
+export const listToGive = (client: SupabaseClient, patientId: number) =>
+  listWhere(client, 'status.in.(awaiting_payment,awaiting_dispense)', patientId)
+
 export const listAwaitingDispense = (client: SupabaseClient) =>
   listWhere(client, 'status.eq.awaiting_dispense,and(also_sent.is.true,status.eq.awaiting_payment)')
 
