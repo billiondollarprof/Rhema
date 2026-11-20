@@ -849,6 +849,29 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+232. **Dispense and test before payment; the options; drafts never lost.**
+    (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
+    confirm that the lab and the pharmacy can dispense medicine or take a
+    lab test, even if someone has not paid... it is showing waiting for
+    payment to them, but there's the button to dispense... can still be
+    clicked... the lab, the same thing... finished the test, even if
+    payment has not been made... for emergency case... already an
+    inpatient that was admitted, so that there will be no obstruction as
+    to payment... money that has not been paid... will always remind the
+    front desk... It's only the one that has not been paid that disappears
+    after 24 hours. The one that has not been dispensed or carried out."
+    (The limit is 72 hours since his choice of 2026-11-20.) "So I just want
+    to confirm that that's how it is now currently."
+    On 230 a to d: "all of them are good... the device they are using, the
+    CPU is 2 gig RAM, the desktop... do it in a way that... their system is
+    still able to carry it... let's not keep so many drafts, because what
+    if that person's system crashes and network never came online and some
+    things just wipe, or the person logs out?... if it's possible that even
+    if the person logs out, they didn't lose those drafts... what about if
+    the computer they are using, something happens to it? So the drafts...
+    should load into the system within the next 5 minutes or something like
+    that. The system should try it until it's uploaded to the database."
+
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
     same ones given to the other agent for 227i) "the pharmacy is saying
@@ -872,7 +895,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     shows, with the count; "+ Add another strength" (supplies: "+ Add
     another size") under each name, using add_medicine; the list is read
     1,000 rows at a time (Supabase answers at most 1,000), so it never stops
-    short as it grows. Ships with the families SQL after his yes.
+    short as it grows. His yes 2026-11-20; shipping with the families SQL.
 
 230. **Run through everything; instant loading; drafts with no network.**
     (2026-11-20) "run through everything that you did. Ensure that nothing
@@ -901,7 +924,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Found and fixed (SQL waiting for his yes): a signed in person could
     change any column of a family or add an empty family directly
     (20261120082841_families_details_only, test 061; test 016 accepts the
-    stronger refusal).
+    stronger refusal). HIS YES ON THE SQL, 2026-11-20.
     FOUND, PROPOSED, WAITING: (a) app files are not kept by the browser
     between opens (no long cache header on /_next/static), so every open
     asks again; poor 3G: sign in screen ready in about 20 s; (b) warm up
