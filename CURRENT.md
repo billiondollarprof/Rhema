@@ -878,7 +878,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     prescribe drugs." So no change for the matron; he will ask the hospital.
     BUILT 2026-11-20: migration 20261120040440 (consultation_update: the
     writer or the signer only), test 059, 4 breaks caught; Void and Correct
-    show only on the consultant's own notes. WAITING FOR HIS YES ON THE SQL.
+    show only on the consultant's own notes. HIS YES ON THE SQL, 2026-11-20.
 
 228. **Front desk: payments that expire, the family file first, Take vitals;
     Given fills the nursing sheet.** (2026-11-19, in a new session; "I don't
