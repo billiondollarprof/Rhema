@@ -13,6 +13,9 @@
  *   register   a new patient from Register patient
  *   record     one medical record entry (a note, a reading, an allergy...)
  *   message    a message to a room (its key makes a resend the same one)
+ *   family     a new family with its first member, saved together
+ *              (request 230d, 2026-11-20: what was saved "keep trying
+ *              until it uploads")
  * The sender (components/offline/OutboxSender) sends them when it can.
  * The database's double tap guard and a check before each resend make sure
  * nothing is saved twice.
@@ -25,6 +28,15 @@
 
 // ===== 1. Shapes =====
 export type OutboxTask =
+  | {
+      id: string
+      kind: 'family'
+      created: number
+      label: string
+      family: Record<string, unknown>
+      member: Record<string, unknown> & { full_name: string }
+      failed?: string
+    }
   | {
       id: string
       kind: 'register'
@@ -87,6 +99,12 @@ function writeOutbox(staffId: string, tasks: OutboxTask[]) {
 
 // The two kinds as callers write them, before an id and a time are added.
 type NewTask =
+  | {
+      kind: 'family'
+      label: string
+      family: Record<string, unknown>
+      member: Record<string, unknown> & { full_name: string }
+    }
   | { kind: 'register'; label: string; values: Record<string, unknown> }
   | {
       kind: 'record'

@@ -932,6 +932,10 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     the app opens) and History for the period it opens on (6 s later), in
     memory only, once per person; Notifications were already loaded by the
     menu bubble. Measured: Messages opened in 0.1 s after.
+    230d BUILT 2026-11-20 (no SQL): a new family saved with no network waits on
+    the device (outbox kind family) and is sent by itself, checked first so
+    it is never saved twice. Register from old file still asks to try again
+    (its files need the network). Drafts unchanged, as he decided.
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the

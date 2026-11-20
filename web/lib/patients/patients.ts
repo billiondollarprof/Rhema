@@ -537,14 +537,23 @@ export async function updateFamily(
 
 // Register a new family with its first member, in one step: both are saved
 // or neither, so a family is never empty. The member's address boxes left
-// empty take the family's. A new family needs the network: it cannot wait
-// on the device like a single patient, because the two go together.
+// empty take the family's. With no network the two wait on this device
+// together and are sent by themselves when it is back (request 230d).
 export async function registerFamily(
   client: SupabaseClient,
   family: FamilyDetails,
   member: Record<string, unknown> & { full_name: string },
   staffId: string,
-): Promise<{ patient: PatientCard | null; familyId: number | null; problem: string | null }> {
+  // No network: wait on this device and send by itself when the network is
+  // back (request 230d). Register from old file says no: its files need the
+  // network, so it asks to try again instead.
+  queueIfOffline = true,
+): Promise<{
+  patient: PatientCard | null
+  familyId: number | null
+  problem: string | null
+  queued?: boolean
+}> {
   const filled: Record<string, unknown> = { ...member }
   for (const key of ['address', 'town', 'lga', 'state'] as const) {
     if (!filled[key]) filled[key] = family[key]
@@ -559,10 +568,20 @@ export async function registerFamily(
     patientId = first?.id ?? null
     familyId = first?.family_id ?? null
   } else if (isNetworkFailure(error)) {
+    if (queueIfOffline) {
+      addToOutbox(staffId, {
+        kind: 'family',
+        label: `${family.name} family`,
+        family,
+        member: filled as Record<string, unknown> & { full_name: string },
+      })
+      return { patient: null, familyId: null, problem: null, queued: true }
+    }
     return {
       patient: null,
       familyId: null,
-      problem: 'No network. A new family needs the network to save. Try again when it is back.',
+      problem:
+        'No network. A new family from an old file needs the network. Try again when it is back.',
     }
   } else if (error) {
     console.warn(`Family could not be registered: ${error.code}`)

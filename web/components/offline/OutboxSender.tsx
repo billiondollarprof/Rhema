@@ -44,6 +44,19 @@ async function alreadySaved(client: SupabaseClient, task: OutboxTask): Promise<b
   const since = new Date(task.created - 60_000).toISOString()
   // A message is checked by its key in the database itself.
   if (task.kind === 'message') return false
+  // A new family: its first member, by this person, in a family, just now.
+  if (task.kind === 'family') {
+    const { data: me } = await client.auth.getSession()
+    const { data } = await client
+      .from('patients')
+      .select('id')
+      .eq('created_by', me.session?.user.id ?? '')
+      .eq('full_name', String(task.member.full_name).trim().replace(/\s+/g, ' '))
+      .not('family_id', 'is', null)
+      .gte('created_at', since)
+      .limit(1)
+    return Boolean(data && data.length)
+  }
   if (task.kind === 'register') {
     const { data } = await client
       .from('patients')
@@ -96,6 +109,27 @@ async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask
       // Every open app fetches it at once (request 157).
       announceChange(client, 'messages')
     }
+    return true
+  }
+  // A new family (request 230d): the family and its first member together.
+  if (task.kind === 'family') {
+    try {
+      if (await alreadySaved(client, task)) {
+        removeFromOutbox(staffId, task.id)
+        return true
+      }
+    } catch {
+      return false
+    }
+    const { error } = await client.rpc('register_family', {
+      family: task.family,
+      member: task.member,
+    })
+    if (isNetworkFailure(error)) return false
+    // The double tap guard: the first one is in already.
+    if (!error || error.code === '23505') removeFromOutbox(staffId, task.id)
+    else markFailed(staffId, task.id, 'Could not be registered. Register the family again.')
+    if (!error) announceChange(client, 'records')
     return true
   }
   try {
