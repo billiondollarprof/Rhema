@@ -116,6 +116,10 @@ export type Consultation = Voidable & {
   author: { full_name: string } | null
   // The clinician who saw the patient (request 224).
   signer?: { full_name: string } | null
+  // Who typed it and who it is signed by: only they void or correct it
+  // (request 229). Missing in a device copy made before 2026-11-20.
+  written_by?: string
+  signed_by?: string | null
 }
 
 // An "Other" vital sign: a measure that has no box of its own (Anthony,
@@ -239,7 +243,7 @@ export async function loadRecord(
     ).limit(50),
     byPatient(
       'consultation_notes',
-      `${VOID}, title, complaint, findings, assessment, plan, created_at, author:staff!written_by(full_name), signer:staff!signed_by(full_name)`,
+      `${VOID}, title, complaint, findings, assessment, plan, created_at, written_by, signed_by, author:staff!written_by(full_name), signer:staff!signed_by(full_name)`,
       'created_at',
     ).limit(30),
     byPatient(

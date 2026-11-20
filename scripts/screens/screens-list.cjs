@@ -95,6 +95,9 @@ const RECORD_DAY = {
       assessment: 'Malaria',
       plan: 'Out-patient treatment, give medicines as charted, encourage oral fluids, review in 48 hours',
       created_at: hoursAgo(14),
+      // Written by the signed in doctor, so Void shows (request 229).
+      written_by: '00000000-0000-0000-0000-0000000000e1',
+      signed_by: '00000000-0000-0000-0000-0000000000e1',
       author: DOCTOR,
     },
   ],

@@ -860,7 +860,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     consultant in room two tends to be the matron, who is also a midwife...
     we did not even put any column for midwife in the system, but I believe
     the database already trying to contain whatever the midwife needs as per
-    pregnancy, antenatal patients." ASKED FOR ADVICE; answered in chat.
+    pregnancy, antenatal patients." ASKED FOR ADVICE; answered in chat
+    2026-11-20. Found in the code: any consultant in a consultation room can
+    open the record and write (good), but can also Void another consultant's
+    note, and Correct it in its first 15 minutes (consultation_update has no
+    written_by check). Proposed: Void and Correct own notes only. The matron
+    writes consultation notes only if her room is a consultation room;
+    prescribing is doctors only (is_doctor); antenatal booking, visits,
+    tests and consent are open to every clinical role. Waiting for his
+    answer.
+    DECIDED 2026-11-20: "let each consultant only be able to cancel or void
+    their own consultation... they'll be able to continue consultation,
+    they'll be able to read the conversation, but they cannot edit, cancel,
+    correct, or void another. They can only void their own or correct their
+    own." Matron: "Except she's a doctor, she normally cannot prescribe drug.
+    But I'll ask them... in the computer, she's not supposed to be allowed to
+    prescribe drugs." So no change for the matron; he will ask the hospital.
+    BUILT 2026-11-20: migration 20261120040440 (consultation_update: the
+    writer or the signer only), test 059, 4 breaks caught; Void and Correct
+    show only on the consultant's own notes. HIS YES ON THE SQL, 2026-11-20.
 
 228. **Front desk: payments that expire, the family file first, Take vitals;
     Given fills the nursing sheet.** (2026-11-19, in a new session; "I don't
@@ -926,6 +944,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        renamed 20261119211756_unpaid_expire_after_72_hours (never run
        anywhere before). HIS YES ON THE SQL, 2026-11-20: "you can now go ahead
        and run the SQL".
+       LIVE 2026-11-20: CI, deploy and smoke test green on testing and live;
+       0 security warnings on both.
     NEXT: b (family file first).
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public

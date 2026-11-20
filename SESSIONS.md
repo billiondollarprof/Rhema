@@ -4,6 +4,18 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-20 (morning): 229 own notes only, his yes. Slip: a stray "do $$
+  begin" in test 059 broke the file; mutate.sh then called every break
+  CAUGHT, and my grep hid its "tests fail on the restored file" line. CI on
+  testing caught it (database job red); nothing reached live. Fixed the test,
+  re-proved 4 breaks with real FAIL lines, and mutate.sh now refuses to run
+  when the tests already fail.
+
+- 2026-11-20: 228a LIVE: unpaid drugs and lab tests never given or tested
+  expire after 72 hours (his change from 24), grey in the record, owed ones
+  stay; 0 security warnings on testing and live. Recorded 229 (consultants
+  sharing patients, matron as midwife), advice given. Next: 228b family file.
+
 - 2026-11-19 (afternoon, new session): request 228 recorded and said back;
   his yes to all. 228c LIVE: Take vitals for the Front Desk (readings go into
   the record; Front Desk adds in its own name, reads back only its own,

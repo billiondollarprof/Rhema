@@ -30,6 +30,9 @@
  * (Anthony, 2026-11-10). Everybody with the record reads. The database
  * decides it again.
  *
+ * Void and Correct only on a consultant's own notes (request 229,
+ * 2026-11-20): another consultant reads them and carries the patient on.
+ *
  * Never: change a saved note. A wrong one is voided with a reason and
  * written again, so the record shows what was corrected.
  */
@@ -556,8 +559,10 @@ export default function ConsultationsSection({
               : `Written by ${line.signer?.full_name ?? line.author?.full_name ?? 'staff'}`
           }
           voided={voidedOf(line)}
+          // Only the consultant who wrote or signed a note voids or corrects
+          // it; the others read it (request 229, the database checks too).
           voidable={
-            canWrite
+            canWrite && (line.written_by === staffId || line.signed_by === staffId)
               ? {
                   client,
                   table: 'consultation_notes',

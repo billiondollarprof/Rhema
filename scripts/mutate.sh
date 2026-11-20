@@ -28,6 +28,13 @@ cp "$FILE" "$BACKUP"
 trap 'cp "$BACKUP" "$FILE"; rm -f "$BACKUP"' EXIT
 
 "$HERE/scripts/local-db.sh" --start > /dev/null
+# Every test must pass before any break. A test file that cannot even run
+# would make every break look CAUGHT (2026-11-20: a stray "do $$ begin" in a
+# test file did exactly that, and only CI saw it).
+if ! "$HERE/scripts/local-db.sh" > /dev/null 2>&1; then
+  echo "The tests fail BEFORE any break. Run scripts/local-db.sh, fix them, then run this again."
+  exit 2
+fi
 missed=0
 for expr in "$@"; do
   cp "$BACKUP" "$FILE"
