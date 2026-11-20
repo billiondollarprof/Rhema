@@ -229,10 +229,13 @@ function Entry({
             Take payment
           </button>
         ) : null}
+        {/* Not paid yet: it can still be given (request 232, 2026-11-20:
+            "so that there will be no obstruction as to payment"). The Front
+            Desk keeps it as owed until the money is taken. */}
         {view === 'dispense' && prescription.status === 'awaiting_payment' ? (
-          <span className={styles.muted}>Waiting for payment</span>
+          <span className={styles.waitingPay}>Not paid yet</span>
         ) : null}
-        {view === 'dispense' && prescription.status !== 'awaiting_payment' ? (
+        {view === 'dispense' ? (
           <button className={`${styles.button} ${styles.primary}`} onClick={done} disabled={busy}>
             {busy ? 'Saving…' : 'Dispensed'}
           </button>

@@ -134,9 +134,16 @@ begin
   if public.mark_sample_taken(paid) <> 'already' then
     raise exception 'FAIL 4: a second tap marked it again';
   end if;
-  if public.mark_sample_taken(unpaid) <> 'not_paid' then
-    raise exception 'FAIL 4: an unpaid request was marked';
-  end if;
+  begin
+  -- Since 2026-11-20 (request 232) this works before payment; the block
+  -- undoes itself so the steps below still start from an unpaid one.
+    if public.mark_sample_taken(unpaid) <> 'done' then
+      raise exception 'FAIL 4: an unpaid request could not be marked';
+    end if;
+    raise exception 'undo';
+  exception when raise_exception then
+    if sqlerrm <> 'undo' then raise; end if;
+  end;
 end $$;
 reset role;
 do $$

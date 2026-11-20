@@ -255,11 +255,15 @@ function LabEntry({
             Take payment
           </button>
         ) : null}
+        {/* Not paid yet: the test can still be done (request 232). The Front
+            Desk keeps it as owed until the money is taken. */}
         {view === 'lab' && request.status === 'awaiting_payment' ? (
-          <span className={styles.waitingPay}>Waiting for payment at the Front Desk</span>
+          <span className={styles.waitingPay}>Not paid yet</span>
         ) : null}
         {/* The sample, one tap (request 219c, number 4). */}
-        {view === 'lab' && request.status === 'awaiting_test' && !request.sample_taken_at ? (
+        {view === 'lab' &&
+        (request.status === 'awaiting_test' || request.status === 'awaiting_payment') &&
+        !request.sample_taken_at ? (
           <button
             className={styles.button}
             disabled={marking}
@@ -274,7 +278,9 @@ function LabEntry({
             {marking ? 'Saving…' : 'Sample taken'}
           </button>
         ) : null}
-        {view === 'lab' && request.sample_taken_at && request.status === 'awaiting_test' ? (
+        {view === 'lab' &&
+        request.sample_taken_at &&
+        (request.status === 'awaiting_test' || request.status === 'awaiting_payment') ? (
           <span className={styles.sampleTaken}>
             Sample taken{' '}
             {new Date(request.sample_taken_at).toLocaleTimeString('en-GB', {
@@ -284,7 +290,7 @@ function LabEntry({
             })}
           </span>
         ) : null}
-        {view === 'lab' && request.status !== 'awaiting_payment' ? (
+        {view === 'lab' ? (
           <Link
             className={`${styles.button} ${styles.primary}`}
             href={`/lab/result/?r=${request.id}`}

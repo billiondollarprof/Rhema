@@ -871,6 +871,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     the computer they are using, something happens to it? So the drafts...
     should load into the system within the next 5 minutes or something like
     that. The system should try it until it's uploaded to the database."
+    LIVE 2026-11-20: families details only and the full Pharmacy list (0
+    security warnings on testing and live).
+    CHECKED 2026-11-20: NOT as he thought. One sent to the Front Desk first
+    (waiting for payment) could not be dispensed, sampled or tested until
+    paid (dispense_prescription, mark_sample_taken, record_lab_results,
+    add_lab_result answered not_paid; the buttons were hidden). Only one sent
+    straight to the Pharmacy or Lab could. The owed and 72 hour parts were
+    already as he says. BUILT: migration 20261120130854 (all four allow
+    waiting for payment; cancelled still refused), test 062, tests 009, 010,
+    013 and 047 now check the new rule (each in a block that undoes itself),
+    6 breaks caught; screens show "Not paid yet" with Dispensed, Sample taken
+    and Enter results. WAITING FOR HIS YES ON THE SQL.
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the

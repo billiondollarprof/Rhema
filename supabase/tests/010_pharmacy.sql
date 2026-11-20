@@ -76,17 +76,24 @@ end $$;
 \echo 'PASS 1: only a doctor prescribes; one per double tap'
 
 
--- ===== 2. The Pharmacy cannot dispense before payment =====
+-- ===== 2. The Pharmacy may dispense before payment (request 232) =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000f4"}', true);
 set local role authenticated;
 do $$
 begin
-  if public.dispense_prescription((select id from public.prescriptions)) <> 'not_paid' then
-    raise exception 'FAIL 2: drugs were dispensed before payment';
-  end if;
+  begin
+  -- Since 2026-11-20 (request 232) this works before payment; the block
+  -- undoes itself so the steps below still start from an unpaid one.
+    if public.dispense_prescription((select id from public.prescriptions)) <> 'dispensed' then
+      raise exception 'FAIL 2: drugs could not be dispensed before payment';
+    end if;
+    raise exception 'undo';
+  exception when raise_exception then
+    if sqlerrm <> 'undo' then raise; end if;
+  end;
 end $$;
 reset role;
-\echo 'PASS 2: no dispensing before payment'
+\echo 'PASS 2: dispensing before payment works'
 
 
 -- ===== 3. The Front Desk types a price per drug; the database adds them up =====

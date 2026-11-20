@@ -216,8 +216,11 @@ function EnterResults() {
   const donePatientId = request ? request.patient_id : (walkIn?.id ?? null)
   const notLab = !staff.can_lab
   // A finished request can be corrected too: add a missed or corrected result.
+  // Paid or not (request 232, 2026-11-20): never a cancelled one.
   const ready = request
-    ? request.status === 'awaiting_test' || request.status === 'completed'
+    ? request.status === 'awaiting_test' ||
+      request.status === 'awaiting_payment' ||
+      request.status === 'completed'
     : Boolean(walkIn)
 
   return (
@@ -276,10 +279,9 @@ function EnterResults() {
               </div>
             </div>
             {request?.note ? <p className={styles.muted}>Note: {request.note}</p> : null}
+            {/* Not paid yet: the result can still be entered (request 232). */}
             {request && request.status === 'awaiting_payment' ? (
-              <p className={styles.error}>
-                This test has not been paid for yet. Ask the Front Desk.
-              </p>
+              <p className={styles.muted}>Not paid yet. The Front Desk will take the payment.</p>
             ) : null}
             {request && request.status === 'completed' ? (
               <EarlierResults client={client} requestId={request.id} />
