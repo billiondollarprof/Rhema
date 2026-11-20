@@ -12,9 +12,15 @@
  *      with its receipt (request 141; the fee may be left empty);
  *   4. the new RMC number shows, with Send to room.
  *
- * Family (request 128, step 2): after saving a patient with Family chosen,
- * "Add family member" starts the family (it gets a FAM number) and opens
- * this form again with the family already set (?family=12). No surname.
+ * Category first (request 228b, 2026-11-20): a drop down at the top,
+ * Individual, Family or Antenatal, before anything else is filled in.
+ *
+ * Family: the Family details card (family name, phone, address), then Add
+ * family member opens the member's own form with the family's address in
+ * it. Save registers the family and that first member together, so a
+ * family is never empty. More members join with ?family=12 (from Add
+ * family member after saving, or on a member's page); the family's card
+ * covers them, so no card fee is asked.
  *
  * Never: register silently over a possible duplicate. Two numbers for one
  * person splits their history.
@@ -27,14 +33,21 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import PatientForm, { EMPTY_DETAILS, type CardFee } from '../_parts/PatientForm'
+import FamilyDetailsForm, { checkFamily, tidyFamily } from '../_parts/FamilyDetailsForm'
 import SendToRoom from '../_parts/SendToRoom'
 import styles from '../_parts/patients.module.css'
 import { lastSeenWords } from '../_parts/PatientDetail'
 import { ageFrom } from '@/lib/patients/age'
 import {
+  EMPTY_FAMILY,
   familyNumber,
   findPossibleDuplicates,
+  loadFamily,
+  registerFamily,
   registerPatient,
+  type Category,
+  type Family,
+  type FamilyDetails,
   startFamily,
   type PatientCard,
   type PatientDetails,
@@ -71,6 +84,26 @@ function RegisterPatient() {
   const [sending, setSending] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
   const [formKey, setFormKey] = useState(0)
+
+  // ===== 0b. The category, chosen first (request 228b) =====
+  // Empty until chosen. Adding to a family that exists: always Family.
+  const [category, setCategory] = useState<Category | ''>(familyId ? 'family' : '')
+  // A new family: its details, what is wrong with them, whether the first
+  // member's form is open, and the family once saved.
+  const [family, setFamily] = useState<FamilyDetails>(EMPTY_FAMILY)
+  const [familyShown, setFamilyShown] = useState<Record<string, string>>({})
+  const [addingMember, setAddingMember] = useState(false)
+  const [savedFamily, setSavedFamily] = useState<Family | null>(null)
+  const newFamily = !familyId && category === 'family'
+
+  // Start again with nothing chosen (Register another patient).
+  function startOver() {
+    setCategory('')
+    setFamily(EMPTY_FAMILY)
+    setFamilyShown({})
+    setAddingMember(false)
+    setSavedFamily(null)
+  }
 
   // The card fee on the price list, offered under the fee box (2026-11-16).
   // The card fees on the price list, by kind of patient (2026-11-16).
@@ -208,18 +241,39 @@ function RegisterPatient() {
         return
       }
     }
-    const result = await registerPatient(client, details, staff.id)
+    // A new family: the family and this first member, saved together.
+    const result = newFamily
+      ? await registerFamily(client, tidyFamily(family), details, staff.id)
+      : await registerPatient(client, details, staff.id)
     setBusy(false)
     setWaiting(null)
     setMatches([])
     setFee(cardFee)
     setFeeSaved(false)
-    if (result.queued) setQueued(details.full_name)
+    if ('queued' in result && result.queued) setQueued(details.full_name)
     else if (result.problem) setProblem(result.problem)
     else {
       setSaved(result.patient)
+      const newFamilyId = 'familyId' in result ? (result.familyId as number | null) : null
+      if (newFamilyId) {
+        const found = await loadFamily(client, newFamilyId)
+        setSavedFamily(found)
+        setFamilyCard(found?.family_number ?? null)
+      }
       if (result.patient) await payFee(result.patient.id, cardFee)
     }
+  }
+
+  // ===== 1c. A new family: the family name must be there before saving =====
+  function saveFamilyAndMember(details: PatientDetails, cardFee: CardFee) {
+    const wrong = checkFamily(family)
+    setFamilyShown(wrong)
+    if (Object.keys(wrong).length > 0) {
+      setProblem('Fill in the family details first.')
+      document.getElementById(`family-${Object.keys(wrong)[0]}`)?.focus()
+      return
+    }
+    void save(details, cardFee)
   }
 
   // ===== 1b. No network: saved on this device, sent later =====
@@ -265,7 +319,7 @@ function RegisterPatient() {
       <AppShell>
         <div className={styles.page}>
           <div className={styles.head}>
-            <h2>Patient registered</h2>
+            <h2>{savedFamily ? 'Family registered' : 'Patient registered'}</h2>
           </div>
           <div className={styles.ok}>
             <Icon name="reg" size={22} />
@@ -279,6 +333,20 @@ function RegisterPatient() {
             {saved.full_name} · {ageFrom(saved.date_of_birth)}
             {familyCard && saved.family_id ? ` · Family ${familyCard}` : ''}
           </p>
+          {/* A new family: its name, number and the day it was registered. */}
+          {savedFamily ? (
+            <div className={styles.familyBanner}>
+              <Icon name="users" size={18} />
+              <span>
+                <b>{savedFamily.name}</b> family · {savedFamily.family_number} · registered{' '}
+                {new Date(savedFamily.created_at).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+          ) : null}
           {/* ----- The card fee, if one was typed ----- */}
           {fee && paying ? <p className={styles.muted}>Saving the card fee…</p> : null}
           {fee && !paying && feeSaved ? (
@@ -342,7 +410,12 @@ function RegisterPatient() {
                   disabled={joining}
                   onClick={() => addMember(saved.id)}
                 >
-                  <Icon name="users" size={16} /> {joining ? 'Starting…' : 'Add family member'}
+                  <Icon name="users" size={16} />{' '}
+                  {joining
+                    ? 'Starting…'
+                    : savedFamily
+                      ? 'Add another family member'
+                      : 'Add family member'}
                 </button>
               ) : null}
               <button
@@ -352,6 +425,7 @@ function RegisterPatient() {
                   setSentTo(null)
                   setFee(null)
                   setFormKey((key) => key + 1)
+                  startOver()
                   if (familyId) router.push('/patients/register/')
                 }}
               >
@@ -436,10 +510,114 @@ function RegisterPatient() {
           </div>
         ) : null}
 
+        {/* ===== 4. The category, before anything else (request 228b) ===== */}
+        {!familyId ? (
+          <div className={`${styles.field} ${styles.categoryPick}`}>
+            <label htmlFor="register-category">Category</label>
+            <select
+              id="register-category"
+              className={styles.input}
+              value={category}
+              onChange={(event) => {
+                setCategory(event.target.value as Category | '')
+                setProblem(null)
+                setAddingMember(false)
+              }}
+            >
+              <option value="">Select category</option>
+              <option value="individual">Individual</option>
+              <option value="family">Family</option>
+              <option value="antenatal">Antenatal</option>
+            </select>
+          </div>
+        ) : null}
+
+        {/* ===== 5. A new family: its details, then its first member ===== */}
+        {newFamily ? (
+          <>
+            <FamilyDetailsForm
+              value={family}
+              onChange={(next) => {
+                setFamily(next)
+                setFamilyShown({})
+              }}
+              shown={familyShown}
+              client={client}
+              staffId={staff.id}
+            />
+            {!addingMember ? (
+              <>
+                <p className={styles.familyNote}>A family needs at least one member.</p>
+                {problem ? <p className={styles.error}>{problem}</p> : null}
+                <div className={styles.buttons}>
+                  <button
+                    className={`${styles.button} ${styles.familyButton}`}
+                    onClick={() => {
+                      const wrong = checkFamily(family)
+                      setFamilyShown(wrong)
+                      if (Object.keys(wrong).length > 0) {
+                        document.getElementById(`family-${Object.keys(wrong)[0]}`)?.focus()
+                        return
+                      }
+                      setProblem(null)
+                      setAddingMember(true)
+                    }}
+                  >
+                    <Icon name="users" size={16} /> Add family member
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className={styles.familyBanner}>
+                <Icon name="users" size={18} />
+                <span>
+                  First member of the <b>{family.name.trim()}</b> family
+                </span>
+              </div>
+            )}
+          </>
+        ) : null}
+
         {/* A family member's form waits for the family's details, so it
             starts filled in rather than filling while somebody types. */}
-        {familyId && !familyStart ? (
+        {!category || (newFamily && !addingMember) ? null : familyId && !familyStart ? (
           <p className={styles.muted}>Loading the family…</p>
+        ) : newFamily ? (
+          <PatientForm
+            client={client}
+            staffId={staff?.id}
+            key={`${formKey}-new-family`}
+            initial={{
+              ...EMPTY_DETAILS,
+              category: 'family',
+              address: family.address,
+              town: family.town,
+              lga: family.lga,
+              state: family.state,
+              country: family.country,
+            }}
+            saveLabel="Save family and member"
+            busy={busy}
+            problem={problem}
+            withPayment
+            hideCategory
+            cardFeeFor={(kind) => cardPriceFor(cardPrices, kind)}
+            onSave={(details, cardFee) => saveFamilyAndMember(details, cardFee)}
+          />
+        ) : !familyId ? (
+          <PatientForm
+            client={client}
+            staffId={staff?.id}
+            key={`${formKey}-${category}`}
+            initial={{ ...EMPTY_DETAILS, category }}
+            saveLabel="Save patient"
+            busy={busy}
+            problem={problem}
+            withPayment
+            hideCategory
+            cardFeeFor={(kind) => cardPriceFor(cardPrices, kind)}
+            onSave={(details, cardFee) => save(details, cardFee)}
+          />
         ) : (
           <PatientForm
             client={client}
@@ -455,6 +633,7 @@ function RegisterPatient() {
             // registration, so the card fee is paid (requests 160, 165).
             feeRequiredIf={familyId ? (details) => details.category !== 'family' : undefined}
             familyCard={familyId ? (familyCard ?? '') : undefined}
+            familyCovers
             familyPaid={
               familyId && familyStart
                 ? familyStart.paid.map((payment) => ({

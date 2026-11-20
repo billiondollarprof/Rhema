@@ -20,7 +20,7 @@
  * Never: point it at the live or testing site. It uses made up data.
  */
 const { chromium } = require('playwright')
-const { signIn, mockSupabase } = require('./mock.cjs')
+const { signIn, mockSupabase, pressFirst } = require('./mock.cjs')
 const { SCREENS } = require('./screens-list.cjs')
 
 const APP = process.env.APP_URL || 'http://127.0.0.1:3100'
@@ -56,6 +56,8 @@ async function openScreen(browser, screen) {
   await mockSupabase(page, screen.extra ?? {})
   await page.goto(APP + screen.path)
   await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
+  // What the screen's press opens gets its buttons pressed too (mock.cjs).
+  await pressFirst(page, screen)
   await page.waitForTimeout(500)
   return { context, page, errors, requests: () => requests }
 }

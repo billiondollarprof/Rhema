@@ -28,6 +28,11 @@
  * patient gets "Add family member" after saving, which starts the family
  * and opens a fresh old file form that joins it (?family=12).
  *
+ * Category first (request 228b, 2026-11-20), as on Register patient: a drop
+ * down at the top. Family shows the Family details card, then Add family
+ * member opens this old file form for the first member, with the family's
+ * address; Save registers the family and that member together.
+ *
  * Never: register silently over a patient with the same phone. Never show
  * the old file's contents here: only somebody with the medical record may
  * open it.
@@ -40,6 +45,7 @@ import { useRouter } from 'next/navigation'
 import AppShell from '@/components/shell/AppShell'
 import Icon from '@/components/shell/Icon'
 import FilePicker from '../_parts/FilePicker'
+import FamilyDetailsForm, { checkFamily, tidyFamily } from '../_parts/FamilyDetailsForm'
 import OptionSelect from '@/components/options/OptionSelect'
 import SearchSelect from '@/components/options/SearchSelect'
 import styles from '../_parts/patients.module.css'
@@ -51,10 +57,15 @@ import {
   ANTENATAL_MARITAL,
   ANTENATAL_RELIGION,
   cleanPhone,
+  EMPTY_FAMILY,
   familyNumber,
   findSamePhone,
+  loadFamily,
   phoneLooksRight,
+  registerFamily,
   registerFromOldFile,
+  type Family,
+  type FamilyDetails,
   saveAntenatalDetails,
   startFamily,
   type Category,
@@ -78,11 +89,18 @@ export default function OldFilePage() {
   const [born, setBorn] = useState('')
   const [sex, setSex] = useState<Sex | null>(null)
   // The front desk asked for it (2026-11-16): individual, family or antenatal.
-  const [category, setCategory] = useState<Category>(() =>
+  // 2026-11-20 (request 228b): chosen first, in a drop down; empty until then.
+  const [category, setCategory] = useState<Category | ''>(() =>
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('family')
       ? 'family'
-      : 'individual',
+      : '',
   )
+  // A new family: its details, what is wrong with them, whether the first
+  // member's form is open, and the family once saved (request 228b).
+  const [family, setFamily] = useState<FamilyDetails>(EMPTY_FAMILY)
+  const [familyShown, setFamilyShown] = useState<Record<string, string>>({})
+  const [addingMember, setAddingMember] = useState(false)
+  const [savedFamily, setSavedFamily] = useState<Family | null>(null)
   // The month the old file was first opened (Anthony, 2026-11-16: "they're
   // registering the patients month by month"). Kept after Register another,
   // because the next file is usually from the same month.
@@ -137,6 +155,7 @@ export default function OldFilePage() {
   )
   const [familyCard, setFamilyCard] = useState<string | null>(null)
   const [joining, setJoining] = useState(false)
+  const newFamily = !familyId && category === 'family'
   useEffect(() => {
     if (!client || !familyId) return
     let current = true
@@ -201,6 +220,17 @@ export default function OldFilePage() {
     setTried(true)
     if (!client || !staff || nameWrong || phoneWrong || bornWrong || kinPhoneWrong || emailWrong)
       return
+    if (!category) return
+    // A new family: the family name must be there (request 228b).
+    if (newFamily) {
+      const wrong = checkFamily(family)
+      setFamilyShown(wrong)
+      if (Object.keys(wrong).length > 0) {
+        setProblem('Fill in the family details first.')
+        document.getElementById(`family-${Object.keys(wrong)[0]}`)?.focus()
+        return
+      }
+    }
     setBusy(true)
     setProblem(null)
     if (!skipCheck && cleanedPhone !== '') {
@@ -212,27 +242,51 @@ export default function OldFilePage() {
       }
     }
     setMatches([])
-    const result = await registerFromOldFile(
-      client,
-      name,
-      cleanedPhone || null,
-      staff.id,
-      born || null,
-      sex,
-      category,
-      {
-        email: more.email.trim().toLowerCase() || null,
-        address: more.address.trim() || null,
-        town: more.town || null,
-        lga: more.lga || null,
-        state: more.state || null,
-        next_of_kin_name: more.kinName.trim() || null,
-        next_of_kin_relationship: more.kinRelationship || null,
-        next_of_kin_phone: kinPhone || null,
-        first_registered_on: month ? `${month}-01` : null,
-        ...(familyId && category === 'family' ? { family_id: familyId } : {}),
-      },
-    )
+    const extras = {
+      email: more.email.trim().toLowerCase() || null,
+      address: more.address.trim() || null,
+      town: more.town || null,
+      lga: more.lga || null,
+      state: more.state || null,
+      next_of_kin_name: more.kinName.trim() || null,
+      next_of_kin_relationship: more.kinRelationship || null,
+      next_of_kin_phone: kinPhone || null,
+      first_registered_on: month ? `${month}-01` : null,
+    }
+    // A new family: the family and this first member, saved together.
+    const result = newFamily
+      ? await registerFamily(
+          client,
+          tidyFamily(family),
+          {
+            full_name: name.trim().replace(/\s+/g, ' '),
+            phone: cleanedPhone || null,
+            date_of_birth: born || null,
+            sex,
+            ...extras,
+            from_old_file: true,
+          },
+          staff.id,
+        )
+      : await registerFromOldFile(
+          client,
+          name,
+          cleanedPhone || null,
+          staff.id,
+          born || null,
+          sex,
+          category,
+          {
+            ...extras,
+            ...(familyId && category === 'family' ? { family_id: familyId } : {}),
+          },
+        )
+    const newFamilyId = 'familyId' in result ? (result.familyId as number | null) : null
+    if (newFamilyId) {
+      const found = await loadFamily(client, newFamilyId)
+      setSavedFamily(found)
+      setFamilyCard(found?.family_number ?? null)
+    }
     if (result.problem || !result.patient) {
       setBusy(false)
       setProblem(result.problem)
@@ -259,7 +313,11 @@ export default function OldFilePage() {
     setPhone('')
     setBorn('')
     setSex(null)
-    setCategory(familyId ? 'family' : 'individual')
+    setCategory(familyId ? 'family' : '')
+    setFamily(EMPTY_FAMILY)
+    setFamilyShown({})
+    setAddingMember(false)
+    setSavedFamily(null)
     setAntenatal(emptyAntenatal)
     setMore({
       email: '',
@@ -285,8 +343,22 @@ export default function OldFilePage() {
       <AppShell>
         <div className={styles.page}>
           <div className={styles.head}>
-            <h2>Patient registered</h2>
+            <h2>{savedFamily ? 'Family registered' : 'Patient registered'}</h2>
           </div>
+          {/* A new family: its name, number and the day it was registered. */}
+          {savedFamily ? (
+            <div className={styles.familyBanner}>
+              <Icon name="users" size={18} />
+              <span>
+                <b>{savedFamily.name}</b> family · {savedFamily.family_number} · registered{' '}
+                {new Date(savedFamily.created_at).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+          ) : null}
           <div className={styles.ok}>
             <Icon name="file" size={22} />
             <div>
@@ -345,7 +417,12 @@ export default function OldFilePage() {
                   setCategory('family')
                 }}
               >
-                <Icon name="users" size={16} /> {joining ? 'Starting…' : 'Add family member'}
+                <Icon name="users" size={16} />{' '}
+                {joining
+                  ? 'Starting…'
+                  : savedFamily
+                    ? 'Add another family member'
+                    : 'Add family member'}
               </button>
             ) : null}
             {problem ? <p className={styles.error}>{problem}</p> : null}
@@ -407,320 +484,403 @@ export default function OldFilePage() {
           </div>
         ) : null}
 
-        {/* ===== 6. Name, phone, and the old file ===== */}
-        <div className={styles.card}>
-          {/* The month the file was first opened, first, because files are
-              entered a month at a time (request 211). */}
-          <div className={styles.field}>
-            <label htmlFor="old-month">Month first registered (optional)</label>
-            <input
-              id="old-month"
+        {/* ===== 5b. The category, before anything else (request 228b) ===== */}
+        {!familyId ? (
+          <div className={`${styles.field} ${styles.categoryPick}`}>
+            <label htmlFor="old-category">Category</label>
+            <select
+              id="old-category"
               className={styles.input}
-              type="month"
-              min="1950-01"
-              max={new Date().toISOString().slice(0, 7)}
-              value={month}
-              onChange={(event) => setMonth(event.target.value)}
-            />
-            <small className={styles.muted}>
-              Stays the same for the next file, until you change it.
-            </small>
+              value={category}
+              onChange={(event) => {
+                setCategory(event.target.value as Category | '')
+                setProblem(null)
+                setAddingMember(false)
+              }}
+            >
+              <option value="">Select category</option>
+              <option value="individual">Individual</option>
+              <option value="family">Family</option>
+              <option value="antenatal">Antenatal</option>
+            </select>
           </div>
-          <div className={styles.field}>
-            <label htmlFor="old-name">Full name</label>
-            <input
-              id="old-name"
-              className={styles.input}
-              maxLength={120}
-              autoComplete="off"
-              value={name}
-              aria-invalid={tried && nameWrong ? 'true' : undefined}
-              onChange={(event) => setName(event.target.value)}
+        ) : null}
+
+        {/* ===== 5c. A new family: its details, then its first member ===== */}
+        {newFamily ? (
+          <>
+            <FamilyDetailsForm
+              value={family}
+              onChange={(next) => {
+                setFamily(next)
+                setFamilyShown({})
+              }}
+              shown={familyShown}
+              client={client}
+              staffId={staff.id}
             />
-            {tried && nameWrong ? <small className={styles.error}>{nameWrong}</small> : null}
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="old-phone">Phone number (optional)</label>
-            <input
-              id="old-phone"
-              className={styles.input}
-              inputMode="tel"
-              autoComplete="off"
-              placeholder="08031234567"
-              value={phone}
-              aria-invalid={tried && phoneWrong ? 'true' : undefined}
-              onChange={(event) => setPhone(event.target.value)}
-            />
-            {tried && phoneWrong ? <small className={styles.error}>{phoneWrong}</small> : null}
-          </div>
-          <div className={styles.fields2}>
-            <div className={styles.field}>
-              <label htmlFor="old-born">Date of birth (optional)</label>
-              <input
-                id="old-born"
-                type="date"
-                className={styles.input}
-                max={new Date().toISOString().slice(0, 10)}
-                value={born}
-                aria-invalid={bornWrong ? 'true' : undefined}
-                onChange={(event) => setBorn(event.target.value)}
-              />
-              {bornWrong ? <small className={styles.error}>{bornWrong}</small> : null}
-              {born && !bornWrong ? (
-                <small className={styles.hint}>Age: {ageFrom(born)}</small>
-              ) : null}
-            </div>
-            <div className={styles.field}>
-              <label>Sex (optional)</label>
-              <div className={styles.segments} role="group" aria-label="Sex">
-                {(['female', 'male'] as Sex[]).map((value) => (
+            {!addingMember ? (
+              <>
+                <p className={styles.familyNote}>A family needs at least one member.</p>
+                <div className={styles.buttons}>
                   <button
-                    key={value}
-                    type="button"
-                    aria-pressed={sex === value}
-                    onClick={() => setSex(sex === value ? null : value)}
+                    className={`${styles.button} ${styles.familyButton}`}
+                    onClick={() => {
+                      const wrong = checkFamily(family)
+                      setFamilyShown(wrong)
+                      if (Object.keys(wrong).length > 0) {
+                        document.getElementById(`family-${Object.keys(wrong)[0]}`)?.focus()
+                        return
+                      }
+                      // The member starts with the family's address.
+                      setMore((now) => ({
+                        ...now,
+                        address: family.address ?? '',
+                        town: family.town ?? '',
+                        lga: family.lga ?? '',
+                        state: family.state ?? '',
+                      }))
+                      setProblem(null)
+                      setAddingMember(true)
+                    }}
                   >
-                    {value === 'female' ? 'Female' : 'Male'}
+                    <Icon name="users" size={16} /> Add family member
                   </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className={styles.field}>
-            <label>Patient category</label>
-            <div className={styles.segments} role="group" aria-label="Patient category">
-              {(
-                [
-                  ['individual', 'Individual'],
-                  ['family', 'Family'],
-                  ['antenatal', 'Antenatal'],
-                ] as [Category, string][]
-              ).map(([value, words]) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={category === value}
-                  onClick={() => setCategory(value)}
-                >
-                  {words}
-                </button>
-              ))}
-            </div>
-          </div>
-          {familyCard ? (
-            <p className={styles.familyNote}>
-              Joining family <b>{familyCard}</b>. Choose another category to register this person on
-              their own.
-            </p>
-          ) : null}
-          {/* ===== The antenatal card's details, when Antenatal is chosen
-              (request 227o) ===== */}
-          {category === 'antenatal' ? (
-            <div className={styles.anteBox}>
-              <b>Antenatal details</b>
-              <div className={styles.fields2}>
-                {(
-                  [
-                    ['client_marital_status', 'Marital status', ANTENATAL_MARITAL, false],
-                    ['client_religion', 'Religion', ANTENATAL_RELIGION, true],
-                    ['client_education', 'Level of education', ANTENATAL_EDUCATION, true],
-                  ] as [keyof typeof emptyAntenatal, string, string[], boolean][]
-                ).map(([key, label, answers, other]) => (
-                  <div key={key} className={styles.field}>
-                    <label htmlFor={`old-${key}`}>{label}</label>
-                    <SearchSelect
-                      id={`old-${key}`}
-                      value={antenatal[key]}
-                      placeholder="Choose"
-                      options={answers.map((answer) => ({ value: answer, label: answer }))}
-                      onChange={setAnte(key)}
-                      onOther={other ? (typed) => typed && setAnte(key)(typed) : undefined}
-                    />
-                  </div>
-                ))}
-                <div className={styles.field}>
-                  <label htmlFor="old-client_occupation">Occupation</label>
-                  <input
-                    id="old-client_occupation"
-                    className={styles.input}
-                    maxLength={80}
-                    placeholder="e.g. Trader"
-                    value={antenatal.client_occupation}
-                    onChange={(event) => setAnte('client_occupation')(event.target.value)}
-                  />
                 </div>
+              </>
+            ) : (
+              <div className={styles.familyBanner}>
+                <Icon name="users" size={18} />
+                <span>
+                  First member of the <b>{family.name.trim()}</b> family
+                </span>
               </div>
-              <b>Next of kin</b>
-              <div className={styles.fields2}>
-                <div className={styles.field}>
-                  <label htmlFor="old-kin_occupation">Occupation</label>
-                  <input
-                    id="old-kin_occupation"
-                    className={styles.input}
-                    maxLength={80}
-                    placeholder="e.g. Driver"
-                    value={antenatal.kin_occupation}
-                    onChange={(event) => setAnte('kin_occupation')(event.target.value)}
-                  />
-                </div>
-                {(
-                  [
-                    ['kin_religion', 'Religion', ANTENATAL_RELIGION],
-                    ['kin_education', 'Level of education', ANTENATAL_EDUCATION],
-                  ] as [keyof typeof emptyAntenatal, string, string[]][]
-                ).map(([key, label, answers]) => (
-                  <div key={key} className={styles.field}>
-                    <label htmlFor={`old-${key}`}>{label}</label>
-                    <SearchSelect
-                      id={`old-${key}`}
-                      value={antenatal[key]}
-                      placeholder="Choose"
-                      options={answers.map((answer) => ({ value: answer, label: answer }))}
-                      onChange={setAnte(key)}
-                      onOther={(typed) => typed && setAnte(key)(typed)}
-                    />
-                  </div>
-                ))}
-                <div className={styles.field}>
-                  <label htmlFor="old-kin_age">Age</label>
-                  <input
-                    id="old-kin_age"
-                    className={styles.input}
-                    inputMode="numeric"
-                    placeholder="e.g. 40"
-                    value={antenatal.kin_age}
-                    onChange={(event) =>
-                      setAnte('kin_age')(event.target.value.replace(/\D/g, '').slice(0, 3))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          ) : null}
-          {/* ===== More details, folded (2026-11-16) ===== */}
-          <details className={styles.more}>
-            <summary>More details (optional): address, next of kin, email</summary>
+            )}
+          </>
+        ) : null}
+
+        {/* ===== 6. Name, phone, and the old file ===== */}
+        {!category || (newFamily && !addingMember) ? null : (
+          <div className={styles.card}>
+            {/* The month the file was first opened, first, because files are
+              entered a month at a time (request 211). */}
             <div className={styles.field}>
-              <label htmlFor="old-address">Address</label>
+              <label htmlFor="old-month">Month first registered (optional)</label>
               <input
-                id="old-address"
+                id="old-month"
                 className={styles.input}
-                maxLength={200}
-                value={more.address}
-                onChange={(event) => setMorePart('address')(event.target.value)}
+                type="month"
+                min="1950-01"
+                max={new Date().toISOString().slice(0, 7)}
+                value={month}
+                onChange={(event) => setMonth(event.target.value)}
               />
+              <small className={styles.muted}>
+                Stays the same for the next file, until you change it.
+              </small>
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="old-name">Full name</label>
+              <input
+                id="old-name"
+                className={styles.input}
+                maxLength={120}
+                autoComplete="off"
+                value={name}
+                aria-invalid={tried && nameWrong ? 'true' : undefined}
+                onChange={(event) => setName(event.target.value)}
+              />
+              {tried && nameWrong ? <small className={styles.error}>{nameWrong}</small> : null}
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="old-phone">Phone number (optional)</label>
+              <input
+                id="old-phone"
+                className={styles.input}
+                inputMode="tel"
+                autoComplete="off"
+                placeholder="08031234567"
+                value={phone}
+                aria-invalid={tried && phoneWrong ? 'true' : undefined}
+                onChange={(event) => setPhone(event.target.value)}
+              />
+              {tried && phoneWrong ? <small className={styles.error}>{phoneWrong}</small> : null}
             </div>
             <div className={styles.fields2}>
               <div className={styles.field}>
-                <label htmlFor="old-town">Town / City</label>
-                <OptionSelect
-                  client={client}
-                  staffId={staff.id}
-                  list="town"
-                  id="old-town"
-                  value={more.town}
-                  onChange={setMorePart('town')}
-                  placeholder="Choose the town"
-                  otherLabel="Type the town"
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="old-lga">Local government (LGA)</label>
-                <OptionSelect
-                  client={client}
-                  staffId={staff.id}
-                  list="lga"
-                  id="old-lga"
-                  value={more.lga}
-                  onChange={setMorePart('lga')}
-                  placeholder="Choose the local government"
-                  otherLabel="Type the local government"
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="old-state">State</label>
-                <OptionSelect
-                  client={client}
-                  staffId={staff.id}
-                  list="state"
-                  id="old-state"
-                  value={more.state}
-                  onChange={setMorePart('state')}
-                  placeholder="Choose the State"
-                  otherLabel="Type the State"
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="old-email">Email</label>
+                <label htmlFor="old-born">Date of birth (optional)</label>
                 <input
-                  id="old-email"
+                  id="old-born"
+                  type="date"
                   className={styles.input}
-                  type="email"
-                  inputMode="email"
-                  value={more.email}
-                  aria-invalid={tried && emailWrong ? 'true' : undefined}
-                  onChange={(event) => setMorePart('email')(event.target.value)}
+                  max={new Date().toISOString().slice(0, 10)}
+                  value={born}
+                  aria-invalid={bornWrong ? 'true' : undefined}
+                  onChange={(event) => setBorn(event.target.value)}
                 />
-                {tried && emailWrong ? <small className={styles.error}>{emailWrong}</small> : null}
-              </div>
-            </div>
-            <span className={styles.fieldTitle}>Next of kin</span>
-            <div className={styles.fields2}>
-              <div className={styles.field}>
-                <label htmlFor="old-kin-name">Full name</label>
-                <input
-                  id="old-kin-name"
-                  className={styles.input}
-                  maxLength={120}
-                  value={more.kinName}
-                  onChange={(event) => setMorePart('kinName')(event.target.value)}
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="old-kin-relationship">Relationship</label>
-                <OptionSelect
-                  client={client}
-                  staffId={staff.id}
-                  list="relationship"
-                  id="old-kin-relationship"
-                  value={more.kinRelationship}
-                  onChange={setMorePart('kinRelationship')}
-                  placeholder="Choose the relationship"
-                  otherLabel="Type the relationship"
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="old-kin-phone">Phone</label>
-                <input
-                  id="old-kin-phone"
-                  className={styles.input}
-                  inputMode="tel"
-                  placeholder="08031234567"
-                  value={more.kinPhone}
-                  aria-invalid={tried && kinPhoneWrong ? 'true' : undefined}
-                  onChange={(event) => setMorePart('kinPhone')(event.target.value)}
-                />
-                {tried && kinPhoneWrong ? (
-                  <small className={styles.error}>{kinPhoneWrong}</small>
+                {bornWrong ? <small className={styles.error}>{bornWrong}</small> : null}
+                {born && !bornWrong ? (
+                  <small className={styles.hint}>Age: {ageFrom(born)}</small>
                 ) : null}
               </div>
+              <div className={styles.field}>
+                <label>Sex (optional)</label>
+                <div className={styles.segments} role="group" aria-label="Sex">
+                  {(['female', 'male'] as Sex[]).map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={sex === value}
+                      onClick={() => setSex(sex === value ? null : value)}
+                    >
+                      {value === 'female' ? 'Female' : 'Male'}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </details>
-          <div className={styles.field}>
-            <span className={styles.fieldTitle}>Old file (optional)</span>
-            <FilePicker files={files} onChange={setFiles} disabled={busy} />
+            {/* Joining a family that exists: the category can still change
+              here, to register this person on their own. */}
+            {familyId ? (
+              <div className={styles.field}>
+                <label>Patient category</label>
+                <div className={styles.segments} role="group" aria-label="Patient category">
+                  {(
+                    [
+                      ['individual', 'Individual'],
+                      ['family', 'Family'],
+                      ['antenatal', 'Antenatal'],
+                    ] as [Category, string][]
+                  ).map(([value, words]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={category === value}
+                      onClick={() => setCategory(value)}
+                    >
+                      {words}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {familyCard ? (
+              <p className={styles.familyNote}>
+                Joining family <b>{familyCard}</b>. Choose another category to register this person
+                on their own.
+              </p>
+            ) : null}
+            {/* ===== The antenatal card's details, when Antenatal is chosen
+              (request 227o) ===== */}
+            {category === 'antenatal' ? (
+              <div className={styles.anteBox}>
+                <b>Antenatal details</b>
+                <div className={styles.fields2}>
+                  {(
+                    [
+                      ['client_marital_status', 'Marital status', ANTENATAL_MARITAL, false],
+                      ['client_religion', 'Religion', ANTENATAL_RELIGION, true],
+                      ['client_education', 'Level of education', ANTENATAL_EDUCATION, true],
+                    ] as [keyof typeof emptyAntenatal, string, string[], boolean][]
+                  ).map(([key, label, answers, other]) => (
+                    <div key={key} className={styles.field}>
+                      <label htmlFor={`old-${key}`}>{label}</label>
+                      <SearchSelect
+                        id={`old-${key}`}
+                        value={antenatal[key]}
+                        placeholder="Choose"
+                        options={answers.map((answer) => ({ value: answer, label: answer }))}
+                        onChange={setAnte(key)}
+                        onOther={other ? (typed) => typed && setAnte(key)(typed) : undefined}
+                      />
+                    </div>
+                  ))}
+                  <div className={styles.field}>
+                    <label htmlFor="old-client_occupation">Occupation</label>
+                    <input
+                      id="old-client_occupation"
+                      className={styles.input}
+                      maxLength={80}
+                      placeholder="e.g. Trader"
+                      value={antenatal.client_occupation}
+                      onChange={(event) => setAnte('client_occupation')(event.target.value)}
+                    />
+                  </div>
+                </div>
+                <b>Next of kin</b>
+                <div className={styles.fields2}>
+                  <div className={styles.field}>
+                    <label htmlFor="old-kin_occupation">Occupation</label>
+                    <input
+                      id="old-kin_occupation"
+                      className={styles.input}
+                      maxLength={80}
+                      placeholder="e.g. Driver"
+                      value={antenatal.kin_occupation}
+                      onChange={(event) => setAnte('kin_occupation')(event.target.value)}
+                    />
+                  </div>
+                  {(
+                    [
+                      ['kin_religion', 'Religion', ANTENATAL_RELIGION],
+                      ['kin_education', 'Level of education', ANTENATAL_EDUCATION],
+                    ] as [keyof typeof emptyAntenatal, string, string[]][]
+                  ).map(([key, label, answers]) => (
+                    <div key={key} className={styles.field}>
+                      <label htmlFor={`old-${key}`}>{label}</label>
+                      <SearchSelect
+                        id={`old-${key}`}
+                        value={antenatal[key]}
+                        placeholder="Choose"
+                        options={answers.map((answer) => ({ value: answer, label: answer }))}
+                        onChange={setAnte(key)}
+                        onOther={(typed) => typed && setAnte(key)(typed)}
+                      />
+                    </div>
+                  ))}
+                  <div className={styles.field}>
+                    <label htmlFor="old-kin_age">Age</label>
+                    <input
+                      id="old-kin_age"
+                      className={styles.input}
+                      inputMode="numeric"
+                      placeholder="e.g. 40"
+                      value={antenatal.kin_age}
+                      onChange={(event) =>
+                        setAnte('kin_age')(event.target.value.replace(/\D/g, '').slice(0, 3))
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {/* ===== More details, folded (2026-11-16) ===== */}
+            <details className={styles.more}>
+              <summary>More details (optional): address, next of kin, email</summary>
+              <div className={styles.field}>
+                <label htmlFor="old-address">Address</label>
+                <input
+                  id="old-address"
+                  className={styles.input}
+                  maxLength={200}
+                  value={more.address}
+                  onChange={(event) => setMorePart('address')(event.target.value)}
+                />
+              </div>
+              <div className={styles.fields2}>
+                <div className={styles.field}>
+                  <label htmlFor="old-town">Town / City</label>
+                  <OptionSelect
+                    client={client}
+                    staffId={staff.id}
+                    list="town"
+                    id="old-town"
+                    value={more.town}
+                    onChange={setMorePart('town')}
+                    placeholder="Choose the town"
+                    otherLabel="Type the town"
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="old-lga">Local government (LGA)</label>
+                  <OptionSelect
+                    client={client}
+                    staffId={staff.id}
+                    list="lga"
+                    id="old-lga"
+                    value={more.lga}
+                    onChange={setMorePart('lga')}
+                    placeholder="Choose the local government"
+                    otherLabel="Type the local government"
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="old-state">State</label>
+                  <OptionSelect
+                    client={client}
+                    staffId={staff.id}
+                    list="state"
+                    id="old-state"
+                    value={more.state}
+                    onChange={setMorePart('state')}
+                    placeholder="Choose the State"
+                    otherLabel="Type the State"
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="old-email">Email</label>
+                  <input
+                    id="old-email"
+                    className={styles.input}
+                    type="email"
+                    inputMode="email"
+                    value={more.email}
+                    aria-invalid={tried && emailWrong ? 'true' : undefined}
+                    onChange={(event) => setMorePart('email')(event.target.value)}
+                  />
+                  {tried && emailWrong ? (
+                    <small className={styles.error}>{emailWrong}</small>
+                  ) : null}
+                </div>
+              </div>
+              <span className={styles.fieldTitle}>Next of kin</span>
+              <div className={styles.fields2}>
+                <div className={styles.field}>
+                  <label htmlFor="old-kin-name">Full name</label>
+                  <input
+                    id="old-kin-name"
+                    className={styles.input}
+                    maxLength={120}
+                    value={more.kinName}
+                    onChange={(event) => setMorePart('kinName')(event.target.value)}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="old-kin-relationship">Relationship</label>
+                  <OptionSelect
+                    client={client}
+                    staffId={staff.id}
+                    list="relationship"
+                    id="old-kin-relationship"
+                    value={more.kinRelationship}
+                    onChange={setMorePart('kinRelationship')}
+                    placeholder="Choose the relationship"
+                    otherLabel="Type the relationship"
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="old-kin-phone">Phone</label>
+                  <input
+                    id="old-kin-phone"
+                    className={styles.input}
+                    inputMode="tel"
+                    placeholder="08031234567"
+                    value={more.kinPhone}
+                    aria-invalid={tried && kinPhoneWrong ? 'true' : undefined}
+                    onChange={(event) => setMorePart('kinPhone')(event.target.value)}
+                  />
+                  {tried && kinPhoneWrong ? (
+                    <small className={styles.error}>{kinPhoneWrong}</small>
+                  ) : null}
+                </div>
+              </div>
+            </details>
+            <div className={styles.field}>
+              <span className={styles.fieldTitle}>Old file (optional)</span>
+              <FilePicker files={files} onChange={setFiles} disabled={busy} />
+            </div>
+            {problem ? <p className={styles.error}>{problem}</p> : null}
+            <div className={styles.buttons}>
+              <button
+                className={`${styles.button} ${styles.primary}`}
+                disabled={busy}
+                onClick={() => save()}
+              >
+                {busy ? 'Saving…' : newFamily ? 'Save family and member' : 'Save patient'}
+              </button>
+            </div>
           </div>
-          {problem ? <p className={styles.error}>{problem}</p> : null}
-          <div className={styles.buttons}>
-            <button
-              className={`${styles.button} ${styles.primary}`}
-              disabled={busy}
-              onClick={() => save()}
-            >
-              {busy ? 'Saving…' : 'Save patient'}
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </AppShell>
   )

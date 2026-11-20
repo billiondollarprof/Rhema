@@ -200,6 +200,29 @@ const PHARMACY_ALERTS = {
 }
 
 // ===== 1. Every screen, and the text that shows it has loaded =====
+// A made up family (request 228b): one row, or the list, as asked.
+const FAMILY = {
+  id: 12,
+  family_number: 'FAM-000012',
+  name: 'James',
+  phone: null,
+  address: '4 Okoro Close',
+  town: 'Surulere',
+  lga: 'Surulere',
+  state: 'Lagos',
+  country: 'Nigeria',
+  created_at: hoursAgo(48),
+}
+const oneOrAll = (row) => (req) =>
+  (req.headers().accept || '').includes('vnd.pgrst.object') ? row : [row]
+const FAMILY_ROWS = oneOrAll(FAMILY)
+const FAMILY_PATIENT = oneOrAll({
+  ...require('./mock.cjs').PATIENT,
+  category: 'family',
+  family_id: 12,
+  family: { family_number: 'FAM-000012' },
+})
+
 module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today' },
   // Home is different for every role (review pass, 2026-11-02).
@@ -317,6 +340,34 @@ module.exports.SCREENS = [
     press: 'Take vitals',
     mustSee: ['Take vitals for Adaeze Okafor', 'Temperature °C', 'Save vital signs'],
   },
+  // Request 228b: the category first; Individual opens the form.
+  {
+    path: '/patients/register/',
+    waitFor: 'Register patient',
+    press: 'Individual',
+    mustSee: ['Category', 'Who are we registering?', 'Save patient'],
+  },
+  // Request 228b: Family opens the Family details card and Add family member.
+  {
+    path: '/patients/register/',
+    waitFor: 'Register patient',
+    press: 'Family',
+    mustSee: ['Family details', 'Family name (surname)', 'Add family member'],
+  },
+  // Request 228b: adding to a family that exists: no card fee.
+  {
+    path: '/patients/register/?family=12',
+    waitFor: 'Adding to family',
+    extra: { 'rest/v1/families': FAMILY_ROWS },
+    mustSee: ['The family card covers this member. No card fee.'],
+  },
+  // Request 228b: a member's page shows the family's details, and Edit.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Adaeze Okafor',
+    extra: { 'rest/v1/families': FAMILY_ROWS, 'rest/v1/patients': FAMILY_PATIENT },
+    mustSee: ['Family name', 'Family address', 'Edit family details', 'Add family member'],
+  },
   // Request 227g: choosing Antenatal shows the antenatal card's details.
   {
     path: '/patients/register/',
@@ -381,6 +432,13 @@ module.exports.SCREENS = [
     extra: QUEUE_PRIORITY,
   },
   { path: '/patients/old-file/', waitFor: 'Register from old file' },
+  // Request 228b: Family on an old file opens the Family details card.
+  {
+    path: '/patients/old-file/',
+    waitFor: 'Register from old file',
+    press: 'Family',
+    mustSee: ['Family details', 'Family name (surname)', 'Add family member'],
+  },
   // Request 227o: Antenatal on an old file shows the antenatal card's details.
   {
     path: '/patients/old-file/',
