@@ -243,6 +243,42 @@ module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today', role: 'doctor', medical: true },
   { path: '/', waitFor: 'Registered today', role: 'laboratory' },
   { path: '/', waitFor: 'Registered today', role: 'pharmacy' },
+  // Request 233: the Pharmacy finds a patient's drugs to give, paid or not.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Adaeze Okafor',
+    role: 'pharmacy',
+    extra: {
+      'rest/v1/prescriptions': [
+        {
+          id: 5,
+          patient_id: 1,
+          note: null,
+          status: 'awaiting_payment',
+          prescribed_at: hoursAgo(2),
+          dispensed_at: null,
+          expired_at: null,
+          also_sent: false,
+          payment_id: null,
+          patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+          prescriber: DOCTOR,
+          items: [
+            {
+              id: 50,
+              drug: 'Paracetamol',
+              strength: '500 mg tablet',
+              dose: '1 g',
+              how_often: 'Three times daily',
+              days: 3,
+              quantity: '18',
+              note: null,
+            },
+          ],
+        },
+      ],
+    },
+    mustSee: ['Drugs to give', 'Not paid yet', 'Dispensed'],
+  },
   // Request 232: an unpaid drug can still be dispensed; an unpaid test done.
   {
     path: '/',
@@ -486,12 +522,27 @@ module.exports.SCREENS = [
   { path: '/privacy/', waitFor: 'Your rights' },
   { path: '/terms/', waitFor: 'Your account is yours alone' },
   { path: '/lab/request/?p=1', waitFor: 'Send to', medical: true },
+  // Request 233: Front Desk and Lab (the default), or Front Desk only.
+  {
+    path: '/lab/request/?p=1',
+    waitFor: 'Send to',
+    medical: true,
+    mustSee: ['Front Desk and Lab', 'Front Desk only'],
+  },
   { path: '/lab/result/', waitFor: 'Add a lab result' },
   // Every test, no patient (2026-11-16).
   { path: '/lab/tests/', waitFor: 'Lab test list', role: 'laboratory' },
   // Find a patient's paid tests, to correct (request 214).
   { path: '/lab/patient/', waitFor: "Find a patient's tests", role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
+  // Request 233: Front Desk and Pharmacy (the default), or Front Desk only.
+  {
+    path: '/pharmacy/prescribe/?p=1',
+    waitFor: 'Prescribe',
+    medical: true,
+    role: 'doctor',
+    mustSee: ['Front Desk and Pharmacy', 'Front Desk only'],
+  },
   { path: '/pharmacy/list/', waitFor: 'Medicine list', role: 'pharmacy' },
   // Request 231: every name shows (not only 60), each with Add another strength.
   {

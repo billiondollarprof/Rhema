@@ -862,8 +862,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     sent to only front desk... Once the front desk click take payment...
     The system automatically just sends it to lab... Same with pharmacy. But
     if it was sent to both sides, then the system only updates the pharmacy
-    of the payment as well as lab of the payment." To check against the
-    code and say back.
+    of the payment as well as lab of the payment." CHECKED 2026-11-20: today the choices are "Pharmacy and
+    Front Desk (payment)" and "Straight to the pharmacy" (lab the same), plus
+    "Also send to..." after sending. Pharmacy: front-desk-only already
+    reaches the Pharmacy's list on payment (status awaiting_dispense).
+    Lab: every request shows on the Lab's list at once, paid or not (no
+    front-desk-only for the lab yet). Notifications count unpaid work for
+    neither. The Pharmacy has no patient search for drugs; the Lab's Find a
+    patient's tests shows paid ones only. Said back.
+    HIS YES 2026-11-20: "Straight to the pharmacy or straight to lab goes
+    away... Front desk only. The test will reach the lab when front desk has
+    taken money... front desk and pharmacy, let it be the default."
+    BUILT: migration 20261120143627 (lab_requests.sent_to_lab; request_lab
+    takes front_desk or both, an older screen's laboratory counts as both;
+    every new request waits for payment), test 063, test 009 section 8 now
+    checks the new rule, 3 breaks caught. Screens: Front Desk and Pharmacy /
+    Front Desk only (and the same for the Lab), default both; the Lab's list
+    and notices hold what was sent to it or is paid; the Pharmacy's notices
+    the same; Drugs to give on the patient's page for the Pharmacy; Find a
+    patient's tests shows unpaid ones. HIS YES ON THE SQL, 2026-11-20.
 
 232. **Dispense and test before payment; the options; drafts never lost.**
     (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
@@ -910,6 +927,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     232 LIVE 2026-11-20 (0 security warnings on testing and live).
     230a BUILT 2026-11-20: web/public/_headers keeps /_next/static for a year
     (immutable; the names carry fingerprints). No SQL.
+    230a LIVE 2026-11-20.
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the

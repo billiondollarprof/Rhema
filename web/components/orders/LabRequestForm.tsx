@@ -11,7 +11,8 @@
  * How it goes:
  *   1. Tap the common tests, or "Add a test" to find any other.
  *   2. A note for the lab, if needed.
- *   3. Send to the Lab and the Front Desk (payment), or straight to the Lab.
+ *   3. Send to the Front Desk and the Lab (the default), or to the Front
+ *      Desk only: the Lab gets it once it is paid (request 233).
  *
  * Never: let somebody without medical record access send a request. The
  * database refuses it too.
@@ -29,7 +30,9 @@ import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import type { PatientResult } from '@/lib/patients/patients'
 
-type SendTo = 'front_desk' | 'laboratory'
+// The Front Desk and the Lab at once (the default), or the Front Desk only:
+// the Lab then gets it once it is paid (request 233, 2026-11-20).
+type SendTo = 'both' | 'front_desk'
 
 export default function LabRequestForm({
   client,
@@ -47,7 +50,7 @@ export default function LabRequestForm({
 }) {
   const [tests, setTests] = useState<string[]>([])
   const [note, setNote] = useState('')
-  const [sendTo, setSendTo] = useState<SendTo>('front_desk')
+  const [sendTo, setSendTo] = useState<SendTo>('both')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState<string | null>(null)
@@ -61,7 +64,8 @@ export default function LabRequestForm({
     restore: (typed) => {
       setTests(typed.tests)
       setNote(typed.note)
-      setSendTo(typed.sendTo)
+      // A draft from before 2026-11-20 may say 'laboratory': now both.
+      setSendTo(typed.sendTo === 'front_desk' ? 'front_desk' : 'both')
     },
   })
 
@@ -84,9 +88,9 @@ export default function LabRequestForm({
     }
     draft.clear()
     setSent(
-      sendTo === 'front_desk'
+      sendTo === 'both'
         ? `Sent to the Lab, and to the Front Desk for payment: ${tests.join(', ')}.`
-        : `Sent to the Laboratory: ${tests.join(', ')}.`,
+        : `Sent to the Front Desk for payment: ${tests.join(', ')}. The Lab gets it once it is paid.`,
     )
   }
 
@@ -180,19 +184,15 @@ export default function LabRequestForm({
       <div>
         <span className={styles.label}>Send to</span>
         <div className={styles.segments} role="group" aria-label="Send to">
+          <button type="button" aria-pressed={sendTo === 'both'} onClick={() => setSendTo('both')}>
+            Front Desk and Lab
+          </button>
           <button
             type="button"
             aria-pressed={sendTo === 'front_desk'}
             onClick={() => setSendTo('front_desk')}
           >
-            Lab and Front Desk (payment)
-          </button>
-          <button
-            type="button"
-            aria-pressed={sendTo === 'laboratory'}
-            onClick={() => setSendTo('laboratory')}
-          >
-            Straight to the lab
+            Front Desk only
           </button>
         </div>
       </div>
