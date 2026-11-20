@@ -867,6 +867,24 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     button... doctor is typing a medicine, but he did not save. It goes back,
     it saves as draft, and after a while it shows it to him. So either
     continue or delete."
+    REVIEW DONE 2026-11-20: all 61 database tests, verify, layout (55
+    screens at 320 to 1440), readability (light and dark), can-be-seen (88),
+    click-through (no button broke a page), npm audit (0 high; 1 moderate in
+    the lint tools only, never shipped: left for the other agent's list).
+    Code size: first visit 871 KB at the start of the session, 873 KB now.
+    Fixed: the payment lists waited for the expiry (now together, withExpiry).
+    Found and fixed (SQL waiting for his yes): a signed in person could
+    change any column of a family or add an empty family directly
+    (20261120082841_families_details_only, test 061; test 016 accepts the
+    stronger refusal).
+    FOUND, PROPOSED, WAITING: (a) app files are not kept by the browser
+    between opens (no long cache header on /_next/static), so every open
+    asks again; poor 3G: sign in screen ready in about 20 s; (b) warm up
+    messages, notifications, history and the role's lists in memory after
+    Home; (c) records of patients seen in the last 7 days on the device for
+    doctors and nurses (today: open visits only; NDPA decision); (d) drafts
+    on Take vitals, the registration forms, Edit details and antenatal
+    forms; a new family waiting on the device with no network.
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
