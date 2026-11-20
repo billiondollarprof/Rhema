@@ -972,8 +972,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        member added later; Family card shows the family's details with Edit
        family details; Find patient shows families by name, tap to line up
        the members. Screen checks now pick a drop down option too
-       (mock.cjs pressFirst, used by all four checks). WAITING FOR HIS YES
-       ON THE SQL.
+       (mock.cjs pressFirst, used by all four checks). HIS YES ON THE SQL,
+       2026-11-20.
+    b DECIDED 2026-11-20: a member who changes category keeps the family
+       link (their own card and card fee, still listed in the family): "someone
+       who is part of the family can come and change their category to
+       antenatal... they are still part of that family... I think you should
+       confirm that and leave it that way." Numbers stay: FAM for the family,
+       RMC for each member.
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public
     for now (GitHub cost); private at the end.
