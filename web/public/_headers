@@ -24,3 +24,11 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=()
+
+# Request 230a (2026-11-20, his yes): the app's own code and styles. Each file
+# name carries a fingerprint of its contents, so a new version always gets a
+# new name. The browser may keep these for a year and never ask again, which
+# makes every later open fast on a poor network. Never put patient data
+# under /_next/static (only the build writes there).
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
