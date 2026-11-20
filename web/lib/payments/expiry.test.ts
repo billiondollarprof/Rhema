@@ -1,7 +1,7 @@
 // Tests for drugs and lab tests that expire unpaid (request 228a).
 import { describe, expect, it, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { expireUnpaid, isExpiredRefusal } from './expiry'
+import { expireUnpaid, isExpiredRefusal, withExpiry } from './expiry'
 
 describe('isExpiredRefusal', () => {
   it('knows the database refusing an expired one', () => {
@@ -20,5 +20,30 @@ describe('expireUnpaid', () => {
     await Promise.all([expireUnpaid(client), expireUnpaid(client), expireUnpaid(client)])
     expect(rpc).toHaveBeenCalledTimes(1)
     expect(rpc).toHaveBeenCalledWith('expire_unpaid')
+  })
+})
+
+describe('withExpiry', () => {
+  it('loads the list once when nothing expired', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(Date.now() + 120_000)
+    const client = {
+      rpc: vi.fn().mockResolvedValue({ data: 0, error: null }),
+    } as unknown as SupabaseClient
+    const load = vi.fn().mockResolvedValue(['one'])
+    expect(await withExpiry(client, load)).toEqual(['one'])
+    expect(load).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+  })
+  it('loads it again when something expired just now', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(Date.now() + 240_000)
+    const client = {
+      rpc: vi.fn().mockResolvedValue({ data: 2, error: null }),
+    } as unknown as SupabaseClient
+    const load = vi.fn().mockResolvedValueOnce(['old']).mockResolvedValueOnce(['fresh'])
+    expect(await withExpiry(client, load)).toEqual(['fresh'])
+    expect(load).toHaveBeenCalledTimes(2)
+    vi.useRealTimers()
   })
 })

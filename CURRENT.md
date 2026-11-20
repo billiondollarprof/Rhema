@@ -849,6 +849,25 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+230. **Run through everything; instant loading; drafts with no network.**
+    (2026-11-20) "run through everything that you did. Ensure that nothing
+    got broken... the app loads well. There's no lagging, and all the
+    security is intact. There are no loopholes... they align very well on
+    the screen... tablets, portrait tablet, portrait mobile phone, landscape
+    tablet, desktop... The app still loads really fast, even with the
+    smallest amount of network. And once it loads, data of the previous 7
+    days or people actively being attended to for the past 7 days are
+    loaded, including medical records, including history section... before
+    a person opens any button, at the background, many of the next sections
+    loads down. So once they click find patient... all the category of
+    patients that have been active in the past 7 days... are already
+    loaded. When they click on messages, any recent messages... from the
+    past 7 days... history... majority of the things still saves as draft
+    and loads underneath when there is no network, when they click save
+    button... doctor is typing a medicine, but he did not save. It goes back,
+    it saves as draft, and after a while it shows it to him. So either
+    continue or delete."
+
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major

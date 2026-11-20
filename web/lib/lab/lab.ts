@@ -14,7 +14,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { COMMON_LAB_TESTS } from './catalogue'
-import { EXPIRED_WORDS, expireUnpaid, isExpiredRefusal } from '@/lib/payments/expiry'
+import { EXPIRED_WORDS, isExpiredRefusal, withExpiry } from '@/lib/payments/expiry'
 
 // ===== 1. Shapes and words =====
 export type LabStatus = 'awaiting_payment' | 'awaiting_test' | 'completed' | 'voided'
@@ -103,16 +103,17 @@ export async function listAwaitingPayment(
   client: SupabaseClient,
   patientId?: number,
 ): Promise<LabRequest[]> {
-  // First the database expires what was not paid in 72 hours (request 228a).
-  await expireUnpaid(client)
-  let query = client
-    .from('lab_requests')
-    .select(REQUEST_COLUMNS)
-    .is('payment_id', null)
-    .neq('status', 'voided')
-  if (patientId) query = query.eq('patient_id', patientId)
-  const { data } = await query.order('requested_at')
-  return (data as unknown as LabRequest[] | null) ?? []
+  // The database expires what was not paid in 72 hours as this loads (228a).
+  return withExpiry(client, async () => {
+    let query = client
+      .from('lab_requests')
+      .select(REQUEST_COLUMNS)
+      .is('payment_id', null)
+      .neq('status', 'voided')
+    if (patientId) query = query.eq('patient_id', patientId)
+    const { data } = await query.order('requested_at')
+    return (data as unknown as LabRequest[] | null) ?? []
+  })
 }
 
 export async function payLabRequest(
@@ -161,13 +162,14 @@ export async function payLabRequestLines(
 // goes to lab and front desk simultaneously"). An unpaid one shows as
 // waiting for payment and turns ready the moment it is paid.
 export async function listAwaitingTest(client: SupabaseClient): Promise<LabRequest[]> {
-  await expireUnpaid(client)
-  const { data } = await client
-    .from('lab_requests')
-    .select(REQUEST_COLUMNS)
-    .in('status', ['awaiting_test', 'awaiting_payment'])
-    .order('requested_at')
-  return (data as unknown as LabRequest[] | null) ?? []
+  return withExpiry(client, async () => {
+    const { data } = await client
+      .from('lab_requests')
+      .select(REQUEST_COLUMNS)
+      .in('status', ['awaiting_test', 'awaiting_payment'])
+      .order('requested_at')
+    return (data as unknown as LabRequest[] | null) ?? []
+  })
 }
 
 export async function getLabRequest(
@@ -304,7 +306,13 @@ export async function loadPatientLab(
   client: SupabaseClient,
   patientId: number,
 ): Promise<{ results: LabResult[]; open: LabRequest[] }> {
-  await expireUnpaid(client)
+  return withExpiry(client, () => loadPatientLabNow(client, patientId))
+}
+
+async function loadPatientLabNow(
+  client: SupabaseClient,
+  patientId: number,
+): Promise<{ results: LabResult[]; open: LabRequest[] }> {
   const [results, open] = await Promise.all([
     client
       .from('lab_results')

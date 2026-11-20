@@ -13,7 +13,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
-import { EXPIRED_WORDS, expireUnpaid, isExpiredRefusal } from '@/lib/payments/expiry'
+import { EXPIRED_WORDS, isExpiredRefusal, withExpiry } from '@/lib/payments/expiry'
 
 // ===== 1. Shapes and words =====
 export type PrescriptionStatus = 'awaiting_payment' | 'awaiting_dispense' | 'dispensed' | 'voided'
@@ -100,14 +100,15 @@ export async function prescribe(
 }
 
 // ===== 3. Lists =====
-// Each list first lets the database expire what was not paid in 72 hours
-// (request 228a), so an expired one never shows as waiting.
-async function listWhere(client: SupabaseClient, filter: string, patientId?: number) {
-  await expireUnpaid(client)
-  let query = client.from('prescriptions').select(COLUMNS).or(filter)
-  if (patientId) query = query.eq('patient_id', patientId)
-  const { data } = await query.order('prescribed_at')
-  return (data as unknown as Prescription[] | null) ?? []
+// Each list lets the database expire what was not paid in 72 hours
+// (request 228a) as it loads, so an expired one never shows as waiting.
+function listWhere(client: SupabaseClient, filter: string, patientId?: number) {
+  return withExpiry(client, async () => {
+    let query = client.from('prescriptions').select(COLUMNS).or(filter)
+    if (patientId) query = query.eq('patient_id', patientId)
+    const { data } = await query.order('prescribed_at')
+    return (data as unknown as Prescription[] | null) ?? []
+  })
 }
 
 // The Front Desk: every prescription not paid and not cancelled, however it
@@ -151,13 +152,14 @@ export async function loadPatientPrescriptions(
   client: SupabaseClient,
   patientId: number,
 ): Promise<Prescription[]> {
-  await expireUnpaid(client)
-  const { data } = await client
-    .from('prescriptions')
-    .select(COLUMNS)
-    .eq('patient_id', patientId)
-    .order('prescribed_at', { ascending: false })
-  return (data as unknown as Prescription[] | null) ?? []
+  return withExpiry(client, async () => {
+    const { data } = await client
+      .from('prescriptions')
+      .select(COLUMNS)
+      .eq('patient_id', patientId)
+      .order('prescribed_at', { ascending: false })
+    return (data as unknown as Prescription[] | null) ?? []
+  })
 }
 
 // ===== 4. The Front Desk: a price per drug, the database adds them up =====
