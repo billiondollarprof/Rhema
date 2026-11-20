@@ -302,6 +302,17 @@ textarea.input {
   color: var(--mut-2);
 }
 
+/* Add another strength or size under a name (request 231, 2026-11-20). */
+.addMore {
+  justify-self: start;
+  margin: 2px 0 10px;
+}
+
+.lineRow > .input {
+  flex: 1 1 180px;
+  width: auto;
+}
+
 .editRow {
   display: grid;
   gap: 8px;

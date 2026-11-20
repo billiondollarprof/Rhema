@@ -849,6 +849,91 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+232. **Dispense and test before payment; the options; drafts never lost.**
+    (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
+    confirm that the lab and the pharmacy can dispense medicine or take a
+    lab test, even if someone has not paid... it is showing waiting for
+    payment to them, but there's the button to dispense... can still be
+    clicked... the lab, the same thing... finished the test, even if
+    payment has not been made... for emergency case... already an
+    inpatient that was admitted, so that there will be no obstruction as
+    to payment... money that has not been paid... will always remind the
+    front desk... It's only the one that has not been paid that disappears
+    after 24 hours. The one that has not been dispensed or carried out."
+    (The limit is 72 hours since his choice of 2026-11-20.) "So I just want
+    to confirm that that's how it is now currently."
+    On 230 a to d: "all of them are good... the device they are using, the
+    CPU is 2 gig RAM, the desktop... do it in a way that... their system is
+    still able to carry it... let's not keep so many drafts, because what
+    if that person's system crashes and network never came online and some
+    things just wipe, or the person logs out?... if it's possible that even
+    if the person logs out, they didn't lose those drafts... what about if
+    the computer they are using, something happens to it? So the drafts...
+    should load into the system within the next 5 minutes or something like
+    that. The system should try it until it's uploaded to the database."
+
+231. **The Pharmacy sees only a few medicines; add a strength or a size.**
+    (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
+    same ones given to the other agent for 227i) "the pharmacy is saying
+    that the drugs, they are not enough, they are not complete... There is
+    not enough medicine to choose from in the medicine list for the
+    pharmacist... I want the pharmacist to be able to see the list of all
+    the medicine that has been added into the system. But there are just a
+    few they are seeing, the supplies and all of those. So I'll need you to
+    check that." And: "on that row for a medicine that has been added
+    already, put a row that says add strength... cimetidine might have 400
+    milligram, 200 milligram... add another strength... Same thing with
+    supplies too... there may be like 5 sizes in the system currently, and
+    they want to add an additional size. They should be able to add."
+    (Earlier platforms he named for the lists: Swift Practice, Bama in
+    India, Epic in the United States, open repositories.)
+    FOUND 2026-11-20: every medicine on his 4 photos is already on the list
+    (some under another name: Augmentin, Cotrimoxazole for Septrin,
+    Cafergot, Vitamin C, Chlorpheniramine; cimetidine 200 and 400 mg;
+    syringes in 6 sizes). The cause: the Pharmacy's list showed only the
+    first 60 names until something was typed. BUILT (no SQL): every name
+    shows, with the count; "+ Add another strength" (supplies: "+ Add
+    another size") under each name, using add_medicine; the list is read
+    1,000 rows at a time (Supabase answers at most 1,000), so it never stops
+    short as it grows. His yes 2026-11-20; shipping with the families SQL.
+
+230. **Run through everything; instant loading; drafts with no network.**
+    (2026-11-20) "run through everything that you did. Ensure that nothing
+    got broken... the app loads well. There's no lagging, and all the
+    security is intact. There are no loopholes... they align very well on
+    the screen... tablets, portrait tablet, portrait mobile phone, landscape
+    tablet, desktop... The app still loads really fast, even with the
+    smallest amount of network. And once it loads, data of the previous 7
+    days or people actively being attended to for the past 7 days are
+    loaded, including medical records, including history section... before
+    a person opens any button, at the background, many of the next sections
+    loads down. So once they click find patient... all the category of
+    patients that have been active in the past 7 days... are already
+    loaded. When they click on messages, any recent messages... from the
+    past 7 days... history... majority of the things still saves as draft
+    and loads underneath when there is no network, when they click save
+    button... doctor is typing a medicine, but he did not save. It goes back,
+    it saves as draft, and after a while it shows it to him. So either
+    continue or delete."
+    REVIEW DONE 2026-11-20: all 61 database tests, verify, layout (55
+    screens at 320 to 1440), readability (light and dark), can-be-seen (88),
+    click-through (no button broke a page), npm audit (0 high; 1 moderate in
+    the lint tools only, never shipped: left for the other agent's list).
+    Code size: first visit 871 KB at the start of the session, 873 KB now.
+    Fixed: the payment lists waited for the expiry (now together, withExpiry).
+    Found and fixed (SQL waiting for his yes): a signed in person could
+    change any column of a family or add an empty family directly
+    (20261120082841_families_details_only, test 061; test 016 accepts the
+    stronger refusal). HIS YES ON THE SQL, 2026-11-20.
+    FOUND, PROPOSED, WAITING: (a) app files are not kept by the browser
+    between opens (no long cache header on /_next/static), so every open
+    asks again; poor 3G: sign in screen ready in about 20 s; (b) warm up
+    messages, notifications, history and the role's lists in memory after
+    Home; (c) records of patients seen in the last 7 days on the device for
+    doctors and nurses (today: open visits only; NDPA decision); (d) drafts
+    on Take vitals, the registration forms, Edit details and antenatal
+    forms; a new family waiting on the device with no network.
+
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major

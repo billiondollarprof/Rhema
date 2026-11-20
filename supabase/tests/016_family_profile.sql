@@ -69,10 +69,18 @@ begin
   begin
     update public.families set family_number = 'FAM-999999' where id = (select family from t);
     raise exception 'FAIL 3: a family number was changed';
-  exception when raise_exception then
-    if sqlerrm <> 'A family number cannot be changed' then raise; end if;
+  exception
+    when raise_exception then
+      if sqlerrm <> 'A family number cannot be changed' then raise; end if;
+    -- Since 2026-11-20 (20261120082841) the column cannot even be touched.
+    when insufficient_privilege then null;
   end;
-  insert into public.families (family_number) values ('FAM-123456');
+  begin
+    insert into public.families (family_number) values ('FAM-123456');
+  exception
+    -- Since 2026-11-20 nobody adds a family directly at all.
+    when insufficient_privilege then null;
+  end;
   if exists (select 1 from public.families where family_number = 'FAM-123456') then
     raise exception 'FAIL 3: a family number was set by hand';
   end if;

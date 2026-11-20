@@ -8,28 +8,39 @@
  * expire it and grey it out." 72 hours, his choice on 2026-11-20 (it was 24).
  *
  * How: the database decides what expires (expire_unpaid, migration
- * 20261119211756). The lists ask it to run just before they load, so what
+ * 20261119211756). The lists ask it to run as they load, so what
  * is shown is always up to date, with no separate timer. It runs at most
- * once a minute from one screen, because a page can load several lists.
+ * once a minute from one screen, because a page can load several lists,
+ * and at the same time as the list, not before it (withExpiry).
  *
  * Never: decide here what expires, or stop a list loading when this fails.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ===== 1. Run the expiry, at most once a minute =====
-// The last run, so two lists loading together wait for the same one.
+// The last run, so two lists loading together share it. Answers how many
+// expired (0 when the run failed, or was shared and already counted).
 let lastRun = 0
-let running: Promise<void> = Promise.resolve()
+let running: Promise<number> = Promise.resolve(0)
 
-export function expireUnpaid(client: SupabaseClient): Promise<void> {
-  if (Date.now() - lastRun < 60_000) return running
+export function expireUnpaid(client: SupabaseClient): Promise<number> {
+  if (Date.now() - lastRun < 60_000) return running.then(() => 0)
   lastRun = Date.now()
   // A failure (no network, say) only means nothing expired this time.
   running = Promise.resolve(client.rpc('expire_unpaid')).then(
-    () => undefined,
-    () => undefined,
+    ({ data }) => (typeof data === 'number' ? data : 0),
+    () => 0,
   )
   return running
+}
+
+// ===== 1b. Load a list while the expiry runs, not after it =====
+// One trip on a poor network instead of two (request 230, 2026-11-20: "The
+// app still loads really fast, even with the smallest amount of network").
+// Only when something did expire just now is the list loaded once more.
+export async function withExpiry<T>(client: SupabaseClient, load: () => Promise<T>): Promise<T> {
+  const [expired, first] = await Promise.all([expireUnpaid(client), load()])
+  return expired > 0 ? load() : first
 }
 
 // ===== 2. The words when the database refuses one that has expired =====

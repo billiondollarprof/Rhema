@@ -13,7 +13,10 @@
  *   3. add a medicine (or, on the Supplies tab, a supply such as a syringe or
  *      plaster), with one or more strengths or sizes;
  *   4. the whole list, searched by the first letters, each line editable or
- *      switched off (never deleted).
+ *      switched off (never deleted). Every name shows, not only the first
+ *      60, and each name has Add another strength (Add another size for a
+ *      supply) (request 231, 2026-11-20: "cimetidine might have 400
+ *      milligram, 200 milligram... add another strength").
  *
  * At the top (request 219c, 2026-11-17): Running low (counted lines at or
  * below their warning level) and Expiring soon (new stock that expires
@@ -69,6 +72,9 @@ export default function MedicineListPage() {
   const [editStrength, setEditStrength] = useState('')
   // The line whose stock is open (request 214).
   const [stockFor, setStockFor] = useState<number | null>(null)
+  // The name getting another strength or size (request 231), and what is typed.
+  const [addingTo, setAddingTo] = useState<string | null>(null)
+  const [moreStrength, setMoreStrength] = useState('')
 
   // Stock that expires within 90 days (request 219c).
   const [expiring, setExpiring] = useState<ExpiringBatch[]>([])
@@ -106,7 +112,9 @@ export default function MedicineListPage() {
     [lines],
   )
   const names = useMemo(() => groupMedicines(mine.filter((l) => l.status === 'standard')), [mine])
-  const shown = useMemo(() => findMedicines(names, search, 60), [names, search])
+  // Every name, not only the first 60 (request 231: "I want the pharmacist
+  // to be able to see the list of all the medicine that has been added").
+  const shown = useMemo(() => findMedicines(names, search, names.length), [names, search])
   // Switched off lines, shown to the Pharmacy only, to switch back on.
   const off = useMemo(
     () => mine.filter((line) => line.status === 'standard' && !line.is_active),
@@ -350,7 +358,9 @@ export default function MedicineListPage() {
         {/* ----- The list ----- */}
         <div className={styles.card}>
           <div className={styles.sectionHead}>
-            <b>The list</b>
+            <b>
+              The list ({names.length} {tab === 'medicine' ? 'medicines' : 'supplies'})
+            </b>
           </div>
           <input
             className={styles.input}
@@ -460,6 +470,61 @@ export default function MedicineListPage() {
                     ) : null}
                   </div>
                 ),
+              )}
+              {/* ----- Another strength or size for this name (request 231) ----- */}
+              {addingTo === entry.name ? (
+                <div className={styles.lineRow}>
+                  <input
+                    className={styles.input}
+                    aria-label={`New ${tab === 'medicine' ? 'strength' : 'size'} for ${entry.name}`}
+                    placeholder={tab === 'medicine' ? 'e.g. 800 mg tablet' : 'e.g. 3 ml'}
+                    maxLength={60}
+                    autoFocus
+                    value={moreStrength}
+                    onChange={(event) => setMoreStrength(event.target.value)}
+                  />
+                  <button
+                    className={`${styles.button} ${styles.primary} ${styles.small}`}
+                    disabled={busy || !moreStrength.trim()}
+                    onClick={() =>
+                      run(async () => {
+                        const result = await addMedicine(
+                          client,
+                          entry.name,
+                          moreStrength.trim(),
+                          tab,
+                        )
+                        if (!result) {
+                          setAddingTo(null)
+                          setMoreStrength('')
+                        }
+                        return result
+                      })
+                    }
+                  >
+                    Save
+                  </button>
+                  <button
+                    className={`${styles.button} ${styles.small}`}
+                    onClick={() => {
+                      setAddingTo(null)
+                      setMoreStrength('')
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={`${styles.button} ${styles.small} ${styles.addMore}`}
+                  disabled={busy}
+                  onClick={() => {
+                    setAddingTo(entry.name)
+                    setMoreStrength('')
+                  }}
+                >
+                  {tab === 'medicine' ? '+ Add another strength' : '+ Add another size'}
+                </button>
               )}
             </div>
           ))}
