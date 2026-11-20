@@ -92,6 +92,13 @@ type FormProps = {
   // (contact, address and next of kin cleared), still linked to the family.
   familyCard?: string | null
   onSave: (details: PatientDetails, fee: CardFee) => void
+  // Register (request 228b, 2026-11-20): the category is chosen in a drop
+  // down above the form, so the form does not ask it again.
+  hideCategory?: boolean
+  // A member added to a family that is already registered: the family's
+  // card covers them, so no card fee is asked (Anthony, 2026-11-20: "The
+  // card for the family covers everybody in that family").
+  familyCovers?: boolean
   // For the drop downs (town, local government, State, relationship):
   // picked, not typed (Anthony, 2026-11-16). Without them, plain boxes.
   client?: SupabaseClient
@@ -180,6 +187,8 @@ export default function PatientForm({
   cardFeeFor,
   familyCard,
   onSave,
+  hideCategory = false,
+  familyCovers = false,
   client,
   staffId,
 }: FormProps) {
@@ -220,6 +229,8 @@ export default function PatientForm({
   // Whether the card fee must be paid now, for what is on the form.
   const feeNeededNow = feeRequiredIf?.(details) ?? false
   const cardFee = cardFeeFor?.(details.category)
+  // Covered by the family's card: no Payment section at all.
+  const covered = familyCovers && details.category === 'family'
 
   function set<K extends keyof PatientDetails>(key: K, value: PatientDetails[K]) {
     setDetails((now) => ({ ...now, [key]: value }))
@@ -229,7 +240,7 @@ export default function PatientForm({
     const ready = tidy(details)
     const wrong = check(ready)
     const feeNeeded = feeRequiredIf?.(details) ?? false
-    const amount = withPayment || feeNeeded ? readFee(fee) : null
+    const amount = (withPayment && !covered) || feeNeeded ? readFee(fee) : null
     if (feeNeeded && amount === null)
       wrong.fee = 'A patient of their own pays the card fee. Type it in naira, like 2,000.'
     else if (amount !== null && !(amount > 0 && amount < 100000000))
@@ -358,58 +369,60 @@ export default function PatientForm({
                   ))}
                 </div>
               </div>
-              <div className={styles.field}>
-                <label>Patient category</label>
-                {inFamilyForm && details.category === 'family' && !changingCategory ? (
-                  <div className={styles.familyCategory}>
-                    <span>
-                      Family <b>{familyCard ?? ''}</b>
-                    </span>
-                    <button
-                      type="button"
-                      className={styles.button}
-                      onClick={() => setChangingCategory(true)}
-                    >
-                      Change category
-                    </button>
-                  </div>
-                ) : inFamilyForm ? (
-                  <>
+              {hideCategory ? null : (
+                <div className={styles.field}>
+                  <label>Patient category</label>
+                  {inFamilyForm && details.category === 'family' && !changingCategory ? (
+                    <div className={styles.familyCategory}>
+                      <span>
+                        Family <b>{familyCard ?? ''}</b>
+                      </span>
+                      <button
+                        type="button"
+                        className={styles.button}
+                        onClick={() => setChangingCategory(true)}
+                      >
+                        Change category
+                      </button>
+                    </div>
+                  ) : inFamilyForm ? (
+                    <>
+                      <div className={styles.segments} role="group" aria-label="Patient category">
+                        {(['individual', 'antenatal'] as Category[]).map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            aria-pressed={details.category === value}
+                            onClick={() => chooseCategory(value)}
+                          >
+                            {value[0].toUpperCase() + value.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.linkButton}
+                        onClick={() => chooseCategory('family')}
+                      >
+                        Keep in the family
+                      </button>
+                    </>
+                  ) : (
                     <div className={styles.segments} role="group" aria-label="Patient category">
-                      {(['individual', 'antenatal'] as Category[]).map((value) => (
+                      {(['individual', 'family', 'antenatal'] as Category[]).map((value) => (
                         <button
                           key={value}
                           type="button"
                           aria-pressed={details.category === value}
-                          onClick={() => chooseCategory(value)}
+                          onClick={() => set('category', value)}
                         >
                           {value[0].toUpperCase() + value.slice(1)}
                         </button>
                       ))}
                     </div>
-                    <button
-                      type="button"
-                      className={styles.linkButton}
-                      onClick={() => chooseCategory('family')}
-                    >
-                      Keep in the family
-                    </button>
-                  </>
-                ) : (
-                  <div className={styles.segments} role="group" aria-label="Patient category">
-                    {(['individual', 'family', 'antenatal'] as Category[]).map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        aria-pressed={details.category === value}
-                        onClick={() => set('category', value)}
-                      >
-                        {value[0].toUpperCase() + value.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 
@@ -504,7 +517,10 @@ export default function PatientForm({
       </div>
 
       {/* ===== 6. Payment: the card fee (Register only) ===== */}
-      {withPayment || feeNeededNow ? (
+      {covered && !feeNeededNow ? (
+        <p className={styles.familyNote}>The family card covers this member. No card fee.</p>
+      ) : null}
+      {(withPayment && !covered) || feeNeededNow ? (
         <section className={styles.card}>
           <div className={styles.sectionHead}>
             <i>

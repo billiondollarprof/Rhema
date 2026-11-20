@@ -7,7 +7,11 @@
  * profile pop up." The family number (FAM-000012) is on the card; each
  * member keeps their own RMC number.
  *
- * Never: show anything but name, number and age here.
+ * The family file (request 228b, 2026-11-20): the family's own name,
+ * phone, address and the day it was registered, and Edit family details
+ * for the Front Desk ("There should be a way to edit the family address").
+ *
+ * Never: show anything about a member but name, number and age here.
  */
 'use client'
 
@@ -19,9 +23,14 @@ import styles from './patients.module.css'
 import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import { ageFrom } from '@/lib/patients/age'
+import FamilyDetailsForm, { checkFamily, tidyFamily } from './FamilyDetailsForm'
 import {
   familyMembers,
+  loadFamily,
   startFamily,
+  updateFamily,
+  type Family,
+  type FamilyDetails,
   type PatientCard,
   type PatientResult,
 } from '@/lib/patients/patients'
@@ -40,6 +49,40 @@ export default function FamilyCard({
   const [members, setMembers] = useState<PatientCard[]>([])
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // The family's own details, and Edit family details (request 228b).
+  const [family, setFamily] = useState<Family | null>(null)
+  const [editing, setEditing] = useState<FamilyDetails | null>(null)
+  const [editShown, setEditShown] = useState<Record<string, string>>({})
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!patient.family_id) return
+    let current = true
+    loadFamily(client, patient.family_id).then((found) => {
+      if (current) setFamily(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, patient.family_id])
+
+  async function saveFamily() {
+    if (!editing || !family) return
+    const wrong = checkFamily(editing)
+    setEditShown(wrong)
+    if (Object.keys(wrong).length > 0) return
+    setSaving(true)
+    const ready = tidyFamily(editing)
+    const failed = await updateFamily(client, family.id, ready)
+    setSaving(false)
+    if (failed) {
+      setProblem(failed)
+      return
+    }
+    setFamily({ ...family, ...ready })
+    setEditing(null)
+    setProblem(null)
+  }
 
   useEffect(() => {
     if (!patient.family_id) return
@@ -66,7 +109,72 @@ export default function FamilyCard({
 
   return (
     <div className={styles.factGroup}>
-      <h3>Family{patient.family ? ` · ${patient.family.family_number}` : ''}</h3>
+      <h3>
+        {family?.name ? `${family.name} family` : 'Family'}
+        {patient.family ? ` · ${patient.family.family_number}` : ''}
+      </h3>
+      {/* The family's own details (request 228b). */}
+      {family && !editing ? (
+        <dl className={styles.facts}>
+          <div>
+            <dt>Family name</dt>
+            <dd>{family.name ?? 'Not given'}</dd>
+          </div>
+          <div>
+            <dt>Family phone</dt>
+            <dd>{family.phone ?? 'Not given'}</dd>
+          </div>
+          <div>
+            <dt>Family address</dt>
+            <dd>
+              {[family.address, family.town, family.lga, family.state].filter(Boolean).join(', ') ||
+                'Not given'}
+            </dd>
+          </div>
+          <div>
+            <dt>Registered</dt>
+            <dd>
+              {new Date(family.created_at).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </dd>
+          </div>
+        </dl>
+      ) : null}
+      {editing ? (
+        <>
+          <FamilyDetailsForm
+            value={editing}
+            onChange={(next) => {
+              setEditing(next)
+              setEditShown({})
+            }}
+            shown={editShown}
+          />
+          <div className={styles.buttons}>
+            <button
+              className={`${styles.button} ${styles.primary}`}
+              disabled={saving}
+              onClick={saveFamily}
+            >
+              {saving ? 'Saving…' : 'Save family details'}
+            </button>
+            <button
+              className={styles.button}
+              disabled={saving}
+              onClick={() => {
+                setEditing(null)
+                setEditShown({})
+                setProblem(null)
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      ) : null}
       {members.length > 0 ? (
         <ul className={styles.familyList}>
           {members.map((member) => (
@@ -85,7 +193,7 @@ export default function FamilyCard({
         </ul>
       ) : null}
       {problem ? <p className={styles.error}>{problem}</p> : null}
-      {canAdd ? (
+      {canAdd && !editing ? (
         <div className={styles.buttons}>
           <button
             className={`${styles.button} ${styles.familyButton}`}
@@ -94,6 +202,25 @@ export default function FamilyCard({
           >
             <Icon name="users" size={16} /> {busy ? 'Starting…' : 'Add family member'}
           </button>
+          {/* The Front Desk edits the family's name, phone and address. */}
+          {family ? (
+            <button
+              className={styles.button}
+              onClick={() =>
+                setEditing({
+                  name: family.name ?? '',
+                  phone: family.phone,
+                  address: family.address,
+                  town: family.town,
+                  lga: family.lga,
+                  state: family.state,
+                  country: family.country,
+                })
+              }
+            >
+              Edit family details
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

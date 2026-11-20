@@ -284,6 +284,8 @@ try {
   await desk.getByRole('heading', { name: 'Find patient' }).waitFor()
   await desk.getByRole('link', { name: 'Register patient' }).click()
   await desk.getByRole('heading', { name: 'Register patient' }).waitFor()
+  // The category comes first, in a drop down (request 228b).
+  await desk.getByLabel('Category').selectOption('individual')
   await desk.getByLabel('Full name').first().fill('Made Up Patient C')
   await desk.getByLabel('Date of birth').fill('1995-03-14')
   await desk.getByText('Age: ').waitFor()
@@ -307,6 +309,7 @@ try {
 
   step('The same name and date of birth again: warned, and she opens the existing one')
   await desk.getByRole('button', { name: 'Register another patient' }).click()
+  await desk.getByLabel('Category').selectOption('individual')
   await desk.getByLabel('Full name').first().fill('made up patient c')
   await desk.getByLabel('Date of birth').fill('1995-03-14')
   await desk.getByRole('button', { name: 'Save patient' }).click()
@@ -506,6 +509,25 @@ try {
   step('Lab: the record shows the test awaiting its result')
   await page.getByRole('link', { name: 'Open the record' }).click()
   await page.getByText('Awaiting test').waitFor()
+
+  step('A family: its details first, then its first member, saved together')
+  await desk.goto(new URL('/patients/register/', desk.url()).href)
+  await desk.getByRole('heading', { name: 'Register patient' }).waitFor()
+  await desk.getByLabel('Category').selectOption('family')
+  await desk.getByLabel('Family name (surname)').fill('Madeupson')
+  await desk.getByLabel('Address').first().fill('7 Made Up Close')
+  await desk.getByRole('button', { name: 'Add family member' }).click()
+  await desk.getByLabel('Full name').first().fill('Made Up Member D')
+  await desk.getByLabel('Date of birth').fill('1990-06-01')
+  await desk.getByRole('button', { name: 'Save family and member' }).click()
+  await desk.getByText('Family registered').waitFor()
+  await desk.getByText(/Madeupson family · FAM-\d{6}/).waitFor()
+  await shot(desk, 'family-registered')
+
+  step('The next member joins without a card fee')
+  await desk.getByRole('button', { name: 'Add another family member' }).click()
+  await desk.getByText('Adding to family').waitFor()
+  await desk.getByText('The family card covers this member. No card fee.').waitFor()
   await desk.close()
 
   step('Home now shows the new patient waiting in her room')

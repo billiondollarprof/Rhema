@@ -284,4 +284,34 @@ async function shoot(page, folder, name) {
   await page.setViewportSize(size)
 }
 
-module.exports = { STAFF_ID, ROOMS, PATIENT, signIn, mockSupabase, overflow, layout, shoot }
+// ===== Before a check: what a screen's "press" opens =====
+// press names, in this order: a button by its words; an option of a drop
+// down (the category on Register, request 228b, 2026-11-20); or a folded
+// record section by its heading (request 228a). Every check uses this, so
+// a form that shows only after a choice is still checked.
+async function pressFirst(page, screen) {
+  if (!screen.press) return
+  const button = page.getByRole('button', { name: screen.press, exact: true }).first()
+  if (await button.count()) {
+    await button.click()
+    return
+  }
+  const dropDown = page.locator(`select:has(option:text-is("${screen.press}"))`).first()
+  if (await dropDown.count()) {
+    await dropDown.selectOption({ label: screen.press })
+    return
+  }
+  await page.locator('summary', { hasText: screen.press }).first().click()
+}
+
+module.exports = {
+  STAFF_ID,
+  ROOMS,
+  PATIENT,
+  signIn,
+  mockSupabase,
+  overflow,
+  layout,
+  shoot,
+  pressFirst,
+}

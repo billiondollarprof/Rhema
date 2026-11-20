@@ -476,6 +476,133 @@ export async function familyNumber(
   return (data as { family_number: string } | null)?.family_number ?? null
 }
 
+// ===== 6b. The family file first (request 228b, 2026-11-20) =====
+// A family has its own details: the family name (the surname), a phone and
+// the address. The date it was registered is set by the database.
+export type FamilyDetails = {
+  name: string
+  phone: string | null
+  address: string | null
+  town: string | null
+  lga: string | null
+  state: string | null
+  country: string
+}
+
+// A family registered before 2026-11-20 may have no name.
+export type Family = Omit<FamilyDetails, 'name'> & {
+  name: string | null
+  id: number
+  family_number: string
+  created_at: string
+}
+
+export const EMPTY_FAMILY: FamilyDetails = {
+  name: '',
+  phone: null,
+  address: null,
+  town: null,
+  lga: null,
+  state: null,
+  country: 'Nigeria',
+}
+
+const FAMILY_COLUMNS =
+  'id, family_number, name, phone, address, town, lga, state, country, created_at'
+
+export async function loadFamily(client: SupabaseClient, familyId: number): Promise<Family | null> {
+  const { data } = await client
+    .from('families')
+    .select(FAMILY_COLUMNS)
+    .eq('id', familyId)
+    .maybeSingle()
+  return (data as Family | null) ?? null
+}
+
+// The Front Desk changes the family's name, phone or address (Anthony,
+// 2026-11-20: "There should be a way to edit the family address"). The
+// database refuses anybody else.
+export async function updateFamily(
+  client: SupabaseClient,
+  familyId: number,
+  details: FamilyDetails,
+): Promise<string | null> {
+  const { error } = await client.from('families').update(details).eq('id', familyId)
+  if (error) {
+    console.warn(`Family ${familyId} could not be updated: ${error.code}`)
+    return 'The family could not be saved. Check the details and try again.'
+  }
+  return null
+}
+
+// Register a new family with its first member, in one step: both are saved
+// or neither, so a family is never empty. The member's address boxes left
+// empty take the family's. A new family needs the network: it cannot wait
+// on the device like a single patient, because the two go together.
+export async function registerFamily(
+  client: SupabaseClient,
+  family: FamilyDetails,
+  member: Record<string, unknown> & { full_name: string },
+  staffId: string,
+): Promise<{ patient: PatientCard | null; familyId: number | null; problem: string | null }> {
+  const filled: Record<string, unknown> = { ...member }
+  for (const key of ['address', 'town', 'lga', 'state'] as const) {
+    if (!filled[key]) filled[key] = family[key]
+  }
+  if (!filled.country) filled.country = family.country
+  const { data, error } = await client.rpc('register_family', { family, member: filled })
+  let patientId = (data as { patient_id?: number } | null)?.patient_id ?? null
+  let familyId = (data as { family_id?: number } | null)?.family_id ?? null
+  // A double tap: the first tap saved them; find that member.
+  if (error && isDoubleTap(error)) {
+    const first = await justRegistered(client, staffId, member.full_name)
+    patientId = first?.id ?? null
+    familyId = first?.family_id ?? null
+  } else if (isNetworkFailure(error)) {
+    return {
+      patient: null,
+      familyId: null,
+      problem: 'No network. A new family needs the network to save. Try again when it is back.',
+    }
+  } else if (error) {
+    console.warn(`Family could not be registered: ${error.code}`)
+    return {
+      patient: null,
+      familyId: null,
+      problem: 'The family could not be saved. Check the details and try again.',
+    }
+  }
+  const patient = patientId ? await getPatient(client, patientId) : null
+  return { patient, familyId, problem: patient ? null : 'Saved. Find the family to open it.' }
+}
+
+// Families whose name starts with what was typed (Find patient: "James"
+// shows the James family, with how many members it has).
+export type FamilyResult = Family & { members: number }
+
+export async function searchFamilies(
+  client: SupabaseClient,
+  typed: string,
+): Promise<FamilyResult[]> {
+  const words = typed
+    .trim()
+    .replace(/[,()%_]/g, ' ')
+    .trim()
+  if (words.length < 2) return []
+  const { data, error } = await client
+    .from('families')
+    .select(`${FAMILY_COLUMNS}, patients(count)`)
+    .ilike('name', `${words}%`)
+    .order('name')
+    .limit(10)
+  if (error || !data) return []
+  type Row = Family & { patients: { count: number }[] }
+  return (data as unknown as Row[]).map(({ patients, ...family }) => ({
+    ...family,
+    members: patients[0]?.count ?? 0,
+  }))
+}
+
 export async function updatePatient(
   client: SupabaseClient,
   id: number,

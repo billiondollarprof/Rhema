@@ -28,7 +28,9 @@ import {
   getPatient,
   knownPatient,
   knownSearch,
+  searchFamilies,
   searchPatients,
+  type FamilyResult,
   type PatientResult,
 } from '@/lib/patients/patients'
 import { recall, remember } from '@/lib/cache/memory'
@@ -54,6 +56,8 @@ function FindPatient() {
       `find:${recall<string>(auth.staff?.id, 'find:typed') ?? ''}`,
     ),
   )
+  // Families whose name starts with what was typed (request 228b).
+  const [families, setFamilies] = useState<FamilyResult[]>([])
   const [chosen, setChosen] = useState<PatientResult | null>(null)
   // Whether the chosen patient was picked from the results on this screen.
   const cameFromList = useRef(false)
@@ -74,6 +78,12 @@ function FindPatient() {
         remember(staffId, `find:${typed}`, found)
         for (const patient of found) remember(staffId, `patient:${patient.id}`, patient)
         setResults(found)
+      })
+      // A family name (Anthony, 2026-11-20: "when somebody types... the
+      // family name, they can click on the family name and they will see
+      // all the members of the family lined up").
+      searchFamilies(client, typed).then((found) => {
+        if (current) setFamilies(found)
       })
     }, 250)
     return () => {
@@ -159,7 +169,30 @@ function FindPatient() {
               <small className={styles.muted}>
                 Same name as another patient? Use the number or phone.
               </small>
-              {results && shownResults.length === 0 ? (
+              {/* ----- Families with that name: tap one to line up its members ----- */}
+              {families.map((family) => (
+                <button
+                  key={`family-${family.id}`}
+                  className={`${styles.result} ${styles.familyResult}`}
+                  onClick={() => setTyped(family.family_number)}
+                >
+                  <i className={styles.familyIcon}>
+                    <Icon name="users" size={18} />
+                  </i>
+                  <div>
+                    <b>{family.name} family</b>
+                    <small>
+                      {family.family_number} ·{' '}
+                      {family.members === 1 ? '1 member' : `${family.members} members`}
+                    </small>
+                  </div>
+                  <span className={styles.tag}>Family</span>
+                </button>
+              ))}
+              {/^FAM-?\d+$/i.test(typed.trim()) && shownResults.length > 0 ? (
+                <p className={styles.muted}>Everybody in family {typed.trim().toUpperCase()}.</p>
+              ) : null}
+              {results && shownResults.length === 0 && families.length === 0 ? (
                 <p className={styles.muted}>
                   {typed ? 'No patient found.' : 'No patients registered yet.'}
                 </p>

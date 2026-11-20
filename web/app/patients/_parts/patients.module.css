@@ -1125,3 +1125,25 @@
   border-radius: 14px;
   background: var(--tint-1);
 }
+
+/* The category, chosen first, at the top left (request 228b, 2026-11-20). */
+.categoryPick {
+  max-width: 320px;
+}
+
+/* A family in Find patient: tap it to line up its members (request 228b). */
+.familyResult {
+  border-style: dashed;
+}
+
+.familyIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--tint-3);
+  color: var(--link);
+  font-style: normal;
+}

@@ -21,7 +21,7 @@
  * Never: change a screen, or pass a screen that did not load.
  */
 const { chromium } = require('playwright')
-const { signIn, mockSupabase } = require('./screens/mock.cjs')
+const { signIn, mockSupabase, pressFirst } = require('./screens/mock.cjs')
 const { SCREENS } = require('./screens/screens-list.cjs')
 
 const APP = process.env.APP_URL || 'http://127.0.0.1:3100'
@@ -107,6 +107,8 @@ function faintText(floor) {
       await page.goto(APP + screen.path)
       try {
         await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
+        // What the screen's press opens is checked too (mock.cjs).
+        await pressFirst(page, screen)
       } catch {
         problems.push(`${theme} ${screen.path}: did not load ("${screen.waitFor}" never showed)`)
         await context.close()

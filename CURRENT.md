@@ -949,6 +949,31 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
        LIVE 2026-11-20: CI, deploy and smoke test green on testing and live;
        0 security warnings on both.
     NEXT: b (family file first).
+    b PLAN SAID BACK 2026-11-20 (category drop down first; Family details
+       card: surname compulsory, phone optional, address, town, LGA, state,
+       date by the system; Add family member opens the member form with the
+       family address filled in; family and first member saved together;
+       old file the same). HIS ANSWER 2026-11-20: "There should be a way to
+       edit the family address... a family carries its family number.
+       Individuals from that family carries fam, then individual number as
+       designed today already. Then the family name on its own carries only
+       family number. So when somebody types family, the family name, they
+       can click on the family name and they will see all the members of the
+       family lined up... if somebody is added to a family, the person does
+       not need to pay for card again. The card for the family covers
+       everybody in that family. That's how they run today."
+    b BUILT 2026-11-20: migration 20261120072145 (families get phone and
+       address; register_family saves the family and its first member in
+       one step, Front Desk only, with its own 30 second double tap guard;
+       families insert and update narrowed to the Front Desk), test 060, 8
+       breaks caught. Screens: category drop down first on Register and
+       Register from old file; Family details card then Add family member;
+       "Family registered" with the FAM number and date; no card fee for a
+       member added later; Family card shows the family's details with Edit
+       family details; Find patient shows families by name, tap to line up
+       the members. Screen checks now pick a drop down option too
+       (mock.cjs pressFirst, used by all four checks). WAITING FOR HIS YES
+       ON THE SQL.
     "do not take any job that the other agent was doing before... make sure
     the security of the platform is kept intact." Repository stays public
     for now (GitHub cost); private at the end.

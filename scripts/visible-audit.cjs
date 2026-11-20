@@ -21,7 +21,7 @@
  * built, its words go in mustSee in the same change.
  */
 const { chromium } = require('playwright')
-const { signIn, mockSupabase } = require('./screens/mock.cjs')
+const { signIn, mockSupabase, pressFirst } = require('./screens/mock.cjs')
 const { SCREENS } = require('./screens/screens-list.cjs')
 
 const APP = process.env.APP_URL || 'http://127.0.0.1:3100'
@@ -89,13 +89,8 @@ function seen(words) {
       const where = `${screen.path}${screen.role ? ` (${screen.role})` : ''} at ${width}`
       try {
         await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
-        if (screen.press) {
-          // A button by its words, or else a folded record section by its
-          // heading (request 228a: what is inside a section must be seen too).
-          const button = page.getByRole('button', { name: screen.press, exact: true }).first()
-          if (await button.count()) await button.click()
-          else await page.locator('summary', { hasText: screen.press }).first().click()
-        }
+        // A button, a drop down option or a folded section (mock.cjs).
+        await pressFirst(page, screen)
         await page.waitForTimeout(1200)
       } catch {
         problems.push(`${where}: did not load ("${screen.waitFor}" never showed)`)

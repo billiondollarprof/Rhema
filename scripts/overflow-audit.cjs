@@ -19,7 +19,7 @@
  * Never: point it at the live or testing site. It uses made up data.
  */
 const { chromium } = require('playwright')
-const { signIn, mockSupabase, layout } = require('./screens/mock.cjs')
+const { signIn, mockSupabase, layout, pressFirst } = require('./screens/mock.cjs')
 
 const APP = process.env.APP_URL || 'http://127.0.0.1:3100'
 
@@ -44,6 +44,8 @@ const { SCREENS } = require('./screens/screens-list.cjs')
     await page.goto(APP + screen.path)
     try {
       await page.getByText(screen.waitFor).first().waitFor({ timeout: 10000 })
+      // What the screen's press opens is checked too (mock.cjs).
+      await pressFirst(page, screen)
     } catch {
       problems.push(`${screen.path}: did not load ("${screen.waitFor}" never showed)`)
       await context.close()
