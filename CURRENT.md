@@ -907,6 +907,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     save it"). No server copy of drafts. (c) yes: "7 days for both doctors
     and nurses, and it should be their own room... light, scrambled, and
     then it should wipe out as they log out."
+    232 LIVE 2026-11-20 (0 security warnings on testing and live).
+    230a BUILT 2026-11-20: web/public/_headers keeps /_next/static for a year
+    (immutable; the names carry fingerprints). No SQL.
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
