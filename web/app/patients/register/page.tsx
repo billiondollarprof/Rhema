@@ -250,7 +250,11 @@ function RegisterPatient() {
     setMatches([])
     setFee(cardFee)
     setFeeSaved(false)
-    if ('queued' in result && result.queued) setQueued(details.full_name)
+    // No network: it waits on this device (a new family too, request 230d).
+    if ('queued' in result && result.queued)
+      setQueued(
+        newFamily ? `${family.name.trim()} family · ${details.full_name}` : details.full_name,
+      )
     else if (result.problem) setProblem(result.problem)
     else {
       setSaved(result.patient)

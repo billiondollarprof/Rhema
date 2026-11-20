@@ -28,6 +28,8 @@
 
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import { useEffect, useState } from 'react'
+import { recall, remember } from '@/lib/cache/memory'
+import { HISTORY_KEY, type WarmHistory } from '@/lib/warm/warm'
 import AppShell from '@/components/shell/AppShell'
 import styles from './history.module.css'
 import {
@@ -78,15 +80,18 @@ export default function HistoryPage() {
   const period: PeriodKey | 'shift' = chosen ?? (frontDesk ? 'shift' : 'today')
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
-  const [shiftStart, setShiftStart] = useState<Date | null>(null)
+  // Loaded in the background after the app opened (request 230b): shown at
+  // once for the period History opens on, then refreshed as usual.
+  const warm = recall<WarmHistory>(staff?.id, HISTORY_KEY)
+  const [shiftStart, setShiftStart] = useState<Date | null>(() => warm?.shiftStart ?? null)
   // An admin: everybody, or one person ("" is everybody).
   const [takenBy, setTakenBy] = useState('')
   const [takers, setTakers] = useState<{ value: string; label: string }[]>([])
 
-  const [money, setMoney] = useState<Money | null>(null)
-  const [lab, setLab] = useState<LabNumbers | null>(null)
-  const [pharmacy, setPharmacy] = useState<PharmacyNumbers | null>(null)
-  const [work, setWork] = useState<MyWork | null>(null)
+  const [money, setMoney] = useState<Money | null>(() => warm?.money ?? null)
+  const [lab, setLab] = useState<LabNumbers | null>(() => warm?.lab ?? null)
+  const [pharmacy, setPharmacy] = useState<PharmacyNumbers | null>(() => warm?.pharmacy ?? null)
+  const [work, setWork] = useState<MyWork | null>(() => warm?.work ?? null)
   const [loading, setLoading] = useState(false)
 
   const seesMoney = Boolean(staff && (staff.role === 'front_desk' || staff.can_admin))
@@ -135,6 +140,16 @@ export default function HistoryPage() {
       setPharmacy(p)
       setWork(w)
       setLoading(false)
+      // The period History opens on: keep it for next time (request 230b).
+      if (chosen === null && !takenBy && shiftStart) {
+        remember<WarmHistory>(staff.id, HISTORY_KEY, {
+          shiftStart,
+          money: m,
+          lab: l,
+          pharmacy: p,
+          work: w,
+        })
+      }
     })
     return () => {
       current = false

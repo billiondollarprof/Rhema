@@ -47,6 +47,7 @@ import Logo from '@/components/brand/Logo'
 import styles from './AppShell.module.css'
 import { roleLabel } from '@/lib/auth/roles'
 import { useAuth } from '@/lib/auth/session'
+import { warmUp } from '@/lib/warm/warm'
 
 // ===== 1. The menu =====
 const MENU = [
@@ -159,6 +160,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     if (idle) idle(fetchAll)
     else window.setTimeout(fetchAll, 2000)
   }, [router])
+  // Messages and History load quietly a few seconds after the app opens,
+  // in memory only, so they show at once (request 230b). Once per person.
+  useEffect(() => {
+    if (auth.client && auth.staff) warmUp(auth.client, auth.staff)
+  }, [auth.client, auth.staff])
   // Remembered outside the component, because each screen may mount the
   // shell again: a flag kept inside it forgot every move and always went
   // Home (Anthony, 2026-11-10: "it always takes me straight to the home").

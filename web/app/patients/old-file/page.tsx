@@ -267,6 +267,8 @@ export default function OldFilePage() {
             from_old_file: true,
           },
           staff.id,
+          // Its files need the network, so it does not wait on the device.
+          false,
         )
       : await registerFromOldFile(
           client,
