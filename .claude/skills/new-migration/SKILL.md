@@ -54,4 +54,8 @@ the shim.
   database itself the first time.
 - `mutate.sh` says NO CHANGE: the sed expression matched nothing. Fix the
   expression.
+- `mutate.sh` says the tests fail BEFORE any break: a test file is broken
+  (2026-11-20: a stray "do $$ begin" made every break look CAUGHT). Run
+  `scripts/local-db.sh`, read the ERROR line, fix it, then run it again.
+  Never filter its output down to CAUGHT lines only: read the last line.
 - If a script is wrong, fix it in the same change and say so.

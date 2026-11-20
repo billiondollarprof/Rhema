@@ -108,8 +108,7 @@ update public.consultation_notes
    set voided_at = now(), voided_by = '00000000-0000-0000-0000-000000000592', void_reason = 'Duplicate'
  where complaint = 'T59 signed by doctor 1';
 reset role;
-do $$
-begin
+
 -- And the doctor who typed it may void such a note too.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000593"}', true);
 set local role authenticated;
