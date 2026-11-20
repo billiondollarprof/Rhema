@@ -880,7 +880,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Front Desk only (and the same for the Lab), default both; the Lab's list
     and notices hold what was sent to it or is paid; the Pharmacy's notices
     the same; Drugs to give on the patient's page for the Pharmacy; Find a
-    patient's tests shows unpaid ones. WAITING FOR HIS YES ON THE SQL.
+    patient's tests shows unpaid ones. HIS YES ON THE SQL, 2026-11-20.
 
 232. **Dispense and test before payment; the options; drafts never lost.**
     (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
