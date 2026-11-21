@@ -941,7 +941,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     patients seen in my own room in the last 7 days or still open there,
     newest first, at most 50, logged as before), test 064, 9 breaks tried (1
     repeat check removed); recordCopy.ts calls it; Privacy Policy section 6
-    says so (LEGAL_UPDATED 20 November). WAITING FOR HIS YES ON THE SQL.
+    says so (LEGAL_UPDATED 20 November). HIS YES ON THE SQL, 2026-11-21.
 
 231. **The Pharmacy sees only a few medicines; add a strength or a size.**
     (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
