@@ -1120,3 +1120,162 @@ this file.
     228b LIVE 2026-11-20: CI (with the new family steps in the real
     walk-through), deploy and smoke test green on testing and live; 0
     security warnings on both. ALL OF 228 AND 229 LIVE AND CHECKED.
+
+233. **Where prescriptions and lab requests go.** (2026-11-20) "you can
+    either send a medicine straight to the front desk only, or you send both
+    to the front desk and the pharmacist. When it comes to lab tests, you
+    either send to the front desk only, or you send both to the lab and the
+    front desk... There's no time you will send to lab or pharmacy, straight
+    to lab or straight to pharmacy without it sending to front desk... What
+    is sent to only the front desk, the pharmacist will not get any
+    notification. But if they search the patient and see, they will see...
+    something that is waiting... to be dispensed or carried out as a test.
+    But if it was sent to them, they will see the notification... if it's
+    sent to only front desk... Once the front desk click take payment...
+    The system automatically just sends it to lab... Same with pharmacy. But
+    if it was sent to both sides, then the system only updates the pharmacy
+    of the payment as well as lab of the payment." CHECKED 2026-11-20: today the choices are "Pharmacy and
+    Front Desk (payment)" and "Straight to the pharmacy" (lab the same), plus
+    "Also send to..." after sending. Pharmacy: front-desk-only already
+    reaches the Pharmacy's list on payment (status awaiting_dispense).
+    Lab: every request shows on the Lab's list at once, paid or not (no
+    front-desk-only for the lab yet). Notifications count unpaid work for
+    neither. The Pharmacy has no patient search for drugs; the Lab's Find a
+    patient's tests shows paid ones only. Said back.
+    HIS YES 2026-11-20: "Straight to the pharmacy or straight to lab goes
+    away... Front desk only. The test will reach the lab when front desk has
+    taken money... front desk and pharmacy, let it be the default."
+    BUILT: migration 20261120143627 (lab_requests.sent_to_lab; request_lab
+    takes front_desk or both, an older screen's laboratory counts as both;
+    every new request waits for payment), test 063, test 009 section 8 now
+    checks the new rule, 3 breaks caught. Screens: Front Desk and Pharmacy /
+    Front Desk only (and the same for the Lab), default both; the Lab's list
+    and notices hold what was sent to it or is paid; the Pharmacy's notices
+    the same; Drugs to give on the patient's page for the Pharmacy; Find a
+    patient's tests shows unpaid ones. HIS YES ON THE SQL, 2026-11-20.
+
+232. **Dispense and test before payment; the options; drafts never lost.**
+    (2026-11-20) Yes to the families SQL and the Pharmacy fix. "I want to
+    confirm that the lab and the pharmacy can dispense medicine or take a
+    lab test, even if someone has not paid... it is showing waiting for
+    payment to them, but there's the button to dispense... can still be
+    clicked... the lab, the same thing... finished the test, even if
+    payment has not been made... for emergency case... already an
+    inpatient that was admitted, so that there will be no obstruction as
+    to payment... money that has not been paid... will always remind the
+    front desk... It's only the one that has not been paid that disappears
+    after 24 hours. The one that has not been dispensed or carried out."
+    (The limit is 72 hours since his choice of 2026-11-20.) "So I just want
+    to confirm that that's how it is now currently."
+    On 230 a to d: "all of them are good... the device they are using, the
+    CPU is 2 gig RAM, the desktop... do it in a way that... their system is
+    still able to carry it... let's not keep so many drafts, because what
+    if that person's system crashes and network never came online and some
+    things just wipe, or the person logs out?... if it's possible that even
+    if the person logs out, they didn't lose those drafts... what about if
+    the computer they are using, something happens to it? So the drafts...
+    should load into the system within the next 5 minutes or something like
+    that. The system should try it until it's uploaded to the database."
+    LIVE 2026-11-20: families details only and the full Pharmacy list (0
+    security warnings on testing and live).
+    CHECKED 2026-11-20: NOT as he thought. One sent to the Front Desk first
+    (waiting for payment) could not be dispensed, sampled or tested until
+    paid (dispense_prescription, mark_sample_taken, record_lab_results,
+    add_lab_result answered not_paid; the buttons were hidden). Only one sent
+    straight to the Pharmacy or Lab could. The owed and 72 hour parts were
+    already as he says. BUILT: migration 20261120130854 (all four allow
+    waiting for payment; cancelled still refused), test 062, tests 009, 010,
+    013 and 047 now check the new rule (each in a block that undoes itself),
+    6 breaks caught; screens show "Not paid yet" with Dispensed, Sample taken
+    and Enter results. HIS YES ON THE SQL, 2026-11-20.
+    DECIDED 2026-11-20 on 230: (a) and (b) yes. (d): only what was SAVED with
+    no network must never be lost and must keep trying until it reaches the
+    database (already so; add a new family). Drafts typed but not saved stay
+    as they are: 30 minutes, wiped at sign out, never into the record ("let
+    it expire... if the computer turns off... no problem, since they didn't
+    save it"). No server copy of drafts. (c) yes: "7 days for both doctors
+    and nurses, and it should be their own room... light, scrambled, and
+    then it should wipe out as they log out."
+    232 LIVE 2026-11-20 (0 security warnings on testing and live).
+    230a BUILT 2026-11-20: web/public/_headers keeps /_next/static for a year
+    (immutable; the names carry fingerprints). No SQL.
+    230a LIVE 2026-11-20.
+    230b BUILT 2026-11-20 (no SQL): lib/warm/warm.ts loads Messages (6 s after
+    the app opens) and History for the period it opens on (6 s later), in
+    memory only, once per person; Notifications were already loaded by the
+    menu bubble. Measured: Messages opened in 0.1 s after.
+    230d BUILT 2026-11-20 (no SQL): a new family saved with no network waits on
+    the device (outbox kind family) and is sent by itself, checked first so
+    it is never saved twice. Register from old file still asks to try again
+    (its files need the network). Drafts unchanged, as he decided.
+    230b and 230d LIVE 2026-11-20.
+    230c BUILT 2026-11-20: migration 20261120162058 (copy_room_visits: the
+    patients seen in my own room in the last 7 days or still open there,
+    newest first, at most 50, logged as before), test 064, 9 breaks tried (1
+    repeat check removed); recordCopy.ts calls it; Privacy Policy section 6
+    says so (LEGAL_UPDATED 20 November). HIS YES ON THE SQL, 2026-11-21. LIVE 2026-11-21.
+
+231. **The Pharmacy sees only a few medicines; add a strength or a size.**
+    (2026-11-20, with 4 photos of the hospital's handwritten drug lists, the
+    same ones given to the other agent for 227i) "the pharmacy is saying
+    that the drugs, they are not enough, they are not complete... There is
+    not enough medicine to choose from in the medicine list for the
+    pharmacist... I want the pharmacist to be able to see the list of all
+    the medicine that has been added into the system. But there are just a
+    few they are seeing, the supplies and all of those. So I'll need you to
+    check that." And: "on that row for a medicine that has been added
+    already, put a row that says add strength... cimetidine might have 400
+    milligram, 200 milligram... add another strength... Same thing with
+    supplies too... there may be like 5 sizes in the system currently, and
+    they want to add an additional size. They should be able to add."
+    (Earlier platforms he named for the lists: Swift Practice, Bama in
+    India, Epic in the United States, open repositories.)
+    FOUND 2026-11-20: every medicine on his 4 photos is already on the list
+    (some under another name: Augmentin, Cotrimoxazole for Septrin,
+    Cafergot, Vitamin C, Chlorpheniramine; cimetidine 200 and 400 mg;
+    syringes in 6 sizes). The cause: the Pharmacy's list showed only the
+    first 60 names until something was typed. BUILT (no SQL): every name
+    shows, with the count; "+ Add another strength" (supplies: "+ Add
+    another size") under each name, using add_medicine; the list is read
+    1,000 rows at a time (Supabase answers at most 1,000), so it never stops
+    short as it grows. His yes 2026-11-20; shipping with the families SQL.
+
+230. **Run through everything; instant loading; drafts with no network.**
+    (2026-11-20) "run through everything that you did. Ensure that nothing
+    got broken... the app loads well. There's no lagging, and all the
+    security is intact. There are no loopholes... they align very well on
+    the screen... tablets, portrait tablet, portrait mobile phone, landscape
+    tablet, desktop... The app still loads really fast, even with the
+    smallest amount of network. And once it loads, data of the previous 7
+    days or people actively being attended to for the past 7 days are
+    loaded, including medical records, including history section... before
+    a person opens any button, at the background, many of the next sections
+    loads down. So once they click find patient... all the category of
+    patients that have been active in the past 7 days... are already
+    loaded. When they click on messages, any recent messages... from the
+    past 7 days... history... majority of the things still saves as draft
+    and loads underneath when there is no network, when they click save
+    button... doctor is typing a medicine, but he did not save. It goes back,
+    it saves as draft, and after a while it shows it to him. So either
+    continue or delete."
+    REVIEW DONE 2026-11-20: all 61 database tests, verify, layout (55
+    screens at 320 to 1440), readability (light and dark), can-be-seen (88),
+    click-through (no button broke a page), npm audit (0 high; 1 moderate in
+    the lint tools only, never shipped: left for the other agent's list).
+    Code size: first visit 871 KB at the start of the session, 873 KB now.
+    Fixed: the payment lists waited for the expiry (now together, withExpiry).
+    Found and fixed (SQL waiting for his yes): a signed in person could
+    change any column of a family or add an empty family directly
+    (20261120082841_families_details_only, test 061; test 016 accepts the
+    stronger refusal). HIS YES ON THE SQL, 2026-11-20.
+    FOUND, PROPOSED, WAITING: (a) app files are not kept by the browser
+    between opens (no long cache header on /_next/static), so every open
+    asks again; poor 3G: sign in screen ready in about 20 s; (b) warm up
+    messages, notifications, history and the role's lists in memory after
+    Home; (c) records of patients seen in the last 7 days on the device for
+    doctors and nurses (today: open visits only; NDPA decision); (d) drafts
+    on Take vitals, the registration forms, Edit details and antenatal
+    forms; a new family waiting on the device with no network.
+    ALL OF 230 TO 233 LIVE AND CHECKED (2026-11-20 and 21): 0 security
+    warnings on testing and live each time. Left for later, not asked: the
+    moderate npm audit warning in the lint tools (never shipped).

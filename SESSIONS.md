@@ -4,6 +4,20 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-20 and 21: requests 230 to 233 LIVE, each with 0 security
+  warnings. 230: full review (all checks; first load 871 KB before, 873 KB
+  after); fixes: payment lists load alongside the expiry, families details
+  only (no direct insert, date and author locked); a: app files kept a year;
+  b: Messages and History load in the background (memory only); c: device
+  record copy is own room, last 7 days, at most 50 (Privacy Policy updated);
+  d: a new family waits on the device with no network (drafts unchanged, his
+  choice). 231: Pharmacy list showed only 60 names (all there); every name
+  now, Add another strength or size, read 1,000 rows at a time. 232: the
+  Pharmacy and Lab give and test before payment. 233: Front Desk only, or
+  Front Desk and Pharmacy or Lab; Drugs to give on the patient's page.
+  Slip: a broken test file made mutate.sh call every break caught; CI on
+  testing caught it; mutate.sh now refuses to run on failing tests.
+
 - 2026-11-20 (afternoon): 228b LIVE: category drop down first on both
   registration screens; a family registered with its own name, phone and
   address, saved with its first member in one step; no card fee for later
