@@ -4,6 +4,9 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-21: request 234 LIVE: the style checker updated (typescript-eslint
+  8.73.0, minimatch 11.0.9); npm audit 0 problems. Nothing the app uses moved.
+
 - 2026-11-20 and 21: requests 230 to 233 LIVE, each with 0 security
   warnings. 230: full review (all checks; first load 871 KB before, 873 KB
   after); fixes: payment lists load alongside the expiry, families details
