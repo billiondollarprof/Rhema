@@ -1279,3 +1279,12 @@ this file.
     ALL OF 230 TO 233 LIVE AND CHECKED (2026-11-20 and 21): 0 security
     warnings on testing and live each time. Left for later, not asked: the
     moderate npm audit warning in the lint tools (never shipped).
+
+234. **Update the style checker (moderate npm audit warning).** (2026-11-21)
+    "update it". The warning: minimatch, inside typescript-eslint (the lint
+    tools), can be slowed by a crafted pattern. Never shipped to devices.
+    DONE 2026-11-21: npm audit fix moved only the lint packages
+    (typescript-eslint 8.72.1 to 8.73.0, its minimatch 10.2.6 to 11.0.9 and
+    3 small helpers); npm audit 0 problems, worker 0; verify green, the same
+    9 old lint notes.
+    LIVE 2026-11-21: CI, deploy and smoke test green on testing and live.
