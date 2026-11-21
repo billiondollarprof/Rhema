@@ -849,6 +849,35 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+235. **The director's voice note: blood glucose in vital signs; bills from the
+    consulting room.** (2026-11-21, transcribed voice note from the director,
+    then Anthony's reading of it.) Director: "the vital sign... there's no
+    blood glucose... especially for emergency patient. Blood glucose... can be
+    fasting or random... when you click it, it should show whether... fasting
+    when the patient has not eaten or random. And the result, write the
+    result... that place where they calculate B[ill]... has to be available in
+    my computer, my consulting... the B[ill] for each of the drug... That is
+    not in my computer... there should be some place for additional B[ill]...
+    a patient will be charged even though they did not buy drugs... when they
+    do a procedure... to pass catheter... including surgery. Sometimes
+    including consultation fee... bed fee, all those things." Anthony: check
+    for other missing vital signs too, so nurses pick, not type; the doctor
+    (and the matron) decide prices: in the prescription and the lab request,
+    a price per drug or test, the total worked out, and the Front Desk
+    collects that amount; a bill for procedures and other things (operation,
+    catheter, bed fee); consultation and card fees are standard and could be
+    set by the admin in Settings; "even the nurses can also write a bill...
+    for this particular hospital, it's usually the matron and the doctor,
+    the director, that decide price." "just let me know if you understand
+    this whole thing." Said back 2026-11-21 ("BMI" and "B" in the transcript
+    read as "bill"): 1 blood glucose (Fasting or Random, then the result),
+    BMI worked out, pain score; 2 a price per drug and per test in the
+    prescription and lab request, total shown, the Front Desk collects it;
+    3 Add a bill (procedure, operation, bed fee...) to the Front Desk as
+    Bills to pay, never expires. Asked: glucose unit, more vital signs, who
+    sets prices (doctors and matron, nurses?), may the Front Desk change a
+    doctor's price, drugs on the price list. Waiting for his answers.
+
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major
