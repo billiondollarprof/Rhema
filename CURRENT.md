@@ -849,6 +849,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
+234. **Update the style checker (moderate npm audit warning).** (2026-11-21)
+    "update it". The warning: minimatch, inside typescript-eslint (the lint
+    tools), can be slowed by a crafted pattern. Never shipped to devices.
+    DONE 2026-11-21: npm audit fix moved only the lint packages
+    (typescript-eslint 8.72.1 to 8.73.0, its minimatch 10.2.6 to 11.0.9 and
+    3 small helpers); npm audit 0 problems, worker 0; verify green, the same
+    9 old lint notes.
+
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major
