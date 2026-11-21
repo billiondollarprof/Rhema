@@ -165,7 +165,8 @@ export default function OutboxSender({
 }: {
   client: SupabaseClient
   staffId: string
-  // Clinical staff also keep the records of open visits (request 224).
+  // Clinical staff also keep the records of their own room's last 7 days
+  // (requests 224 and 230c).
   medical?: boolean
 }) {
   const [tasks, setTasks] = useState<OutboxTask[]>([])
@@ -212,7 +213,8 @@ export default function OutboxSender({
     }
   }, [client, staffId])
 
-  // ===== 4b. Records of open visits, for clinical staff (request 224) =====
+  // ===== 4b. Records of their own room's last 7 days, for clinical staff
+  // (requests 224 and 230c) =====
   // 20 seconds after opening, then every 30 minutes; and the records opened
   // from the copy are written in the activity log when the network is back.
   useEffect(() => {
