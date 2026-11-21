@@ -36,6 +36,15 @@ import {
 } from '@/lib/record/record'
 import { recall, remember } from '@/lib/cache/memory'
 import SearchSelect from '@/components/options/SearchSelect'
+import {
+  GLUCOSE_UNITS,
+  GLUCOSE_WHEN,
+  bmiOf,
+  bmiWords,
+  glucoseWords,
+  type GlucoseUnit,
+  type GlucoseWhen,
+} from '@/lib/record/vitals'
 
 type Props = {
   client: SupabaseClient
@@ -76,6 +85,80 @@ export const RANGES: Record<string, Range> = {
   spo2: { from: 70, to: 100, step: 1, start: '98', decimals: 0 },
   weight_kg: { from: 1, to: 200, step: 0.5, start: '65', decimals: 1 },
   height_cm: { from: 40, to: 220, step: 1, start: '165', decimals: 0 },
+  // Request 235 (2026-11-21): pain 0 to 10, and blood glucose in either unit.
+  pain_score: { from: 0, to: 10, step: 1, start: '0', decimals: 0 },
+  glucose_mmol: { from: 2, to: 33, step: 0.1, start: '5.5', decimals: 1 },
+  glucose_mg: { from: 36, to: 600, step: 1, start: '100', decimals: 0 },
+}
+
+// ===== 1b. Blood glucose: fasting or random, the unit, then the result =====
+// The director, 2026-11-21: "when you click it, it should show whether... the
+// patient... is fasting... or random. And the result." The UK unit (mmol/L)
+// is chosen first; mg/dL is one tap away.
+export type Glucose = { value: string; unit: GlucoseUnit; when: GlucoseWhen | null }
+export const EMPTY_GLUCOSE: Glucose = { value: '', unit: 'mmol/L', when: null }
+
+export function GlucoseBox({
+  id,
+  glucose,
+  onChange,
+}: {
+  id: string
+  glucose: Glucose
+  onChange: (next: Glucose) => void
+}) {
+  return (
+    <div className={`${styles.field} ${styles.fieldWide} ${styles.glucoseBox}`}>
+      <label htmlFor={id}>Blood glucose</label>
+      <div className={styles.segments} role="group" aria-label="Fasting or random">
+        {GLUCOSE_WHEN.map(([value, words]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={glucose.when === value}
+            onClick={() => onChange({ ...glucose, when: value })}
+          >
+            {words}
+          </button>
+        ))}
+      </div>
+      <div className={styles.segments} role="group" aria-label="Glucose unit">
+        {GLUCOSE_UNITS.map((unit) => (
+          <button
+            key={unit}
+            type="button"
+            aria-pressed={glucose.unit === unit}
+            onClick={() => onChange({ ...glucose, unit, value: '' })}
+          >
+            {unit}
+          </button>
+        ))}
+      </div>
+      <VitalPick
+        key={glucose.unit}
+        id={id}
+        range={glucose.unit === 'mmol/L' ? RANGES.glucose_mmol : RANGES.glucose_mg}
+        value={glucose.value}
+        onChange={(value) => onChange({ ...glucose, value })}
+      />
+    </div>
+  )
+}
+
+// What is wrong with a glucose, or the three values to save (none when empty).
+export function readGlucose(glucose: Glucose):
+  | { problem: string }
+  | {
+      values: { blood_glucose: number; glucose_unit: GlucoseUnit; glucose_when: GlucoseWhen } | null
+    } {
+  const typed = glucose.value.trim()
+  if (!typed) return { values: null }
+  const value = Number(typed.replace(',', '.'))
+  if (Number.isNaN(value)) return { problem: 'Use numbers only.' }
+  if (!glucose.when) return { problem: 'Choose fasting or random for the blood glucose.' }
+  return {
+    values: { blood_glucose: value, glucose_unit: glucose.unit, glucose_when: glucose.when },
+  }
 }
 
 // "36.8", "65" (not "65.0"), and so on, from the lowest to the highest.
@@ -91,6 +174,13 @@ function numbersOf(range: Range): string[] {
 
 function VitalsReadings({ vitals }: { vitals: Vitals }) {
   const shown: [string, string][] = []
+  // Blood glucose first (request 235: "one of the first things").
+  const glucose = glucoseWords(
+    vitals.blood_glucose ?? null,
+    vitals.glucose_unit ?? null,
+    vitals.glucose_when ?? null,
+  )
+  if (glucose) shown.push(['Blood glucose', glucose.replace(/ glucose/, '')])
   if (vitals.systolic !== null || vitals.diastolic !== null) {
     shown.push(['Blood pressure', `${vitals.systolic ?? '?'}/${vitals.diastolic ?? '?'} mmHg`])
   }
@@ -99,6 +189,10 @@ function VitalsReadings({ vitals }: { vitals: Vitals }) {
     if (value !== null && value !== undefined)
       shown.push([reading.label, `${value}${reading.unit}`])
   }
+  if (vitals.pain_score !== null && vitals.pain_score !== undefined)
+    shown.push(['Pain', `${vitals.pain_score} of 10`])
+  const bmi = bmiWords(bmiOf(vitals.weight_kg, vitals.height_cm))
+  if (bmi) shown.push(['BMI', bmi.replace('BMI ', '')])
   return (
     <dl className={styles.readings}>
       {shown.map(([label, value]) => (
@@ -121,9 +215,11 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     spo2: '',
     weight_kg: '',
     height_cm: '',
+    pain_score: '',
   }
   const [adding, setAdding] = useState(false)
   const [values, setValues] = useState<Record<string, string>>(empty)
+  const [glucose, setGlucose] = useState<Glucose>(EMPTY_GLUCOSE)
   const [problem, setProblem] = useState<string | null>(null)
   // "Other" vital signs: the measures this person has typed before, and the
   // standard ones, each with a box (Anthony, 2026-11-11).
@@ -189,6 +285,13 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
       }
       extras.push({ measure, value })
     }
+    // Blood glucose: fasting or random and its unit go with it (request 235).
+    const read = readGlucose(glucose)
+    if ('problem' in read) {
+      setProblem(read.problem)
+      return
+    }
+    if (read.values) Object.assign(numbers, read.values)
     const hasFixed = Object.values(numbers).some((n) => n !== null)
     if (!hasFixed && extras.length === 0) {
       setProblem('Fill in at least one reading.')
@@ -221,6 +324,7 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     }
     setAdding(false)
     setValues(empty)
+    setGlucose(EMPTY_GLUCOSE)
     setExtraValues({})
     setProblem(null)
     reload()
@@ -284,6 +388,7 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
       {adding ? (
         <div className={styles.form}>
           <div className={styles.fields}>
+            <GlucoseBox id="vit-glucose" glucose={glucose} onChange={setGlucose} />
             {box('systolic', 'BP top (systolic)')}
             {box('diastolic', 'BP bottom (diastolic)')}
             {box('temperature_c', 'Temperature °C')}
@@ -292,6 +397,15 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
             {box('spo2', 'Oxygen SpO2 (%)')}
             {box('weight_kg', 'Weight (kg)')}
             {box('height_cm', 'Height (cm)')}
+            {box('pain_score', 'Pain (0 to 10)')}
+            {/* BMI, worked out as the weight and height are picked (235). */}
+            {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null)) ? (
+              <p className={`${styles.fieldWide} ${styles.bmiLine}`}>
+                {bmiWords(
+                  bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null),
+                )}
+              </p>
+            ) : null}
             {measures.map((measure) => (
               <div className={styles.field} key={`measure-${measure.id}`}>
                 <label htmlFor={`vit-x-${measure.id}`}>

@@ -1081,3 +1081,43 @@ a.small {
   align-items: center;
   gap: 8px;
 }
+
+/* Blood glucose (request 235): fasting or random, the unit, then the result. */
+.glucoseBox {
+  display: grid;
+  gap: 6px;
+}
+
+.segments {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
+.segments button {
+  font: inherit;
+  flex: 1;
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 8px 10px;
+  min-height: 36px;
+  color: var(--mut);
+  cursor: pointer;
+}
+
+.segments button[aria-pressed='true'] {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
+}
+
+/* BMI, worked out as the weight and height are picked. */
+.bmiLine {
+  font-size: 13px;
+  color: var(--ink2);
+}

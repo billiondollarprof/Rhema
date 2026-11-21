@@ -876,7 +876,26 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     3 Add a bill (procedure, operation, bed fee...) to the Front Desk as
     Bills to pay, never expires. Asked: glucose unit, more vital signs, who
     sets prices (doctors and matron, nurses?), may the Front Desk change a
-    doctor's price, drugs on the price list. Waiting for his answers.
+    doctor's price, drugs on the price list.
+    HIS ANSWERS 2026-11-21 ("I like your suggestions so far. They are all
+    good."): blood glucose "is supposed to be like one of the first things";
+    units: "offer both... check what many... used in Nigeria. And we always
+    use the UK standard"; BMI and pain score yes, "it can't be too much...
+    they are not compulsory... they don't block submission". Prices: "only
+    doctors and matron that sets prices"; if anybody else, "the pharmacy and
+    the lab, the people that actually carry out this test and dispense the
+    drugs"; "The front desk cannot change the price... can go and ask the
+    doctor". Standard prices fill in, "doctor can still clear it and put
+    their own price... the system should probably record that price in case
+    of next time... so that particular consultant can use it again."
+    Order: 1 vital signs, 2 prices in prescription and lab, 3 bills.
+    1 BUILT 2026-11-21: migration 20261121222211 (vital_signs blood_glucose,
+    glucose_unit mmol/L or mg/dL, glucose_when fasting or random, pain_score
+    0 to 10; all optional; a glucose needs both), test 065, 7 breaks caught.
+    Screens: Blood glucose first on the record form and Take vitals (Fasting
+    or Random, mmol/L first, then the result), Pain, BMI worked out; shown in
+    both units; the sheet has Glucose and Pain columns; the summary shows
+    glucose first. WAITING FOR HIS YES ON THE SQL.
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should

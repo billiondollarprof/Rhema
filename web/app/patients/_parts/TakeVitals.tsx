@@ -25,8 +25,16 @@ import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
 import recordStyles from '../record/_parts/record.module.css'
-import { RANGES, VitalPick } from '../record/_parts/Observations'
+import {
+  EMPTY_GLUCOSE,
+  GlucoseBox,
+  RANGES,
+  VitalPick,
+  readGlucose,
+  type Glucose,
+} from '../record/_parts/Observations'
 import { addLine } from '@/lib/record/record'
+import { bmiOf, bmiWords, glucoseWords } from '@/lib/record/vitals'
 
 // ===== 1. The boxes, in the nurses' order =====
 // label: above the box. name and unit: in the saved line ("Pulse 84 bpm").
@@ -39,13 +47,18 @@ const BOXES: { key: string; label: string; name: string; unit: string }[] = [
   { key: 'spo2', label: 'Oxygen SpO2 (%)', name: 'Oxygen', unit: '%' },
   { key: 'weight_kg', label: 'Weight (kg)', name: 'Weight', unit: ' kg' },
   { key: 'height_cm', label: 'Height (cm)', name: 'Height', unit: ' cm' },
+  // Request 235 (2026-11-21).
+  { key: 'pain_score', label: 'Pain (0 to 10)', name: 'Pain', unit: ' of 10' },
 ]
 
 const EMPTY: Record<string, string> = Object.fromEntries(BOXES.map((box) => [box.key, '']))
 
 // ===== 2. The saved reading, in words: "BP 120/80 mmHg", "Pulse 80 bpm" =====
-function savedWords(values: Record<string, string>): string[] {
+function savedWords(values: Record<string, string>, glucose: Glucose): string[] {
   const words: string[] = []
+  // Blood glucose first (request 235).
+  const sugar = glucoseWords(Number(glucose.value) || null, glucose.unit, glucose.when)
+  if (sugar) words.push(sugar)
   if (values.systolic || values.diastolic) {
     words.push(`BP ${values.systolic || '?'}/${values.diastolic || '?'} mmHg`)
   }
@@ -53,6 +66,8 @@ function savedWords(values: Record<string, string>): string[] {
     if (box.key === 'systolic' || box.key === 'diastolic') continue
     if (values[box.key]) words.push(`${box.name} ${values[box.key]}${box.unit}`)
   }
+  const bmi = bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null))
+  if (bmi) words.push(bmi)
   return words
 }
 
@@ -66,6 +81,7 @@ type Props = {
 
 export default function TakeVitals({ client, staffId, patientId, patientName, onClose }: Props) {
   const [values, setValues] = useState<Record<string, string>>(EMPTY)
+  const [glucose, setGlucose] = useState<Glucose>(EMPTY_GLUCOSE)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const [saved, setSaved] = useState<string[] | null>(null)
@@ -82,6 +98,13 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
         return
       }
     }
+    // Blood glucose: fasting or random and its unit go with it (request 235).
+    const read = readGlucose(glucose)
+    if ('problem' in read) {
+      setProblem(read.problem)
+      return
+    }
+    if (read.values) Object.assign(numbers, read.values)
     if (Object.values(numbers).every((number) => number === null)) {
       setProblem('Fill in at least one reading.')
       return
@@ -98,8 +121,9 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
       setProblem(result)
       return
     }
-    setSaved(savedWords(values))
+    setSaved(savedWords(values, glucose))
     setValues(EMPTY)
+    setGlucose(EMPTY_GLUCOSE)
   }
 
   // ===== 4. Saved: the numbers just taken =====
@@ -128,6 +152,14 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
         <p className={styles.muted}>Fill in what you measured. Leave the rest empty.</p>
       </div>
       <div className={recordStyles.fields}>
+        <GlucoseBox
+          id="desk-vit-glucose"
+          glucose={glucose}
+          onChange={(next) => {
+            setGlucose(next)
+            setProblem(null)
+          }}
+        />
         {BOXES.map((box) => (
           <div className={recordStyles.field} key={box.key}>
             <label htmlFor={`desk-vit-${box.key}`}>{box.label}</label>

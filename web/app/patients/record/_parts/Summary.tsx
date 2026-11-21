@@ -45,6 +45,12 @@ export function SummaryCard({ record }: { record: MedicalRecord }) {
 
   const vitalWords = vitals
     ? [
+        // Blood glucose first (request 235), in the unit it was taken in.
+        vitals.blood_glucose !== null && vitals.blood_glucose !== undefined && vitals.glucose_unit
+          ? `Glucose ${vitals.blood_glucose} ${vitals.glucose_unit}${
+              vitals.glucose_when === 'fasting' ? ' fasting' : ' random'
+            }`
+          : null,
         vitals.systolic !== null || vitals.diastolic !== null
           ? `BP ${vitals.systolic ?? '?'}/${vitals.diastolic ?? '?'}`
           : null,
@@ -52,6 +58,9 @@ export function SummaryCard({ record }: { record: MedicalRecord }) {
         vitals.pulse !== null ? `Pulse ${vitals.pulse}` : null,
         vitals.spo2 !== null ? `SpO₂ ${vitals.spo2}%` : null,
         vitals.weight_kg !== null ? `${vitals.weight_kg} kg` : null,
+        vitals.pain_score !== null && vitals.pain_score !== undefined
+          ? `Pain ${vitals.pain_score}/10`
+          : null,
       ]
         .filter(Boolean)
         .join(' · ')
