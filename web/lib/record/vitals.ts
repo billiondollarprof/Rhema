@@ -44,8 +44,9 @@ export function glucoseWords(
 // kg divided by the height in metres, squared. Null when either is missing.
 export function bmiOf(weightKg: number | null, heightCm: number | null): number | null {
   if (!weightKg || !heightCm) return null
-  const metres = heightCm / 100
-  return Math.round((weightKg / (metres * metres)) * 10) / 10
+  // Worked out in whole numbers first (kg x 100,000 / cm squared gives BMI x
+  // 10), so 80 kg at 160 cm is exactly 31.25 and rounds to 31.3, not 31.2.
+  return Math.round((weightKg * 100000) / (heightCm * heightCm)) / 10
 }
 
 // "BMI 24.2 (healthy)", using the usual adult bands.

@@ -895,7 +895,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Screens: Blood glucose first on the record form and Take vitals (Fasting
     or Random, mmol/L first, then the result), Pain, BMI worked out; shown in
     both units; the sheet has Glucose and Pain columns; the summary shows
-    glucose first. WAITING FOR HIS YES ON THE SQL.
+    glucose first. HIS YES ON THE SQL, 2026-11-22 ("bumpy [BMI] please double
+    check... the button is well fitted"): BMI checked at 320 to 1440, also
+    live on Take vitals, rounding fixed (31.25 to 31.3); buttons 36 px, inside.
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should

@@ -20,6 +20,9 @@ describe('bmi', () => {
     expect(bmiOf(70, 170)).toBe(24.2)
     expect(bmiWords(24.2)).toBe('BMI 24.2 (healthy)')
   })
+  it('rounds a half up (80 kg at 160 cm is 31.25)', () => {
+    expect(bmiOf(80, 160)).toBe(31.3)
+  })
   it('needs both', () => {
     expect(bmiOf(70, null)).toBeNull()
     expect(bmiWords(null)).toBeNull()

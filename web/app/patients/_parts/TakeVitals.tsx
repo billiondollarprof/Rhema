@@ -174,6 +174,12 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
             />
           </div>
         ))}
+        {/* BMI, worked out as the weight and height are picked (235). */}
+        {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null)) ? (
+          <p className={`${recordStyles.fieldWide} ${recordStyles.bmiLine}`}>
+            {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null))}
+          </p>
+        ) : null}
       </div>
       {problem ? <p className={styles.error}>{problem}</p> : null}
       <div className={styles.buttons}>
