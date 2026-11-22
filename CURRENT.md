@@ -981,6 +981,18 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     drug price: doctor approves, or the director (admin) approves, or build
     nothing for the Pharmacy now since the doctor sets drug prices?
     NEXT after part 3 (bills).
+    HIS ANSWER 2026-11-22 (after bills went live): "the front desk should
+    not wait. most times the front desk already knows the price, and the
+    front desk can also edit the price set by the doctor. A set price only
+    acts as a suggestion not a blocker or a must." So for 238: the lab's
+    price shows to the Front Desk at once as a suggestion; the doctor's
+    Approve or Change is still there. See 239 for the Front Desk editing.
+
+239. **A set price is a suggestion; the Front Desk can change it.**
+    (2026-11-22) Same words as above. This reverses 235's "The front desk
+    cannot change the price" for drugs, lab tests and bills: the doctor's
+    price fills in, the Front Desk can change it before taking payment.
+    SQL batch shown to him; waiting for his yes.
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs
@@ -2350,6 +2362,9 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-22: a price set by a doctor, the matron or the lab is a
+  suggestion. The Front Desk can change it and never waits for an approval.
+  "A set price only acts as a suggestion not a blocker or a must."
 - 2026-11-22: every staff role can see bills (procedures, operations, bed
   fee and the rest). "let everyone see the bill".
 - 2026-11-06: Email Routing goes to rhemamedical7@gmail.com for now (the
