@@ -1,6 +1,7 @@
 /*
  * app/admin/_parts/PricesTab.tsx: the hospital's price list (Settings,
- * part 1): the card fee, the consultation fee, and a price for each lab test.
+ * part 1): the card fee, the consultation fee, and a price for each lab test,
+ * drug (request 236) and procedure or bill line (request 235, part 3).
  *
  * Why: Anthony, 2026-11-16 (requests 197 and 201): settings for the admin,
  * one part at a time, prices first. The Front Desk then sees the price
@@ -75,6 +76,7 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
 
   const labPrices = prices.filter((price) => price.kind === 'lab_test')
   const drugPrices = prices.filter((price) => price.kind === 'drug')
+  const procedurePrices = prices.filter((price) => price.kind === 'procedure')
 
   return (
     <div className={styles.split}>
@@ -118,7 +120,10 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
       <LabPrices client={client} labPrices={labPrices} onSaved={reload} />
 
       {/* ===== 3b. Drugs (request 236): standard prices doctors set, or set here ===== */}
-      <DrugPrices client={client} drugPrices={drugPrices} onSaved={reload} />
+      <ListedPrices client={client} kind="drug" listed={drugPrices} onSaved={reload} />
+
+      {/* ===== 3c. Procedures, bed fee and the rest: a bill's lines (235) ===== */}
+      <ListedPrices client={client} kind="procedure" listed={procedurePrices} onSaved={reload} />
     </div>
   )
 }
@@ -285,68 +290,86 @@ function LabPrices({
   )
 }
 
-// ===== 5b. Drugs: the standard price of each drug and strength (request 236) =====
-// Doctors and the matron make prices standard after prescribing; the admin
-// sees, changes or removes them here, or types a new one.
-function DrugPrices({
+// ===== 5b. Drugs (request 236) and procedures (request 235, part 3) =====
+// Doctors and the matron make prices standard after prescribing or billing;
+// the admin sees, changes or removes them here, or types a new one. One
+// section for each, the same way.
+const LISTED = {
+  drug: {
+    title: 'Drug prices',
+    label: 'Drug and strength',
+    empty: 'No drug has a standard price yet. Doctors and the matron add them after prescribing.',
+  },
+  procedure: {
+    title: 'Procedure and bill prices',
+    label: 'Procedure, bed fee or other',
+    empty:
+      'Nothing has a standard price yet. Doctors and the matron add them after sending a bill.',
+  },
+} as const
+
+function ListedPrices({
   client,
-  drugPrices,
+  kind,
+  listed,
   onSaved,
 }: {
   client: SupabaseClient
-  drugPrices: Price[]
+  kind: keyof typeof LISTED
+  listed: Price[]
   onSaved: () => Promise<void>
 }) {
-  const [drug, setDrug] = useState('')
+  const words = LISTED[kind]
+  const [item, setItem] = useState('')
   const options = useMemo<SelectOption[]>(
     () =>
-      drugPrices.map((price) => ({
+      listed.map((price) => ({
         value: price.item,
         label: price.item,
         note: nairaWords(price.amount),
       })),
-    [drugPrices],
+    [listed],
   )
 
   return (
     <div className={styles.card}>
-      <h3>Drug prices ({drugPrices.length})</h3>
+      <h3>
+        {words.title} ({listed.length})
+      </h3>
       <div className={styles.field}>
-        <label htmlFor="price-drug">Drug and strength</label>
+        <label htmlFor={`price-${kind}`}>{words.label}</label>
         <SearchSelect
-          id="price-drug"
-          value={drug}
+          id={`price-${kind}`}
+          value={item}
           placeholder="Choose, or Other to type one"
           options={options}
-          onChange={setDrug}
-          onOther={(typed) => setDrug(typed)}
+          onChange={setItem}
+          onOther={(typed) => setItem(typed)}
         />
       </div>
-      {drug ? (
+      {item ? (
         <OnePrice
-          key={drug}
+          key={item}
           client={client}
-          id="price-drug-amount"
-          label={`Price of ${drug}`}
-          kind="drug"
-          item={drug}
-          now={drugPrices.find((price) => price.item.toLowerCase() === drug.toLowerCase())?.amount}
+          id={`price-${kind}-amount`}
+          label={`Price of ${item}`}
+          kind={kind}
+          item={item}
+          now={listed.find((price) => price.item.toLowerCase() === item.toLowerCase())?.amount}
           onSaved={onSaved}
         />
       ) : null}
-      {drugPrices.length === 0 ? (
-        <p className={styles.muted}>
-          No drug has a standard price yet. Doctors and the matron add them after prescribing.
-        </p>
+      {listed.length === 0 ? (
+        <p className={styles.muted}>{words.empty}</p>
       ) : (
         <div className={styles.list}>
-          {drugPrices.map((price) => (
+          {listed.map((price) => (
             <button
               key={price.id}
               type="button"
               className={styles.row}
-              aria-current={price.item === drug}
-              onClick={() => setDrug(price.item)}
+              aria-current={price.item === item}
+              onClick={() => setItem(price.item)}
             >
               <span className={styles.rowText}>
                 <b>{price.item}</b>

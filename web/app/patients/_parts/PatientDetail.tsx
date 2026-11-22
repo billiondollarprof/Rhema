@@ -34,6 +34,7 @@ import FamilyCard from './FamilyCard'
 import PharmacyMedicines from './PharmacyMedicines'
 import PaymentsCard from './PaymentsCard'
 import LabCard from '@/components/work/LabCard'
+import BillsCard from '@/components/work/BillsCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import type { StaffMember } from '@/lib/auth/session'
 import SendToRoom from './SendToRoom'
@@ -279,6 +280,11 @@ export default function PatientDetail({
           <LabCard client={client} staff={staff} patientId={patient.id} />
         </>
       ) : null}
+
+      {/* Bills from a doctor or the matron (request 235, part 3): every
+          member of staff sees them ("let everyone see the bill"); the Front
+          Desk takes payment here. Hidden when there is none. */}
+      {staff ? <BillsCard client={client} staff={staff} patientId={patient.id} /> : null}
 
       {/* Drugs to give (request 233, 2026-11-20): the Pharmacy finds a
           patient's drugs, paid or not, even one sent to the Front Desk only,

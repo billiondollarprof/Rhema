@@ -29,6 +29,7 @@ import AppShell from '@/components/shell/AppShell'
 import AnnouncementsCard from './_home/AnnouncementsCard'
 import CountTiles from './_home/CountTiles'
 import LabCard from '@/components/work/LabCard'
+import BillsCard from '@/components/work/BillsCard'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import QueueCard from './_home/QueueCard'
 import QuickActions from './_home/QuickActions'
@@ -137,6 +138,8 @@ export default function HomePage() {
         <QueueCard client={client} staff={staff} entries={entries} onChanged={refresh} />
         <LabCard client={client} staff={staff} />
         <PharmacyCard client={client} staff={staff} />
+        {/* Bills to pay (request 235, part 3): the Front Desk, only when there is one. */}
+        <BillsCard client={client} staff={staff} />
       </div>
     </AppShell>
   )

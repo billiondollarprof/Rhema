@@ -942,12 +942,42 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     NEXT: part 3, Add a bill (SQL batch shown to him, waiting for his yes).
     HIS ANSWER 2026-11-22 on who sees bills: "let everyone see the bill" (all
     staff roles, not only doctors, matron, Front Desk and admin). Batch
-    updated and shown again; waiting for his yes.
+    updated and shown again. HIS YES 2026-11-22: "yes". Building now.
+    Adding a bill uses the same rule as setting prices (sets_prices), so any
+    change to who sets prices covers bills too.
+    BUILT 2026-11-22: migration 20261122204301_bills (bills, bill_lines,
+    add_bill, pay_bill, void_bill; "procedure" on the price list and own
+    prices; payment kind "bill"), test 068, 11 breaks caught. Screens: Add a
+    bill on the record (doctor, matron) opens /bills/add/; Bills to pay on
+    the Front Desk's Home; Bills on every patient's page for all staff, Take
+    payment (locked amounts) for the Front Desk, Cancel bill for its maker;
+    admin Prices tab has "Procedure and bill prices". Note: changes are in
+    the activity log; reads of bills are not logged one by one (the same as
+    lab requests and prescriptions). Told him.
 
 238. **The lab sets a test price, the doctor approves.** (2026-11-22)
     "sometimes the lab scientists do set price for tests so the doctor can
     approve". Said back to him how it would work; waiting for his yes. Not
     started.
+    HIS ANSWER 2026-11-22: "yes, (a), wait for the doctor". So: on one
+    patient's lab request with no price, the lab scientist types a price per
+    test; the doctor who asked sees "Price from the lab" with Approve or
+    Change; the Front Desk takes payment only after the doctor approves.
+    And, same day: "The pharmacist sets price of drugs. They don't set price
+    of tests. The lab scientist sets price of tests. They don't set price of
+    drugs. But the nurses, the front desk, they see the price. Who can edit
+    and set price? The doctor or the matron, anyone with a consultant room.
+    Then for drug prices, the pharmacy can set price, but they still need the
+    doctor to approve it. If they ever set price, they need the director to
+    approve... in this case, they don't actually set the price. It's the
+    doctor that sets the price. But the lab scientist sets price because the
+    lab scientist is the one that does most of the price, and then the doctor
+    approves as it is designed."
+    OPEN QUESTIONS asked 2026-11-22: (1) today "doctor or matron" is by role;
+    should it be "anyone with a consultation room" instead? (2) the Pharmacy
+    drug price: doctor approves, or the director (admin) approves, or build
+    nothing for the Pharmacy now since the doctor sets drug prices?
+    NEXT after part 3 (bills).
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs

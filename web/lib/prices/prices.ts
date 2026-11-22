@@ -15,7 +15,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ===== 1. Shapes =====
 // drug: a drug and its strength, since 2026-11-22 (request 236).
-export type PriceKind = 'card' | 'consultation' | 'lab_test' | 'drug'
+// procedure: a line of a bill (bed fee, dressing and the rest), part 3 of 235.
+export type PriceKind = 'card' | 'consultation' | 'lab_test' | 'drug' | 'procedure'
 export type Price = { id: number; kind: PriceKind; item: string; amount: number }
 
 // The names the card and consultation prices are kept under.
@@ -148,7 +149,7 @@ export function standardOn(change: PriceChange): Date {
 // The doctor or matron sets the price of each drug and test. Their last
 // price for each one is kept, to fill in next time ("so that particular
 // consultant can use it again"). Each person reads only their own.
-export type MyPrice = { kind: 'drug' | 'lab_test'; item: string; amount: number }
+export type MyPrice = { kind: 'drug' | 'lab_test' | 'procedure'; item: string; amount: number }
 
 // The name a price is kept under: the drug and its strength, or the test,
 // in small letters, as the database keeps it.
@@ -171,7 +172,11 @@ export const PRICE_SET_WORDS = 'The doctor set this price. Ask the doctor to cha
 // ===== Standard prices from a doctor or the matron (request 236) =====
 // "Make these the standard prices?" after sending: they fill in for everybody
 // next time. Answers the words to show when it did not go.
-export type StandardPrice = { kind: 'drug' | 'lab_test'; item: string; amount: number }
+export type StandardPrice = {
+  kind: 'drug' | 'lab_test' | 'procedure'
+  item: string
+  amount: number
+}
 
 export async function makeStandardPrices(
   client: SupabaseClient,

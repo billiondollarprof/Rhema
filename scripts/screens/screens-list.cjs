@@ -12,6 +12,23 @@ const hoursAgo = (hours) => new Date(Date.now() - hours * 3600 * 1000).toISOStri
 const NURSE = { full_name: 'Nurse Bisi Ade' }
 const DOCTOR = { full_name: 'Dr Emeka Obi' }
 const NOT_VOIDED = { voided_at: null, void_reason: null, voider: null }
+// A made up bill (request 235, part 3): two lines, not paid yet.
+const BILL_ROWS = [
+  {
+    id: 1,
+    patient_id: 1,
+    note: null,
+    status: 'awaiting_payment',
+    created_at: hoursAgo(1),
+    created_by: 'someone-else',
+    patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+    maker: DOCTOR,
+    lines: [
+      { id: 1, kind: 'dressing', item: 'Wound dressing', amount: 5000 },
+      { id: 2, kind: 'bed', item: 'Bed fee, 2 days', amount: 10000 },
+    ],
+  },
+]
 const RECORD_DAY = {
   'rest/v1/patient_medications': [
     {
@@ -405,7 +422,8 @@ module.exports.SCREENS = [
     roomId: 2,
     extra: RECORD_DAY,
     // Request 227: Print and Email at the top; Void on a saved note.
-    mustSee: ['Prescribe', 'Request lab', 'Print', 'Email record', 'Void'],
+    // Request 235, part 3: Add a bill.
+    mustSee: ['Prescribe', 'Request lab', 'Add a bill', 'Print', 'Email record', 'Void'],
   },
   // Request 228a: a drug and a lab test not paid in 72 hours, in grey.
   {
@@ -796,8 +814,48 @@ module.exports.SCREENS = [
         { id: 3, kind: 'lab_test', item: 'Malaria test', amount: 1500 },
         // Request 236: a drug's standard price.
         { id: 4, kind: 'drug', item: 'Ceftriaxone 1 g injection', amount: 2500 },
+        // Request 235, part 3: a bill line's standard price.
+        { id: 5, kind: 'procedure', item: 'Bed fee per day', amount: 5000 },
       ],
     },
-    mustSee: ['Drug prices (1)', 'Ceftriaxone 1 g injection'],
+    mustSee: [
+      'Drug prices (1)',
+      'Ceftriaxone 1 g injection',
+      'Procedure and bill prices (1)',
+      'Bed fee per day',
+    ],
+  },
+  // Request 235, part 3: Add a bill, for a doctor.
+  {
+    path: '/bills/add/?p=1',
+    waitFor: 'Add a bill',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    mustSee: ['What for', 'Amount ₦', '+ Add another line', 'Send bill'],
+  },
+  // The Front Desk: Bills to pay on Home, and on the patient's page.
+  {
+    path: '/',
+    waitFor: 'Bills to pay',
+    extra: { 'rest/v1/bills': BILL_ROWS },
+    mustSee: ['Bills to pay', 'Wound dressing', 'Take payment'],
+  },
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Not paid yet',
+    extra: { 'rest/v1/bills': BILL_ROWS },
+    press: 'Take payment',
+    mustSee: ['Bills', 'Not paid yet', 'Set by the doctor', 'Record payment · ₦15,000'],
+  },
+  // Everybody sees the bill (Anthony, 2026-11-22); only the Front Desk pays.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Not paid yet',
+    role: 'nurse',
+    medical: true,
+    roomId: 6,
+    extra: { 'rest/v1/bills': BILL_ROWS },
+    mustSee: ['Bills', 'Not paid yet', 'Wound dressing'],
   },
 ]

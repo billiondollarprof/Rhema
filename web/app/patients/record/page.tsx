@@ -251,6 +251,13 @@ function PatientRecord() {
           Request lab
         </Link>
       ) : null}
+      {/* A bill for a procedure, an operation, the bed fee and the rest
+          (request 235, part 3): doctors and the matron. */}
+      {allowed && patient && (staff.role === 'doctor' || staff.role === 'matron') ? (
+        <Link className={buttons.button} href={`/bills/add/?p=${id}`}>
+          Add a bill
+        </Link>
+      ) : null}
       {allowed && record ? (
         <button
           className={buttons.button}

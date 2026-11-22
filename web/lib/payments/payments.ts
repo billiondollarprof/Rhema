@@ -18,7 +18,7 @@ import type { PaymentMode } from '../lab/lab'
 
 // ===== 1. Shapes and words =====
 export type PaymentPurpose =
-  'registration_card' | 'consultation' | 'lab_test' | 'scan' | 'drugs' | 'other'
+  'registration_card' | 'consultation' | 'lab_test' | 'scan' | 'drugs' | 'other' | 'bill'
 
 export const PURPOSE_WORDS: Record<PaymentPurpose, string> = {
   registration_card: 'Card',
@@ -27,6 +27,8 @@ export const PURPOSE_WORDS: Record<PaymentPurpose, string> = {
   scan: 'Scan',
   drugs: 'Drugs',
   other: 'Other',
+  // A doctor's or the matron's bill: procedures, bed fee and the rest (235).
+  bill: 'Bill',
 }
 
 // What the Front Desk picks from when taking a payment here. Lab tests and
