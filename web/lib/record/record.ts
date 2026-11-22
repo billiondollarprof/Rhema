@@ -14,6 +14,7 @@
  *
  * Never: log a value from the record. Errors are reported by table and id.
  */
+import type { GlucoseUnit, GlucoseWhen } from './vitals'
 import { HOSPITAL_TIME_ZONE } from '../time/zone'
 import { serverNow } from '../time/serverTime'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -94,6 +95,12 @@ export type Vitals = Voidable & {
   spo2: number | null
   weight_kg: number | null
   height_cm: number | null
+  // Request 235 (2026-11-21): blood glucose with fasting or random and its
+  // unit, and a pain score from 0 to 10.
+  blood_glucose?: number | null
+  glucose_unit?: GlucoseUnit | null
+  glucose_when?: GlucoseWhen | null
+  pain_score?: number | null
   recorded_at: string
   recorder: { full_name: string } | null
   // The nurse who took them, when another person typed (request 224).
@@ -233,7 +240,7 @@ export async function loadRecord(
     ).limit(200),
     byPatient(
       'vital_signs',
-      `${VOID}, systolic, diastolic, pulse, temperature_c, breathing_rate, spo2, weight_kg, height_cm, recorded_at, recorder:staff!recorded_by(full_name), signer:staff!signed_by(full_name)`,
+      `${VOID}, systolic, diastolic, pulse, temperature_c, breathing_rate, spo2, weight_kg, height_cm, blood_glucose, glucose_unit, glucose_when, pain_score, recorded_at, recorder:staff!recorded_by(full_name), signer:staff!signed_by(full_name)`,
       'recorded_at',
     ).limit(100),
     byPatient(

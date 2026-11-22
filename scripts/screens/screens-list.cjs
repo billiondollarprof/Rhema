@@ -112,7 +112,12 @@ const RECORD_DAY = {
       breathing_rate: 18,
       spo2: 98,
       weight_kg: 64,
-      height_cm: null,
+      height_cm: 165,
+      // Request 235: blood glucose and pain.
+      blood_glucose: 6.8,
+      glucose_unit: 'mmol/L',
+      glucose_when: 'random',
+      pain_score: 4,
       recorded_at: hoursAgo(14),
       recorder: NURSE,
     },
@@ -422,6 +427,8 @@ module.exports.SCREENS = [
     role: 'nurse',
     roomId: 6,
     extra: RECORD_DAY,
+    // Request 235: Glucose and Pain columns, and a reading in them.
+    mustSee: ['Random', '4/10', 'Save readings'],
   },
   {
     path: '/patients/record/consult/?p=1',

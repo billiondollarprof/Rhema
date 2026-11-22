@@ -493,7 +493,15 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
   const [values, setValues] = useState(empty)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
-  const KEYS = ['temperature_c', 'pulse', 'breathing_rate', 'systolic', 'diastolic', 'spo2']
+  const KEYS = [
+    'temperature_c',
+    'pulse',
+    'breathing_rate',
+    'systolic',
+    'diastolic',
+    'spo2',
+    'pain_score',
+  ]
   // Unsaved readings, kept 30 minutes on this device (request 227j).
   const draft = useDraft({
     staffId,
@@ -515,7 +523,24 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
       }
       numbers[key] = number
     }
-    if (Object.keys(numbers).length === 0) {
+    // Blood glucose (request 235): the number, fasting or random, the unit.
+    const sugar = (values.glucose ?? '').trim()
+    const glucose: Record<string, string | number> = {}
+    if (sugar) {
+      const number = Number(sugar.replace(',', '.'))
+      if (Number.isNaN(number)) {
+        setProblem('Type numbers only, like 5.4.')
+        return
+      }
+      if (!values.glucose_when) {
+        setProblem('Choose fasting or random for the blood glucose.')
+        return
+      }
+      glucose.blood_glucose = number
+      glucose.glucose_when = values.glucose_when
+      glucose.glucose_unit = values.glucose_unit || 'mmol/L'
+    }
+    if (Object.keys(numbers).length === 0 && !sugar) {
       setProblem('Type at least one reading.')
       return
     }
@@ -525,6 +550,7 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
     const result = await addLine(client, 'vital_signs', {
       patient_id: patientId,
       ...numbers,
+      ...glucose,
       recorded_by: staffId,
     })
     setBusy(false)
@@ -563,11 +589,13 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
     <section className={styles.table} aria-label="Vital signs sheet">
       <div className={`${styles.row} ${styles.vitalRow} ${styles.headRow}`} role="row">
         <span>Time</span>
+        <span>Glucose</span>
         <span>Temp °C</span>
         <span>Pulse</span>
         <span>Resp</span>
         <span>BP</span>
         <span>SpO₂ %</span>
+        <span>Pain</span>
         <span>Sign</span>
       </div>
 
@@ -576,6 +604,33 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
         <div className={styles.cell}>
           <span className={styles.label}>Time</span>
           <span className={styles.timeNow}>Now</span>
+        </div>
+        {/* Blood glucose first (request 235): the number, then fasting or
+            random and the unit (mmol/L, the UK one, unless changed). */}
+        <div className={styles.cell}>
+          <span className={styles.label}>Glucose</span>
+          {box('glucose', 'Blood glucose', '5.4')}
+          <div className={styles.glucosePicks}>
+            <select
+              aria-label="Fasting or random"
+              className={styles.input}
+              value={values.glucose_when ?? ''}
+              onChange={(event) => setValues({ ...values, glucose_when: event.target.value })}
+            >
+              <option value="">Choose</option>
+              <option value="fasting">Fasting</option>
+              <option value="random">Random</option>
+            </select>
+            <select
+              aria-label="Glucose unit"
+              className={styles.input}
+              value={values.glucose_unit || 'mmol/L'}
+              onChange={(event) => setValues({ ...values, glucose_unit: event.target.value })}
+            >
+              <option value="mmol/L">mmol/L</option>
+              <option value="mg/dL">mg/dL</option>
+            </select>
+          </div>
         </div>
         {cell('temperature_c', 'Temp °C', '36.5')}
         {cell('pulse', 'Pulse', '88')}
@@ -589,6 +644,7 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
           </div>
         </div>
         {cell('spo2', 'SpO₂ %', '98')}
+        {cell('pain_score', 'Pain (0 to 10)', '0')}
         <div className={styles.cell}>
           <span className={styles.label}>Sign</span>
           <span className={styles.me}>{me}</span>
@@ -616,6 +672,17 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
           {dayRows.map((vitals) => (
             <div key={vitals.id} className={`${styles.row} ${styles.vitalRow}`} role="row">
               <span className={styles.time}>{timeWords(vitals.recorded_at)}</span>
+              {/* The number and unit, then Fasting or Random under it (235). */}
+              <span className={styles.glucose}>
+                {vitals.blood_glucose !== null && vitals.blood_glucose !== undefined ? (
+                  <>
+                    {vitals.blood_glucose} {vitals.glucose_unit ?? ''}
+                    <small>{vitals.glucose_when === 'fasting' ? 'Fasting' : 'Random'}</small>
+                  </>
+                ) : (
+                  ''
+                )}
+              </span>
               <span>{vitals.temperature_c !== null ? `${vitals.temperature_c}°C` : ''}</span>
               <span>{vitals.pulse !== null ? `${vitals.pulse} bpm` : ''}</span>
               <span>{vitals.breathing_rate !== null ? `${vitals.breathing_rate}/min` : ''}</span>
@@ -625,6 +692,11 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
                   : ''}
               </span>
               <span>{vitals.spo2 !== null ? `${vitals.spo2}%` : ''}</span>
+              <span>
+                {vitals.pain_score !== null && vitals.pain_score !== undefined
+                  ? `${vitals.pain_score}/10`
+                  : ''}
+              </span>
               <span>{vitals.signer?.full_name ?? vitals.recorder?.full_name ?? 'Staff'}</span>
             </div>
           ))}
