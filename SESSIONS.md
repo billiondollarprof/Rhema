@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-22 (evening): 235 part 2 (doctor's prices), 237 (Completed as a
+  reason), 236 standard prices and the clearer Other vital sign all LIVE.
+  0 security warnings on each database change; click-through none broke.
+  Next: 235 part 3, Add a bill (SQL batch shown, waiting for his yes).
+
 - 2026-11-22: request 235 part 1 LIVE: blood glucose first (Fasting or
   Random, mmol/L or mg/dL, shown in both), pain score, BMI worked out (also
   before saving on Take vitals; rounding fixed); sheet has Glucose and Pain

@@ -937,7 +937,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     Other vital sign BUILT 2026-11-22: "+ Other vital sign" jumps to the new
     box and puts the cursor in it; once a number has been saved for that sign,
     the box offers the numbers typed before plus "Other..." (kept on the
-    device, numbers only, 30 at most). No SQL. NEXT: part 3, Add a bill.
+    device, numbers only, 30 at most). No SQL. LIVE 2026-11-22: CI, deploy
+    and smoke test green on testing and live; click-through, none broke.
+    NEXT: part 3, Add a bill (SQL batch shown to him, waiting for his yes).
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs
