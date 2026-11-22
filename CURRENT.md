@@ -916,6 +916,22 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     per test (doctor; matron for tests), the last price fills in, the total
     shows; the Front Desk sees it locked, "Set by the doctor". NOT SHIPPED:
     waiting for his yes on the SQL, and his answer on standard prices (236).
+    HIS YES 2026-11-22: "run the SQL"; "your suggestion on standard pricing is
+    good" (after Send, "Make these the standard prices?" with a tick per
+    line, Make standard / Not now; drugs and procedures on the price list;
+    doctors and the matron set standard prices). Other vital sign plan: not
+    answered yet.
+    Also fixed 2026-11-22: the Front Desk's payment form spilled past the edge
+    at 320 and 360 wide (found by a new check that opens Take payment on Home).
+
+237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
+    with a photo of "Why suspend Normal saline?") "All these place for drugs
+    that if you want to stop or edit or suspend, I will be asking you for the
+    reason. One of the reasons you should put there is completed. When the
+    treatment is completed, you stop it... Doctor said so... not needed now...
+    you may not change it, just put completed as one of the options."
+    BUILT 2026-11-22: "Completed" first among the reasons to suspend or stop a
+    medicine (Medications.tsx; Edit asks no reason). No SQL.
 
 236. **Other vital sign needs a number; check every "Other"; prices become
     standard.** (2026-11-22, with a photo of Other vital sign) "for add vital

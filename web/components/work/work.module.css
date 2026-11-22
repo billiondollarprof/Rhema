@@ -357,3 +357,16 @@ a.button {
   color: var(--ink2);
   cursor: default;
 }
+
+/* The payment form never wider than its card on a narrow phone (found by the
+   layout check at 320 and 360 wide, 2026-11-22): grid items may shrink, and
+   the price box takes the width it is given, not its own preferred width. */
+.entry > *,
+.payForm > *,
+.priceLine > * {
+  min-width: 0;
+}
+
+.money input {
+  width: 100%;
+}

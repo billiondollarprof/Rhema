@@ -251,7 +251,8 @@ module.exports.SCREENS = [
   // Request 235: the Front Desk sees the doctor's price, locked.
   {
     path: '/',
-    waitFor: 'Drugs to pay for',
+    waitFor: 'Ceftriaxone 1 g injection',
+    roomId: 1,
     press: 'Take payment',
     extra: {
       'rest/v1/prescriptions': [

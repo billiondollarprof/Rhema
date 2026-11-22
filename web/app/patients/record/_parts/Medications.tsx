@@ -406,7 +406,15 @@ function MedicationLine({
                 choices={
                   changing === 'active'
                     ? ['Doctor said to resume', 'Condition improved']
-                    : ['Doctor said so', 'Side effects', 'Not needed now', 'Patient refused']
+                    : // Completed first (the director, 2026-11-22, request 237:
+                      // "When the treatment is completed, you stop it").
+                      [
+                        'Completed',
+                        'Doctor said so',
+                        'Side effects',
+                        'Not needed now',
+                        'Patient refused',
+                      ]
                 }
                 confirmLabel={
                   changing === 'suspended' ? 'Suspend' : changing === 'stopped' ? 'Stop' : 'Resume'
