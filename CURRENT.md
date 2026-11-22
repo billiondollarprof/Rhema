@@ -898,6 +898,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     glucose first. HIS YES ON THE SQL, 2026-11-22 ("bumpy [BMI] please double
     check... the button is well fitted"): BMI checked at 320 to 1440, also
     live on Take vitals, rounding fixed (31.25 to 31.3); buttons 36 px, inside.
+    1 LIVE 2026-11-22: 0 security warnings on testing and live; click-through
+    960 buttons, none broke. NEXT: 2 prices in the prescription and lab.
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should

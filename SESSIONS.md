@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-22: request 235 part 1 LIVE: blood glucose first (Fasting or
+  Random, mmol/L or mg/dL, shown in both), pain score, BMI worked out (also
+  before saving on Take vitals; rounding fixed); sheet has Glucose and Pain
+  columns. 0 security warnings. Next: part 2, the doctor's prices.
+
 - 2026-11-21: request 234 LIVE: the style checker updated (typescript-eslint
   8.73.0, minimatch 11.0.9); npm audit 0 problems. Nothing the app uses moved.
 
