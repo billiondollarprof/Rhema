@@ -923,6 +923,16 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     answered yet.
     Also fixed 2026-11-22: the Front Desk's payment form spilled past the edge
     at 320 and 360 wide (found by a new check that opens Take payment on Home).
+    2 and 237 LIVE 2026-11-22: 0 security warnings on testing and live;
+    click-through 979 buttons, none broke. NEXT: 2b standard prices.
+    2b BUILT 2026-11-22: migration 20261122154048 (price_list holds drugs;
+    set_price takes drugs; make_standard_prices for a doctor, the matron or
+    an admin), test 067, 5 breaks caught. Screens: the standard price fills
+    in first, else the person's last; after Send, "Make these the standard
+    prices?" (a tick each, Make standard / Not now) for prices new or not the
+    standard; the admin's Prices tab has Drug prices. HIS YES ON THE SQL,
+    2026-11-22, and yes to the clearer Other vital sign (jump to the new box;
+    from the second time, the numbers typed before to pick).
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs

@@ -38,6 +38,7 @@ import {
   type MyPrice,
   type Price,
 } from '@/lib/prices/prices'
+import MakeStandard, { type Candidate } from './MakeStandard'
 import { useDraft } from '@/lib/drafts/drafts'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
@@ -86,9 +87,12 @@ export default function LabRequestForm({
       current = false
     }
   }, [client, setsPrices])
+  // The standard price first, else this person's last price (236).
   const priceFor = (test: string) =>
     prices[test] ??
-    String(myPriceOf(mine, 'lab_test', priceKey(test)) ?? priceOf(list, 'lab_test', test) ?? '')
+    String(priceOf(list, 'lab_test', test) ?? myPriceOf(mine, 'lab_test', priceKey(test)) ?? '')
+  // After sending: the prices to offer as standard (request 236).
+  const [toStandard, setToStandard] = useState<Candidate[]>([])
   const total = tests.reduce((sum, test) => sum + (readAmount(priceFor(test)) ?? 0), 0)
 
   // The unsaved request, kept 30 minutes on this device (227j).
@@ -136,6 +140,13 @@ export default function LabRequestForm({
       return
     }
     draft.clear()
+    // Prices that are new, or not the standard: offer them as standard (236).
+    setToStandard(
+      Object.entries(priced).flatMap(([test, amount]) => {
+        const now = priceOf(list, 'lab_test', test)
+        return now === amount ? [] : [{ kind: 'lab_test' as const, item: test, amount, now }]
+      }),
+    )
     setSent(
       sendTo === 'both'
         ? `Sent to the Lab, and to the Front Desk for payment: ${tests.join(', ')}.`
@@ -150,6 +161,7 @@ export default function LabRequestForm({
     return (
       <>
         <p className={styles.good}>{sent}</p>
+        <MakeStandard client={client} candidates={toStandard} />
         <p className={styles.muted}>
           You will be told when the result is ready. It goes straight into {patient.full_name}
           &apos;s record.

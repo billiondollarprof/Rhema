@@ -32,7 +32,16 @@ import type { PatientResult } from '@/lib/patients/patients'
 import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
 import { useDraft } from '@/lib/drafts/drafts'
 import { naira } from '@/lib/lab/lab'
-import { loadMyPrices, myPriceOf, priceKey, readAmount, type MyPrice } from '@/lib/prices/prices'
+import {
+  loadMyPrices,
+  loadPrices,
+  myPriceOf,
+  priceKey,
+  readAmount,
+  type MyPrice,
+  type Price,
+} from '@/lib/prices/prices'
+import MakeStandard, { type Candidate } from './MakeStandard'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
@@ -112,17 +121,29 @@ export default function PrescribeForm({
     },
   })
 
-  // This doctor's last price for each drug, to fill in (request 235).
+  // The standard price of each drug, else this doctor's last price, to fill
+  // in (requests 235 and 236).
   const [mine, setMine] = useState<MyPrice[]>([])
+  const [standard, setStandard] = useState<Price[]>([])
   useEffect(() => {
     let current = true
-    void loadMyPrices(client).then((found) => {
-      if (current) setMine(found)
+    void Promise.all([loadMyPrices(client), loadPrices(client)]).then(([own, list]) => {
+      if (!current) return
+      setMine(own)
+      setStandard(list ?? [])
     })
     return () => {
       current = false
     }
   }, [client])
+  const standardOf = (drug: string, strength: string) =>
+    standard.find(
+      (price) => price.kind === 'drug' && price.item.toLowerCase() === priceKey(drug, strength),
+    )?.amount
+  const fillPrice = (drug: string, strength: string) =>
+    standardOf(drug, strength) ?? myPriceOf(mine, 'drug', priceKey(drug, strength))
+  // After sending: the prices to offer as standard (request 236).
+  const [toStandard, setToStandard] = useState<Candidate[]>([])
 
   // ===== 2. Changing one drug =====
   // A new drug or strength fills in this doctor's last price for it, when
@@ -133,7 +154,7 @@ export default function PrescribeForm({
         if (at !== index) return draft
         const next = { ...draft, [part]: value }
         if ((part === 'drug' || part === 'strength') && !(draft.price ?? '').trim()) {
-          const last = myPriceOf(mine, 'drug', priceKey(next.drug, next.strength))
+          const last = fillPrice(next.drug, next.strength)
           if (last) next.price = String(last)
         }
         return next
@@ -193,6 +214,17 @@ export default function PrescribeForm({
       else setAlsoSent(true)
     }
     setBusy(false)
+    // Prices that are new, or not the standard: offer them as standard (236).
+    setToStandard(
+      drafts.flatMap((one) => {
+        const amount = readAmount(one.price ?? '')
+        if (!amount || !one.drug.trim()) return []
+        const now = standardOf(one.drug, one.strength)
+        if (now === amount) return []
+        const item = [one.drug.trim(), one.strength.trim()].filter(Boolean).join(' ')
+        return [{ kind: 'drug' as const, item, amount, now }]
+      }),
+    )
     setSent(true)
     draft.clear()
   }
@@ -210,6 +242,7 @@ export default function PrescribeForm({
           Once dispensed, the drugs join {patient.full_name}&apos;s current medications.
         </p>
         {alsoProblem ? <p className={styles.error}>{alsoProblem}</p> : null}
+        <MakeStandard client={client} candidates={toStandard} />
         <div className={styles.buttons}>
           {inConsultation ? (
             <button
@@ -295,7 +328,7 @@ export default function PrescribeForm({
                       if (at !== index) return one
                       const next = { ...one, drug: name, strength: picked }
                       // This doctor's last price for it, if the box is empty (235).
-                      const last = myPriceOf(mine, 'drug', priceKey(name, picked))
+                      const last = fillPrice(name, picked)
                       if (last && !(one.price ?? '').trim()) next.price = String(last)
                       return next
                     }),
