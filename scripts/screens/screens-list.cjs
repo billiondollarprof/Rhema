@@ -794,7 +794,10 @@ module.exports.SCREENS = [
         { id: 1, kind: 'card', item: 'Registration card', amount: 2000 },
         { id: 2, kind: 'lab_test', item: 'Full Blood Count', amount: 3500 },
         { id: 3, kind: 'lab_test', item: 'Malaria test', amount: 1500 },
+        // Request 236: a drug's standard price.
+        { id: 4, kind: 'drug', item: 'Ceftriaxone 1 g injection', amount: 2500 },
       ],
     },
+    mustSee: ['Drug prices (1)', 'Ceftriaxone 1 g injection'],
   },
 ]

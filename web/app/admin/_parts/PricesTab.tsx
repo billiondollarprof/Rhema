@@ -74,6 +74,7 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
   if (prices === null) return <p className={styles.muted}>Loading the prices…</p>
 
   const labPrices = prices.filter((price) => price.kind === 'lab_test')
+  const drugPrices = prices.filter((price) => price.kind === 'drug')
 
   return (
     <div className={styles.split}>
@@ -115,6 +116,9 @@ export default function PricesTab({ client }: { client: SupabaseClient }) {
 
       {/* ===== 3. Lab tests ===== */}
       <LabPrices client={client} labPrices={labPrices} onSaved={reload} />
+
+      {/* ===== 3b. Drugs (request 236): standard prices doctors set, or set here ===== */}
+      <DrugPrices client={client} drugPrices={drugPrices} onSaved={reload} />
     </div>
   )
 }
@@ -267,6 +271,82 @@ function LabPrices({
               className={styles.row}
               aria-current={price.item === test}
               onClick={() => setTest(price.item)}
+            >
+              <span className={styles.rowText}>
+                <b>{price.item}</b>
+                <small>Tap to change or remove</small>
+              </span>
+              <b>{nairaWords(price.amount)}</b>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ===== 5b. Drugs: the standard price of each drug and strength (request 236) =====
+// Doctors and the matron make prices standard after prescribing; the admin
+// sees, changes or removes them here, or types a new one.
+function DrugPrices({
+  client,
+  drugPrices,
+  onSaved,
+}: {
+  client: SupabaseClient
+  drugPrices: Price[]
+  onSaved: () => Promise<void>
+}) {
+  const [drug, setDrug] = useState('')
+  const options = useMemo<SelectOption[]>(
+    () =>
+      drugPrices.map((price) => ({
+        value: price.item,
+        label: price.item,
+        note: nairaWords(price.amount),
+      })),
+    [drugPrices],
+  )
+
+  return (
+    <div className={styles.card}>
+      <h3>Drug prices ({drugPrices.length})</h3>
+      <div className={styles.field}>
+        <label htmlFor="price-drug">Drug and strength</label>
+        <SearchSelect
+          id="price-drug"
+          value={drug}
+          placeholder="Choose, or Other to type one"
+          options={options}
+          onChange={setDrug}
+          onOther={(typed) => setDrug(typed)}
+        />
+      </div>
+      {drug ? (
+        <OnePrice
+          key={drug}
+          client={client}
+          id="price-drug-amount"
+          label={`Price of ${drug}`}
+          kind="drug"
+          item={drug}
+          now={drugPrices.find((price) => price.item.toLowerCase() === drug.toLowerCase())?.amount}
+          onSaved={onSaved}
+        />
+      ) : null}
+      {drugPrices.length === 0 ? (
+        <p className={styles.muted}>
+          No drug has a standard price yet. Doctors and the matron add them after prescribing.
+        </p>
+      ) : (
+        <div className={styles.list}>
+          {drugPrices.map((price) => (
+            <button
+              key={price.id}
+              type="button"
+              className={styles.row}
+              aria-current={price.item === drug}
+              onClick={() => setDrug(price.item)}
             >
               <span className={styles.rowText}>
                 <b>{price.item}</b>

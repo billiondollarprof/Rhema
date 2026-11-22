@@ -14,7 +14,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ===== 1. Shapes =====
-export type PriceKind = 'card' | 'consultation' | 'lab_test'
+// drug: a drug and its strength, since 2026-11-22 (request 236).
+export type PriceKind = 'card' | 'consultation' | 'lab_test' | 'drug'
 export type Price = { id: number; kind: PriceKind; item: string; amount: number }
 
 // The names the card and consultation prices are kept under.
@@ -166,3 +167,18 @@ export function myPriceOf(mine: MyPrice[], kind: MyPrice['kind'], key: string): 
 
 // The words when the database refuses a changed price.
 export const PRICE_SET_WORDS = 'The doctor set this price. Ask the doctor to change it.'
+
+// ===== Standard prices from a doctor or the matron (request 236) =====
+// "Make these the standard prices?" after sending: they fill in for everybody
+// next time. Answers the words to show when it did not go.
+export type StandardPrice = { kind: 'drug' | 'lab_test'; item: string; amount: number }
+
+export async function makeStandardPrices(
+  client: SupabaseClient,
+  prices: StandardPrice[],
+): Promise<string | null> {
+  const { error } = await client.rpc('make_standard_prices', { prices })
+  if (!error) return null
+  if (error.code === '42501') return 'Only a doctor, the matron or an admin sets standard prices.'
+  return 'The prices could not be saved. Check the internet and try again.'
+}
