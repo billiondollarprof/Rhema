@@ -21,7 +21,7 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
 import recordStyles from '../record/_parts/record.module.css'
@@ -85,6 +85,9 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const [saved, setSaved] = useState<string[] | null>(null)
+
+  // BMI, worked out from what is picked (request 235).
+  const bmi = bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null))
 
   // ===== 3. Save =====
   async function save() {
@@ -161,25 +164,25 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
           }}
         />
         {BOXES.map((box) => (
-          <div className={recordStyles.field} key={box.key}>
-            <label htmlFor={`desk-vit-${box.key}`}>{box.label}</label>
-            <VitalPick
-              id={`desk-vit-${box.key}`}
-              range={RANGES[box.key]}
-              value={values[box.key]}
-              onChange={(value) => {
-                setValues({ ...values, [box.key]: value })
-                setProblem(null)
-              }}
-            />
-          </div>
+          <Fragment key={box.key}>
+            <div className={recordStyles.field}>
+              <label htmlFor={`desk-vit-${box.key}`}>{box.label}</label>
+              <VitalPick
+                id={`desk-vit-${box.key}`}
+                range={RANGES[box.key]}
+                value={values[box.key]}
+                onChange={(value) => {
+                  setValues({ ...values, [box.key]: value })
+                  setProblem(null)
+                }}
+              />
+            </div>
+            {/* BMI right under the weight and height, as they are picked (235). */}
+            {box.key === 'height_cm' && bmi ? (
+              <p className={`${recordStyles.fieldWide} ${recordStyles.bmiLine}`}>{bmi}</p>
+            ) : null}
+          </Fragment>
         ))}
-        {/* BMI, worked out as the weight and height are picked (235). */}
-        {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null)) ? (
-          <p className={`${recordStyles.fieldWide} ${recordStyles.bmiLine}`}>
-            {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null))}
-          </p>
-        ) : null}
       </div>
       {problem ? <p className={styles.error}>{problem}</p> : null}
       <div className={styles.buttons}>

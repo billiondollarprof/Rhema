@@ -397,7 +397,6 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
             {box('spo2', 'Oxygen SpO2 (%)')}
             {box('weight_kg', 'Weight (kg)')}
             {box('height_cm', 'Height (cm)')}
-            {box('pain_score', 'Pain (0 to 10)')}
             {/* BMI, worked out as the weight and height are picked (235). */}
             {bmiWords(bmiOf(Number(values.weight_kg) || null, Number(values.height_cm) || null)) ? (
               <p className={`${styles.fieldWide} ${styles.bmiLine}`}>
@@ -406,6 +405,7 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
                 )}
               </p>
             ) : null}
+            {box('pain_score', 'Pain (0 to 10)')}
             {measures.map((measure) => (
               <div className={styles.field} key={`measure-${measure.id}`}>
                 <label htmlFor={`vit-x-${measure.id}`}>
