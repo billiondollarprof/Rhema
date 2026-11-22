@@ -42,6 +42,8 @@ import {
   bmiOf,
   bmiWords,
   glucoseWords,
+  rememberNumber,
+  usedNumbers,
   type GlucoseUnit,
   type GlucoseWhen,
 } from '@/lib/record/vitals'
@@ -262,6 +264,12 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     setOtherName('')
     setOtherUnit('')
     setProblem(null)
+    // Straight to the new box, ready for the number (request 236).
+    window.setTimeout(() => {
+      const box = document.getElementById(`vit-x-${id}`)
+      box?.scrollIntoView({ block: 'center' })
+      box?.focus()
+    }, 50)
   }
 
   async function add() {
@@ -309,6 +317,8 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
       }
     }
     for (const { measure, value } of extras) {
+      // Kept to offer next time, as a bare number (request 236).
+      rememberNumber(staffId, measure.id, value)
       const result = await addLine(client, 'vital_extras', {
         patient_id: patientId,
         measure_id: measure.id,
@@ -412,13 +422,13 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
                   {measure.name}
                   {measure.unit ? ` (${measure.unit})` : ''}
                 </label>
-                <input
+                {/* The numbers typed before for this sign to pick from, with
+                    Other to type a new one; the first time, a number box. */}
+                <ExtraPick
                   id={`vit-x-${measure.id}`}
-                  className={styles.input}
-                  inputMode="decimal"
-                  placeholder="Number"
+                  numbers={usedNumbers(staffId, measure.id)}
                   value={extraValues[measure.id] ?? ''}
-                  onChange={(e) => setExtraValues({ ...extraValues, [measure.id]: e.target.value })}
+                  onChange={(value) => setExtraValues({ ...extraValues, [measure.id]: value })}
                 />
               </div>
             ))}
@@ -631,6 +641,56 @@ export function NursingNotesSection({ client, staffId, patientId, record, reload
 }
 
 // ===== One vital sign box: pick a number, or type one with Other =====
+// ===== An "Other" vital sign's box (request 236) =====
+// A list of the numbers typed before, with Other to type a new one; with
+// none yet, a plain number box.
+function ExtraPick({
+  id,
+  numbers,
+  value,
+  onChange,
+}: {
+  id: string
+  numbers: string[]
+  value: string
+  onChange: (value: string) => void
+}) {
+  const [typing, setTyping] = useState(numbers.length === 0)
+  if (typing) {
+    return (
+      <div className={styles.vitalTyping}>
+        <input
+          id={id}
+          className={styles.input}
+          inputMode="decimal"
+          placeholder="Type the number"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        {numbers.length ? (
+          <button type="button" className={styles.linkButton} onClick={() => setTyping(false)}>
+            Back to the list
+          </button>
+        ) : null}
+      </div>
+    )
+  }
+  return (
+    <SearchSelect
+      id={id}
+      value={value}
+      placeholder="Choose"
+      options={numbers.map((number) => ({ value: number, label: number }))}
+      focusSearch={false}
+      onChange={onChange}
+      onOther={(typed) => {
+        if (typed) onChange(typed)
+        else setTyping(true)
+      }}
+    />
+  )
+}
+
 export function VitalPick({
   id,
   range,

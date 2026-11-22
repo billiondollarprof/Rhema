@@ -55,3 +55,39 @@ export function bmiWords(bmi: number | null): string | null {
   const band = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'healthy' : bmi < 30 ? 'overweight' : 'obese'
   return `BMI ${bmi} (${band})`
 }
+
+// ===== 3. "Other" vital signs: the numbers typed before (request 236) =====
+// Anthony, 2026-11-22: once a sign has been added, "the system can populate
+// it with number[s] people can pick from while still keeping the 'other'
+// button". The system cannot guess sensible numbers for a sign it has never
+// seen, so the list is made of the numbers this person typed before for that
+// sign, on this device: bare numbers only, never a patient, at most 30.
+const NUMBERS_KEY = (staffId: string) => `rhema-vital-numbers-${staffId}`
+
+function readNumbers(staffId: string): Record<string, string[]> {
+  try {
+    return JSON.parse(localStorage.getItem(NUMBERS_KEY(staffId)) ?? '{}') as Record<
+      string,
+      string[]
+    >
+  } catch {
+    return {}
+  }
+}
+
+export function usedNumbers(staffId: string, measureId: number): string[] {
+  return readNumbers(staffId)[String(measureId)] ?? []
+}
+
+export function rememberNumber(staffId: string, measureId: number, value: number) {
+  const all = readNumbers(staffId)
+  const key = String(measureId)
+  const next = [...new Set([...(all[key] ?? []), String(value)])]
+    .sort((a, b) => Number(a) - Number(b))
+    .slice(-30)
+  try {
+    localStorage.setItem(NUMBERS_KEY(staffId), JSON.stringify({ ...all, [key]: next }))
+  } catch {
+    // No storage: the box stays a plain number box.
+  }
+}

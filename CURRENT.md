@@ -933,6 +933,11 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     standard; the admin's Prices tab has Drug prices. HIS YES ON THE SQL,
     2026-11-22, and yes to the clearer Other vital sign (jump to the new box;
     from the second time, the numbers typed before to pick).
+    2b LIVE 2026-11-22 (0 security warnings; 981 buttons pressed, none broke).
+    Other vital sign BUILT 2026-11-22: "+ Other vital sign" jumps to the new
+    box and puts the cursor in it; once a number has been saved for that sign,
+    the box offers the numbers typed before plus "Other..." (kept on the
+    device, numbers only, 30 at most). No SQL. NEXT: part 3, Add a bill.
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs
