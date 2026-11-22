@@ -350,3 +350,10 @@ a.button {
   align-items: center;
   gap: 8px;
 }
+
+/* A price the doctor set (request 235): shaded, so it reads as fixed. */
+.money input[readonly] {
+  background: var(--bg);
+  color: var(--ink2);
+  cursor: default;
+}

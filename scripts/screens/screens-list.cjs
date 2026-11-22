@@ -248,6 +248,43 @@ module.exports.SCREENS = [
   { path: '/', waitFor: 'Registered today', role: 'doctor', medical: true },
   { path: '/', waitFor: 'Registered today', role: 'laboratory' },
   { path: '/', waitFor: 'Registered today', role: 'pharmacy' },
+  // Request 235: the Front Desk sees the doctor's price, locked.
+  {
+    path: '/',
+    waitFor: 'Drugs to pay for',
+    press: 'Take payment',
+    extra: {
+      'rest/v1/prescriptions': [
+        {
+          id: 8,
+          patient_id: 1,
+          note: null,
+          status: 'awaiting_payment',
+          prescribed_at: hoursAgo(1),
+          dispensed_at: null,
+          expired_at: null,
+          also_sent: true,
+          payment_id: null,
+          patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+          prescriber: DOCTOR,
+          items: [
+            {
+              id: 80,
+              drug: 'Ceftriaxone',
+              strength: '1 g injection',
+              dose: '1 g',
+              how_often: 'Once daily',
+              days: 3,
+              quantity: '3',
+              note: null,
+              price: 2500,
+            },
+          ],
+        },
+      ],
+    },
+    mustSee: ['Set by the doctor', 'Record payment · ₦2,500'],
+  },
   // Request 233: the Pharmacy finds a patient's drugs to give, paid or not.
   {
     path: '/patients/?p=1',
@@ -542,6 +579,14 @@ module.exports.SCREENS = [
   // Find a patient's paid tests, to correct (request 214).
   { path: '/lab/patient/', waitFor: "Find a patient's tests", role: 'laboratory' },
   { path: '/pharmacy/prescribe/?p=1', waitFor: 'Prescribe', medical: true },
+  // Request 235: a price box per drug for the doctor.
+  {
+    path: '/pharmacy/prescribe/?p=1',
+    waitFor: 'Prescribe',
+    medical: true,
+    role: 'doctor',
+    mustSee: ['Price ₦ (optional)'],
+  },
   // Request 233: Front Desk and Pharmacy (the default), or Front Desk only.
   {
     path: '/pharmacy/prescribe/?p=1',

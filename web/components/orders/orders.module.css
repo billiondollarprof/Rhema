@@ -213,3 +213,31 @@ textarea.input {
   align-items: center;
   gap: 8px;
 }
+
+/* The total of the doctor's prices (request 235). */
+.total {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--tint-3);
+  color: var(--ink);
+  font-size: 15px;
+}
+
+/* A price for each test, set by a doctor or the matron (request 235). */
+.prices {
+  display: grid;
+  gap: 8px;
+}
+
+.priceRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 140px);
+  gap: 8px;
+  align-items: center;
+}
+
+.priceRow label {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}

@@ -257,6 +257,9 @@ function Entry({
         <PriceForm
           formId={`rx-${prescription.id}`}
           labels={labels}
+          // The doctor's prices, filled in and locked (request 235).
+          prices={prescription.items.map((item) => (item.price ? Number(item.price) : undefined))}
+          locked={prescription.items.map((item) => Boolean(item.price))}
           save={(lines, mode) => payPrescription(client, prescription.id, lines, mode)}
           onCancel={() => setPaying(false)}
           onDone={() => onPaid(prescription.patient_id)}
