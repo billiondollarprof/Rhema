@@ -316,7 +316,11 @@ function LabEntry({
         <PriceForm
           formId={`lab-${request.id}`}
           labels={request.tests}
-          prices={request.tests.map((test) => lineFor(test).price)}
+          // The doctor's price first, locked (request 235); else the list.
+          prices={request.tests.map((test) =>
+            request.prices?.[test] ? Number(request.prices[test]) : lineFor(test).price,
+          )}
+          locked={request.tests.map((test) => Boolean(request.prices?.[test]))}
           notes={request.tests.map((test) => lineFor(test).note)}
           save={(lines, mode) => payLabRequestLines(client, request.id, lines, mode)}
           onCancel={() => setPaying(false)}

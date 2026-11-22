@@ -10,7 +10,9 @@
  *
  * How it goes:
  *   1. One block per drug: name and strength, dose, how often, how many
- *      days, quantity, a note. "Add another drug" adds a block.
+ *      days, quantity, a price (request 235: the doctor sets it, filled in
+ *      from their last price for that drug), a note. "Add another drug" adds
+ *      a block. The total shows as prices are typed.
  *   2. Send to the Front Desk and the Pharmacy (the default), or to the
  *      Front Desk only: the Pharmacy gets it once it is paid (request 233).
  *   3. Sent: what happened; Front Desk only offers "Also send to Pharmacy".
@@ -20,7 +22,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
 import OptionSelect from '@/components/options/OptionSelect'
@@ -29,6 +31,8 @@ import { knownMedicines } from '@/lib/medicines/medicines'
 import type { PatientResult } from '@/lib/patients/patients'
 import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharmacy'
 import { useDraft } from '@/lib/drafts/drafts'
+import { naira } from '@/lib/lab/lab'
+import { loadMyPrices, myPriceOf, priceKey, readAmount, type MyPrice } from '@/lib/prices/prices'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 
@@ -50,6 +54,9 @@ type Draft = {
   days: string
   quantity: string
   note: string
+  // The price in naira, set by the doctor (request 235); empty: the Front
+  // Desk prices it. Older drafts have none.
+  price?: string
 }
 
 const EMPTY: Omit<Draft, 'key'> = {
@@ -60,6 +67,7 @@ const EMPTY: Omit<Draft, 'key'> = {
   days: '',
   quantity: '',
   note: '',
+  price: '',
 }
 
 export default function PrescribeForm({
@@ -104,10 +112,36 @@ export default function PrescribeForm({
     },
   })
 
+  // This doctor's last price for each drug, to fill in (request 235).
+  const [mine, setMine] = useState<MyPrice[]>([])
+  useEffect(() => {
+    let current = true
+    void loadMyPrices(client).then((found) => {
+      if (current) setMine(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [client])
+
   // ===== 2. Changing one drug =====
+  // A new drug or strength fills in this doctor's last price for it, when
+  // the price box is still empty (it can be cleared and typed again).
   function change(index: number, part: keyof Draft, value: string) {
-    setDrafts((all) => all.map((draft, at) => (at === index ? { ...draft, [part]: value } : draft)))
+    setDrafts((all) =>
+      all.map((draft, at) => {
+        if (at !== index) return draft
+        const next = { ...draft, [part]: value }
+        if ((part === 'drug' || part === 'strength') && !(draft.price ?? '').trim()) {
+          const last = myPriceOf(mine, 'drug', priceKey(next.drug, next.strength))
+          if (last) next.price = String(last)
+        }
+        return next
+      }),
+    )
   }
+  // The total of the prices typed, shown as they are typed (request 235).
+  const total = drafts.reduce((sum, draft) => sum + (readAmount(draft.price ?? '') ?? 0), 0)
 
   // A medicine the Pharmacy counts needs a quantity (request 214); the others
   // do not.
@@ -123,6 +157,13 @@ export default function PrescribeForm({
 
   // ===== 3. Send =====
   async function send() {
+    // A price, when typed, must read as naira (request 235).
+    if (
+      drafts.some((draft) => (draft.price ?? '').trim() && readAmount(draft.price ?? '') === null)
+    ) {
+      setError('Type each price in naira, like 2,500, or leave it empty.')
+      return
+    }
     setBusy(true)
     setError(null)
     const items: PrescriptionItem[] = drafts.map((draft) => ({
@@ -133,6 +174,7 @@ export default function PrescribeForm({
       days: Number(draft.days) > 0 ? Math.min(365, Math.round(Number(draft.days))) : null,
       quantity: draft.quantity.trim() || null,
       note: draft.note.trim() || null,
+      price: readAmount(draft.price ?? ''),
     }))
     // Always to the Front Desk for payment; then to the Pharmacy too, if asked.
     const problem = await prescribe(client, patient.id, items, note, 'front_desk')
@@ -249,9 +291,14 @@ export default function PrescribeForm({
                 strength={draft.strength}
                 onChange={(name, picked) =>
                   setDrafts((all) =>
-                    all.map((one, at) =>
-                      at === index ? { ...one, drug: name, strength: picked } : one,
-                    ),
+                    all.map((one, at) => {
+                      if (at !== index) return one
+                      const next = { ...one, drug: name, strength: picked }
+                      // This doctor's last price for it, if the box is empty (235).
+                      const last = myPriceOf(mine, 'drug', priceKey(name, picked))
+                      if (last && !(one.price ?? '').trim()) next.price = String(last)
+                      return next
+                    }),
                   )
                 }
               />
@@ -321,6 +368,22 @@ export default function PrescribeForm({
                 </small>
               ) : null}
             </div>
+            {/* The doctor's price (request 235): the Front Desk collects it. */}
+            <div>
+              <label className={styles.label} htmlFor={`price-${index}`}>
+                Price ₦ (optional)
+              </label>
+              <input
+                id={`price-${index}`}
+                className={styles.input}
+                inputMode="decimal"
+                placeholder="e.g. 2,500"
+                value={draft.price ?? ''}
+                onChange={(event) =>
+                  change(index, 'price', event.target.value.replace(/[^\d.,\s]/g, ''))
+                }
+              />
+            </div>
             <div className={styles.wide}>
               <label className={styles.label} htmlFor={`note-${index}`}>
                 Note for this drug (optional)
@@ -347,6 +410,12 @@ export default function PrescribeForm({
       >
         Add another drug
       </button>
+      {/* The total, worked out as prices are typed (request 235). */}
+      {total > 0 ? (
+        <p className={styles.total}>
+          Total <b>{naira(total)}</b>
+        </p>
+      ) : null}
 
       {/* ----- A note, and where it goes ----- */}
       <div>

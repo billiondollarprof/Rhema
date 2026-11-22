@@ -10,6 +10,9 @@
  * The total shown here is only for the eye. The database adds up the same
  * lines itself, so what is saved is always the true sum.
  *
+ * A line the doctor priced (request 235, 2026-11-22: "The front desk cannot
+ * change the price") shows filled in and locked, marked Set by the doctor.
+ *
  * Never: send a total of our own; send the lines and let the database add.
  */
 'use client'
@@ -34,6 +37,7 @@ export default function PriceForm({
   onDone,
   prices = [],
   notes = [],
+  locked = [],
 }: {
   // Keeps each box's label tied to its own box when several forms are open.
   formId: string
@@ -47,6 +51,9 @@ export default function PriceForm({
   prices?: (number | undefined)[]
   // A word under a line, such as "New price, not yet approved" (request 208).
   notes?: (string | undefined)[]
+  // Lines the doctor priced (request 235): shown filled in and locked. The
+  // Front Desk cannot change them; the database refuses it too.
+  locked?: boolean[]
 }) {
   const [typed, setTyped] = useState<string[]>(
     labels.map((_, at) => (prices[at] ? String(prices[at]) : '')),
@@ -84,14 +91,21 @@ export default function PriceForm({
               inputMode="decimal"
               placeholder="e.g. 2,000"
               value={typed[at]}
-              autoFocus={at === 0}
+              autoFocus={at === 0 && !locked[at]}
+              readOnly={locked[at]}
+              aria-readonly={locked[at] ? 'true' : undefined}
               onChange={(event) => {
+                if (locked[at]) return
                 const value = event.target.value.replace(/[^\d.,\s]/g, '')
                 setTyped((all) => all.map((old, index) => (index === at ? value : old)))
               }}
             />
           </div>
-          {notes[at] ? <small className={styles.muted}>{notes[at]}</small> : null}
+          {locked[at] ? (
+            <small className={styles.muted}>Set by the doctor</small>
+          ) : notes[at] ? (
+            <small className={styles.muted}>{notes[at]}</small>
+          ) : null}
         </div>
       ))}
 

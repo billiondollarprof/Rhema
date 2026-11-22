@@ -900,6 +900,54 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     live on Take vitals, rounding fixed (31.25 to 31.3); buttons 36 px, inside.
     1 LIVE 2026-11-22: 0 security warnings on testing and live; click-through
     960 buttons, none broke. NEXT: 2 prices in the prescription and lab.
+    2026-11-22 "go on with part 2". And, to do LAST: "for the weight and height,
+    if possible you can add Unit conversion... some people put their units in
+    feet for the height... what about people who measure in pounds?... easy
+    conversion... not with clutter... choose this type of unit, that type of
+    unit... still getting the exact conversion in centimeter and in kilogram
+    as well. And you're still getting your BMI correct... take it gradually."
+    BMI made easy to see 2026-11-22 (he could not find it): right under Weight
+    and Height, bold on light blue. LIVE.
+    2 BUILT 2026-11-22: migration 20261122051713 (prescription_items.price,
+    lab_requests.prices, my_prices for each person's last price, sets_prices
+    doctor or matron, check_set_prices: the Front Desk pays the doctor's
+    price or the payment is refused; the one-total lab payment refuses a
+    priced request), test 066, 11 breaks caught. Screens: Price per drug and
+    per test (doctor; matron for tests), the last price fills in, the total
+    shows; the Front Desk sees it locked, "Set by the doctor". NOT SHIPPED:
+    waiting for his yes on the SQL, and his answer on standard prices (236).
+    HIS YES 2026-11-22: "run the SQL"; "your suggestion on standard pricing is
+    good" (after Send, "Make these the standard prices?" with a tick per
+    line, Make standard / Not now; drugs and procedures on the price list;
+    doctors and the matron set standard prices). Other vital sign plan: not
+    answered yet.
+    Also fixed 2026-11-22: the Front Desk's payment form spilled past the edge
+    at 320 and 360 wide (found by a new check that opens Take payment on Home).
+
+237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
+    with a photo of "Why suspend Normal saline?") "All these place for drugs
+    that if you want to stop or edit or suspend, I will be asking you for the
+    reason. One of the reasons you should put there is completed. When the
+    treatment is completed, you stop it... Doctor said so... not needed now...
+    you may not change it, just put completed as one of the options."
+    BUILT 2026-11-22: "Completed" first among the reasons to suspend or stop a
+    medicine (Medications.tsx; Edit asks no reason). No SQL.
+
+236. **Other vital sign needs a number; check every "Other"; prices become
+    standard.** (2026-11-22, with a photo of Other vital sign) "for add vital
+    sign... you can only add the name and the unit, no place to put a
+    number... or is it that the system automatically understands... once
+    there's a unit attached, the system can populate it with number[s]
+    people can pick from while still keeping the 'other' button... confirm
+    how this works and... cross check other places where the provision to
+    enter other things not included like the medicine list or the test list
+    if the fields provided are well calculated to take in the values." And:
+    "if the doctor or matron enters a price for medicine or test or any
+    procedure, once they press save, show them a dialogue button to make the
+    price a standard price... the price field will have its own save
+    button... it sticks. Can also decide to edit the price... put a new
+    standard price... do a proper arrangement so no clutter and so it's easy
+    to understand by any one."
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should

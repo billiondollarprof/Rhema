@@ -10,7 +10,9 @@
  *
  * How it goes:
  *   1. Tap the common tests, or "Add a test" to find any other.
- *   2. A note for the lab, if needed.
+ *   2. A doctor or the matron sets a price for each test (request 235),
+ *      filled in from their last price, or else the price list; the total
+ *      shows. A note for the lab, if needed.
  *   3. Send to the Front Desk and the Lab (the default), or to the Front
  *      Desk only: the Lab gets it once it is paid (request 233).
  *
@@ -20,11 +22,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import TestSearch from './TestSearch'
 import styles from './orders.module.css'
-import { COMMON_TESTS, requestLab } from '@/lib/lab/lab'
+import { COMMON_TESTS, naira, requestLab } from '@/lib/lab/lab'
+import { useAuth } from '@/lib/auth/session'
+import {
+  loadMyPrices,
+  loadPrices,
+  myPriceOf,
+  priceKey,
+  priceOf,
+  readAmount,
+  type MyPrice,
+  type Price,
+} from '@/lib/prices/prices'
 import { useDraft } from '@/lib/drafts/drafts'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
@@ -54,6 +67,29 @@ export default function LabRequestForm({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState<string | null>(null)
+  // ===== 0. Prices (request 235): a doctor or the matron sets one per test,
+  // filled in from their own last price, or else the price list. =====
+  const { staff } = useAuth()
+  const setsPrices = staff?.role === 'doctor' || staff?.role === 'matron'
+  const [prices, setPrices] = useState<Record<string, string>>({})
+  const [mine, setMine] = useState<MyPrice[]>([])
+  const [list, setList] = useState<Price[]>([])
+  useEffect(() => {
+    if (!setsPrices) return
+    let current = true
+    void Promise.all([loadMyPrices(client), loadPrices(client)]).then(([own, standard]) => {
+      if (!current) return
+      setMine(own)
+      setList(standard ?? [])
+    })
+    return () => {
+      current = false
+    }
+  }, [client, setsPrices])
+  const priceFor = (test: string) =>
+    prices[test] ??
+    String(myPriceOf(mine, 'lab_test', priceKey(test)) ?? priceOf(list, 'lab_test', test) ?? '')
+  const total = tests.reduce((sum, test) => sum + (readAmount(priceFor(test)) ?? 0), 0)
 
   // The unsaved request, kept 30 minutes on this device (227j).
   const draft = useDraft({
@@ -78,9 +114,22 @@ export default function LabRequestForm({
 
   // ===== 2. Send =====
   async function send() {
+    const priced: Record<string, number> = {}
+    if (setsPrices) {
+      for (const test of tests) {
+        const typed = priceFor(test).trim()
+        if (!typed) continue
+        const amount = readAmount(typed)
+        if (amount === null) {
+          setError('Type each price in naira, like 3,000, or leave it empty.')
+          return
+        }
+        priced[test] = amount
+      }
+    }
     setBusy(true)
     setError(null)
-    const problem = await requestLab(client, patient.id, tests, note, sendTo)
+    const problem = await requestLab(client, patient.id, tests, note, sendTo, priced)
     setBusy(false)
     if (problem) {
       setError(problem)
@@ -165,6 +214,33 @@ export default function LabRequestForm({
       </div>
       {/* ----- Every other test: search or browse (request 196a) ----- */}
       <TestSearch client={client} staffId={staffId} chosen={tests} onToggle={toggle} />
+
+      {/* ----- The price of each test, for a doctor or the matron (235) ----- */}
+      {setsPrices && tests.length > 0 ? (
+        <div className={styles.prices}>
+          <span className={styles.label}>Prices ₦ (optional)</span>
+          {tests.map((test) => (
+            <div key={test} className={styles.priceRow}>
+              <label htmlFor={`lab-price-${test}`}>{test}</label>
+              <input
+                id={`lab-price-${test}`}
+                className={styles.input}
+                inputMode="decimal"
+                placeholder="e.g. 3,000"
+                value={priceFor(test)}
+                onChange={(event) =>
+                  setPrices({ ...prices, [test]: event.target.value.replace(/[^\d.,\s]/g, '') })
+                }
+              />
+            </div>
+          ))}
+          {total > 0 ? (
+            <p className={styles.total}>
+              Total <b>{naira(total)}</b>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {/* ----- A note for the lab ----- */}
       <div>

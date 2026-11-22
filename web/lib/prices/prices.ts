@@ -142,3 +142,27 @@ export async function decidePrice(
 export function standardOn(change: PriceChange): Date {
   return new Date(new Date(change.proposed_at).getTime() + 72 * 60 * 60 * 1000)
 }
+
+// ===== My own prices (request 235, part 2, 2026-11-22) =====
+// The doctor or matron sets the price of each drug and test. Their last
+// price for each one is kept, to fill in next time ("so that particular
+// consultant can use it again"). Each person reads only their own.
+export type MyPrice = { kind: 'drug' | 'lab_test'; item: string; amount: number }
+
+// The name a price is kept under: the drug and its strength, or the test,
+// in small letters, as the database keeps it.
+export function priceKey(name: string, strength?: string | null): string {
+  return [name.trim(), (strength ?? '').trim()].filter(Boolean).join(' ').toLowerCase()
+}
+
+export async function loadMyPrices(client: SupabaseClient): Promise<MyPrice[]> {
+  const { data } = await client.from('my_prices').select('kind, item, amount')
+  return ((data as MyPrice[] | null) ?? []).map((one) => ({ ...one, amount: Number(one.amount) }))
+}
+
+export function myPriceOf(mine: MyPrice[], kind: MyPrice['kind'], key: string): number | undefined {
+  return mine.find((one) => one.kind === kind && one.item === key)?.amount
+}
+
+// The words when the database refuses a changed price.
+export const PRICE_SET_WORDS = 'The doctor set this price. Ask the doctor to change it.'

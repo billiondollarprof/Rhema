@@ -15,6 +15,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { COMMON_LAB_TESTS } from './catalogue'
 import { EXPIRED_WORDS, isExpiredRefusal, withExpiry } from '@/lib/payments/expiry'
+import { PRICE_SET_WORDS } from '@/lib/prices/prices'
 
 // ===== 1. Shapes and words =====
 export type LabStatus = 'awaiting_payment' | 'awaiting_test' | 'completed' | 'voided'
@@ -32,6 +33,8 @@ export type LabRequest = {
   sample_taken_at: string | null
   // Sent to the Lab too, not the Front Desk only (request 233).
   sent_to_lab?: boolean
+  // The doctor's price for each test, by test name (request 235).
+  prices?: Record<string, number> | null
   // Not paid within 72 hours and never tested (request 228a); null otherwise.
   expired_at: string | null
   patient: { full_name: string; patient_number: string } | null
@@ -68,7 +71,7 @@ export const PAYMENT_MODES: [PaymentMode, string][] = [
 ]
 
 const REQUEST_COLUMNS =
-  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, sent_to_lab, ' +
+  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, sent_to_lab, prices, ' +
   'patient:patients(full_name, patient_number), requester:staff!lab_requests_requested_by_fkey(full_name)'
 
 // "₦7,500.50", "₦7,500".
@@ -89,12 +92,15 @@ export async function requestLab(
   note: string,
   // The Front Desk only, or the Front Desk and the Lab (request 233).
   sendTo: 'front_desk' | 'both',
+  // A price for each test, set by a doctor or the matron (request 235).
+  prices: Record<string, number> = {},
 ): Promise<string | null> {
   const { error } = await client.rpc('request_lab', {
     patient: patientId,
     wanted: tests,
     request_note: note,
     send_to: sendTo,
+    ...(Object.keys(prices).length ? { test_prices: prices } : {}),
   })
   return error ? 'The request could not be sent. Check the internet and try again.' : null
 }
@@ -153,6 +159,7 @@ export async function payLabRequestLines(
     paid_by: mode,
   })
   if (isExpiredRefusal(error)) return EXPIRED_WORDS
+  if (error?.message?.startsWith('price_changed')) return PRICE_SET_WORDS
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }

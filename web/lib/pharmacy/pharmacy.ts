@@ -14,6 +14,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
 import { EXPIRED_WORDS, isExpiredRefusal, withExpiry } from '@/lib/payments/expiry'
+import { PRICE_SET_WORDS } from '@/lib/prices/prices'
 
 // ===== 1. Shapes and words =====
 export type PrescriptionStatus = 'awaiting_payment' | 'awaiting_dispense' | 'dispensed' | 'voided'
@@ -27,6 +28,8 @@ export type PrescriptionItem = {
   days: number | null
   quantity: string | null
   note: string | null
+  // The doctor's price in naira (request 235); null: priced at the Front Desk.
+  price?: number | null
 }
 
 export type Prescription = {
@@ -80,7 +83,7 @@ const COLUMNS =
   'id, patient_id, note, status, prescribed_at, dispensed_at, expired_at, also_sent, payment_id, ' +
   'patient:patients(full_name, patient_number), ' +
   'prescriber:staff!prescriptions_prescribed_by_fkey(full_name), ' +
-  'items:prescription_items(id, drug, strength, dose, how_often, days, quantity, note)'
+  'items:prescription_items(id, drug, strength, dose, how_often, days, quantity, note, price)'
 
 // ===== 2. A doctor prescribes =====
 export async function prescribe(
@@ -183,6 +186,7 @@ export async function payPrescription(
     paid_by: mode,
   })
   if (isExpiredRefusal(error)) return EXPIRED_WORDS
+  if (error?.message?.startsWith('price_changed')) return PRICE_SET_WORDS
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }
