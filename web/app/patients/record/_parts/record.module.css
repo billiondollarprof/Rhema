@@ -1116,8 +1116,14 @@ a.small {
   box-shadow: 0 1px 3px rgba(15, 34, 56, 0.15);
 }
 
-/* BMI, worked out as the weight and height are picked. */
+/* BMI, worked out as the weight and height are picked, right under them,
+   easy to see (Anthony, 2026-11-22: "I can't see any BMI here"). */
 .bmiLine {
-  font-size: 13px;
-  color: var(--ink2);
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--tint-3);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
 }
