@@ -940,6 +940,14 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     device, numbers only, 30 at most). No SQL. LIVE 2026-11-22: CI, deploy
     and smoke test green on testing and live; click-through, none broke.
     NEXT: part 3, Add a bill (SQL batch shown to him, waiting for his yes).
+    HIS ANSWER 2026-11-22 on who sees bills: "let everyone see the bill" (all
+    staff roles, not only doctors, matron, Front Desk and admin). Batch
+    updated and shown again; waiting for his yes.
+
+238. **The lab sets a test price, the doctor approves.** (2026-11-22)
+    "sometimes the lab scientists do set price for tests so the doctor can
+    approve". Said back to him how it would work; waiting for his yes. Not
+    started.
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs
@@ -2309,6 +2317,8 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-22: every staff role can see bills (procedures, operations, bed
+  fee and the rest). "let everyone see the bill".
 - 2026-11-06: Email Routing goes to rhemamedical7@gmail.com for now (the
   account made for the hospital, behind its Cloudflare, Supabase and
   Resend). "Use this one when I get to the hospital and then add it to
