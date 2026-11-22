@@ -954,6 +954,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     admin Prices tab has "Procedure and bill prices". Note: changes are in
     the activity log; reads of bills are not logged one by one (the same as
     lab requests and prescriptions). Told him.
+    LIVE 2026-11-22: 0 security warnings on testing and live; smoke tests
+    passed; click-through none broke. NEXT: 238 (lab price, doctor approves),
+    once he answers the two open questions.
 
 238. **The lab sets a test price, the doctor approves.** (2026-11-22)
     "sometimes the lab scientists do set price for tests so the doctor can
