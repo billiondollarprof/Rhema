@@ -999,6 +999,9 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     function removed), test 069, tests 066 and 068 brought to the new rule,
     7 breaks caught. Screens: "Doctor's price" under the box, the box can be
     changed, on drugs, lab tests and bills.
+    LIVE 2026-11-23: 0 security warnings on testing and live; smoke tests
+    passed; click-through none broke. NEXT: 238 (lab price; the Front Desk
+    does not wait).
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs

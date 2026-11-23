@@ -4,6 +4,10 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-23: 239 LIVE: a set price is a suggestion; the Front Desk can
+  change the doctor's price on drugs, tests and bills (0 security warnings).
+  Next: 238, the lab sets a test price.
+
 - 2026-11-22 (evening): 235 part 2 (doctor's prices), 237 (Completed as a
   reason), 236 standard prices and the clearer Other vital sign all LIVE.
   0 security warnings on each database change; click-through none broke.
