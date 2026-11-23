@@ -40,6 +40,14 @@ Numbers are kept from the full list, so older notes still match.
     links "from TikTok or from Instagram or from anywhere", and later post
     testimonials and other things themselves. Staff photos and names come
     last. Said back; waiting for his yes and for when the app may be touched.
+    DECIDED 2026-11-23 (later): option A first: build everything that does
+    not touch the app; he says soon whether the app may be touched.
+    Testimonials as a rotating RING like the Olympus gallery ("Turn the
+    ring"): tap a card, the ring stops and the video plays; turn it again;
+    the written testimonials stay too; "everything well arranged and
+    premium". Cover photo: optional field; when the system cannot pull the
+    thumbnail (Instagram, or any link), it asks for a cover photo.
+    Repository: private (my suggestion; he did not object).
 
 
 5. **Is Cloudflare's free 10 GB per account or per project? If per
