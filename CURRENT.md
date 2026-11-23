@@ -32,7 +32,10 @@ Numbers are kept from the full list, so older notes still match.
     migration 20261123192759 (is_doctor and sets_prices also count a
     consulting room, with medical access), test 070, 7 breaks caught; the
     screens use actsAsDoctor and setsPrices (lib/auth/roles.ts). SQL batch
-    shown; waiting for his yes.
+    shown. HIS YES 2026-11-23: "show me the SQL ba[tch], and let's run it."
+    Midwife role: "there's no need to add it. Just leave it." Antenatal:
+    "I don't think anything is missing... I'll let you know when I meet
+    with the midwife again." 
     Also: "there are certain things that the matron is able to chart, the
     midwife is able to chart, that are not included... check it again"
     (antenatal: palpation and the rest). FOUND: request 189's visit table is
@@ -63,6 +66,11 @@ Numbers are kept from the full list, so older notes still match.
     name of medicine or name of test"; lab tests "they used to pay that one
     different... the system can still fetch the laboratory tests... and still
     show the money they paid, even though they are not owing." Part of 240.
+    2026-11-23: "I think you got the bill right. The lab test can show as
+    paid. And also, if they've not paid for it, it is still show that
+    they've not paid and it still shows the amount... whatever the person
+    has paid is subtracted from the total and the person pays the
+    difference... show me the SQL ba[tch]." 
 
 240. **The director on bills, the medicine chart, the Pharmacy, lab results
     and a back button on phones.** (2026-11-23, a long voice note, written
