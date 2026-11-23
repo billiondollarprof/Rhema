@@ -15,6 +15,51 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+241. **Anybody in a consulting room does everything a doctor does; the
+    matron cannot prescribe today.** (2026-11-23) "I noticed that the matron
+    does not have access to prescribed drugs. She needs the prescription
+    access. I said that anybody with a consultant room must be able to
+    prescribe, must be able to write consultant notes. Everything that the
+    doctor will do, as long as they are assigned to consultant room, you
+    should be able to do that... So everybody with a consultant room can do
+    everything that a consultant can do, right?" (This replaces the
+    2026-11-20 note "in the computer, she's not supposed to be allowed to
+    prescribe drugs".) FOUND: prescribing and "also send to the Pharmacy"
+    check the doctor role only (private.is_doctor); prices and bills check
+    doctor or matron by role; the screens check role === 'doctor'.
+    Consultation notes already go by the consulting room. SQL batch shown;
+    waiting for his yes.
+    Also: "there are certain things that the matron is able to chart, the
+    midwife is able to chart, that are not included... check it again"
+    (antenatal: palpation and the rest). FOUND: request 189's visit table is
+    live (fundus, presentation, position, FHR, urine, BP, pulse, breathing,
+    weight, Hb, oedema, drugs given, remark, examiner, return date), and the
+    booking, tests and consent; any clinical role can write them. Asked him
+    which items are missing.
+    And: "I'm even thinking if midwife should be a role... currently the
+    midwives take the nurses role." (Asked for an opinion.)
+
+242. **Inpatients: deposits at the Front Desk during the stay.** (2026-11-23)
+    "when the inpatient stays... they used to come and still make some
+    deposit... for a bed space... they don't usually meet the doctor, they
+    just go and meet front desk. So front desk should be able to take the
+    payment and enter the description of what payment they made, that
+    deposit... optional description... any deposit they are making as they
+    are staying is counting towards their stay as against the services they
+    are receiving... calculate how much they have paid so far cumulatively
+    and how much service they have gotten so far cumulatively... pay the
+    balance difference." HIS YES to the chart plan (Epic and Bahmni way):
+    "a very nice and easy flow... go on with it." Admit: "the doctor, the
+    matron, the front desk. All three... antenatal patients... switch from
+    being outpatient to inpatient when they come to do delivery." Pharmacy:
+    "see the chart on the patient's page, not the full medical record."
+    Bill: "Medicines given" one line, automatic; "Take home medicine" its
+    own line, from prescriptions while admitted, even if paid separately;
+    everything while admitted counts; "the receipt should not be naming the
+    name of medicine or name of test"; lab tests "they used to pay that one
+    different... the system can still fetch the laboratory tests... and still
+    show the money they paid, even though they are not owing." Part of 240.
+
 240. **The director on bills, the medicine chart, the Pharmacy, lab results
     and a back button on phones.** (2026-11-23, a long voice note, written
     down in his words; an image of the hospital's receipt was mentioned but
