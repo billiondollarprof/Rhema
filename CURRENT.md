@@ -15,6 +15,72 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+240. **The director on bills, the medicine chart, the Pharmacy, lab results
+    and a back button on phones.** (2026-11-23, a long voice note, written
+    down in his words; an image of the hospital's receipt was mentioned but
+    did not come through.) Said back to him in parts a to i; NOT STARTED,
+    waiting for his yes and answers. The 238 SQL (Lab sets prices) is ON
+    HOLD: he now says "the lab scientist should not be able to edit price".
+    a. Pharmacy and the medicine chart: "those medications that are entered
+       into medicine chart, they are medications that the inpatients take...
+       they don't pay for it... They pay when they are about to check them
+       out... give the pharmacy access to see the list of medications from
+       those medicine charts... Only the medicine... the pharmacy should also
+       see those medicine and be able to see their own button... dispense. So
+       when they are clicking dispense, the system would also record the
+       history... just like it records the history for medicine that the
+       pharmacies give out... that medicine chart now is not part of what
+       comes as notification. The pharmacies will only click on find
+       patients... open the medical record... the only thing they are able
+       to see and access is the medication and the prescriptions... They will
+       see all the prescription, all the ones they have given and the ones
+       they have not given. They will see the medicine chart... so that they
+       can click on dispense for that particular time."
+    b. Chart medicines given become a bill line: "every medicine in medicine
+       chart that has been given would appear automatically in the bill...
+       with the prices that the doctor used to input when he was charting the
+       medication... The total should appear with the name medications...
+       it should be one line... Receipt can just say medications given...
+       The doctor doesn't want the names of the medicine to be in the receipt
+       that will be given to the patient to avoid self-prescription."
+    c. The bill's list (from the receipt): "professional fee, nursing fee,
+       procedure and surgery, aesthetic [anaesthetic], oxygen, phototherapy,
+       blood transfusion, delivery, physiotherapy, tear and repair, hospital
+       facilities, stroke [/] bed space, orals, injectable, infusion, stroke
+       [/] cannulation, consumables, antibiotics, take home drugs, others...
+       where others is is where they can add others and put a name... they
+       can still make it a standard."
+    d. Bed space: "a sub category that says... regular, private and VIP...
+       They have different prices... capture any price the doctor puts...
+       make it a standard for next time... remember and recommend it."
+    e. Prices: "the only people that can set that price is either the admin,
+       the matron or the doctor. Also the doctor said that the lab scientist
+       should not be able to edit price. So only the matron, the doctor and
+       the admin can set price of medication."
+    f. Preview: "The doctor also want to see the preview of the receipt...
+       click to preview the receipt. And he should be able to edit the
+       receipt before sending it to front desk... every row on its own with
+       its price."
+    g. "Other" (he says "order") shows the typed name: "when they click
+       order, they will put the name of the thing... that new name... becomes
+       what appears in the field, not order... Same with every other place
+       in the platform... the doctor... clicked on order inside the bill...
+       the system was still showing order... Even after we made it a
+       standard... nothing care [nursing care] will be on its own. I believe
+       that is a mistake in the system."
+    h. Lab results one test at a time: "the doctor can send three lab
+       requests at the same time. He should be able to conduct the one he can
+       conduct now and send the results without sending everything... the
+       other one, he will keep it as pending results... some of the results
+       takes three days. Whenever the results is ready, he can now send it."
+    i. Back button on phones: "putting that back button that we have on
+       desktop and tablet screen... at the top for mobile as well... when you
+       are using iPhone, it's difficult to go back... it doesn't take space.
+       Just be at the corner... previous pages, not... home page."
+    Also: "cross-check before you run the SQL that you just showed me...
+    if there's any adjustment that needs to be made before this current SQL,
+    you make the adjustment before running the SQL."
+
 5. **Is Cloudflare's free 10 GB per account or per project? If per
    account, move the domain to a new Cloudflare account for the hospital.**
    Answered: per account, so yes, new account, and the move is supported.
