@@ -5,10 +5,10 @@
 -- What this proves:
 --   1. A doctor prescribes with a price on one drug: it is kept, and kept as
 --      that doctor's own price for next time.
---   2. The Front Desk cannot pay a different amount for the priced drug; it
---      pays the doctor's price and types the other.
+--   2. The Front Desk pays the doctor's price and types the other. (Since
+--      request 239 it may also change it: test 069.)
 --   3. A doctor and the matron put prices on a lab request; a nurse cannot.
---   4. The Front Desk cannot change a lab price the doctor set.
+--   4. The Front Desk pays the doctor's lab price (may change it: test 069).
 --   5. Each person reads only their own prices.
 --   6. A price of 0, or for a test not asked for, is refused.
 --
@@ -62,17 +62,8 @@ declare wanted bigint := (select id from public.prescriptions where note = 'T66 
 begin
   perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000662"}', true);
   set local role authenticated;
-  begin
-    perform public.pay_prescription(wanted,
-      '[{"label": "Ceftriaxone 1 g injection", "amount": 2000}, {"label": "Paracetamol 500 mg tablet", "amount": 300}]', 'cash');
-    raise exception 'FAIL 2: the Front Desk changed the doctor''s price';
-  exception when invalid_parameter_value then null;
-  end;
-  begin
-    perform public.pay_prescription(wanted, '[{"label": "Paracetamol 500 mg tablet", "amount": 300}]', 'cash');
-    raise exception 'FAIL 2: the Front Desk left out the drug the doctor priced';
-  exception when invalid_parameter_value then null;
-  end;
+  -- Since 20261123082024 the doctor's price is a suggestion the Front Desk
+  -- may change (request 239); test 069 proves that. Here: it pays it as set.
   if public.pay_prescription(wanted,
        '[{"label": "Ceftriaxone 1 g injection", "amount": 2500}, {"label": "Paracetamol 500 mg tablet", "amount": 300}]', 'cash') <> 'paid' then
     raise exception 'FAIL 2: the Front Desk could not pay the doctor''s price';
@@ -119,23 +110,13 @@ end $$;
 \echo 'PASS 3: a doctor and the matron price lab tests; a nurse requests without prices'
 
 
--- ===== 4. The Front Desk cannot change a lab price =====
+-- ===== 4. The Front Desk pays the doctor's lab price =====
 do $$
 declare wanted bigint := (select id from public.lab_requests where note = 'T66 lab doctor');
 begin
   perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000662"}', true);
   set local role authenticated;
-  begin
-    perform public.pay_lab_request_lines(wanted,
-      '[{"label": "Widal", "amount": 2000}, {"label": "Full Blood Count", "amount": 4000}]', 'cash');
-    raise exception 'FAIL 4: the Front Desk changed the doctor''s lab price';
-  exception when invalid_parameter_value then null;
-  end;
-  begin
-    perform public.pay_lab_request(wanted, 100, 'cash');
-    raise exception 'FAIL 4: the Front Desk paid a priced request as one typed total';
-  exception when invalid_parameter_value then null;
-  end;
+  -- A changed price is allowed since 20261123082024 (request 239, test 069).
   if public.pay_lab_request_lines(wanted,
        '[{"label": "Widal", "amount": 3000}, {"label": "Full Blood Count", "amount": 4000}]', 'pos') <> 'paid' then
     raise exception 'FAIL 4: the Front Desk could not pay the doctor''s lab price';

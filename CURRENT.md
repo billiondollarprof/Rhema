@@ -992,7 +992,13 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     (2026-11-22) Same words as above. This reverses 235's "The front desk
     cannot change the price" for drugs, lab tests and bills: the doctor's
     price fills in, the Front Desk can change it before taking payment.
-    SQL batch shown to him; waiting for his yes.
+    SQL batch shown to him. HIS YES 2026-11-23: "Yes".
+    BUILT 2026-11-23: migration 20261123082024_set_price_is_a_suggestion
+    (no price check when paying drugs or tests; the one-total lab payment
+    takes a priced request; pay_bill takes the typed lines; the price check
+    function removed), test 069, tests 066 and 068 brought to the new rule,
+    7 breaks caught. Screens: "Doctor's price" under the box, the box can be
+    changed, on drugs, lab tests and bills.
 
 237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
     with a photo of "Why suspend Normal saline?") "All these place for drugs

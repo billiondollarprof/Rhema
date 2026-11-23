@@ -14,7 +14,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
 import { EXPIRED_WORDS, isExpiredRefusal, withExpiry } from '@/lib/payments/expiry'
-import { PRICE_SET_WORDS } from '@/lib/prices/prices'
 
 // ===== 1. Shapes and words =====
 export type PrescriptionStatus = 'awaiting_payment' | 'awaiting_dispense' | 'dispensed' | 'voided'
@@ -186,7 +185,6 @@ export async function payPrescription(
     paid_by: mode,
   })
   if (isExpiredRefusal(error)) return EXPIRED_WORDS
-  if (error?.message?.startsWith('price_changed')) return PRICE_SET_WORDS
   if (error || (data !== 'paid' && data !== 'already_paid')) {
     return 'The payment could not be saved. Check the internet and try again.'
   }

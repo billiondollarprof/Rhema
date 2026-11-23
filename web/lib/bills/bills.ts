@@ -11,8 +11,10 @@
  * lines itself (supabase/migrations/20261122204301_bills.sql). These
  * functions only ask.
  *
- * Never: send a total, or an amount to pay. The database takes the amounts
- * from the bill.
+ * Paying sends each line with its amount: the doctor's, or the one the
+ * Front Desk changed it to (request 239). The database adds them up.
+ *
+ * Never: send a total. The database adds the lines up itself.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
@@ -104,9 +106,10 @@ export async function addBill(
 export async function payBill(
   client: SupabaseClient,
   billId: number,
+  lines: { label: string; amount: number }[],
   mode: PaymentMode,
 ): Promise<string | null> {
-  const { data, error } = await client.rpc('pay_bill', { bill: billId, paid_by: mode })
+  const { data, error } = await client.rpc('pay_bill', { bill: billId, lines, paid_by: mode })
   if (data === 'voided') return 'The doctor cancelled this bill.'
   // "already_paid": paid at another desk a moment ago. The list refreshes.
   if (error || (data !== 'paid' && data !== 'already_paid')) {

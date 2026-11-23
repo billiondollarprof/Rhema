@@ -9,7 +9,8 @@
 --   3. A wrong kind, no name, an amount of 0, no lines or 21 lines is refused.
 --   4. Every active member of staff reads bills; a deactivated one does not;
 --      nobody writes to the tables directly.
---   5. The Front Desk pays the bill's own amounts, once; a nurse cannot pay.
+--   5. The Front Desk pays the bill, once; a nurse cannot pay. (Since
+--      20261123082024 it sends the amounts, which it may change: test 069.)
 --   6. Only the person who made a bill voids it, and only before payment;
 --      a voided bill is not paid.
 --   7. Procedures take standard prices (a doctor, and the admin's Prices tab).
@@ -195,7 +196,7 @@ begin
   perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000683"}', true);
   set local role authenticated;
   begin
-    perform public.pay_bill(wanted, 'cash');
+    perform public.pay_bill(wanted, '[{"label": "T68 Wound suturing", "amount": 15000}]', 'cash');
     reset role;
     raise exception 'FAIL 5: a nurse paid a bill';
   exception when insufficient_privilege then
@@ -203,10 +204,10 @@ begin
   end;
   perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000684"}', true);
   set local role authenticated;
-  if public.pay_bill(wanted, 'pos') <> 'paid' then
+  if public.pay_bill(wanted, '[{"label": "T68 Wound suturing", "amount": 15000}, {"label": "T68 Bed fee, 2 days", "amount": 10000}]', 'pos') <> 'paid' then
     raise exception 'FAIL 5: the Front Desk could not pay the bill';
   end if;
-  if public.pay_bill(wanted, 'pos') <> 'already_paid' then
+  if public.pay_bill(wanted, '[{"label": "T68 Wound suturing", "amount": 15000}]', 'pos') <> 'already_paid' then
     raise exception 'FAIL 5: the bill was paid twice';
   end if;
   reset role;
@@ -219,7 +220,7 @@ begin
     raise exception 'FAIL 5: the payment is not the bill''s total, its lines, or was taken twice';
   end if;
 end $$;
-\echo 'PASS 5: the Front Desk pays the bill''s own amounts, once; a nurse cannot'
+\echo 'PASS 5: the Front Desk pays the bill, once; a nurse cannot'
 
 
 -- ===== 6. Voiding: the person who made it, before payment =====
@@ -255,7 +256,7 @@ begin
   -- A voided bill is not paid.
   perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000684"}', true);
   set local role authenticated;
-  if public.pay_bill(open_one, 'cash') <> 'voided' then
+  if public.pay_bill(open_one, '[{"label": "T68 Catheter", "amount": 3000}]', 'cash') <> 'voided' then
     raise exception 'FAIL 6: a voided bill was paid';
   end if;
   reset role;

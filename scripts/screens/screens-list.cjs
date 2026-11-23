@@ -301,7 +301,7 @@ module.exports.SCREENS = [
         },
       ],
     },
-    mustSee: ['Set by the doctor', 'Record payment · ₦2,500'],
+    mustSee: ["Doctor's price", 'Record payment · ₦2,500'],
   },
   // Request 233: the Pharmacy finds a patient's drugs to give, paid or not.
   {
@@ -846,7 +846,7 @@ module.exports.SCREENS = [
     waitFor: 'Not paid yet',
     extra: { 'rest/v1/bills': BILL_ROWS },
     press: 'Take payment',
-    mustSee: ['Bills', 'Not paid yet', 'Set by the doctor', 'Record payment · ₦15,000'],
+    mustSee: ['Bills', 'Not paid yet', "Doctor's price", 'Record payment · ₦15,000'],
   },
   // Everybody sees the bill (Anthony, 2026-11-22); only the Front Desk pays.
   {

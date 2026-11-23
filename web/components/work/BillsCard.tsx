@@ -14,8 +14,11 @@
  * Why: the director's voice note and Anthony, 2026-11-21 and 22 (request
  * 235, part 3). A bill never expires.
  *
- * Never: let the Front Desk type an amount. Every line is the doctor's,
- * locked; the database takes the amounts from the bill.
+ * Each line's amount is the doctor's, filled in. The Front Desk can change
+ * it before taking payment (request 239, 2026-11-22: "A set price only acts
+ * as a suggestion"). The bill itself stays as the doctor wrote it.
+ *
+ * Never: take payment from anybody but the Front Desk (the database checks).
  */
 'use client'
 
@@ -199,13 +202,13 @@ function BillEntry({
 
       {problem ? <p className={styles.muted}>{problem}</p> : null}
       {paying ? (
-        // Every line locked: the amounts are the doctor's.
+        // The doctor's amounts filled in; the Front Desk may change them.
         <PriceForm
           formId={`bill-${bill.id}`}
           labels={bill.lines.map((line) => line.item)}
           prices={bill.lines.map((line) => line.amount)}
-          locked={bill.lines.map(() => true)}
-          save={(_lines, mode) => payBill(client, bill.id, mode)}
+          fromDoctor={bill.lines.map(() => true)}
+          save={(lines, mode) => payBill(client, bill.id, lines, mode)}
           onCancel={() => setPaying(false)}
           onDone={() => {
             setPaying(false)

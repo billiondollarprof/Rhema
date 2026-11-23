@@ -166,9 +166,6 @@ export function myPriceOf(mine: MyPrice[], kind: MyPrice['kind'], key: string): 
   return mine.find((one) => one.kind === kind && one.item === key)?.amount
 }
 
-// The words when the database refuses a changed price.
-export const PRICE_SET_WORDS = 'The doctor set this price. Ask the doctor to change it.'
-
 // ===== Standard prices from a doctor or the matron (request 236) =====
 // "Make these the standard prices?" after sending: they fill in for everybody
 // next time. Answers the words to show when it did not go.
