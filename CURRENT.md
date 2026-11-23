@@ -99,6 +99,8 @@ Numbers are kept from the full list, so older notes still match.
     tests worked out with what each is made of, Preview, Paid since admission
     and Balance; the Front Desk takes the balance; the receipt shows the
     bill's lines, balance and signature lines.
+    LIVE 2026-11-23: 0 security warnings on testing and live; smoke tests
+    passed; click-through none broke.
     FOLLOW-UPS (not built, to ask him): (a) unpaid prescriptions and lab
     tests of an inpatient still expire after 72 hours; they should wait for
     the bill (needs SQL); (b) a bill the deposits fully cover stays in Bills

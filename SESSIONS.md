@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-23 (night): 240/242 inpatient bill LIVE (admit, deposits, chart
+  doses and dose price, Pharmacy dispense from the chart, the stay's bill
+  with Preview and balance, the bill receipt). 0 security warnings. Three
+  follow-ups to ask him (inpatient expiry, deposit covering a bill, editing
+  doses). 243 (Other in blue) saved for later.
+
 - 2026-11-23 (later): bill Other fault fixed and a back arrow on phones
   LIVE; 241 LIVE (anybody with medical access in a consulting room
   prescribes, prices and bills; 0 security warnings). Bill and inpatient
