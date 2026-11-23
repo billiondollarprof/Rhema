@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-23 (later): bill Other fault fixed and a back arrow on phones
+  LIVE; 241 LIVE (anybody with medical access in a consulting room
+  prescribes, prices and bills; 0 security warnings). Bill and inpatient
+  batch shown, waiting for his yes.
+
 - 2026-11-23: 239 LIVE: a set price is a suggestion; the Front Desk can
   change the doctor's price on drugs, tests and bills (0 security warnings).
   Next: 238, the lab sets a test price.

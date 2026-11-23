@@ -36,6 +36,9 @@ Numbers are kept from the full list, so older notes still match.
     Midwife role: "there's no need to add it. Just leave it." Antenatal:
     "I don't think anything is missing... I'll let you know when I meet
     with the midwife again." 
+    LIVE 2026-11-23: 0 security warnings on testing and live; smoke tests
+    passed; click-through none broke (first run had no local site; run
+    again).
     Also: "there are certain things that the matron is able to chart, the
     midwife is able to chart, that are not included... check it again"
     (antenatal: palpation and the rest). FOUND: request 189's visit table is
@@ -70,7 +73,8 @@ Numbers are kept from the full list, so older notes still match.
     paid. And also, if they've not paid for it, it is still show that
     they've not paid and it still shows the amount... whatever the person
     has paid is subtracted from the total and the person pays the
-    difference... show me the SQL ba[tch]." 
+    difference... show me the SQL ba[tch]." Bill and inpatient SQL batch
+    (13 points) shown 2026-11-23; waiting for his yes.
 
 240. **The director on bills, the medicine chart, the Pharmacy, lab results
     and a back button on phones.** (2026-11-23, a long voice note, written
