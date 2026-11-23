@@ -241,3 +241,19 @@
   color: var(--c-b91c1c);
   font-weight: 600;
 }
+
+/* A bill's receipt: lines to sign, as on the hospital's form (request 240). */
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.signatures span {
+  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
+  border-top: 1px solid #333;
+  font-size: 13px;
+}

@@ -18,6 +18,11 @@
  * it before taking payment (request 239, 2026-11-22: "A set price only acts
  * as a suggestion"). The bill itself stays as the doctor wrote it.
  *
+ * An inpatient's bill (request 240, 2026-11-23): Take payment first reads
+ * the stay's statement and asks for the Balance (the stay's bills less the
+ * deposits and payments since admission), which the Front Desk can still
+ * change. When the deposits already cover it, it says so.
+ *
  * Never: take payment from anybody but the Front Desk (the database checks).
  */
 'use client'
@@ -33,7 +38,15 @@ import { recall, remember } from '@/lib/cache/memory'
 import { onChange } from '@/lib/live/changes'
 import { waitedSince } from '@/lib/patients/age'
 import { naira } from '@/lib/lab/lab'
-import { billTotal, listBills, payBill, voidBill, type Bill } from '@/lib/bills/bills'
+import {
+  billTotal,
+  listBills,
+  loadStatement,
+  payBill,
+  voidBill,
+  type Bill,
+  type Statement,
+} from '@/lib/bills/bills'
 
 // ===== 1. The card =====
 export default function BillsCard({
@@ -140,6 +153,27 @@ function BillEntry({
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const open = bill.status === 'awaiting_payment'
+  // An inpatient's bill: the stay's statement, read when Take payment opens.
+  const [statement, setStatement] = useState<Statement | null>(null)
+  const [reading, setReading] = useState(false)
+
+  async function startPaying() {
+    setProblem(null)
+    if (!bill.admission_id) {
+      setPaying(true)
+      return
+    }
+    setReading(true)
+    const found = await loadStatement(client, bill.patient_id)
+    setReading(false)
+    if (!found) {
+      setProblem('The stay could not be read. Check the internet and try again.')
+      return
+    }
+    setStatement(found.admitted && found.admission_id === bill.admission_id ? found : null)
+    setPaying(true)
+  }
+  const balance = statement ? Number(statement.balance ?? 0) : null
 
   async function cancel() {
     setBusy(true)
@@ -176,7 +210,11 @@ function BillEntry({
       <div className={styles.entryButtons}>
         {open ? <span className={styles.waitingPay}>Not paid yet</span> : <span>Paid</span>}
         {open && canPay && !paying ? (
-          <button className={`${styles.button} ${styles.primary}`} onClick={() => setPaying(true)}>
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            disabled={reading}
+            onClick={startPaying}
+          >
             Take payment
           </button>
         ) : null}
@@ -201,7 +239,33 @@ function BillEntry({
       ) : null}
 
       {problem ? <p className={styles.muted}>{problem}</p> : null}
-      {paying ? (
+      {paying && statement ? (
+        <p className={styles.muted}>
+          This stay: billed {naira(Number(statement.billed ?? 0))} · paid since admission{' '}
+          {naira(Number(statement.paid ?? 0))} · <b>balance {naira(balance ?? 0)}</b>
+        </p>
+      ) : null}
+      {paying && statement && (balance ?? 0) <= 0 ? (
+        <p className={styles.muted}>
+          The deposits already cover this bill
+          {(balance ?? 0) < 0 ? `, with ${naira(-(balance ?? 0))} over` : ''}. Nothing to take.
+        </p>
+      ) : null}
+      {paying && statement && (balance ?? 0) > 0 ? (
+        // An inpatient: the balance, which the Front Desk may change.
+        <PriceForm
+          formId={`bill-${bill.id}`}
+          labels={['Balance']}
+          prices={[balance ?? 0]}
+          save={(lines, mode) => payBill(client, bill.id, lines, mode)}
+          onCancel={() => setPaying(false)}
+          onDone={() => {
+            setPaying(false)
+            onPaid(bill.patient_id)
+          }}
+        />
+      ) : null}
+      {paying && !statement ? (
         // The doctor's amounts filled in; the Front Desk may change them.
         <PriceForm
           formId={`bill-${bill.id}`}

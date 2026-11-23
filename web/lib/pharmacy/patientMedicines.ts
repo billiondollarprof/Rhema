@@ -28,6 +28,11 @@ export type PharmacyMedicine = {
   last_change: string | null
   last_reason: string | null
   last_changed_at: string | null
+  // The course (request 240, 2026-11-23): doses in all (if charted), doses
+  // the nurses gave, and doses the Pharmacy handed over.
+  doses?: number | null
+  given?: number
+  dispensed?: number
 }
 
 export function knownPatientMedicines(
@@ -50,4 +55,24 @@ export async function loadPatientMedicines(
   if (error || !Array.isArray(data)) return null
   remember(staffId, `pmeds:${patientId}`, data as PharmacyMedicine[])
   return data as PharmacyMedicine[]
+}
+
+// ===== Dispense from the chart (request 240) =====
+// The Pharmacy hands a supply to the ward: how many doses. Answers the words
+// to show when it did not go, or null.
+export async function dispenseFromChart(
+  client: SupabaseClient,
+  medicationId: number,
+  doses: number,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('dispense_chart', {
+    medication: medicationId,
+    how_many: doses,
+  })
+  if (error?.code === '42501') return 'Only the Pharmacy dispenses.'
+  // "already_dispensed": the same, a moment ago (a double tap).
+  if (error || (data !== 'dispensed' && data !== 'already_dispensed')) {
+    return 'That could not be saved. Check the internet and try again.'
+  }
+  return null
 }

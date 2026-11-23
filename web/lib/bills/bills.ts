@@ -20,21 +20,78 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PaymentMode } from '@/lib/lab/lab'
 
 // ===== 1. The kinds of line, and the name each starts with =====
+// The hospital's Discharge / Billing Form (photo, 2026-11-23), with the bed
+// as Regular, Private or VIP (request 240d). Medicines given and Laboratory
+// tests are worked out from the stay. The first kinds (2026-11-22) stay for
+// the bills already made.
 export type BillKind =
-  'procedure' | 'operation' | 'bed' | 'consultation' | 'dressing' | 'catheter' | 'other'
+  | 'professional_fee'
+  | 'nursing_fee'
+  | 'procedure_surgery'
+  | 'anaesthetics'
+  | 'oxygen'
+  | 'phototherapy'
+  | 'blood_transfusion'
+  | 'delivery'
+  | 'episiotomy_repair'
+  | 'bed_regular'
+  | 'bed_private'
+  | 'bed_vip'
+  | 'orals'
+  | 'injectable'
+  | 'infusion_cannulation'
+  | 'consumables'
+  | 'antibiotics'
+  | 'take_home_drugs'
+  | 'others'
+  | 'medicines_given'
+  | 'lab_tests'
+  | 'procedure'
+  | 'operation'
+  | 'bed'
+  | 'consultation'
+  | 'dressing'
+  | 'catheter'
+  | 'other'
 
+// What the doctor picks from, in the form's order. Others: type a name.
 export const BILL_KINDS: { kind: BillKind; words: string }[] = [
-  { kind: 'procedure', words: 'Procedure' },
-  { kind: 'operation', words: 'Operation' },
-  { kind: 'bed', words: 'Bed fee' },
-  { kind: 'consultation', words: 'Consultation' },
-  { kind: 'dressing', words: 'Dressing' },
-  { kind: 'catheter', words: 'Catheter' },
-  { kind: 'other', words: 'Other' },
+  { kind: 'professional_fee', words: 'Professional Fee' },
+  { kind: 'nursing_fee', words: 'Nursing Fee' },
+  { kind: 'procedure_surgery', words: 'Procedures / Surgery' },
+  { kind: 'anaesthetics', words: 'Anaesthetics' },
+  { kind: 'oxygen', words: 'Oxygen' },
+  { kind: 'phototherapy', words: 'Phototherapy' },
+  { kind: 'blood_transfusion', words: 'Blood Transfusion' },
+  { kind: 'delivery', words: 'Delivery' },
+  { kind: 'episiotomy_repair', words: 'Episiotomy Tear and Repair' },
+  { kind: 'bed_regular', words: 'Bed space: Regular' },
+  { kind: 'bed_private', words: 'Bed space: Private' },
+  { kind: 'bed_vip', words: 'Bed space: VIP' },
+  { kind: 'orals', words: 'Orals' },
+  { kind: 'injectable', words: 'Injectable' },
+  { kind: 'infusion_cannulation', words: 'Infusion / Cannulation' },
+  { kind: 'consumables', words: 'Consumables' },
+  { kind: 'antibiotics', words: 'Antibiotics' },
+  { kind: 'take_home_drugs', words: 'Take Home Drugs' },
+  { kind: 'others', words: 'Others' },
 ]
 
+// The lines worked out from the stay, and the first kinds, for their words.
+const MORE_WORDS: Partial<Record<BillKind, string>> = {
+  medicines_given: 'Medicines given',
+  lab_tests: 'Laboratory tests',
+  procedure: 'Procedure',
+  operation: 'Operation',
+  bed: 'Bed fee',
+  consultation: 'Consultation',
+  dressing: 'Dressing',
+  catheter: 'Catheter',
+  other: 'Other',
+}
+
 export function billKindWords(kind: BillKind): string {
-  return BILL_KINDS.find((one) => one.kind === kind)?.words ?? 'Other'
+  return BILL_KINDS.find((one) => one.kind === kind)?.words ?? MORE_WORDS[kind] ?? 'Others'
 }
 
 // ===== 2. Shapes =====
@@ -46,13 +103,15 @@ export type Bill = {
   status: 'awaiting_payment' | 'paid' | 'voided'
   created_at: string
   created_by: string
+  // The stay it belongs to (an inpatient's bill), or null.
+  admission_id: number | null
   patient: { full_name: string; patient_number: string } | null
   maker: { full_name: string } | null
   lines: BillLine[]
 }
 
 const COLUMNS =
-  'id, patient_id, note, status, created_at, created_by, ' +
+  'id, patient_id, note, status, created_at, created_by, admission_id, ' +
   'patient:patients(full_name, patient_number), ' +
   'maker:staff!bills_created_by_fkey(full_name), ' +
   'lines:bill_lines(id, kind, item, amount)'
@@ -125,4 +184,63 @@ export async function voidBill(client: SupabaseClient, billId: number): Promise<
   if (error || data !== 'voided')
     return 'That could not be saved. Check the internet and try again.'
   return null
+}
+
+// ===== 5. The stay's statement (request 240, 2026-11-23) =====
+// Everything charged and paid since admission, and the balance. Medicine and
+// test names are for the doctor and the Front Desk on screen; the receipt
+// shows only the bill's lines.
+export type Statement = {
+  admitted: boolean
+  admission_id?: number
+  admitted_at?: string
+  medicines?: { medicine: string; doses: number; dose_price: number; amount: number }[]
+  prescriptions?: { id: number; at: string; paid: boolean; drugs: string; amount: number | null }[]
+  labs?: { id: number; at: string; paid: boolean; tests: string; amount: number | null }[]
+  bills?: { id: number; at: string; status: Bill['status']; total: number }[]
+  billed?: number
+  deposits?: number
+  paid?: number
+  balance?: number
+}
+
+// null: not allowed, or no network.
+export async function loadStatement(
+  client: SupabaseClient,
+  patientId: number,
+): Promise<Statement | null> {
+  const { data, error } = await client.rpc('bill_statement', { patient: patientId })
+  if (error || !data) return null
+  return data as Statement
+}
+
+// The total of a list of amounts, ignoring the ones with no price.
+export function sumOf(amounts: (number | null | undefined)[]): number {
+  return amounts.reduce<number>((sum, amount) => sum + Number(amount ?? 0), 0)
+}
+
+// ===== 6. The bill a payment paid, for its receipt =====
+export async function billForPayment(
+  client: SupabaseClient,
+  paymentId: number,
+): Promise<Bill | null> {
+  const { data } = await client
+    .from('bills')
+    .select(COLUMNS)
+    .eq('payment_id', paymentId)
+    .maybeSingle()
+  if (!data) return null
+  const bill = data as unknown as Bill
+  return {
+    ...bill,
+    lines: [...bill.lines]
+      .sort((a, b) => a.id - b.id)
+      .map((line) => ({ ...line, amount: Number(line.amount) })),
+  }
+}
+
+// The balance in words: what is owed, or that more was paid than billed.
+export function balanceWords(balance: number, money: (amount: number) => string): string {
+  if (balance >= 0) return money(balance)
+  return `${money(0)} (${money(-balance)} more was paid)`
 }

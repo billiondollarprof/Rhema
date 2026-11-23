@@ -39,6 +39,7 @@ import { DosesSection, MedicationsSection } from './Medications'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
 import { isLate, lastDoseOf, nextDue } from '@/lib/record/chart'
+import { doseWords, givenCount } from '@/lib/record/doses'
 import { addLine, when, type MedicalRecord, type Medication } from '@/lib/record/record'
 
 type Props = {
@@ -245,6 +246,10 @@ function ChartRow({
   const [problem, setProblem] = useState<string | null>(null)
 
   const last = lastDoseOf(medication, record.doses)
+  // The course (request 240): "2 of 6 doses given"; every dose already given
+  // asks once more, because a doctor may extend a course.
+  const givenSoFar = givenCount(medication, record.doses)
+  const courseDone = Boolean(medication.doses && givenSoFar >= medication.doses)
   // The newest entry, given or not given: the next dose is worked out from it.
   const lastTry = lastDoseOf(medication, record.doses, false)
   const skipped = lastTry && lastTry.not_given_reason ? lastTry : null
@@ -310,6 +315,7 @@ function ChartRow({
           {[medication.dose, medication.route, medication.how_often].filter(Boolean).join(' · ') ||
             ' '}
         </small>
+        {medication.doses ? <small>{doseWords(givenSoFar, medication.doses)}</small> : null}
       </span>
       <span role="cell" className={styles.chartCell}>
         <small className={styles.chartLabel}>Last given</small>
@@ -377,6 +383,7 @@ function ChartRow({
             </>
           ) : step === 'asking' ? (
             <b>
+              {courseDone ? `All ${medication.doses} doses are given. Give another? ` : ''}
               Give {medication.dose ? `${medication.dose} of ` : ''}
               {medication.medicine} now?
             </b>

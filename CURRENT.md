@@ -84,6 +84,27 @@ Numbers are kept from the full list, so older notes still match.
     has paid is subtracted from the total and the person pays the
     difference... show me the SQL ba[tch]." Bill and inpatient SQL batch
     (13 points) shown 2026-11-23. HIS YES 2026-11-23: "Yes". Building.
+    BUILT 2026-11-23: migration 20261123215523_inpatient_bill (admissions,
+    admit/discharge, deposit, chart days/doses/dose_price with a price-setter
+    check, chart_dispenses and dispense_chart, the Pharmacy's list with
+    doses/given/dispensed, the form's bill kinds, bills tied to the stay with
+    covers, bill_statement, pay_bill settles covered items), test 071, tests
+    068 brought to 40 lines (the form has more than 20), 18 breaks caught.
+    Screens: Stay card (Inpatient/Outpatient, Admit, Discharge, "The bill is
+    paid. Discharge this patient?"); Deposit at the Front Desk for an
+    inpatient; chart: days, doses in all (worked out), price of one dose,
+    "2 of 6 doses given", "All 6 doses are given. Give another?"; the
+    Pharmacy: Given, Dispensed, Left, Dispense; the bill: the form's 17 lines
+    (bed Regular/Private/VIP), Medicines given / Take Home Drugs / Laboratory
+    tests worked out with what each is made of, Preview, Paid since admission
+    and Balance; the Front Desk takes the balance; the receipt shows the
+    bill's lines, balance and signature lines.
+    FOLLOW-UPS (not built, to ask him): (a) unpaid prescriptions and lab
+    tests of an inpatient still expire after 72 hours; they should wait for
+    the bill (needs SQL); (b) a bill the deposits fully cover stays in Bills
+    to pay, because a payment of 0 is refused; it needs a "settled by the
+    deposit" step (needs SQL); (c) days and doses can be set when charting,
+    not yet changed afterwards.
 
 240. **The director on bills, the medicine chart, the Pharmacy, lab results
     and a back button on phones.** (2026-11-23, a long voice note, written

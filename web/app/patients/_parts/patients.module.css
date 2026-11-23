@@ -1030,6 +1030,24 @@
   background: var(--card);
 }
 
+/* Dispense from the chart, on a medicine taken now (request 240). */
+.dispenseRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dispenseRow label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dispenseInput {
+  width: 80px;
+}
+
 /* The folded "More details" on Register from old file (2026-11-16). */
 .more {
   display: grid;

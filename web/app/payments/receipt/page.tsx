@@ -21,6 +21,12 @@
  * a button beside Print sends this receipt to it, through the Worker
  * (worker/src/receipts.ts), the same way staff invitations go.
  *
+ * A bill's payment (request 240, 2026-11-23): the bill's own lines, the
+ * total, what was paid now, and for an inpatient still in, what was paid
+ * since admission and the balance; then lines for the doctor and the
+ * patient to sign, as on the hospital's Discharge / Billing Form. The bill's
+ * lines never name a medicine or a test.
+ *
  * Never: show a receipt to anybody but the Front Desk and admins (the
  * database refuses them too), or show the email button when there is no
  * email to send to.
@@ -48,6 +54,14 @@ import {
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { BRAND } from '@/lib/brand/brand'
+import {
+  billForPayment,
+  balanceWords,
+  billTotal,
+  loadStatement,
+  type Bill,
+  type Statement,
+} from '@/lib/bills/bills'
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-GB', {
@@ -66,6 +80,9 @@ function Receipt() {
   const { client, staff } = auth
   const [payments, setPayments] = useState<Payment[] | null>(null)
   const [emailState, setEmailState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
+  // A bill's payment: the bill, and the stay's statement while still in.
+  const [bill, setBill] = useState<Bill | null>(null)
+  const [statement, setStatement] = useState<Statement | null>(null)
 
   // ===== 1. Load the payment, or the day's payments =====
   useEffect(() => {
@@ -85,8 +102,19 @@ function Receipt() {
       if (patient) return paymentsOnDay(client, patient, new Date())
       return []
     }
-    load().then((found) => {
-      if (current) setPayments(found)
+    load().then(async (found) => {
+      if (!current) return
+      setPayments(found)
+      // One bill payment: its bill, and the stay's statement (request 240).
+      if (found.length === 1 && found[0].purpose === 'bill') {
+        const paid = await billForPayment(client, found[0].id)
+        if (!current || !paid) return
+        setBill(paid)
+        if (paid.admission_id) {
+          const now = await loadStatement(client, paid.patient_id)
+          if (current && now?.admitted && now.admission_id === paid.admission_id) setStatement(now)
+        }
+      }
     })
     return () => {
       current = false
@@ -197,10 +225,48 @@ function Receipt() {
               </div>
             </dl>
 
+            {bill ? (
+              // ----- A bill: its lines, as on the hospital's form -----
+              <table className={styles.lines}>
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Bill</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bill.lines.map((line) => (
+                    <tr key={line.id}>
+                      <td>{line.item}</td>
+                      <td>{naira(line.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total</td>
+                    <td>{naira(billTotal(bill))}</td>
+                  </tr>
+                  {statement ? (
+                    <tr>
+                      <td>Paid since admission (deposits too)</td>
+                      <td>{naira(Number(statement.paid ?? 0))}</td>
+                    </tr>
+                  ) : null}
+                  {statement ? (
+                    <tr>
+                      <td>Balance</td>
+                      <td>{balanceWords(Number(statement.balance ?? 0), naira)}</td>
+                    </tr>
+                  ) : null}
+                </tfoot>
+              </table>
+            ) : null}
+
             <table className={styles.lines}>
               <thead>
                 <tr>
-                  <th>Item</th>
+                  <th>{bill ? 'Paid now' : 'Item'}</th>
                   <th>Amount</th>
                 </tr>
               </thead>
@@ -247,6 +313,13 @@ function Receipt() {
                 </dd>
               </div>
             </dl>
+            {bill ? (
+              // Signed by the doctor and the patient, as on the paper form.
+              <div className={styles.signatures}>
+                <span>Signed: Doctor</span>
+                <span>Patient</span>
+              </div>
+            ) : null}
             <p className={styles.thanks}>Thank you.</p>
           </article>
         ) : null}

@@ -29,6 +29,34 @@ const BILL_ROWS = [
     ],
   },
 ]
+// An inpatient (request 240): the stay, and its statement with a medicine
+// given, a take home prescription, a lab test paid, and a deposit.
+const STAY = { id: 1, admitted_at: hoursAgo(30), admitter: { full_name: 'Front Desk Ada' } }
+const STATEMENT = {
+  admitted: true,
+  admission_id: 1,
+  admitted_at: hoursAgo(30),
+  medicines: [{ medicine: 'Ceftriaxone 1 g injection', doses: 6, dose_price: 2500, amount: 15000 }],
+  prescriptions: [
+    { id: 3, at: hoursAgo(2), paid: false, drugs: 'Amoxicillin 500 mg capsule', amount: 1500 },
+  ],
+  labs: [{ id: 4, at: hoursAgo(20), paid: true, tests: 'Widal', amount: 3000 }],
+  bills: [],
+  billed: 0,
+  deposits: 50000,
+  paid: 50000,
+  balance: -50000,
+}
+const PAID_STATEMENT = {
+  ...STATEMENT,
+  medicines: [],
+  prescriptions: [],
+  labs: [],
+  bills: [{ id: 9, at: hoursAgo(1), status: 'paid', total: 69500 }],
+  billed: 69500,
+  paid: 69500,
+  balance: 0,
+}
 const RECORD_DAY = {
   'rest/v1/patient_medications': [
     {
@@ -825,6 +853,75 @@ module.exports.SCREENS = [
       'Bed fee per day',
     ],
   },
+  // Request 240: Inpatient or Outpatient on the patient's page.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Outpatient',
+    mustSee: ['Outpatient', 'Admit'],
+  },
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Inpatient',
+    extra: { 'rest/v1/admissions': STAY },
+    mustSee: ['Inpatient'],
+  },
+  // The bill is paid: the doctor is offered Discharge.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Inpatient',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    extra: { 'rest/v1/admissions': STAY, 'rpc/bill_statement': PAID_STATEMENT },
+    mustSee: ['The bill is paid. Discharge this patient?', 'Discharge'],
+  },
+  // An inpatient's bill starts with the lines worked out from the stay.
+  {
+    path: '/bills/add/?p=1',
+    waitFor: 'Medicines given',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    extra: { 'rpc/bill_statement': STATEMENT },
+    mustSee: ['Medicines given', 'Take Home Drugs', 'Laboratory tests', 'Preview'],
+  },
+  {
+    path: '/bills/add/?p=1',
+    waitFor: 'Medicines given',
+    medical: true,
+    role: 'doctor',
+    roomId: 2,
+    extra: { 'rpc/bill_statement': STATEMENT },
+    press: 'Preview',
+    mustSee: ['Receipt preview', 'Paid since admission', 'Balance', 'Send bill'],
+  },
+  // The Pharmacy dispenses from the chart.
+  {
+    path: '/patients/?p=1',
+    waitFor: 'Taking now',
+    role: 'pharmacy',
+    extra: {
+      'rpc/patient_medicines_for_pharmacy': [
+        {
+          id: 7,
+          medicine: 'Ceftriaxone 1 g injection',
+          dose: '1 g',
+          how_often: 'Twice daily',
+          status: 'active',
+          started: hoursAgo(30),
+          added_by: 'Dr Emeka Obi',
+          last_change: null,
+          last_reason: null,
+          last_changed_at: null,
+          doses: 6,
+          given: 2,
+          dispensed: 2,
+        },
+      ],
+    },
+    press: 'Dispense',
+    mustSee: ['6 doses in all', 'How many doses', 'Dispense'],
+  },
   // Request 241: the matron in a consulting room prescribes and bills.
   {
     path: '/patients/record/?p=1',
@@ -850,7 +947,7 @@ module.exports.SCREENS = [
     medical: true,
     role: 'doctor',
     roomId: 2,
-    mustSee: ['What for', 'Amount ₦', '+ Add another line', 'Send bill'],
+    mustSee: ['What for', 'Amount ₦', '+ Add another line', 'Preview'],
   },
   // The Front Desk: Bills to pay on Home, and on the patient's page.
   {

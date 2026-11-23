@@ -68,9 +68,14 @@ export default function PaymentsCard({
   patientId,
   staffId,
   category,
+  inpatient = false,
 }: {
   client: SupabaseClient
   patientId: number
+  // An inpatient: Deposit is offered too (request 242, 2026-11-23: "front
+  // desk should be able to take the payment and enter the description...
+  // that deposit").
+  inpatient?: boolean
   // The person taking the payment, for the lists kept on this device.
   staffId?: string
   // Individual, family or antenatal: which card fee applies (2026-11-16).
@@ -281,7 +286,7 @@ export default function PaymentsCard({
       {taking ? (
         <div className={styles.payBox}>
           <div className={styles.segments} role="group" aria-label="Paying for">
-            {TAKE_PURPOSES.map((value) => (
+            {(inpatient ? [...TAKE_PURPOSES, 'deposit' as const] : TAKE_PURPOSES).map((value) => (
               <button
                 key={value}
                 type="button"

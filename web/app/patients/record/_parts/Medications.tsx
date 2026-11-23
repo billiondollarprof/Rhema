@@ -9,7 +9,10 @@
  *
  * Sections in this file:
  *   1. Medications: the list, Add a medicine, and per medicine: Give dose,
- *      Suspend, Resume, Stop, Void.
+ *      Suspend, Resume, Stop, Void. Adding asks for how many days; the
+ *      doses work out from how often (the doctor can change them), and a
+ *      doctor, the matron or anybody in a consulting room types the price
+ *      of one dose, for the bill (request 240, 2026-11-23).
  *   2. Doses given: newest first, and Add a dose not on the list.
  *
  * Never: change a medicine's status without a reason, or record a dose in
@@ -26,6 +29,11 @@ import OptionSelect from '@/components/options/OptionSelect'
 import SearchSelect from '@/components/options/SearchSelect'
 import { ROUTES } from '@/lib/record/signers'
 import { medicineWords } from '@/lib/medicines/medicines'
+import { useAuth } from '@/lib/auth/session'
+import { setsPrices } from '@/lib/auth/roles'
+import { courseDoses, doseWords, givenCount } from '@/lib/record/doses'
+import { readAmount } from '@/lib/prices/prices'
+import { naira } from '@/lib/lab/lab'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
@@ -72,7 +80,15 @@ export function MedicationsSection({
   const [howOften, setHowOften] = useState('')
   // IV, IM, Oral... (request 224).
   const [route, setRoute] = useState('')
+  // The course and its price (request 240). Doses: typed, else worked out.
+  const [days, setDays] = useState('')
+  const [typedDoses, setTypedDoses] = useState<string | null>(null)
+  const [price, setPrice] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
+  const { staff } = useAuth()
+  const prices = staff ? setsPrices(staff) : false
+  const workedOut = courseDoses(howOften, Number(days) || null)
+  const doses = typedDoses ?? (workedOut ? String(workedOut) : '')
 
   // Active first, then suspended, then stopped, voided last.
   const order: Record<MedicationStatus, number> = { active: 0, suspended: 1, stopped: 2 }
@@ -88,12 +104,20 @@ export function MedicationsSection({
       setProblem('Choose the medicine.')
       return
     }
+    const dosePrice = price.trim() ? readAmount(price) : null
+    if (price.trim() && dosePrice === null) {
+      setProblem('Type the price of one dose in naira, like 2,500, or leave it empty.')
+      return
+    }
     const result = await addLine(client, 'patient_medications', {
       patient_id: patientId,
       medicine: medicineWords(medicine.trim(), strength.trim()),
       dose: dose.trim() || null,
       route: route.trim() || null,
       how_often: howOften.trim() || null,
+      days: Number(days) || null,
+      doses: Number(doses) || null,
+      ...(prices && dosePrice ? { dose_price: dosePrice } : {}),
       added_by: staffId,
     })
     if (result) setProblem(result)
@@ -104,6 +128,9 @@ export function MedicationsSection({
       setDose('')
       setRoute('')
       setHowOften('')
+      setDays('')
+      setTypedDoses(null)
+      setPrice('')
       setProblem(null)
       reload()
     }
@@ -117,6 +144,7 @@ export function MedicationsSection({
           key={medication.id}
           medication={medication}
           lastChange={record.statusChanges.find((change) => change.medication_id === medication.id)}
+          given={givenCount(medication, record.doses)}
           client={client}
           staffId={staffId}
           patientId={patientId}
@@ -178,6 +206,44 @@ export function MedicationsSection({
                 otherLabel="Type how often"
               />
             </div>
+            {/* The course (request 240): days, then the doses worked out. */}
+            <div className={styles.field}>
+              <label htmlFor="med-days">For how many days</label>
+              <input
+                id="med-days"
+                className={styles.input}
+                inputMode="numeric"
+                placeholder="e.g. 5"
+                value={days}
+                onChange={(event) => setDays(event.target.value.replace(/\D/g, '').slice(0, 3))}
+              />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="med-doses">Doses in all</label>
+              <input
+                id="med-doses"
+                className={styles.input}
+                inputMode="numeric"
+                placeholder="e.g. 10"
+                value={doses}
+                onChange={(event) =>
+                  setTypedDoses(event.target.value.replace(/\D/g, '').slice(0, 4))
+                }
+              />
+            </div>
+            {prices ? (
+              <div className={styles.field}>
+                <label htmlFor="med-price">Price of one dose ₦ (optional)</label>
+                <input
+                  id="med-price"
+                  className={styles.input}
+                  inputMode="decimal"
+                  placeholder="e.g. 2,500"
+                  value={price}
+                  onChange={(event) => setPrice(event.target.value.replace(/[^\d.,\s]/g, ''))}
+                />
+              </div>
+            ) : null}
           </div>
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.actions}>
@@ -217,8 +283,11 @@ function MedicationLine({
   patientId,
   reload,
   canGive = true,
+  given = 0,
 }: {
   medication: Medication
+  // Doses of it given so far (request 240), for "2 of 6 doses given".
+  given?: number
   lastChange: MedicalRecord['statusChanges'][number] | undefined
   client: SupabaseClient
   staffId: string
@@ -290,6 +359,19 @@ function MedicationLine({
               .filter(Boolean)
               .join(' · ') || 'No dose written'}
           </span>
+          {medication.doses || medication.dose_price ? (
+            <>
+              <br />
+              <span className={styles.muted}>
+                {[
+                  medication.doses ? doseWords(given, medication.doses) : null,
+                  medication.dose_price ? `${naira(Number(medication.dose_price))} a dose` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            </>
+          ) : null}
         </>
       }
       status={<span className={`${styles.pill} ${styles[status.colour]}`}>{status.label}</span>}

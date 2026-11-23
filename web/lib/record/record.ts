@@ -59,6 +59,11 @@ export type Medication = Voidable & {
   // IV, IM, Oral... (request 224); older lines have none.
   route?: string | null
   how_often: string | null
+  // The course (request 240, 2026-11-23): for how many days, how many doses,
+  // and the price of one dose for the bill. Older lines have none.
+  days?: number | null
+  doses?: number | null
+  dose_price?: number | null
   status: MedicationStatus
   created_at: string
   author: { full_name: string } | null
@@ -225,7 +230,7 @@ export async function loadRecord(
     ),
     byPatient(
       'patient_medications',
-      `${VOID}, medicine, dose, route, how_often, status, created_at, author:staff!added_by(full_name)`,
+      `${VOID}, medicine, dose, route, how_often, days, doses, dose_price, status, created_at, author:staff!added_by(full_name)`,
       'created_at',
     ),
     byPatient(

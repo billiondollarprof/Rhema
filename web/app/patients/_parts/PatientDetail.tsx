@@ -35,6 +35,9 @@ import PharmacyMedicines from './PharmacyMedicines'
 import PaymentsCard from './PaymentsCard'
 import LabCard from '@/components/work/LabCard'
 import BillsCard from '@/components/work/BillsCard'
+import StayCard from './StayCard'
+import { canDischarge, loadStay, type Stay } from '@/lib/stay/stay'
+import { loadStatement, type Statement } from '@/lib/bills/bills'
 import PharmacyCard from '@/components/work/PharmacyCard'
 import type { StaffMember } from '@/lib/auth/session'
 import SendToRoom from './SendToRoom'
@@ -121,6 +124,27 @@ export default function PatientDetail({
       onChanged()
     }
   }
+
+  // ===== 0a. The stay: Inpatient or Outpatient (request 240, 2026-11-23).
+  // The doctor or matron also reads the bill statement, to be offered
+  // Discharge once the bill is paid. =====
+  const [stay, setStay] = useState<Stay | null | undefined>(undefined)
+  const [statement, setStatement] = useState<Statement | null>(null)
+  const [stayRound, setStayRound] = useState(0)
+  useEffect(() => {
+    let current = true
+    void loadStay(client, patient.id).then(async (found) => {
+      if (!current || found === undefined) return
+      setStay(found)
+      if (found && staff && canDischarge(staff)) {
+        const read = await loadStatement(client, patient.id)
+        if (current) setStatement(read)
+      } else setStatement(null)
+    })
+    return () => {
+      current = false
+    }
+  }, [client, patient.id, staff, stayRound])
 
   // ===== 0. The antenatal card's details, from the antenatal booking
   // (request 227g): read for an antenatal patient only =====
@@ -293,6 +317,18 @@ export default function PatientDetail({
         <PharmacyCard client={client} staff={staff} patientId={patient.id} />
       ) : null}
 
+      {/* Inpatient or Outpatient, Admit and Discharge (request 240). */}
+      {staff ? (
+        <StayCard
+          client={client}
+          staff={staff}
+          patientId={patient.id}
+          stay={stay}
+          statement={statement}
+          onChanged={() => setStayRound((n) => n + 1)}
+        />
+      ) : null}
+
       {/* The family: its number, the other members, Add family member. */}
       <FamilyCard client={client} patient={patient} canAdd={canRegister} />
 
@@ -303,6 +339,7 @@ export default function PatientDetail({
           patientId={patient.id}
           staffId={staffId}
           category={patient.category}
+          inpatient={Boolean(stay)}
         />
       ) : null}
 
