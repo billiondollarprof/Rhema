@@ -48,6 +48,15 @@ Numbers are kept from the full list, so older notes still match.
     premium". Cover photo: optional field; when the system cannot pull the
     thumbnail (Instagram, or any link), it asks for a cover photo.
     Repository: private (my suggestion; he did not object).
+    BUILT 2026-11-23, not live yet: repository billiondollarprof/rhema-website
+    (private), branch claude/rema-project-planning-1yjeo1: the Vercel page
+    with its pictures as files (1.75 MB to 68 KB, same look), the
+    Testimonials ring (hidden until real content), Cloudflare hosting
+    (web.rhemamedical.app; testing web-testing.rhemamedical.app), security
+    headers, scripts/check.mjs, CI. WAITING ON HIM: a Cloudflare API token
+    and the account ID as secrets in the new repository, then testing and
+    live. Concept placeholders still on the page (doctor names, Google
+    reviews, "Demo" notes) need real content before launch.
 
 
 5. **Is Cloudflare's free 10 GB per account or per project? If per
