@@ -117,6 +117,28 @@ Numbers are kept from the full list, so older notes still match.
     Not answered: (3) patient page or full record for the Pharmacy; (a) or
     (b) for medicines on the bill; the matron setting prices (his earlier
     message says yes; this one is unclear); the order of work.
+    MORE FROM HIM 2026-11-23 (voice note, tidied, meaning kept): "a patient
+    can be marked inpatient or outpatient... outpatient... pay individually
+    [for each] service... inpatient... can still pay the price of whatever
+    they collect or... initial deposit... admission deposit... [separate
+    from the] category of family, individual and antenatal... a toggle...
+    any money they pay during their time of being inpatient... the system
+    knows they've paid since they have been inpatient... at discharge...
+    [take-home] prescription they might not have paid for... when the doctor
+    [or matron or admin] is preparing the bill... the system will be showing
+    that prescription as well... [an unpaid] lab test... as well... once
+    [they] pay the bill complete... the system can ask the doctor to
+    discharge this patient... once discharge is clicked the person [goes]
+    to outpatient... next time... individual fees... a little upgrade
+    rather than [a] change of direction."
+    And on the chart: the nurse taps Given for each dose, morning and
+    evening; the Pharmacy should Dispense at the same time; "when the doctor
+    was... charting, [they] wrote how many times how many doses... if a
+    nurse gave one dose system records one time... I don't know whether that
+    is how it is designed before... check and see how they normally
+    [do it]... how other platforms... normally do this."
+    TODAY (checked): the chart keeps medicine, dose and how often; no number
+    of doses or days. Nurses tap Given each time, with no limit.
     g and i BUILT 2026-11-23 (no SQL): g, the bill's What for shows the
     name typed with Other, and every name used before (standard or own
     price) is its own choice with its price; the other Other boxes in the
