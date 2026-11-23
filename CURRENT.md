@@ -15,6 +15,26 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+228. **The Rhema website: web.rhemamedical.app, TikTok videos, more sections.** (2026-11-23)
+    "We are talking about Rema website. Don't bother about the app for now.
+    I'm actually working on it on my own for now first. I would let you know
+    later when to work on the app again." Eye comfort (223) left for now:
+    the nurse who raised it likes the dark screen.
+    a. Address: "I want to name it web.remamedical.app... peg the web to the
+       remamedical.app app."
+    b. TikTok: "they can find good TikTok videos and put the link... somebody
+       can play it from the website without opening TikTok... We can put 3,
+       4, 5, 6 links, and they will display like card with the thumbnail."
+       Not the rotating cards of the Olympus site. "Those videos from TikTok
+       actually is going to be on the testimonial section."
+    c. More sections: "how the hospital operates, talk good things about the
+       hospital, some testimonials that the matron might share with me."
+       Photos of hospital members to come; some information could come from
+       the app.
+    Found: the site is the Vercel project "rhemamedical" (one index.html,
+    uploaded directly, no Git). Plan sent, waiting for his answers.
+
+
 5. **Is Cloudflare's free 10 GB per account or per project? If per
    account, move the domain to a new Cloudflare account for the hospital.**
    Answered: per account, so yes, new account, and the move is supported.
@@ -1173,7 +1193,7 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     its messages. Backup timer CONFIRMED: runs at 07:17 and 09:17 UTC
     started by the timer, both succeeded.
 
-223. **LATER, REMIND HIM: eye comfort research.** (2026-11-17)
+223. **ON HOLD (2026-11-23): eye comfort research.** (2026-11-17)
     "Save this for later, so you remind me... search open repos, different
     places in the internet, how... we can include [eye care] into the app...
     not just dimming the lights in a way that the system is no longer sharp
