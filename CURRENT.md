@@ -33,6 +33,13 @@ Numbers are kept from the full list, so older notes still match.
        the app.
     Found: the site is the Vercel project "rhemamedical" (one index.html,
     uploaded directly, no Git). Plan sent, waiting for his answers.
+    DECIDED 2026-11-23: a NEW repository for the website (not a folder);
+    hosted on the hospital's Cloudflare account, not Vercel ("we don't want
+    to pay for the Vercel"); address web.rhemamedical.app. Videos: option 2,
+    "a place called websites" in the app's menu, admin only: they add video
+    links "from TikTok or from Instagram or from anywhere", and later post
+    testimonials and other things themselves. Staff photos and names come
+    last. Said back; waiting for his yes and for when the app may be touched.
 
 
 5. **Is Cloudflare's free 10 GB per account or per project? If per
