@@ -93,6 +93,30 @@ Numbers are kept from the full list, so older notes still match.
     only medicines not billed before? (6) Deposit: recorded at admission
     and taken off the Balance? Order proposed: g and i, then h, then a, b,
     c, d, f with one SQL batch.
+    HIS ANSWERS 2026-11-23 (voice note, tidied, his meaning kept):
+    (1) "Yes, it should be a price for each [dose] given... if... it was
+    given... multiple times... the system mathematically calculate the
+    number of times... if the dose is 2500 and... given up to six times...
+    show something like times six, and then show the total."
+    (2) The nurses give each dose and tap Given; the Pharmacy should tap
+    Dispense each time it hands the drugs over, again and again, so the
+    medicine given out is logged "because pharmacy does not have that part
+    as [a pre]scription"; the Pharmacy also sees what the nurses gave.
+    (4) "According to the doctor, do not suggest any price so the Dr check
+    the price. [If the] Matron has any price in mind physically meet the
+    doctor or call the doctor." (So no price suggestions from the Lab.)
+    (5) A second bill shows what has not been billed before, and "Dr you
+    want to see all the money the person is spending when the person came
+    [to the] Hospital. They paid something 50,000 naira... by the time
+    you're leaving the entire might be 300,000... when [the doctor] is
+    writing the bill... shows how much... was previously paid by this
+    patient... and then subtracted from the total... so that the patient
+    can compare the balance." And: "the only way we differentiate
+    inpatients is when they have medicine charts except you can add a place
+    where you can tag inpatient and outpatient... think about that."
+    Not answered: (3) patient page or full record for the Pharmacy; (a) or
+    (b) for medicines on the bill; the matron setting prices (his earlier
+    message says yes; this one is unclear); the order of work.
     Also: "cross-check before you run the SQL that you just showed me...
     if there's any adjustment that needs to be made before this current SQL,
     you make the adjustment before running the SQL."
