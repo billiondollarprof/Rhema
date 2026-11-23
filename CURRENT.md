@@ -117,6 +117,12 @@ Numbers are kept from the full list, so older notes still match.
     Not answered: (3) patient page or full record for the Pharmacy; (a) or
     (b) for medicines on the bill; the matron setting prices (his earlier
     message says yes; this one is unclear); the order of work.
+    g and i BUILT 2026-11-23 (no SQL): g, the bill's What for shows the
+    name typed with Other, and every name used before (standard or own
+    price) is its own choice with its price; the other Other boxes in the
+    app already worked this way (OptionSelect). i, a slim back arrow beside
+    the logo on phones (32 px); at 320 wide the name in the bar is cut
+    shorter ("Chio...").
     Also: "cross-check before you run the SQL that you just showed me...
     if there's any adjustment that needs to be made before this current SQL,
     you make the adjustment before running the SQL."

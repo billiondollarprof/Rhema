@@ -273,7 +273,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           {/* On a desktop this part lines up with the page below it. */}
           <div className={styles.topInner}>
-            {/* Back, on every screen but Home (request 171b). */}
+            {/* Back, on every screen but Home (request 171b), on phones too
+                (request 240i). */}
             {path !== '/' ? (
               <button
                 type="button"

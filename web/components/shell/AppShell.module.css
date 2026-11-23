@@ -386,9 +386,13 @@
   margin-right: 4px;
 }
 
+/* On a phone too (request 240i, 2026-11-23: "when you are using iPhone,
+   it's difficult to go back... it doesn't take space. Just be at the
+   corner"): a slim arrow only, beside the logo. */
 @media (max-width: 699px) {
   .backButton {
-    display: none;
+    padding: 6px;
+    margin-right: 0;
   }
 }
 
