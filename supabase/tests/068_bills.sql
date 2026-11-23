@@ -6,7 +6,8 @@
 --      the same bill again within 30 seconds is refused; a different one is not.
 --   2. The matron can add a bill; a nurse, the Front Desk, the Pharmacy and
 --      the Lab cannot.
---   3. A wrong kind, no name, an amount of 0, no lines or 21 lines is refused.
+--   3. A wrong kind, no name, an amount of 0, no lines or 41 lines is refused
+--      (20 lines until 20261123215523: the hospital's form has more).
 --   4. Every active member of staff reads bills; a deactivated one does not;
 --      nobody writes to the tables directly.
 --   5. The Front Desk pays the bill, once; a nurse cannot pay. (Since
@@ -132,7 +133,7 @@ begin
     '[{"kind": "procedure", "item": "T68 Zero", "amount": 0}]',
     '[]',
     (select jsonb_agg(jsonb_build_object('kind', 'other', 'item', 'T68 line ' || n, 'amount', 10))::text
-     from generate_series(1, 21) n)
+     from generate_series(1, 41) n)
   ] loop
     set local role authenticated;
     begin
@@ -144,7 +145,7 @@ begin
     end;
   end loop;
 end $$;
-\echo 'PASS 3: a wrong kind, no name, 0, no lines or 21 lines is refused'
+\echo 'PASS 3: a wrong kind, no name, 0, no lines or 41 lines is refused'
 
 
 -- ===== 4. Everyone reads; a deactivated person does not; no direct writes =====
