@@ -139,7 +139,7 @@ Numbers are kept from the full list, so older notes still match.
     [do it]... how other platforms... normally do this."
     TODAY (checked): the chart keeps medicine, dose and how often; no number
     of doses or days. Nurses tap Given each time, with no limit.
-    g and i BUILT 2026-11-23 (no SQL): g, the bill's What for shows the
+    g and i LIVE 2026-11-23 (smoke test passed, click-through none broke; no SQL): g, the bill's What for shows the
     name typed with Other, and every name used before (standard or own
     price) is its own choice with its price; the other Other boxes in the
     app already worked this way (OptionSelect). i, a slim back arrow beside
