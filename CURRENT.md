@@ -77,6 +77,22 @@ Numbers are kept from the full list, so older notes still match.
        desktop and tablet screen... at the top for mobile as well... when you
        are using iPhone, it's difficult to go back... it doesn't take space.
        Just be at the corner... previous pages, not... home page."
+    THE FORM (photo sent 2026-11-23): "Rhema Medical Centre, Discharge /
+    Billing Form". Name, Room Name, Date, Card Number. S/N, Service, Bill ₦:
+    1 Professional Fee, 2 Nursing Fee, 3 Procedures / Surgery,
+    4 Anesthetics, 5 Oxygen, 6 Phototherapy, 7 Blood Transfusion,
+    8 Delivery, 9 Episiotomy Tear and Repair, 10 Hospital Facility / Bed,
+    11 Orals, 12 Injectable, 13 Infusion / Cannulation, 14 Consumables,
+    15 Antibiotics, 16 Take Home Drugs, 17 Others. Then Total, Deposit,
+    Balance. Signed: Doctor; Patient.
+    Questions sent 2026-11-23, not answered yet: (1) chart price per dose
+    given? (2) Pharmacy Dispense on the chart: a tap per supply, again
+    later? (3) Pharmacy sees chart medicines and prescriptions on the
+    patient page, not the full record? (4) remove the Lab's price
+    suggestions to the admin (208) and drop 238? (5) a second bill shows
+    only medicines not billed before? (6) Deposit: recorded at admission
+    and taken off the Balance? Order proposed: g and i, then h, then a, b,
+    c, d, f with one SQL batch.
     Also: "cross-check before you run the SQL that you just showed me...
     if there's any adjustment that needs to be made before this current SQL,
     you make the adjustment before running the SQL."
