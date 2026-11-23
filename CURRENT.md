@@ -15,6 +15,15 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+243. **"Other" in every list always in blue.** (2026-11-23) "when someone is
+    picking from a list... drugs... tests... there are some places where the
+    ink is dark just the same color of fonts that the list was used for...
+    the other should come with a different color of font, which is blue...
+    this afternoon... when the doctor entered [Other] and put nursing care,
+    the [Other] itself in that list of options was still dark... so [Other]
+    always comes with a blue type font... I think you should save it for
+    later." SAVED FOR LATER, his word. Not started.
+
 241. **Anybody in a consulting room does everything a doctor does; the
     matron cannot prescribe today.** (2026-11-23) "I noticed that the matron
     does not have access to prescribed drugs. She needs the prescription
@@ -74,7 +83,7 @@ Numbers are kept from the full list, so older notes still match.
     they've not paid and it still shows the amount... whatever the person
     has paid is subtracted from the total and the person pays the
     difference... show me the SQL ba[tch]." Bill and inpatient SQL batch
-    (13 points) shown 2026-11-23; waiting for his yes.
+    (13 points) shown 2026-11-23. HIS YES 2026-11-23: "Yes". Building.
 
 240. **The director on bills, the medicine chart, the Pharmacy, lab results
     and a back button on phones.** (2026-11-23, a long voice note, written
