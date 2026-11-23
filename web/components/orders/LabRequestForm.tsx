@@ -28,6 +28,7 @@ import TestSearch from './TestSearch'
 import styles from './orders.module.css'
 import { COMMON_TESTS, naira, requestLab } from '@/lib/lab/lab'
 import { useAuth } from '@/lib/auth/session'
+import { setsPrices as canSetPrices } from '@/lib/auth/roles'
 import {
   loadMyPrices,
   loadPrices,
@@ -71,7 +72,7 @@ export default function LabRequestForm({
   // ===== 0. Prices (request 235): a doctor or the matron sets one per test,
   // filled in from their own last price, or else the price list. =====
   const { staff } = useAuth()
-  const setsPrices = staff?.role === 'doctor' || staff?.role === 'matron'
+  const setsPrices = staff ? canSetPrices(staff) : false
   const [prices, setPrices] = useState<Record<string, string>>({})
   const [mine, setMine] = useState<MyPrice[]>([])
   const [list, setList] = useState<Price[]>([])

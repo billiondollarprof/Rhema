@@ -66,6 +66,7 @@ import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patient
 import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { actsAsDoctor, setsPrices } from '@/lib/auth/roles'
 import { emailRecord } from '@/lib/record/emailRecord'
 import { recall, remember } from '@/lib/cache/memory'
 
@@ -238,7 +239,7 @@ function PatientRecord() {
   const back = id ? (
     <>
       {/* Always in view, so a lab request never hides in a folded section. */}
-      {allowed && patient && staff.role === 'doctor' ? (
+      {allowed && patient && actsAsDoctor(staff) ? (
         <Link
           className={`${buttons.button} ${buttons.primary}`}
           href={`/pharmacy/prescribe/?p=${id}`}
@@ -253,7 +254,7 @@ function PatientRecord() {
       ) : null}
       {/* A bill for a procedure, an operation, the bed fee and the rest
           (request 235, part 3): doctors and the matron. */}
-      {allowed && patient && (staff.role === 'doctor' || staff.role === 'matron') ? (
+      {allowed && patient && setsPrices(staff) ? (
         <Link className={buttons.button} href={`/bills/add/?p=${id}`}>
           Add a bill
         </Link>
@@ -444,7 +445,7 @@ function PatientRecord() {
                     {...props}
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
-                    canPrescribe={staff.role === 'doctor'}
+                    canPrescribe={actsAsDoctor(staff)}
                     canRequestLab={staff.can_medical}
                   />
                   <LabSection
@@ -476,7 +477,7 @@ function PatientRecord() {
                     {...props}
                     patientName={patient.full_name}
                     canWrite={inConsultingRoom}
-                    canPrescribe={staff.role === 'doctor'}
+                    canPrescribe={actsAsDoctor(staff)}
                     canRequestLab={staff.can_medical}
                   />
                   <LabSection

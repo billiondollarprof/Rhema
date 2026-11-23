@@ -27,8 +27,12 @@ Numbers are kept from the full list, so older notes still match.
     prescribe drugs".) FOUND: prescribing and "also send to the Pharmacy"
     check the doctor role only (private.is_doctor); prices and bills check
     doctor or matron by role; the screens check role === 'doctor'.
-    Consultation notes already go by the consulting room. SQL batch shown;
-    waiting for his yes.
+    Consultation notes already go by the consulting room.
+    BUILT 2026-11-23 (on claude/front-desk-228 only, not on testing):
+    migration 20261123192759 (is_doctor and sets_prices also count a
+    consulting room, with medical access), test 070, 7 breaks caught; the
+    screens use actsAsDoctor and setsPrices (lib/auth/roles.ts). SQL batch
+    shown; waiting for his yes.
     Also: "there are certain things that the matron is able to chart, the
     midwife is able to chart, that are not included... check it again"
     (antenatal: palpation and the rest). FOUND: request 189's visit table is

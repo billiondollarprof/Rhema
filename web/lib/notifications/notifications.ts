@@ -59,7 +59,7 @@ import {
 import { when } from '../record/record'
 import { loadOpenQueue } from '../queue/queue'
 import { knownMedicines, loadMedicines } from '../medicines/medicines'
-import { worksWithPatients } from '../auth/roles'
+import { actsAsDoctor, worksWithPatients } from '../auth/roles'
 import { recall, remember } from '../cache/memory'
 
 // ===== 1. The shapes =====
@@ -146,7 +146,9 @@ export async function loadNotices(client: SupabaseClient, staff: StaffMember): P
     payer ? drugsAwaitingPayment(client) : empty,
     staff.role === 'laboratory' ? listAwaitingTest(client) : empty,
     staff.role === 'pharmacy' ? listAwaitingDispense(client) : empty,
-    staff.role === 'doctor' ? listMyDispensed(client, staff.id) : empty,
+    // The person who prescribed hears it was dispensed (request 241: anybody
+    // in a consulting room prescribes too).
+    actsAsDoctor(staff) ? listMyDispensed(client, staff.id) : empty,
     watchesQueue ? loadOpenQueue(client) : empty,
     staff.role === 'pharmacy'
       ? loadMedicines(client, staff.id).then((lines) => lines ?? knownMedicines(staff.id))

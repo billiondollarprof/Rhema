@@ -45,6 +45,23 @@ export function takesPayments(staff: {
   return Boolean(staff.can_admin) && !worksWithPatients(staff)
 }
 
+// Who does what a doctor does on screen (request 241, 2026-11-23:
+// "everybody with a consultant room can do everything that a consultant can
+// do"): a doctor, or anybody with medical access in a consulting room. The
+// database decides the same way (private.is_doctor); this only shows the
+// buttons.
+type Person = { role: string; can_medical?: boolean; room: { kind: string } | null }
+export function actsAsDoctor(staff: Person): boolean {
+  if (staff.role === 'doctor') return true
+  return Boolean(staff.can_medical) && staff.room?.kind === 'consultation'
+}
+
+// Who sets prices and adds bills: the same, and the matron anywhere
+// (private.sets_prices).
+export function setsPrices(staff: Person): boolean {
+  return staff.role === 'matron' || actsAsDoctor(staff)
+}
+
 // Two letters for the round name badge, e.g. "Chioma Eze" -> "CE".
 export function initials(name: string): string {
   const parts = name

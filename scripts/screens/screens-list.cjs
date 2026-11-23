@@ -825,6 +825,24 @@ module.exports.SCREENS = [
       'Bed fee per day',
     ],
   },
+  // Request 241: the matron in a consulting room prescribes and bills.
+  {
+    path: '/patients/record/?p=1',
+    waitFor: 'Write a consultation',
+    medical: true,
+    role: 'matron',
+    roomId: 2,
+    extra: RECORD_DAY,
+    mustSee: ['Prescribe', 'Request lab', 'Add a bill'],
+  },
+  {
+    path: '/pharmacy/prescribe/?p=1',
+    waitFor: 'Prescribe',
+    medical: true,
+    role: 'matron',
+    roomId: 2,
+    mustSee: ['Price ₦ (optional)'],
+  },
   // Request 235, part 3: Add a bill, for a doctor.
   {
     path: '/bills/add/?p=1',

@@ -22,6 +22,7 @@ import AppShell from '@/components/shell/AppShell'
 import { getPatient, type PatientResult } from '@/lib/patients/patients'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { setsPrices } from '@/lib/auth/roles'
 
 function AddBill() {
   const auth = useAuth()
@@ -47,9 +48,9 @@ function AddBill() {
   if (auth.status !== 'ready' || !client || !staff) return null
 
   // ===== 2. Who may, and the form =====
-  const allowed = staff.role === 'doctor' || staff.role === 'matron'
+  const allowed = setsPrices(staff)
   let stop: string | null = null
-  if (!allowed) stop = 'Bills are added by doctors and the matron.'
+  if (!allowed) stop = 'Bills are added by doctors, the matron and anybody in a consulting room.'
   else if (!givenId || patient === null) stop = 'Open the patient first, then Add a bill.'
 
   return (

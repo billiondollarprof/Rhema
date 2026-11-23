@@ -23,6 +23,7 @@ import { getPatient, type PatientResult } from '@/lib/patients/patients'
 import PrescribeForm from '@/components/orders/PrescribeForm'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { actsAsDoctor } from '@/lib/auth/roles'
 
 function Prescribe() {
   const auth = useAuth()
@@ -52,8 +53,10 @@ function Prescribe() {
       <div className={styles.page}>
         <h2>Prescribe</h2>
 
-        {staff.role !== 'doctor' ? (
-          <p className={styles.muted}>Prescriptions are written by doctors.</p>
+        {!actsAsDoctor(staff) ? (
+          <p className={styles.muted}>
+            Prescriptions are written by doctors, and by anybody working in a consulting room.
+          </p>
         ) : !patientId ? (
           <p className={styles.muted}>Open a patient&apos;s record, then tap Prescribe.</p>
         ) : patient === undefined ? (

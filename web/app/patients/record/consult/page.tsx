@@ -29,6 +29,7 @@ import { useRecord } from '../_parts/useRecord'
 import AppShell from '@/components/shell/AppShell'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { actsAsDoctor } from '@/lib/auth/roles'
 
 function Consult() {
   const auth = useAuth()
@@ -85,7 +86,7 @@ function Consult() {
             reload={reload}
             canWrite={canWrite}
             me={staff.room ? `${staff.full_name} · ${staff.room.name}` : staff.full_name}
-            canPrescribe={staff.role === 'doctor'}
+            canPrescribe={actsAsDoctor(staff)}
             canRequestLab={staff.can_medical}
             fullPage
           />
