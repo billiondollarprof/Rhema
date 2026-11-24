@@ -7,6 +7,9 @@
 --   2. A bill with Take Home Drugs only covers the prescription, not the lab
 --      test, and leaves the doses for later.
 --   3. A bill with Medicines given and Laboratory tests covers those.
+--   4. Discharge with nothing owed settles the stay's unpaid bills, and the
+--      prescription they covered takes the deposit as its payment.
+--   5. Discharge with money owed leaves the bill to pay.
 --
 -- Runs inside one transaction that is rolled back. Made up people only.
 -- =============================================================================
@@ -116,5 +119,60 @@ begin
   end if;
 end $$;
 \echo 'PASS 3: Medicines given and Laboratory tests settle the doses and the test'
+
+
+-- ===== 4. Discharge with nothing owed settles =====
+-- A deposit of 100,000 covers the bills above (20,000 + 1,500 + 5,500).
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000723"}', true);
+set local role authenticated;
+select public.take_payment((select patient from t72), 'deposit', '[{"label": "Deposit", "amount": 100000}]', 'cash');
+reset role;
+do $$
+declare
+  take_home bigint := (select id from public.prescriptions where note = 'T72 take home');
+  deposit bigint := (select id from public.payments where purpose = 'deposit'
+                     and patient_id = (select patient from t72));
+begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000721"}', true);
+  set local role authenticated;
+  if public.discharge_patient((select patient from t72)) <> 'discharged' then
+    raise exception 'FAIL 4: the doctor could not discharge';
+  end if;
+  reset role;
+  if exists (select 1 from public.bills b join public.admissions a on a.id = b.admission_id
+             where a.patient_id = (select patient from t72) and b.status = 'awaiting_payment') then
+    raise exception 'FAIL 4: a bill still waits after a discharge with nothing owed';
+  end if;
+  if (select payment_id from public.prescriptions where id = take_home) is distinct from deposit
+     or (select status from public.prescriptions where id = take_home) <> 'awaiting_dispense' then
+    raise exception 'FAIL 4: the covered prescription was not settled by the deposit';
+  end if;
+end $$;
+\echo 'PASS 4: discharge with nothing owed settles the stay''s bills by the deposit'
+
+
+-- ===== 5. Discharge with money owed leaves the bill to pay =====
+insert into public.patients (full_name, date_of_birth, sex, created_by)
+values ('T72 Owing', '1983-03-03', 'female', '00000000-0000-0000-0000-000000000723');
+do $$
+declare owing bigint := (select id from public.patients where full_name = 'T72 Owing');
+begin
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000723"}', true);
+  set local role authenticated;
+  perform public.admit_patient(owing);
+  perform public.take_payment(owing, 'deposit', '[{"label": "Deposit", "amount": 5000}]', 'cash');
+  reset role;
+  perform set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000721"}', true);
+  set local role authenticated;
+  perform public.add_bill(owing, '[{"kind": "bed_regular", "item": "Bed space: Regular", "amount": 20000}]', 'T72 owing bill');
+  if public.discharge_patient(owing) <> 'discharged' then
+    raise exception 'FAIL 5: the doctor could not discharge a patient who owes';
+  end if;
+  reset role;
+  if (select status from public.bills where note = 'T72 owing bill') <> 'awaiting_payment' then
+    raise exception 'FAIL 5: a bill was settled while money was owed';
+  end if;
+end $$;
+\echo 'PASS 5: discharge with money owed leaves the bill to pay'
 
 rollback;

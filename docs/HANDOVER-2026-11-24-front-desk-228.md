@@ -118,20 +118,18 @@ sent, even 3 days later. It will need a database change (a result per test
 and a request that is complete only when every test has one), so the SQL
 batch must be shown to Anthony first.
 
-**For Anthony to decide (asked 23 November, not answered yet):**
+**His answers, 24 November:** build lab results one at a time (next);
+an unpaid dispensed drug never expires (already so); no "settled by the
+deposit" button, Discharge with nothing owed settles the stay's bills
+(built, in the batch below); days and doses: stop and chart again (no
+change); keep the Lab's price suggestions (208).
 
-1. **Expiry for inpatients.** An inpatient's unpaid prescriptions and lab
-   tests still expire after 72 hours, and then drop off the stay's bill.
-   Proposed: they wait for the bill while the patient is admitted (needs a
-   small SQL change).
-2. **A deposit that covers the whole bill.** The bill stays in Bills to pay,
-   because a payment of 0 is refused. The same happens to an earlier unpaid
-   bill when a later one is paid with the whole balance. Proposed: "Settled
-   by the deposit" for the Front Desk (needs SQL).
-3. **Changing a course.** Days and doses are set when charting, not changed
-   afterwards (needs a screen change only).
-4. **Lab price suggestions (request 208).** Anthony said "do not suggest any
-   price"; removing the Lab's suggestions to the admin has not been asked.
+**Waiting for his yes (request 245), built on the branch, not on testing:**
+migration `20261124094742_bill_settles_only_its_lines` (a bill settles only
+the stay's lines ticked onto it; Discharge with nothing owed settles the
+stay's unpaid bills, with the latest deposit as the payment of what they
+covered), test 072, 8 breaks caught; the bill form's "Put on this bill"
+ticks.
 
 Small known edges, written down so nobody is surprised:
 - A dose given in the minute between opening the bill and sending it is

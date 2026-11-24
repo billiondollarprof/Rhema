@@ -13,10 +13,20 @@
 -- the receipt." Until now sending a bill settled every drug and test of the
 -- stay, so those lines could not be left off.
 --
+-- And: Discharge settles the stay's unpaid bills when nothing is owed
+-- (Anthony, 2026-11-24: "No need [for a] settled by the deposit button, the
+-- system handles that automatically once the person is discharged with no
+-- outstanding balance"). The bills turn paid with no payment of their own;
+-- the prescriptions and lab tests they covered that are still unpaid take
+-- the stay's latest deposit as their payment, so they leave the Front
+-- Desk's lists and the Pharmacy and Lab may go on.
+--
 -- Rules: the same as 20261123215523 add_bill, with the three checks above.
+-- Discharge: the same as 20261123215523, then the settling. With anything
+-- owed, Discharge still works and the bills stay to pay.
 --
 -- Never: settle a prescription, a lab test or a dose that is not charged on
--- the bill.
+-- the bill, or settle a bill while the stay still owes money.
 -- =============================================================================
 
 
@@ -125,3 +135,58 @@ begin
 end;
 $$;
 
+
+
+-- ===== 2. Discharge with nothing owed settles the stay's unpaid bills =====
+create or replace function private.discharge_patient(patient bigint)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  stay public.admissions;
+  owed numeric(12, 2);
+  deposit bigint;
+begin
+  if not (select private.can_discharge()) then
+    raise exception 'Only a doctor or the matron discharges a patient' using errcode = '42501';
+  end if;
+  perform pg_advisory_xact_lock(hashtext('admit:' || patient::text));
+  select * into stay from public.admissions where patient_id = patient and discharged_at is null;
+  if not found then
+    return 'not_admitted';
+  end if;
+
+  -- What the stay still owes, worked out as the bill statement does.
+  owed := (private.bill_statement(patient) ->> 'balance')::numeric;
+  if owed <= 0 then
+    -- The stay's latest deposit stands as the payment of what it covered.
+    select id into deposit from public.payments
+    where patient_id = patient and purpose = 'deposit' and voided_at is null
+      and received_at >= stay.admitted_at
+    order by received_at desc limit 1;
+    if deposit is not null then
+      update public.prescriptions
+         set payment_id = deposit,
+             status = case when status = 'awaiting_payment' then 'awaiting_dispense'::public.prescription_status else status end
+       where payment_id is null and status <> 'voided'
+         and id in (select unnest(b.covers_prescriptions) from public.bills b
+                    where b.admission_id = stay.id and b.status = 'awaiting_payment');
+      update public.lab_requests
+         set payment_id = deposit,
+             status = case when status = 'awaiting_payment' then 'awaiting_test'::public.lab_status else status end
+       where payment_id is null and status <> 'voided'
+         and id in (select unnest(b.covers_labs) from public.bills b
+                    where b.admission_id = stay.id and b.status = 'awaiting_payment');
+    end if;
+    update public.bills set status = 'paid'
+     where admission_id = stay.id and status = 'awaiting_payment';
+  end if;
+
+  update public.admissions
+     set discharged_at = now(), discharged_by = (select auth.uid())
+   where id = stay.id;
+  return 'discharged';
+end;
+$$;

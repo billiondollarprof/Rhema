@@ -1,7 +1,8 @@
 -- =============================================================================
 -- Undo 20261124094742_bill_settles_only_its_lines.sql: a bill settles every
--- prescription, lab test and dose of the stay again, as 20261123215523 left
--- it. Loses no data.
+-- prescription, lab test and dose of the stay again, and Discharge only
+-- closes the stay, as 20261123215523 left them. Loses no data (bills and
+-- items already settled at a discharge stay settled).
 -- =============================================================================
 
 create or replace function private.add_bill(patient bigint, lines jsonb, bill_note text)
@@ -98,3 +99,24 @@ begin
 end;
 $$;
 
+
+create or replace function private.discharge_patient(patient bigint)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if not (select private.can_discharge()) then
+    raise exception 'Only a doctor or the matron discharges a patient' using errcode = '42501';
+  end if;
+  perform pg_advisory_xact_lock(hashtext('admit:' || patient::text));
+  update public.admissions
+     set discharged_at = now(), discharged_by = (select auth.uid())
+   where patient_id = patient and discharged_at is null;
+  if not found then
+    return 'not_admitted';
+  end if;
+  return 'discharged';
+end;
+$$;
