@@ -28,9 +28,12 @@
  * the line. At the bottom: billed before in this stay, paid since admission
  * (deposits too, and the drugs and tests already paid on their own), and
  * the balance.
- * These three lines cannot be removed, and one with no price waits for an
- * amount: sending the bill settles every prescription and lab test of the
- * stay, so each must be charged on it (found in the check of 2026-11-24).
+ * Each of these three lines has a tick, "Put on this bill" (request 245,
+ * 2026-11-24: "If a line is not selected, it should not appear on the
+ * receipt"). Ticked: it needs an amount and goes on the bill, and the bill
+ * settles what it is made of. Not ticked: it is left off, and what it is
+ * made of stays for the next bill (the database settles only the lines on
+ * the bill, 20261124094742). It starts ticked when it has an amount.
  *
  * Never: send a total. The database adds the lines up itself.
  */
@@ -69,7 +72,15 @@ import type { PatientResult } from '@/lib/patients/patients'
 
 // One line as typed: the kind, its name and its amount, as text. auto: a
 // line worked out from the stay (its kind and name are fixed).
-type Line = { key: number; kind: BillKind | ''; item: string; amount: string; auto?: boolean }
+// on: a line worked out from the stay is ticked to go on this bill.
+type Line = {
+  key: number
+  kind: BillKind | ''
+  item: string
+  amount: string
+  auto?: boolean
+  on?: boolean
+}
 
 let nextKey = 1
 const emptyLine = (): Line => ({ key: nextKey++, kind: '', item: '', amount: '' })
@@ -129,6 +140,7 @@ export default function BillForm({
           item: one.item,
           amount: one.amount > 0 ? String(one.amount) : '',
           auto: true,
+          on: one.amount > 0,
         }))
       // Before the doctor's own lines, once; a draft put back keeps its own.
       if (worked.length)
@@ -224,15 +236,22 @@ export default function BillForm({
     )
   }
 
-  const amounts = lines.map((line) => readAmount(line.amount) ?? 0)
+  // A line of the stay left off this bill counts for nothing.
+  const amounts = lines.map((line) => (line.auto && !line.on ? 0 : (readAmount(line.amount) ?? 0)))
   const total = amounts.reduce((sum, amount) => sum + amount, 0)
   // An inpatient: paid since admission, counting the drugs and tests of this
   // bill already paid on their own (the database counts them once the bill
   // covers them), and what this stay owes once this bill is added.
+  // Only for the drug and test lines ticked onto this bill.
+  const ticked = (kind: BillKind) =>
+    lines.some((line) => line.auto && line.on && line.kind === kind)
   const paidSoFar = statement?.admitted
     ? Number(statement.paid ?? 0) +
       sumOf(
-        [...(statement.prescriptions ?? []), ...(statement.labs ?? [])]
+        [
+          ...(ticked('take_home_drugs') ? (statement.prescriptions ?? []) : []),
+          ...(ticked('lab_tests') ? (statement.labs ?? []) : []),
+        ]
           .filter((one) => one.paid)
           .map((one) => one.amount),
       )
@@ -243,8 +262,10 @@ export default function BillForm({
   function readyLines(): { kind: BillKind; item: string; amount: number }[] | string {
     const ready: { kind: BillKind; item: string; amount: number }[] = []
     for (const line of lines) {
-      // A doctor's line left empty is simply not on the bill.
+      // A doctor's line left empty, or a stay's line not ticked, is simply
+      // not on the bill (request 245).
       if (!line.auto && !line.kind && !line.item.trim() && !line.amount.trim()) continue
+      if (line.auto && !line.on) continue
       const amount = readAmount(line.amount)
       if (!line.kind || line.item.trim().length < 2 || amount === null) {
         return 'Each line needs what it is for, a name and an amount, like 5,000.'
@@ -393,6 +414,7 @@ export default function BillForm({
             index={index}
             statement={statement}
             onAmount={(amount) => change(index, { amount })}
+            onTick={(on) => change(index, { on })}
           />
         ) : (
           <div key={line.key} className={styles.drug}>
@@ -533,11 +555,13 @@ function AutoLine({
   index,
   statement,
   onAmount,
+  onTick,
 }: {
   line: Line
   index: number
   statement: Statement | null
   onAmount: (amount: string) => void
+  onTick: (on: boolean) => void
 }) {
   const parts: string[] =
     line.kind === 'medicines_given'
@@ -559,6 +583,14 @@ function AutoLine({
       <div className={styles.drugTop}>
         <b>{line.item}</b>
       </div>
+      <label className={styles.standardRow}>
+        <input
+          type="checkbox"
+          checked={Boolean(line.on)}
+          onChange={(event) => onTick(event.target.checked)}
+        />
+        <span>Put on this bill</span>
+      </label>
       <details>
         <summary>What it is made of ({parts.length})</summary>
         <ul className={styles.autoParts}>
@@ -567,20 +599,25 @@ function AutoLine({
           ))}
         </ul>
       </details>
-      <div>
-        <label className={styles.label} htmlFor={`bill-amount-${index}`}>
-          Amount ₦
-        </label>
-        <input
-          id={`bill-amount-${index}`}
-          className={styles.input}
-          inputMode="decimal"
-          // No price on some of it yet: the doctor types the amount.
-          placeholder="Type the amount"
-          value={line.amount}
-          onChange={(event) => onAmount(event.target.value.replace(/[^\d.,\s]/g, ''))}
-        />
-      </div>
+      {/* Not ticked: no amount, and it stays for the next bill. */}
+      {line.on ? (
+        <div>
+          <label className={styles.label} htmlFor={`bill-amount-${index}`}>
+            Amount ₦
+          </label>
+          <input
+            id={`bill-amount-${index}`}
+            className={styles.input}
+            inputMode="decimal"
+            // No price on some of it yet: the doctor types the amount.
+            placeholder="Type the amount"
+            value={line.amount}
+            onChange={(event) => onAmount(event.target.value.replace(/[^\d.,\s]/g, ''))}
+          />
+        </div>
+      ) : (
+        <p className={styles.muted}>Left off this bill. It stays for the next one.</p>
+      )}
     </div>
   )
 }

@@ -26,6 +26,17 @@ Numbers are kept from the full list, so older notes still match.
     settles every drug and test of the stay. To let the doctor leave one
     off, the database must settle only what is on the bill (SQL). Built
     locally, waiting for his yes on the batch.
+    HIS ANSWERS 2026-11-24 to the open questions: "We build the lab one
+    result at a time" (240h: yes, next). "An unpaid dispensed drug never
+    expires" (already so: the 72 hour rule only expires drugs not given,
+    and tests with no sample taken). "No need [for a] settled by the deposit
+    button, the system handles that automatically once the person is
+    discharged with no outstanding balance" (Discharge with nothing owed
+    marks the stay's unpaid bills settled: SQL, added to this batch). "Yes,
+    the doctor should be able to but we already have cancel, suspend etc"
+    (no new edit for days and doses: stop the medicine and chart it again).
+    "Keep the price suggestion" (the Lab's suggestions to the admin, 208,
+    stay).
 
 244. **Full check of everything this agent (claude/front-desk-228) built,
     then handover notes.** (2026-11-24) "go through all what you've done so

@@ -883,7 +883,13 @@ module.exports.SCREENS = [
     role: 'doctor',
     roomId: 2,
     extra: { 'rpc/bill_statement': STATEMENT },
-    mustSee: ['Medicines given', 'Take Home Drugs', 'Laboratory tests', 'Preview'],
+    mustSee: [
+      'Medicines given',
+      'Take Home Drugs',
+      'Laboratory tests',
+      'Put on this bill',
+      'Preview',
+    ],
   },
   {
     path: '/bills/add/?p=1',
