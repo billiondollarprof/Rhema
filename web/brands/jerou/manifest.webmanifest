@@ -1,7 +1,7 @@
 {
-  "name": "Jarou Hospital",
-  "short_name": "Jarou Hospital",
-  "description": "Jarou Hospital: hospital workspace",
+  "name": "Jerou Hospital",
+  "short_name": "Jerou Hospital",
+  "description": "Jerou Hospital: hospital workspace",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

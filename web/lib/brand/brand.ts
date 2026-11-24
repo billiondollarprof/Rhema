@@ -75,11 +75,11 @@ const BRANDS: Record<string, Brand> = {
     initials: 'CH',
     address: '',
   },
-  // Pitched 2026-11-24 (Anthony: "Okay, now change to Jarou hospital").
-  jarou: {
-    key: 'jarou',
-    name: 'Jarou Hospital',
-    short: 'Jarou',
+  // Pitched 2026-11-24 (Anthony: "Okay, now change to Jerou hospital").
+  jerou: {
+    key: 'jerou',
+    name: 'Jerou Hospital',
+    short: 'Jerou',
     initials: 'JH',
     address: '',
   },
