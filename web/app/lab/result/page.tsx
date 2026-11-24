@@ -15,6 +15,12 @@
  * kept as the comment (request 196a, 2026-11-16). A test not on the menu
  * keeps the one free text box, as before.
  *
+ * One test at a time (request 240h, 2026-11-24: "send the results without
+ * sending everything... the other one... pending results... some of the
+ * results takes three days"): the tests ready now are sent; the others stay
+ * pending, and the request stays on the Lab's list. Opening it again shows
+ * what was sent and a box for each test still pending.
+ *
  * Never: show the patient's medical history here. The lab sees the
  * patient's name and number, the tests and the note, and nothing else.
  */
@@ -82,6 +88,10 @@ function EnterResults() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  // A request part sent before: the tests that already have a result.
+  const [sentBefore, setSentBefore] = useState<string[]>([])
+  // After saving: the tests still pending (request 240h).
+  const [stillPending, setStillPending] = useState<string[]>([])
 
   // Words the Laboratory added with Other inside a test's box, kept for
   // everybody (request 209e): "test|box" to the words.
@@ -112,11 +122,24 @@ function EnterResults() {
   useEffect(() => {
     if (!client || !requestId || auth.status !== 'ready') return
     let current = true
-    getLabRequest(client, requestId).then((found) => {
-      if (!current) return
-      setRequest(found)
-      if (found) setLines(found.tests.map((test) => ({ test, result: '', values: {} })))
-    })
+    Promise.all([getLabRequest(client, requestId), loadRequestResults(client, requestId)]).then(
+      ([found, earlier]) => {
+        if (!current) return
+        setRequest(found)
+        if (!found) return
+        // A box for each test without a result yet (all of them, the first
+        // time). A finished request keeps a box for every test, to correct.
+        const done = earlier
+          .filter((one) => !one.voided_at)
+          .map((one) => one.test.trim().toLowerCase())
+        setSentBefore(found.status === 'completed' ? [] : done)
+        const open =
+          found.status === 'completed'
+            ? found.tests
+            : found.tests.filter((test) => !done.includes(test.trim().toLowerCase()))
+        setLines(open.map((test) => ({ test, result: '', values: {} })))
+      },
+    )
     return () => {
       current = false
     }
@@ -125,15 +148,18 @@ function EnterResults() {
   if (auth.status !== 'ready' || !client || !staff) return null
 
   // ===== 2. Save =====
-  // Each test needs typed words or an attached file (or both).
-  // A finished request is corrected: only the lines filled in are added,
-  // and at least one is needed (request 214).
+  // Each test sent needs typed words or an attached file (or both).
+  // A request: the tests filled in are sent, at least one; the rest stay
+  // pending (request 240h). A finished request is corrected the same way
+  // (request 214). A walk in needs every line it has.
   const correcting = Boolean(request && request.status === 'completed')
   const filled = (line: Line) => line.test.trim().length >= 2 && (resultText(line) || line.file)
-  const complete = correcting ? lines.some(filled) : lines.every(filled)
-  // The tests still without details, named under the button (request 214:
-  // "refuse and add warnings that they should add test details").
-  const missing = correcting
+  const complete = request ? lines.some(filled) : lines.every(filled)
+  // The tests that stay pending after this send, named under the button.
+  const pending =
+    request && !correcting ? lines.filter((line) => !filled(line)).map((line) => line.test) : []
+  // A walk in: the lines still without details.
+  const missing = request
     ? []
     : lines.filter((line) => !filled(line)).map((line) => line.test || 'A test')
   const patientName = request?.patient?.full_name ?? walkIn?.full_name ?? ''
@@ -146,7 +172,8 @@ function EnterResults() {
     // First the files, one by one; then the results that point at them.
     const items: ResultItem[] = []
     for (const line of lines) {
-      if (correcting && !filled(line)) continue
+      // Not filled in: pending (a request), or nothing to add (a correction).
+      if (request && !filled(line)) continue
       const item: ResultItem = {
         test: line.test.trim(),
         result: resultText(line) || 'See the attached file.',
@@ -185,6 +212,7 @@ function EnterResults() {
       setError(problem)
       return
     }
+    setStillPending(pending)
     setSaved(true)
   }
 
@@ -234,9 +262,15 @@ function EnterResults() {
           // ----- Done -----
           <div className={styles.card}>
             <p className={styles.good}>Saved to {patientName}&apos;s record.</p>
+            {stillPending.length > 0 ? (
+              <p className={styles.warning}>
+                Pending results: {stillPending.join(', ')}. Open this request again from the lab
+                list when they are ready.
+              </p>
+            ) : null}
             <p className={styles.muted}>
               {request
-                ? `${request.requester?.full_name ?? 'The person who asked'} has been told the result is ready.`
+                ? `${request.requester?.full_name ?? 'The person who asked'} has been told ${stillPending.length > 0 ? 'these results are' : 'the result is'} ready.`
                 : 'Nobody was alerted, because nobody asked for it.'}{' '}
               Every doctor and nurse who opens the record sees it.
             </p>
@@ -283,8 +317,12 @@ function EnterResults() {
             {request && request.status === 'awaiting_payment' ? (
               <p className={styles.muted}>Not paid yet. The Front Desk will take the payment.</p>
             ) : null}
-            {request && request.status === 'completed' ? (
-              <EarlierResults client={client} requestId={request.id} />
+            {request && (request.status === 'completed' || sentBefore.length > 0) ? (
+              <EarlierResults
+                client={client}
+                requestId={request.id}
+                partial={request.status !== 'completed'}
+              />
             ) : null}
 
             {/* ----- One box per test ----- */}
@@ -360,13 +398,28 @@ function EnterResults() {
                 Add the details for {missing.join(', ')} before Result ready.
               </p>
             ) : null}
+            {/* A request: what stays pending if sent now (request 240h). */}
+            {ready && complete && pending.length > 0 ? (
+              <p className={styles.muted}>
+                Pending after this: {pending.join(', ')}. Send them when they are ready.
+              </p>
+            ) : null}
+            {ready && request && !complete ? (
+              <p className={styles.muted}>Type the results that are ready, then send them.</p>
+            ) : null}
             {ready ? (
               <button
                 className={`${styles.button} ${styles.primary}`}
                 onClick={save}
                 disabled={!complete || busy}
               >
-                {busy ? 'Saving…' : correcting ? 'Add to the record' : 'Result ready'}
+                {busy
+                  ? 'Saving…'
+                  : correcting
+                    ? 'Add to the record'
+                    : pending.length > 0
+                      ? 'Send these results'
+                      : 'Result ready'}
               </button>
             ) : null}
           </div>
@@ -547,7 +600,16 @@ export default function EnterResultsPage() {
 // ===== 5. Results already on a finished request, each can be cancelled =====
 // A wrong result is cancelled with a reason; it stays in the record crossed
 // out. The correct one is added with the boxes below (request 214).
-function EarlierResults({ client, requestId }: { client: SupabaseClient; requestId: number }) {
+function EarlierResults({
+  client,
+  requestId,
+  partial = false,
+}: {
+  client: SupabaseClient
+  requestId: number
+  // Some tests sent, the rest pending (request 240h).
+  partial?: boolean
+}) {
   const [results, setResults] = useState<RequestResult[] | null>(null)
   const [cancelling, setCancelling] = useState<number | null>(null)
   const [reason, setReason] = useState('')
@@ -578,8 +640,9 @@ function EarlierResults({ client, requestId }: { client: SupabaseClient; request
   return (
     <div className={styles.earlier}>
       <p className={styles.good}>
-        These results are in the record. To correct one, cancel it with a reason, then add the right
-        one below.
+        {partial
+          ? 'Sent already, and in the record. The tests below are still pending.'
+          : 'These results are in the record. To correct one, cancel it with a reason, then add the right one below.'}
       </p>
       {results === null ? <p className={styles.muted}>Loading the results…</p> : null}
       {(results ?? []).map((line) => (

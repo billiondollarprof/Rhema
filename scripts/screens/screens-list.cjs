@@ -621,6 +621,53 @@ module.exports.SCREENS = [
     mustSee: ['Front Desk and Lab', 'Front Desk only'],
   },
   { path: '/lab/result/', waitFor: 'Add a lab result' },
+  // Request 240h: a request with one result sent and two pending.
+  {
+    path: '/lab/result/?r=5',
+    waitFor: 'Enter results',
+    role: 'laboratory',
+    extra: {
+      'rest/v1/lab_requests': (req) => {
+        const one = {
+          id: 5,
+          patient_id: 1,
+          tests: ['Widal', 'Full Blood Count', 'Urinalysis'],
+          note: null,
+          status: 'awaiting_test',
+          requested_at: hoursAgo(26),
+          completed_at: null,
+          sample_taken_at: hoursAgo(25),
+          expired_at: null,
+          results_at: hoursAgo(20),
+          patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+          requester: DOCTOR,
+        }
+        return (req.headers().accept || '').includes('vnd.pgrst.object') ? one : [one]
+      },
+      'rest/v1/lab_results': [
+        {
+          id: 9,
+          request_id: 5,
+          test: 'Widal',
+          result: 'S. typhi O 1/80',
+          file_key: null,
+          file_name: null,
+          file_type: null,
+          file_size: null,
+          recorded_at: hoursAgo(20),
+          voided_at: null,
+          void_reason: null,
+          recorder: { full_name: 'Lab Tunde' },
+        },
+      ],
+    },
+    mustSee: [
+      'Sent already, and in the record. The tests below are still pending.',
+      'Full Blood Count',
+      'Urinalysis',
+      'Type the results that are ready, then send them.',
+    ],
+  },
   // Every test, no patient (2026-11-16).
   { path: '/lab/tests/', waitFor: 'Lab test list', role: 'laboratory' },
   // Find a patient's paid tests, to correct (request 214).

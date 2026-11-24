@@ -99,9 +99,12 @@ export default function LabSection({
             key={`open-${request.id}`}
             what={<b>{request.tests.join(', ')}</b>}
             status={
-              // Not paid within 24 hours, never tested: grey (request 228a).
+              // Not paid within 72 hours, never tested: grey (request 228a).
               request.expired_at ? (
                 <span className={`${styles.pill} ${styles.grey}`}>Expired, not paid</span>
+              ) : request.results_at ? (
+                // Some results sent, below; the rest pending (request 240h).
+                <span className={`${styles.pill} ${styles.orange}`}>Pending results</span>
               ) : (
                 <span className={`${styles.pill} ${styles.orange}`}>
                   {/* Request 219c, number 4: the Laboratory has the sample. */}

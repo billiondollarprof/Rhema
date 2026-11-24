@@ -36,6 +36,9 @@ export type LabRequest = {
   prices?: Record<string, number> | null
   // Not paid within 72 hours and never tested (request 228a); null otherwise.
   expired_at: string | null
+  // When results were last sent; set while some tests are still pending
+  // (request 240h). Older requests have none.
+  results_at?: string | null
   patient: { full_name: string; patient_number: string } | null
   requester: { full_name: string } | null
 }
@@ -70,7 +73,7 @@ export const PAYMENT_MODES: [PaymentMode, string][] = [
 ]
 
 const REQUEST_COLUMNS =
-  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, sent_to_lab, prices, ' +
+  'id, patient_id, tests, note, status, requested_at, completed_at, sample_taken_at, expired_at, sent_to_lab, prices, results_at, ' +
   'patient:patients(full_name, patient_number), requester:staff!lab_requests_requested_by_fkey(full_name)'
 
 // "₦7,500.50", "₦7,500".
@@ -218,8 +221,7 @@ export async function recordResults(
   if (isExpiredRefusal(error)) return EXPIRED_WORDS
   if (error) return 'The results could not be saved. Check the internet and try again.'
   if (data === 'not_paid') return 'This test has not been paid for yet. Ask the Front Desk.'
-  if (data === 'missing_tests')
-    return 'Some tests have no details yet. Add the result for every test before Result ready.'
+  if (data === 'missing_tests') return 'Type at least one result, or attach a file, first.'
   return null
 }
 
@@ -303,9 +305,11 @@ export async function listMyReadyResults(
     .from('lab_requests')
     .select(REQUEST_COLUMNS)
     .eq('requested_by', staffId)
-    .eq('status', 'completed')
+    // Complete, or some results sent and the rest pending (request 240h).
+    .or('status.eq.completed,results_at.not.is.null')
+    .neq('status', 'voided')
     .is('result_seen_at', null)
-    .order('completed_at', { ascending: false })
+    .order('results_at', { ascending: false, nullsFirst: false })
   return (data as unknown as LabRequest[] | null) ?? []
 }
 

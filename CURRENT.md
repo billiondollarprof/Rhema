@@ -15,6 +15,14 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+246. **The Pharmacy sees the medicine chart like the nurses, with Dispense
+    in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
+    medicine chart as nurses but with a dispensed button in place of the
+    given button that nurses see." TODAY: the Pharmacy sees the chart's
+    medicines as a list on the patient's page (taking now, suspended,
+    stopped) with doses given, dispensed, left and a Dispense button, not
+    the nurses' chart layout (last given, next due). Next after 240h.
+
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an
     amount. If a line is not selected, it should not appear on the receipt.
