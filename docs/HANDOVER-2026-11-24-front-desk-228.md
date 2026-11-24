@@ -30,6 +30,12 @@ section 9b.
   - GitHub Actions: CI, Deploy, Database (testing), Database (live) and the
     2-hourly backup all green. Security warnings: 0 on testing and live.
 - **One fault found and fixed in the review** (see section 4).
+- **The live deploy of this review (commit `497b3b5`) failed once**, at its
+  first step: Supabase's own management service answered 502 while the
+  deploy fetched the site's public key. Nothing had been uploaded, so the
+  live site kept the previous version. Re-run once (allowed by CLAUDE.md:
+  it died before any test ran); it passed, with the smoke test passing on
+  https://rhemamedical.app.
 
 ## 2. Every request handled, in order
 

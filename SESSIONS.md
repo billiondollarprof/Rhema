@@ -12,6 +12,8 @@ Log of each work session. Newest at the top. Keep entries short.
   out of the preview's paid. Handover: docs/HANDOVER-2026-11-24-front-desk-228.md.
   Moved 235, 236, 237, 239, 241 to DONE. Next in line: 240h (lab results one
   test at a time), then his answers on the three follow-ups.
+  The live deploy failed once at its first step (Supabase's API gave 502);
+  re-run once, green, smoke test passed on live.
 
 - 2026-11-23 (night): 240/242 inpatient bill LIVE (admit, deposits, chart
   doses and dose price, Pharmacy dispense from the chart, the stay's bill
