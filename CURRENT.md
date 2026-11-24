@@ -45,6 +45,20 @@ Numbers are kept from the full list, so older notes still match.
     tests passed; click-through none broke. Merged the other agent's pitch
     commits (testing shows Jerou Hospital; live is always Rhema) before
     pushing. Stays open until he says it is done. NEXT: 240h.
+    2026-11-24 (voice note, tidied): "go on with the lab results now and fix
+    it" (his yes to the 240h batch as described: results_at, saving some
+    tests, the alert at each send). And on the bill: "remind me [of the]
+    plan... tell me if you've done it... medicine chart, nurses give
+    medicine... pharmacist dispense, then on the bill you should show [what]
+    they are given; the prescription is for mostly outpatients... they
+    usually pay that one separately, but everything the patient has taken,
+    has been supplied, everything recorded, so when you open [and] prepare
+    [the] bill you already see the things already recorded and you click
+    other things you want to add... the medication, the drugs, the supplies,
+    the lab test and the rest... check it properly and let me know that
+    everything about billing as we said is concluded [and] live... the other
+    agent is working on something on patient so you should not bother about
+    that."
 
 244. **Full check of everything this agent (claude/front-desk-228) built,
     then handover notes.** (2026-11-24) "go through all what you've done so
