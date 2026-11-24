@@ -15,6 +15,21 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+244. **Full check of everything this agent (claude/front-desk-228) built,
+    then handover notes.** (2026-11-24) "go through all what you've done so
+    far on the Rhema app... everything that you ever touched your previous
+    work your most recent work... step-by-step... checking the screen how it
+    fit on mobile tablet and desktop the responsiveness click through the
+    buttons you walked on every single person you ever added. Check the
+    database check that everything is OK and correct the SQL are running
+    right the health of the system is correct and healthy... The npm run is
+    green... The billing system is accurate and plan[ned] as we planned it...
+    if you find anything not OK take your time [and] fix it here... keep a
+    detailed record of what you did from the time you started your own
+    session... the last 72 hours or thereabouts... write down everything
+    you've ever touched fixed and summary and then handover notes on git."
+    IN PROGRESS 2026-11-24.
+
 243. **"Other" in every list always in blue.** (2026-11-23) "when someone is
     picking from a list... drugs... tests... there are some places where the
     ink is dark just the same color of fonts that the list was used for...
