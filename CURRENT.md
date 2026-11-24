@@ -15,13 +15,43 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
-246. **The Pharmacy sees the medicine chart like the nurses, with Dispense
+247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
     medicine chart as nurses but with a dispensed button in place of the
     given button that nurses see." TODAY: the Pharmacy sees the chart's
     medicines as a list on the patient's page (taking now, suspended,
     stopped) with doses given, dispensed, left and a Dispense button, not
     the nurses' chart layout (last given, next due). Next after 240h.
+    (Numbered 247: the other agent recorded its own 246, the antenatal
+    visit chart, on the same day.)
+
+246. **The antenatal visit chart: pick, do not type, and nothing twice.**
+    (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
+    handwritten list of antenatal drugs) "height of fundus... give them
+    options to pick from and Other... between 1 to 42 or thereabout...
+    foetal heart rate... between 50 to 200 or thereabout... verify that
+    online." "Drugs given... when nurses click given under medication
+    charts, the medications that nurses gave... they should be able to
+    click on the medicine." "Something they filled inside vital signs
+    should automatically appear inside the section for the antenatal
+    patient, so that they don't have to repeat it." "Make sure that
+    everything is represented as I sent it to you." "They gave me a list
+    of drugs here, but you can also check online... and add." "Other...
+    the system takes that option... standard for the next time." "Do not
+    bother about what I've been working on with the other agents."
+    Today (checked): the visit form exists (AntenatalVisits.tsx) with
+    every column on his card, but fundus, foetal heart, BP, pulse,
+    respiration, weight and Hb are typed, and drugs given are 7 fixed
+    chips. His yes 2026-11-24: "the plan is okay"; drugs given "just make
+    it a drop down... select the drug by typing the name... Other is also
+    there"; "If any medicine is not on the pharmacy list yet, include it."
+    Built: every number picked from a list (fundus 12 to 42, foetal heart
+    50 to 200 starting at 140, Hb 4 to 18), today's vital signs fill BP,
+    pulse, respiration and weight, doses ticked Given since the last visit
+    are already chosen, drugs from the medicine list drop down with Other.
+    Waiting: his yes to the SQL batch adding 11 antenatal drugs (migration
+    20261124172708_antenatal_drug_list_2026_11_24, kept off testing until
+    then).
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an

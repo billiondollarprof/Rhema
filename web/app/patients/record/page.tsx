@@ -514,6 +514,8 @@ function PatientRecord() {
                     staffId={staff.id}
                     patientId={props.patientId}
                     lmp={props.record.profile?.last_menstrual_period ?? null}
+                    vitals={props.record.vitals}
+                    doses={props.record.doses}
                   />
                 ) : null}
                 <ConsentSection client={client} staffId={staff.id} patientId={props.patientId} />

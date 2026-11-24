@@ -30,7 +30,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
-import { addLine, when } from '@/lib/record/record'
+import { addLine, when, type DoseGiven, type Vitals } from '@/lib/record/record'
 import {
   TEST_WORDS,
   loadAntenatal,
@@ -49,7 +49,9 @@ import { ClientPart, DueDate, HistoryPart, VisitsPart } from './AntenatalVisits'
 
 type Props = { client: SupabaseClient; staffId: string; patientId: number }
 // The last menstrual period, from the profile, for the due date.
-type SectionProps = Props & { lmp?: string | null }
+// The vital signs and the doses given come from the record already read, so
+// the visit form can fill itself in (request 246).
+type SectionProps = Props & { lmp?: string | null; vitals?: Vitals[]; doses?: DoseGiven[] }
 
 // Today, by the internet's clock (request 225).
 const today = () => serverNow().toISOString().slice(0, 10)
@@ -94,7 +96,14 @@ function Field({
 }
 
 // ===== 2. The antenatal booking =====
-export function AntenatalSection({ client, staffId, patientId, lmp = null }: SectionProps) {
+export function AntenatalSection({
+  client,
+  staffId,
+  patientId,
+  lmp = null,
+  vitals = [],
+  doses = [],
+}: SectionProps) {
   const [data, setData] = useState<Awaited<ReturnType<typeof loadAntenatal>> | null>(null)
   const load = useCallback(
     async () => setData(await loadAntenatal(client, patientId)),
@@ -127,6 +136,8 @@ export function AntenatalSection({ client, staffId, patientId, lmp = null }: Sec
         staffId={staffId}
         patientId={patientId}
         visits={data.visits}
+        vitals={vitals}
+        doses={doses}
         onDone={load}
       />
       <ClientPart
