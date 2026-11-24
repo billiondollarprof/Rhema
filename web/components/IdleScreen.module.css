@@ -116,6 +116,17 @@
   height: auto;
 }
 
+/* A pitched hospital's letters mark is drawn at a fixed size, so on a
+   phone it spilled out of the ring (Anthony, 2026-11-24: "something is
+   off"). Here it shrinks with the ring, as Rhema's picture already does.
+   The important marks beat the mark's own inline size. */
+.logo[role='img'] {
+  width: 93% !important;
+  height: auto !important;
+  aspect-ratio: 1;
+  font-size: clamp(38px, 7.8vw, 67px) !important;
+}
+
 /* ===== 4. The name and the shimmer ===== */
 /* The hospital's red, as on its letterhead: a short line under the name. */
 .redLine {

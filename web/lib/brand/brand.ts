@@ -75,6 +75,14 @@ const BRANDS: Record<string, Brand> = {
     initials: 'CH',
     address: '',
   },
+  // Pitched 2026-11-24 (Anthony: "Okay, now change to Jarou hospital").
+  jarou: {
+    key: 'jarou',
+    name: 'Jarou Hospital',
+    short: 'Jarou',
+    initials: 'JH',
+    address: '',
+  },
 }
 
 // ===== 3. The one in use for this build =====
