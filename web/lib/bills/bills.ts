@@ -194,7 +194,15 @@ export type Statement = {
   admitted: boolean
   admission_id?: number
   admitted_at?: string
-  medicines?: { medicine: string; doses: number; dose_price: number; amount: number }[]
+  // dose_price and amount are null when neither the chart nor the drug's
+  // standard has a price (request 247): the doctor types it.
+  medicines?: {
+    id?: number
+    medicine: string
+    doses: number
+    dose_price: number | null
+    amount: number | null
+  }[]
   prescriptions?: { id: number; at: string; paid: boolean; drugs: string; amount: number | null }[]
   labs?: { id: number; at: string; paid: boolean; tests: string; amount: number | null }[]
   bills?: { id: number; at: string; status: Bill['status']; total: number }[]

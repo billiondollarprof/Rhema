@@ -36,7 +36,11 @@ const STATEMENT = {
   admitted: true,
   admission_id: 1,
   admitted_at: hoursAgo(30),
-  medicines: [{ medicine: 'Ceftriaxone 1 g injection', doses: 6, dose_price: 2500, amount: 15000 }],
+  medicines: [
+    { id: 7, medicine: 'Ceftriaxone 1 g injection', doses: 6, dose_price: 2500, amount: 15000 },
+    // Request 247: given, with no price yet.
+    { id: 8, medicine: 'Metronidazole 500 mg infusion', doses: 2, dose_price: null, amount: null },
+  ],
   prescriptions: [
     { id: 3, at: hoursAgo(2), paid: false, drugs: 'Amoxicillin 500 mg capsule', amount: 1500 },
   ],
@@ -910,7 +914,8 @@ module.exports.SCREENS = [
     path: '/patients/?p=1',
     waitFor: 'Inpatient',
     extra: { 'rest/v1/admissions': STAY },
-    mustSee: ['Inpatient'],
+    // Request 247: the day the stay began can be set.
+    mustSee: ['Inpatient', 'Change admitted on'],
   },
   // The bill is paid: the doctor is offered Discharge.
   {
@@ -936,6 +941,7 @@ module.exports.SCREENS = [
       'Laboratory tests',
       'Put on this bill',
       'Preview',
+      'Metronidazole 500 mg infusion × 2: price of one dose ₦',
     ],
   },
   {
@@ -973,7 +979,7 @@ module.exports.SCREENS = [
       ],
     },
     press: 'Dispense',
-    mustSee: ['6 doses in all', 'How many doses', 'Dispense'],
+    mustSee: ['Last given', 'Next due', 'Returned', 'How many doses', 'Dispense'],
   },
   // Request 241: the matron in a consulting room prescribes and bills.
   {

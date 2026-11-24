@@ -61,9 +61,16 @@ Numbers are kept from the full list, so older notes still match.
     preparation just shows everything the patient has spent since they were
     admitted... and the lab test even if they paid separately... at the end
     of the day they pay... the difference." (Bill counts doses Given.)
-    BUILDING: Admitted on date; prices fill in on the chart and learn;
-    unpriced doses on the bill; prescription chart lines kept off Medicines
-    given; Pharmacy chart with Dispense and Returned. SQL batch to show.
+    BUILT 2026-11-24 on the branch (not on testing): migration
+    20261124200126_chart_prices_returns_admitted_on (set_admitted_on; chart
+    lines marked with their prescription, older ones matched; Medicines
+    given priced from the chart, else the drug's standard, else none;
+    return_to_store; the Pharmacy's chart adds route, last given, returned),
+    test 074, 11 breaks caught. Screens: Change admitted on; the chart's
+    dose price fills from the standard and a new one is offered as standard;
+    a price box per unpriced medicine on the bill (offered as standard after
+    sending); the Pharmacy's medicines taken now with Last given, Next due,
+    Dispense and Returned. SQL batch shown; waiting for his yes.
 
 246. **The antenatal visit chart: pick, do not type, and nothing twice.**
     (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
