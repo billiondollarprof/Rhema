@@ -37,6 +37,10 @@ Numbers are kept from the full list, so older notes still match.
     (no new edit for days and doses: stop the medicine and chart it again).
     "Keep the price suggestion" (the Lab's suggestions to the admin, 208,
     stay).
+    HIS YES 2026-11-24 to the batch (20261124094742: only ticked lines are
+    settled; discharge with nothing owed settles): "Yes, run it". And: "The
+    bill payments and the lab is not done yet" (245 and 240h stay open
+    until he says so).
 
 244. **Full check of everything this agent (claude/front-desk-228) built,
     then handover notes.** (2026-11-24) "go through all what you've done so
