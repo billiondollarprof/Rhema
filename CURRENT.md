@@ -79,6 +79,14 @@ Numbers are kept from the full list, so older notes still match.
     settled; discharge with nothing owed settles): "Yes, run it". And: "The
     bill payments and the lab is not done yet" (245 and 240h stay open
     until he says so).
+    240h LIVE 2026-11-24: migration 20261124172347 (results_at; some tests
+    sent, the rest pending; complete when every test has a result; the
+    doctor's notice and alert at every send), test 073, test 044 brought to
+    the new rule, 7 breaks caught; screens: the Lab types the ready ones,
+    "Send these results", "Pending results" after, opening again shows what
+    was sent and boxes for the rest; "Pending results" on the record; "Some
+    results are ready" for the doctor. 0 security warnings on testing and
+    live. Stays open until he says it is done.
     245 LIVE 2026-11-24: 0 security warnings on testing and live; smoke
     tests passed; click-through none broke. Merged the other agent's pitch
     commits (testing shows Jerou Hospital; live is always Rhema) before
