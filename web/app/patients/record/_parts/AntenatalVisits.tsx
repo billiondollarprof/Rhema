@@ -12,7 +12,11 @@
  *   1. Small helpers (choice buttons, the due date).
  *   2. DueDate: the expected date of delivery and today's weeks, from the
  *      last menstrual period (Naegele: 280 days).
- *   3. VisitsPart: the visits, newest first, and Add a visit.
+ *   3. VisitsPart: the visits, newest first, and Add a visit. Since
+ *      2026-11-24 (request 246) every number is picked from a list, the
+ *      readings already taken in Vital signs today fill themselves in, and
+ *      the drugs come from the medicine list: the ones nurses ticked Given
+ *      on the medication chart since the last visit are already chosen.
  *   4. ClientPart: marital status, religion, education, occupation, tribe.
  *   5. HistoryPart: the medical history ticklist and the surgical history.
  *
@@ -28,7 +32,10 @@ import Line from './Line'
 import { EmptyLine } from './Section'
 import styles from './record.module.css'
 import OptionSelect from '@/components/options/OptionSelect'
-import { addLine } from '@/lib/record/record'
+import { addLine, type DoseGiven, type Vitals } from '@/lib/record/record'
+import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
+import MedicinePicker from '@/components/medicines/MedicinePicker'
+import { RANGES, VitalPick, type Range } from './Observations'
 import {
   DIPSTICK,
   EDUCATION,
@@ -38,7 +45,6 @@ import {
   POSITIONS,
   PRESENTATIONS,
   RELIGIONS,
-  ROUTINE_DRUGS,
   SURGERIES,
   saveBooking,
   type Booking,
@@ -93,33 +99,42 @@ function Choices({
   )
 }
 
-function NumberBox({
+// The lists the card's numbers are picked from (request 246, 2026-11-24).
+// Fundus: palpable from about 12 weeks, and in centimetres it is close to
+// the weeks from 20 weeks on. Foetal heart: 110 to 160 is normal (NICE, and
+// the Irish national guideline); the list runs 50 to 200 so a worrying one
+// can still be written. "Other" types anything outside a list.
+const CARD_RANGES: Record<string, Range> = {
+  fundal: { from: 12, to: 42, step: 1, start: '28', decimals: 0 },
+  fhr: { from: 50, to: 200, step: 1, start: '140', decimals: 0 },
+  hb: { from: 4, to: 18, step: 0.1, start: '11', decimals: 1 },
+}
+
+// A box with its label, holding one number list.
+function PickBox({
   id,
   label,
+  range,
   value,
   onChange,
-  placeholder,
 }: {
   id: string
   label: string
+  range: Range
   value: string
   onChange: (value: string) => void
-  placeholder: string
 }) {
   return (
     <div className={styles.field}>
       <label htmlFor={id}>{label}</label>
-      <input
-        id={id}
-        className={styles.input}
-        inputMode="decimal"
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange(event.target.value.replace(/[^0-9.]/g, ''))}
-      />
+      <VitalPick id={id} range={range} value={value} onChange={onChange} />
     </div>
   )
 }
+
+// The day of a moment, in the hospital's time zone, such as 2026-11-24.
+const dayOf = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-CA', { timeZone: HOSPITAL_TIME_ZONE })
 
 // ===== 2. The due date, from the last menstrual period =====
 export function DueDate({ lmp }: { lmp: string | null }) {
@@ -195,12 +210,74 @@ export function VisitsPart({
   patientId,
   onDone,
   visits,
-}: Props & { visits: Visit[] }) {
+  vitals = [],
+  doses = [],
+}: Props & { visits: Visit[]; vitals?: Vitals[]; doses?: DoseGiven[] }) {
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(EMPTY)
   const [drugs, setDrugs] = useState<string[]>([])
+  // Where the filled in readings came from, to say so on the form.
+  const [fromVitals, setFromVitals] = useState<string | null>(null)
+  // The medicine being picked, before it joins the drugs given.
+  const [pickName, setPickName] = useState('')
+  const [pickStrength, setPickStrength] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
   const set = (key: keyof typeof EMPTY) => (value: string) => setForm({ ...form, [key]: value })
+
+  // ===== 3a. Open the form, with what is already known filled in =====
+  // Nothing typed twice (request 246): today's vital signs give the BP,
+  // pulse, respiration and weight, and the medicines nurses ticked Given on
+  // the medication chart since the last visit are already chosen. Every one
+  // can still be changed before saving.
+  function startVisit() {
+    const todayIs = dayOf(serverNow().toISOString())
+    // The newest reading of each kind taken today, not voided.
+    const todays = vitals
+      .filter((row) => !row.voided_at && dayOf(row.recorded_at) === todayIs)
+      .sort((a, b) => b.recorded_at.localeCompare(a.recorded_at))
+    const newest = <T,>(pick: (row: Vitals) => T | null): string => {
+      const found = todays.find((row) => pick(row) !== null && pick(row) !== undefined)
+      return found ? String(pick(found)) : ''
+    }
+    const filled = {
+      ...EMPTY,
+      systolic: newest((row) => row.systolic),
+      diastolic: newest((row) => row.diastolic),
+      pulse: newest((row) => row.pulse),
+      respiration: newest((row) => row.breathing_rate),
+      weight: newest((row) => row.weight_kg),
+    }
+    setForm(filled)
+    setFromVitals(
+      todays.length
+        ? `Filled in from today's vital signs (${todays[0].signer?.full_name ?? todays[0].recorder?.full_name ?? 'staff'}). Change any that are wrong.`
+        : null,
+    )
+    // Medicines given since the last visit (or in the last 4 weeks).
+    const lastVisit = visits.find((visit) => !visit.voided_at)
+    const since = lastVisit
+      ? new Date(lastVisit.created_at).getTime()
+      : serverNow().getTime() - 28 * 24 * 60 * 60 * 1000
+    const given: string[] = []
+    for (const dose of doses) {
+      if (dose.voided_at || dose.not_given_reason) continue
+      if (new Date(dose.given_at).getTime() < since) continue
+      if (!given.includes(dose.medicine)) given.push(dose.medicine)
+    }
+    setDrugs(given)
+    setPickName('')
+    setPickStrength('')
+    setProblem(null)
+    setAdding(true)
+  }
+
+  // A medicine picked from the list joins the drugs given.
+  function pickMedicine(name: string, strength: string) {
+    const words = [name, strength].filter(Boolean).join(' ').trim()
+    if (words && !drugs.includes(words)) setDrugs([...drugs, words])
+    setPickName('')
+    setPickStrength('')
+  }
 
   async function save() {
     const result = await addLine(client, 'antenatal_visits', {
@@ -271,19 +348,19 @@ export function VisitsPart({
         <div className={styles.form}>
           <b>Palpation</b>
           <div className={styles.fields}>
-            <NumberBox
+            <PickBox
               id="v-fundal"
               label="Height of fundus (weeks)"
+              range={CARD_RANGES.fundal}
               value={form.fundal}
               onChange={set('fundal')}
-              placeholder="e.g. 28"
             />
-            <NumberBox
+            <PickBox
               id="v-fhr"
               label="Foetal heart rate (bpm)"
+              range={CARD_RANGES.fhr}
               value={form.fhr}
               onChange={set('fhr')}
-              placeholder="e.g. 140"
             />
             <Choices
               label="Presentation"
@@ -299,48 +376,49 @@ export function VisitsPart({
             />
           </div>
           <b>Readings</b>
+          {fromVitals ? <p className={styles.muted}>{fromVitals}</p> : null}
           <div className={styles.fields}>
-            <NumberBox
+            <PickBox
               id="v-sys"
               label="BP top"
+              range={RANGES.systolic}
               value={form.systolic}
               onChange={set('systolic')}
-              placeholder="e.g. 110"
             />
-            <NumberBox
+            <PickBox
               id="v-dia"
               label="BP bottom"
+              range={RANGES.diastolic}
               value={form.diastolic}
               onChange={set('diastolic')}
-              placeholder="e.g. 70"
             />
-            <NumberBox
+            <PickBox
               id="v-pulse"
               label="Pulse (bpm)"
+              range={RANGES.pulse}
               value={form.pulse}
               onChange={set('pulse')}
-              placeholder="e.g. 88"
             />
-            <NumberBox
+            <PickBox
               id="v-resp"
               label="Respiration (/min)"
+              range={RANGES.breathing_rate}
               value={form.respiration}
               onChange={set('respiration')}
-              placeholder="e.g. 20"
             />
-            <NumberBox
+            <PickBox
               id="v-weight"
               label="Weight (kg)"
+              range={RANGES.weight_kg}
               value={form.weight}
               onChange={set('weight')}
-              placeholder="e.g. 70"
             />
-            <NumberBox
+            <PickBox
               id="v-hb"
               label="Hb (g/dL)"
+              range={CARD_RANGES.hb}
               value={form.hb}
               onChange={set('hb')}
-              placeholder="e.g. 11.5"
             />
             <Choices
               label="Urine protein"
@@ -356,25 +434,56 @@ export function VisitsPart({
             />
             <Choices label="Oedema" options={OEDEMA} value={form.oedema} onChange={set('oedema')} />
           </div>
+          {/* Drugs given: a drop down of the hospital's medicine list, with
+              Other for one that is missing (request 246). The ones chosen
+              show under it; tap one to take it off. */}
           <div className={`${styles.field} ${styles.fieldWide}`}>
-            <span>Drugs given</span>
-            <div className={styles.chips} role="group" aria-label="Drugs given">
-              {ROUTINE_DRUGS.map((drug) => (
-                <button
-                  key={drug}
-                  type="button"
-                  className={styles.chip}
-                  aria-pressed={drugs.includes(drug)}
-                  onClick={() =>
-                    setDrugs(
-                      drugs.includes(drug) ? drugs.filter((d) => d !== drug) : [...drugs, drug],
-                    )
-                  }
-                >
-                  {drug}
-                </button>
-              ))}
-            </div>
+            <label htmlFor="v-drug">Drugs given</label>
+            <MedicinePicker
+              client={client}
+              staffId={staffId}
+              id="v-drug"
+              name={pickName}
+              strength={pickStrength}
+              onChange={(name, strength) => {
+                // A medicine with several strengths comes first with its name
+                // only; the strength is chosen next, then it joins the list.
+                if (name && strength) pickMedicine(name, strength)
+                else {
+                  setPickName(name)
+                  setPickStrength(strength)
+                }
+              }}
+              placeholder="Type the first letters"
+            />
+            {/* A medicine with no strength on the list joins it with a tap. */}
+            {pickName && !pickStrength ? (
+              <button
+                type="button"
+                className={styles.small}
+                onClick={() => pickMedicine(pickName, '')}
+              >
+                Add {pickName} without a strength
+              </button>
+            ) : null}
+            {drugs.length ? (
+              <div className={styles.chips} role="group" aria-label="Drugs chosen">
+                {drugs.map((drug) => (
+                  <button
+                    key={drug}
+                    type="button"
+                    className={styles.chip}
+                    aria-pressed
+                    aria-label={`Remove ${drug}`}
+                    onClick={() => setDrugs(drugs.filter((d) => d !== drug))}
+                  >
+                    {drug} ✕
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.muted}>No drugs chosen yet.</p>
+            )}
           </div>
           <Choices
             label="Remark"
@@ -422,7 +531,7 @@ export function VisitsPart({
         </div>
       ) : (
         <div className={styles.actions}>
-          <button className={styles.small} onClick={() => setAdding(true)}>
+          <button className={styles.small} onClick={startVisit}>
             + Add a visit
           </button>
         </div>

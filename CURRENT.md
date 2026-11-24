@@ -32,7 +32,16 @@ Numbers are kept from the full list, so older notes still match.
     Today (checked): the visit form exists (AntenatalVisits.tsx) with
     every column on his card, but fundus, foetal heart, BP, pulse,
     respiration, weight and Hb are typed, and drugs given are 7 fixed
-    chips. Said back, waiting for his yes.
+    chips. His yes 2026-11-24: "the plan is okay"; drugs given "just make
+    it a drop down... select the drug by typing the name... Other is also
+    there"; "If any medicine is not on the pharmacy list yet, include it."
+    Built: every number picked from a list (fundus 12 to 42, foetal heart
+    50 to 200 starting at 140, Hb 4 to 18), today's vital signs fill BP,
+    pulse, respiration and weight, doses ticked Given since the last visit
+    are already chosen, drugs from the medicine list drop down with Other.
+    Waiting: his yes to the SQL batch adding 11 antenatal drugs (migration
+    20261124172708_antenatal_drug_list_2026_11_24, kept off testing until
+    then).
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an
