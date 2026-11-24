@@ -39,9 +39,12 @@ Numbers are kept from the full list, so older notes still match.
     50 to 200 starting at 140, Hb 4 to 18), today's vital signs fill BP,
     pulse, respiration and weight, doses ticked Given since the last visit
     are already chosen, drugs from the medicine list drop down with Other.
-    Waiting: his yes to the SQL batch adding 11 antenatal drugs (migration
-    20261124172708_antenatal_drug_list_2026_11_24, kept off testing until
-    then).
+    His yes to the SQL 2026-11-24: "yes, go on... if there are others that
+    were not added, you could have still added... the milligrams, don't
+    guess that much... verify some of them online." Migration
+    20261124172708_antenatal_drug_list_2026_11_24 adds 19 lines: the
+    midwives' list plus common antenatal haematinics; a strength only where
+    the list or a check online gave it. Then live by section 9.
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an
