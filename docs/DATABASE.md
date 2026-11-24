@@ -222,6 +222,62 @@ the request it answers if there was one.
 
 ---
 
+## 9b. Prices, bills and inpatient stays (added 2026-11-20 to 2026-11-23)
+
+Added by the agent on branch `claude/front-desk-228`, each with Anthony's
+yes. The migrations hold the full rules; this is the map.
+
+**Expiry** (`20261119211756`): a prescription or lab request not paid in
+72 hours expires (shown in grey); the Pharmacy and Lab may still give or
+test before payment (`20261120130854`). Routing: Front Desk only, or Front
+Desk and Pharmacy/Lab (`20261120143627`).
+
+**Families** (`20261120072145`, `20261120082841`): `families` holds the
+family name, phone and address; members are patients with `family_id`.
+Only the Front Desk registers; details are changed through a function.
+
+**Prices** (`20261122051713`, `20261122154048`, `20261123082024`):
+- `prescription_items.price` and `lab_requests.prices`: the price the doctor
+  typed. Since `20261123082024` it is a suggestion: the Front Desk may
+  change it when taking payment.
+- `my_prices`: each person's own last price (drug, lab test, procedure),
+  read only by that person.
+- `price_list` also holds `drug` and `procedure` kinds; a doctor, the matron
+  or the admin makes prices standard (`make_standard_prices`).
+- Who sets prices (`private.sets_prices`): the doctor or matron role, or
+  anybody with medical access in a consulting room (`20261123192759`).
+
+**Prescribing** (`private.is_doctor`, `20261123192759`): the doctor role, or
+anybody with medical access working in an open consulting room.
+
+**Bills** (`20261122204301`, `20261123215523`):
+- `bills` and `bill_lines`: lines on the hospital's Discharge / Billing Form
+  (professional fee ... others, bed Regular / Private / VIP), plus Medicines
+  given, Take Home Drugs and Laboratory tests. Every active member of staff
+  reads them; writes only through `add_bill`, `pay_bill`, `void_bill`.
+- An inpatient's bill carries `admission_id`, `medicines_until` (doses
+  given up to then are on it) and `covers_prescriptions` / `covers_labs`
+  (paying the bill settles those still unpaid).
+- `bill_statement(patient)`: for the open stay, medicines given since the
+  last bill (doses × dose price), the stay's prescriptions and lab tests not
+  on a bill (paid or not), the bills, what was paid since admission
+  (deposits, bill payments, and covered items paid on their own), and the
+  balance. Doctors, matron, Front Desk and admin; each look is logged.
+
+**Inpatient stays** (`20261123215523`):
+- `admissions`: one open stay per patient. Admit: a doctor or consulting
+  room, the matron, the Front Desk. Discharge: a doctor or consulting room,
+  the matron. Everybody reads it.
+- `payments.purpose` has `deposit` and `bill`.
+- `patient_medications` has `days`, `doses` and `dose_price` (only a price
+  setter may set the price, checked by a trigger).
+- `chart_dispenses`: the Pharmacy hands doses of a chart medicine to the
+  ward (`dispense_chart`); the record and the Pharmacy read them. The
+  Pharmacy's own list (`patient_medicines_for_pharmacy`) shows doses, given
+  and dispensed, nothing else of the record.
+
+---
+
 ## 10. Talking to each other
 
 | Table | What it holds |

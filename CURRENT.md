@@ -28,7 +28,11 @@ Numbers are kept from the full list, so older notes still match.
     detailed record of what you did from the time you started your own
     session... the last 72 hours or thereabouts... write down everything
     you've ever touched fixed and summary and then handover notes on git."
-    IN PROGRESS 2026-11-24.
+    DONE 2026-11-24: everything re-checked (database, verify, audit,
+    screens, click-through, every walk, CI and live health). One fault found
+    and fixed on screen (the stay's lines on a bill). Handover notes:
+    docs/HANDOVER-2026-11-24-front-desk-228.md. Still open from 240: part h
+    (lab results one test at a time), not built yet.
 
 243. **"Other" in every list always in blue.** (2026-11-23) "when someone is
     picking from a list... drugs... tests... there are some places where the
@@ -38,40 +42,6 @@ Numbers are kept from the full list, so older notes still match.
     the [Other] itself in that list of options was still dark... so [Other]
     always comes with a blue type font... I think you should save it for
     later." SAVED FOR LATER, his word. Not started.
-
-241. **Anybody in a consulting room does everything a doctor does; the
-    matron cannot prescribe today.** (2026-11-23) "I noticed that the matron
-    does not have access to prescribed drugs. She needs the prescription
-    access. I said that anybody with a consultant room must be able to
-    prescribe, must be able to write consultant notes. Everything that the
-    doctor will do, as long as they are assigned to consultant room, you
-    should be able to do that... So everybody with a consultant room can do
-    everything that a consultant can do, right?" (This replaces the
-    2026-11-20 note "in the computer, she's not supposed to be allowed to
-    prescribe drugs".) FOUND: prescribing and "also send to the Pharmacy"
-    check the doctor role only (private.is_doctor); prices and bills check
-    doctor or matron by role; the screens check role === 'doctor'.
-    Consultation notes already go by the consulting room.
-    BUILT 2026-11-23 (on claude/front-desk-228 only, not on testing):
-    migration 20261123192759 (is_doctor and sets_prices also count a
-    consulting room, with medical access), test 070, 7 breaks caught; the
-    screens use actsAsDoctor and setsPrices (lib/auth/roles.ts). SQL batch
-    shown. HIS YES 2026-11-23: "show me the SQL ba[tch], and let's run it."
-    Midwife role: "there's no need to add it. Just leave it." Antenatal:
-    "I don't think anything is missing... I'll let you know when I meet
-    with the midwife again." 
-    LIVE 2026-11-23: 0 security warnings on testing and live; smoke tests
-    passed; click-through none broke (first run had no local site; run
-    again).
-    Also: "there are certain things that the matron is able to chart, the
-    midwife is able to chart, that are not included... check it again"
-    (antenatal: palpation and the rest). FOUND: request 189's visit table is
-    live (fundus, presentation, position, FHR, urine, BP, pulse, breathing,
-    weight, Hb, oedema, drugs given, remark, examiner, return date), and the
-    booking, tests and consent; any clinical role can write them. Asked him
-    which items are missing.
-    And: "I'm even thinking if midwife should be a role... currently the
-    midwives take the nurses role." (Asked for an opinion.)
 
 242. **Inpatients: deposits at the Front Desk during the stay.** (2026-11-23)
     "when the inpatient stays... they used to come and still make some
@@ -1091,115 +1061,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     relationship and the State on the registration card; other repetitive
     fields he may name.
 
-235. **The director's voice note: blood glucose in vital signs; bills from the
-    consulting room.** (2026-11-21, transcribed voice note from the director,
-    then Anthony's reading of it.) Director: "the vital sign... there's no
-    blood glucose... especially for emergency patient. Blood glucose... can be
-    fasting or random... when you click it, it should show whether... fasting
-    when the patient has not eaten or random. And the result, write the
-    result... that place where they calculate B[ill]... has to be available in
-    my computer, my consulting... the B[ill] for each of the drug... That is
-    not in my computer... there should be some place for additional B[ill]...
-    a patient will be charged even though they did not buy drugs... when they
-    do a procedure... to pass catheter... including surgery. Sometimes
-    including consultation fee... bed fee, all those things." Anthony: check
-    for other missing vital signs too, so nurses pick, not type; the doctor
-    (and the matron) decide prices: in the prescription and the lab request,
-    a price per drug or test, the total worked out, and the Front Desk
-    collects that amount; a bill for procedures and other things (operation,
-    catheter, bed fee); consultation and card fees are standard and could be
-    set by the admin in Settings; "even the nurses can also write a bill...
-    for this particular hospital, it's usually the matron and the doctor,
-    the director, that decide price." "just let me know if you understand
-    this whole thing." Said back 2026-11-21 ("BMI" and "B" in the transcript
-    read as "bill"): 1 blood glucose (Fasting or Random, then the result),
-    BMI worked out, pain score; 2 a price per drug and per test in the
-    prescription and lab request, total shown, the Front Desk collects it;
-    3 Add a bill (procedure, operation, bed fee...) to the Front Desk as
-    Bills to pay, never expires. Asked: glucose unit, more vital signs, who
-    sets prices (doctors and matron, nurses?), may the Front Desk change a
-    doctor's price, drugs on the price list.
-    HIS ANSWERS 2026-11-21 ("I like your suggestions so far. They are all
-    good."): blood glucose "is supposed to be like one of the first things";
-    units: "offer both... check what many... used in Nigeria. And we always
-    use the UK standard"; BMI and pain score yes, "it can't be too much...
-    they are not compulsory... they don't block submission". Prices: "only
-    doctors and matron that sets prices"; if anybody else, "the pharmacy and
-    the lab, the people that actually carry out this test and dispense the
-    drugs"; "The front desk cannot change the price... can go and ask the
-    doctor". Standard prices fill in, "doctor can still clear it and put
-    their own price... the system should probably record that price in case
-    of next time... so that particular consultant can use it again."
-    Order: 1 vital signs, 2 prices in prescription and lab, 3 bills.
-    1 BUILT 2026-11-21: migration 20261121222211 (vital_signs blood_glucose,
-    glucose_unit mmol/L or mg/dL, glucose_when fasting or random, pain_score
-    0 to 10; all optional; a glucose needs both), test 065, 7 breaks caught.
-    Screens: Blood glucose first on the record form and Take vitals (Fasting
-    or Random, mmol/L first, then the result), Pain, BMI worked out; shown in
-    both units; the sheet has Glucose and Pain columns; the summary shows
-    glucose first. HIS YES ON THE SQL, 2026-11-22 ("bumpy [BMI] please double
-    check... the button is well fitted"): BMI checked at 320 to 1440, also
-    live on Take vitals, rounding fixed (31.25 to 31.3); buttons 36 px, inside.
-    1 LIVE 2026-11-22: 0 security warnings on testing and live; click-through
-    960 buttons, none broke. NEXT: 2 prices in the prescription and lab.
-    2026-11-22 "go on with part 2". And, to do LAST: "for the weight and height,
-    if possible you can add Unit conversion... some people put their units in
-    feet for the height... what about people who measure in pounds?... easy
-    conversion... not with clutter... choose this type of unit, that type of
-    unit... still getting the exact conversion in centimeter and in kilogram
-    as well. And you're still getting your BMI correct... take it gradually."
-    BMI made easy to see 2026-11-22 (he could not find it): right under Weight
-    and Height, bold on light blue. LIVE.
-    2 BUILT 2026-11-22: migration 20261122051713 (prescription_items.price,
-    lab_requests.prices, my_prices for each person's last price, sets_prices
-    doctor or matron, check_set_prices: the Front Desk pays the doctor's
-    price or the payment is refused; the one-total lab payment refuses a
-    priced request), test 066, 11 breaks caught. Screens: Price per drug and
-    per test (doctor; matron for tests), the last price fills in, the total
-    shows; the Front Desk sees it locked, "Set by the doctor". NOT SHIPPED:
-    waiting for his yes on the SQL, and his answer on standard prices (236).
-    HIS YES 2026-11-22: "run the SQL"; "your suggestion on standard pricing is
-    good" (after Send, "Make these the standard prices?" with a tick per
-    line, Make standard / Not now; drugs and procedures on the price list;
-    doctors and the matron set standard prices). Other vital sign plan: not
-    answered yet.
-    Also fixed 2026-11-22: the Front Desk's payment form spilled past the edge
-    at 320 and 360 wide (found by a new check that opens Take payment on Home).
-    2 and 237 LIVE 2026-11-22: 0 security warnings on testing and live;
-    click-through 979 buttons, none broke. NEXT: 2b standard prices.
-    2b BUILT 2026-11-22: migration 20261122154048 (price_list holds drugs;
-    set_price takes drugs; make_standard_prices for a doctor, the matron or
-    an admin), test 067, 5 breaks caught. Screens: the standard price fills
-    in first, else the person's last; after Send, "Make these the standard
-    prices?" (a tick each, Make standard / Not now) for prices new or not the
-    standard; the admin's Prices tab has Drug prices. HIS YES ON THE SQL,
-    2026-11-22, and yes to the clearer Other vital sign (jump to the new box;
-    from the second time, the numbers typed before to pick).
-    2b LIVE 2026-11-22 (0 security warnings; 981 buttons pressed, none broke).
-    Other vital sign BUILT 2026-11-22: "+ Other vital sign" jumps to the new
-    box and puts the cursor in it; once a number has been saved for that sign,
-    the box offers the numbers typed before plus "Other..." (kept on the
-    device, numbers only, 30 at most). No SQL. LIVE 2026-11-22: CI, deploy
-    and smoke test green on testing and live; click-through, none broke.
-    NEXT: part 3, Add a bill (SQL batch shown to him, waiting for his yes).
-    HIS ANSWER 2026-11-22 on who sees bills: "let everyone see the bill" (all
-    staff roles, not only doctors, matron, Front Desk and admin). Batch
-    updated and shown again. HIS YES 2026-11-22: "yes". Building now.
-    Adding a bill uses the same rule as setting prices (sets_prices), so any
-    change to who sets prices covers bills too.
-    BUILT 2026-11-22: migration 20261122204301_bills (bills, bill_lines,
-    add_bill, pay_bill, void_bill; "procedure" on the price list and own
-    prices; payment kind "bill"), test 068, 11 breaks caught. Screens: Add a
-    bill on the record (doctor, matron) opens /bills/add/; Bills to pay on
-    the Front Desk's Home; Bills on every patient's page for all staff, Take
-    payment (locked amounts) for the Front Desk, Cancel bill for its maker;
-    admin Prices tab has "Procedure and bill prices". Note: changes are in
-    the activity log; reads of bills are not logged one by one (the same as
-    lab requests and prescriptions). Told him.
-    LIVE 2026-11-22: 0 security warnings on testing and live; smoke tests
-    passed; click-through none broke. NEXT: 238 (lab price, doctor approves),
-    once he answers the two open questions.
-
 238. **The lab sets a test price, the doctor approves.** (2026-11-22)
     "sometimes the lab scientists do set price for tests so the doctor can
     approve". Said back to him how it would work; waiting for his yes. Not
@@ -1229,46 +1090,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     acts as a suggestion not a blocker or a must." So for 238: the lab's
     price shows to the Front Desk at once as a suggestion; the doctor's
     Approve or Change is still there. See 239 for the Front Desk editing.
-
-239. **A set price is a suggestion; the Front Desk can change it.**
-    (2026-11-22) Same words as above. This reverses 235's "The front desk
-    cannot change the price" for drugs, lab tests and bills: the doctor's
-    price fills in, the Front Desk can change it before taking payment.
-    SQL batch shown to him. HIS YES 2026-11-23: "Yes".
-    BUILT 2026-11-23: migration 20261123082024_set_price_is_a_suggestion
-    (no price check when paying drugs or tests; the one-total lab payment
-    takes a priced request; pay_bill takes the typed lines; the price check
-    function removed), test 069, tests 066 and 068 brought to the new rule,
-    7 breaks caught. Screens: "Doctor's price" under the box, the box can be
-    changed, on drugs, lab tests and bills.
-    LIVE 2026-11-23: 0 security warnings on testing and live; smoke tests
-    passed; click-through none broke. NEXT: 238 (lab price; the Front Desk
-    does not wait).
-
-237. **"Completed" as a reason to stop a medicine.** (2026-11-22, the director,
-    with a photo of "Why suspend Normal saline?") "All these place for drugs
-    that if you want to stop or edit or suspend, I will be asking you for the
-    reason. One of the reasons you should put there is completed. When the
-    treatment is completed, you stop it... Doctor said so... not needed now...
-    you may not change it, just put completed as one of the options."
-    BUILT 2026-11-22: "Completed" first among the reasons to suspend or stop a
-    medicine (Medications.tsx; Edit asks no reason). No SQL.
-
-236. **Other vital sign needs a number; check every "Other"; prices become
-    standard.** (2026-11-22, with a photo of Other vital sign) "for add vital
-    sign... you can only add the name and the unit, no place to put a
-    number... or is it that the system automatically understands... once
-    there's a unit attached, the system can populate it with number[s]
-    people can pick from while still keeping the 'other' button... confirm
-    how this works and... cross check other places where the provision to
-    enter other things not included like the medicine list or the test list
-    if the fields provided are well calculated to take in the values." And:
-    "if the doctor or matron enters a price for medicine or test or any
-    procedure, once they press save, show them a dialogue button to make the
-    price a standard price... the price field will have its own save
-    button... it sticks. Can also decide to edit the price... put a new
-    standard price... do a proper arrangement so no clutter and so it's easy
-    to understand by any one."
 
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should

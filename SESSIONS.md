@@ -4,6 +4,15 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-24: request 244, full check of this branch's work (19 to 24
+  Nov): database (75 migrations, 371 PASS, undo and redo), verify, audit 0,
+  75 screens at every width, click-through, every walk, CI and live health
+  all green. Fixed on screen: the stay's lines on a bill could be removed or
+  left out while the bill still settled them; paid-on-their-own items left
+  out of the preview's paid. Handover: docs/HANDOVER-2026-11-24-front-desk-228.md.
+  Moved 235, 236, 237, 239, 241 to DONE. Next in line: 240h (lab results one
+  test at a time), then his answers on the three follow-ups.
+
 - 2026-11-23 (night): 240/242 inpatient bill LIVE (admit, deposits, chart
   doses and dose price, Pharmacy dispense from the chart, the stay's bill
   with Preview and balance, the bill receipt). 0 security warnings. Three

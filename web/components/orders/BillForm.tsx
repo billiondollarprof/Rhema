@@ -26,7 +26,11 @@
  * dose), Take Home Drugs (prescriptions of the stay) and Laboratory tests,
  * paid or not. Under each, the names for the doctor; the receipt shows only
  * the line. At the bottom: billed before in this stay, paid since admission
- * (deposits too), and the balance.
+ * (deposits too, and the drugs and tests already paid on their own), and
+ * the balance.
+ * These three lines cannot be removed, and one with no price waits for an
+ * amount: sending the bill settles every prescription and lab test of the
+ * stay, so each must be charged on it (found in the check of 2026-11-24).
  *
  * Never: send a total. The database adds the lines up itself.
  */
@@ -96,29 +100,34 @@ export default function BillForm({
       if (!current || !found) return
       setStatement(found)
       if (!found.admitted) return
+      // A line for each that has anything in it, even with no price yet:
+      // then its amount box waits to be filled.
       const worked: Line[] = [
         {
           kind: 'medicines_given',
           item: 'Medicines given',
+          count: (found.medicines ?? []).length,
           amount: sumOf((found.medicines ?? []).map((one) => one.amount)),
         },
         {
           kind: 'take_home_drugs',
           item: 'Take Home Drugs',
+          count: (found.prescriptions ?? []).length,
           amount: sumOf((found.prescriptions ?? []).map((one) => one.amount)),
         },
         {
           kind: 'lab_tests',
           item: 'Laboratory tests',
+          count: (found.labs ?? []).length,
           amount: sumOf((found.labs ?? []).map((one) => one.amount)),
         },
       ]
-        .filter((one) => one.amount > 0)
+        .filter((one) => one.count > 0)
         .map((one) => ({
           key: nextKey++,
           kind: one.kind as BillKind,
           item: one.item,
-          amount: String(one.amount),
+          amount: one.amount > 0 ? String(one.amount) : '',
           auto: true,
         }))
       // Before the doctor's own lines, once; a draft put back keeps its own.
@@ -217,10 +226,18 @@ export default function BillForm({
 
   const amounts = lines.map((line) => readAmount(line.amount) ?? 0)
   const total = amounts.reduce((sum, amount) => sum + amount, 0)
-  // An inpatient: what this stay owes once this bill is added.
-  const stayBalance = statement?.admitted
-    ? Number(statement.billed ?? 0) + total - Number(statement.paid ?? 0)
-    : null
+  // An inpatient: paid since admission, counting the drugs and tests of this
+  // bill already paid on their own (the database counts them once the bill
+  // covers them), and what this stay owes once this bill is added.
+  const paidSoFar = statement?.admitted
+    ? Number(statement.paid ?? 0) +
+      sumOf(
+        [...(statement.prescriptions ?? []), ...(statement.labs ?? [])]
+          .filter((one) => one.paid)
+          .map((one) => one.amount),
+      )
+    : 0
+  const stayBalance = statement?.admitted ? Number(statement.billed ?? 0) + total - paidSoFar : null
 
   // Every line ready, or the words to show (Preview and Send both check).
   function readyLines(): { kind: BillKind; item: string; amount: number }[] | string {
@@ -314,7 +331,7 @@ export default function BillForm({
             <>
               <p className={styles.previewTotal}>
                 <span>Paid since admission</span>
-                <b>{naira(Number(statement.paid ?? 0))}</b>
+                <b>{naira(paidSoFar)}</b>
               </p>
               {Number(statement.billed ?? 0) > 0 ? (
                 <p className={styles.previewTotal}>
@@ -376,7 +393,6 @@ export default function BillForm({
             index={index}
             statement={statement}
             onAmount={(amount) => change(index, { amount })}
-            onRemove={() => setLines((all) => all.filter((_, at) => at !== index))}
           />
         ) : (
           <div key={line.key} className={styles.drug}>
@@ -466,7 +482,7 @@ export default function BillForm({
       {/* An inpatient: what was paid since admission, and what is left. */}
       {statement?.admitted ? (
         <p className={styles.muted}>
-          Paid since admission {naira(Number(statement.paid ?? 0))}
+          Paid since admission {naira(paidSoFar)}
           {Number(statement.billed ?? 0) > 0
             ? ` · Billed before in this stay ${naira(Number(statement.billed))}`
             : ''}{' '}
@@ -517,13 +533,11 @@ function AutoLine({
   index,
   statement,
   onAmount,
-  onRemove,
 }: {
   line: Line
   index: number
   statement: Statement | null
   onAmount: (amount: string) => void
-  onRemove: () => void
 }) {
   const parts: string[] =
     line.kind === 'medicines_given'
@@ -544,9 +558,6 @@ function AutoLine({
     <div className={styles.drug}>
       <div className={styles.drugTop}>
         <b>{line.item}</b>
-        <button type="button" className={`${styles.button} ${styles.small}`} onClick={onRemove}>
-          Remove
-        </button>
       </div>
       <details>
         <summary>What it is made of ({parts.length})</summary>
@@ -564,6 +575,8 @@ function AutoLine({
           id={`bill-amount-${index}`}
           className={styles.input}
           inputMode="decimal"
+          // No price on some of it yet: the doctor types the amount.
+          placeholder="Type the amount"
           value={line.amount}
           onChange={(event) => onAmount(event.target.value.replace(/[^\d.,\s]/g, ''))}
         />
