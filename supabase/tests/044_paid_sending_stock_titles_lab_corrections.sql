@@ -5,7 +5,7 @@
 -- and a paid drug payment to the Pharmacy once, never another kind of
 -- payment, and a nurse cannot; the Pharmacy alone sets units and moves
 -- stock; dispensing lowers only counted lines, even below 0; notes take a
--- title; Result ready is refused while a test has no details; the Lab adds
+-- title; a test now and another later (since 20261124172347); the Lab adds
 -- a missed result and cancels a wrong one; the Lab sees every result on a
 -- paid request.
 --
@@ -193,30 +193,30 @@ end $$;
 \echo 'PASS 4: notes take a title'
 
 
--- ===== 5. Result ready refused while a test has no details =====
+-- ===== 5. One test now, the other later (since 20261124172347, request 240h:
+-- "send the results without sending everything... the other one... pending") =====
 insert into t44 select 'req', id from public.lab_requests where payment_id = (select id from t44 where name = 'lab_pay');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000444"}', true);
 set local role authenticated;
 do $$
 begin
   if public.record_lab_results((select id from t44 where name = 'req'), null,
-       '[{"test":"PCV","result":"PCV: 34 %"},{"test":"Widal Test","result":"   "}]') <> 'missing_tests' then
-    raise exception 'FAIL 5: a request with an empty test was saved';
+       '[{"test":"PCV","result":"PCV: 34 %"},{"test":"Widal Test","result":"   "}]') <> 'saved' then
+    raise exception 'FAIL 5: the test that is ready was not saved';
   end if;
   if (select status from public.lab_requests where id = (select id from t44 where name = 'req')) <> 'awaiting_test' then
-    raise exception 'FAIL 5: the refused request changed status';
+    raise exception 'FAIL 5: the request closed with a test still pending';
   end if;
   if public.record_lab_results((select id from t44 where name = 'req'), null,
-       '[{"test":"PCV","result":"PCV: 34 %"}]') <> 'missing_tests' then
-    raise exception 'FAIL 5: a request with a test left out was saved';
+       '[{"test":"Widal Test","result":"S. typhi D, O antigen: 1/80"}]') <> 'saved' then
+    raise exception 'FAIL 5: the pending test was not saved later';
   end if;
-  if public.record_lab_results((select id from t44 where name = 'req'), null,
-       '[{"test":"PCV","result":"PCV: 34 %"},{"test":"Widal Test","result":"S. typhi D, O antigen: 1/80"}]') <> 'saved' then
-    raise exception 'FAIL 5: a complete request was not saved';
+  if (select status from public.lab_requests where id = (select id from t44 where name = 'req')) <> 'completed' then
+    raise exception 'FAIL 5: the request did not complete with every test';
   end if;
 end $$;
 reset role;
-\echo 'PASS 5: Result ready is refused until every test has its details'
+\echo 'PASS 5: one test now, the other later; complete when every test has one'
 
 
 -- ===== 6. Another lab scientist sees, adds and cancels =====

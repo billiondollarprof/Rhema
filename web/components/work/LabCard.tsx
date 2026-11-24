@@ -246,6 +246,14 @@ function LabEntry({
           {request.note && view === 'lab' ? (
             <small className={styles.note}>Note: {request.note}</small>
           ) : null}
+          {/* Some results sent, the rest pending (request 240h). */}
+          {request.results_at && request.status !== 'completed' && view !== 'pay' ? (
+            <small className={styles.note}>
+              {view === 'lab'
+                ? 'Some results sent. Pending results: open it to send the rest.'
+                : 'Some results are ready. The rest are pending.'}
+            </small>
+          ) : null}
         </div>
       </div>
 

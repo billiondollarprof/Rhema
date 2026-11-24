@@ -15,6 +15,16 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
+    in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
+    medicine chart as nurses but with a dispensed button in place of the
+    given button that nurses see." TODAY: the Pharmacy sees the chart's
+    medicines as a list on the patient's page (taking now, suspended,
+    stopped) with doses given, dispensed, left and a Dispense button, not
+    the nurses' chart layout (last given, next due). Next after 240h.
+    (Numbered 247: the other agent recorded its own 246, the antenatal
+    visit chart, on the same day.)
+
 246. **The antenatal visit chart: pick, do not type, and nothing twice.**
     (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
     handwritten list of antenatal drugs) "height of fundus... give them
@@ -72,10 +82,32 @@ Numbers are kept from the full list, so older notes still match.
     settled; discharge with nothing owed settles): "Yes, run it". And: "The
     bill payments and the lab is not done yet" (245 and 240h stay open
     until he says so).
+    240h LIVE 2026-11-24: migration 20261124172347 (results_at; some tests
+    sent, the rest pending; complete when every test has a result; the
+    doctor's notice and alert at every send), test 073, test 044 brought to
+    the new rule, 7 breaks caught; screens: the Lab types the ready ones,
+    "Send these results", "Pending results" after, opening again shows what
+    was sent and boxes for the rest; "Pending results" on the record; "Some
+    results are ready" for the doctor. 0 security warnings on testing and
+    live. Stays open until he says it is done.
     245 LIVE 2026-11-24: 0 security warnings on testing and live; smoke
     tests passed; click-through none broke. Merged the other agent's pitch
     commits (testing shows Jerou Hospital; live is always Rhema) before
     pushing. Stays open until he says it is done. NEXT: 240h.
+    2026-11-24 (voice note, tidied): "go on with the lab results now and fix
+    it" (his yes to the 240h batch as described: results_at, saving some
+    tests, the alert at each send). And on the bill: "remind me [of the]
+    plan... tell me if you've done it... medicine chart, nurses give
+    medicine... pharmacist dispense, then on the bill you should show [what]
+    they are given; the prescription is for mostly outpatients... they
+    usually pay that one separately, but everything the patient has taken,
+    has been supplied, everything recorded, so when you open [and] prepare
+    [the] bill you already see the things already recorded and you click
+    other things you want to add... the medication, the drugs, the supplies,
+    the lab test and the rest... check it properly and let me know that
+    everything about billing as we said is concluded [and] live... the other
+    agent is working on something on patient so you should not bother about
+    that."
 
 244. **Full check of everything this agent (claude/front-desk-228) built,
     then handover notes.** (2026-11-24) "go through all what you've done so
