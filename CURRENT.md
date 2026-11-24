@@ -24,6 +24,24 @@ Numbers are kept from the full list, so older notes still match.
     the nurses' chart layout (last given, next due). Next after 240h.
     (Numbered 247: the other agent recorded its own 246, the antenatal
     visit chart, on the same day.)
+    HIS ANSWERS 2026-11-24 (voice note, tidied, meaning kept): on prices:
+    "they don't necessarily have to type... the system should populate
+    prices... when the doctor is typing prices, the system should be
+    recording the price of that drug and then you can just make [it]
+    standard... as long as it's coming from the Dr or the Matron... any
+    price of any drug or the bed space... record it... next time the system
+    is suggesting it... our system should actually be learning." On old
+    patients: "if there is any medicine chart that the doctor entered before
+    now... when the doctor click[s the bill] you should show all of those...
+    we don't know whether the [patient] has been discharged because they were
+    registered... before we built this... you will know inpatient if their
+    medication appear[s] in the medicine chart." On the Pharmacy: "yes...
+    that's what I mean... the nurse can come and take medication at once...
+    they don't always take it as per dose... they can even take more
+    dosages for that patient... then be giving the patient [from] the
+    store... the [Given and Dispense] place is a little bit confusing for
+    me... explain it." Explained back with a plan and three questions;
+    waiting for his answers.
 
 246. **The antenatal visit chart: pick, do not type, and nothing twice.**
     (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
