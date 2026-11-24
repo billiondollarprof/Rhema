@@ -15,6 +15,18 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+245. **Only what was selected, with an amount, is on the receipt.**
+    (2026-11-24) "the receipt must not contain what does not have an
+    amount. If a line is not selected, it should not appear on the receipt.
+    Only what was selected while prep[ar]ing the bill shows on the receipt."
+    FOUND: every saved bill line has an amount above 0 (the database
+    refuses 0), and the receipt prints only the bill's saved lines. But since
+    the check of 2026-11-24 the stay's three lines (Medicines given, Take
+    Home Drugs, Laboratory tests) cannot be left off, because sending a bill
+    settles every drug and test of the stay. To let the doctor leave one
+    off, the database must settle only what is on the bill (SQL). Built
+    locally, waiting for his yes on the batch.
+
 244. **Full check of everything this agent (claude/front-desk-228) built,
     then handover notes.** (2026-11-24) "go through all what you've done so
     far on the Rhema app... everything that you ever touched your previous
