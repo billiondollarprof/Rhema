@@ -124,7 +124,7 @@ deposit" button, Discharge with nothing owed settles the stay's bills
 (built, in the batch below); days and doses: stop and chart again (no
 change); keep the Lab's price suggestions (208).
 
-**Waiting for his yes (request 245), built on the branch, not on testing:**
+**Request 245, LIVE 24 November (his yes: "Yes, run it"):**
 migration `20261124094742_bill_settles_only_its_lines` (a bill settles only
 the stay's lines ticked onto it; Discharge with nothing owed settles the
 stay's unpaid bills, with the latest deposit as the payment of what they
