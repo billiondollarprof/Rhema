@@ -15,6 +15,14 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+248. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
+    "I check the history section... The front desk is saying that money she
+    entered today [for] drug medicine and [for] test is what she collected
+    20,000 naira between... two patients but it recorded... 1000 for drugs
+    instead of test then test recorded 16,000... she is surprised... she
+    [does] not know where the price amount came from so I think we will
+    have to touch that area later." Later, his word. Not started.
+
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
     medicine chart as nurses but with a dispensed button in place of the
@@ -40,8 +48,22 @@ Numbers are kept from the full list, so older notes still match.
     they don't always take it as per dose... they can even take more
     dosages for that patient... then be giving the patient [from] the
     store... the [Given and Dispense] place is a little bit confusing for
-    me... explain it." Explained back with a plan and three questions;
-    waiting for his answers.
+    me... explain it." Explained back with a plan and three questions.
+    HIS ANSWERS 2026-11-24: "there has to be a way to record [what is
+    returned]... maybe a button [that] records [it]... so that the patient
+    is not charged for... whatever is returned or wasted." "Thank you,
+    suggestions are correct." Admitted on: "front desk [or] Dr... can click
+    the details and put admitted on [a] date and then everything from [then
+    on]... that's nice." Prescriptions: "the prescription medicine that
+    [was] dispensed can show... with the price... paid... if the patient is
+    admitted and they still prescribed drug for them even if they had paid
+    for the prescription, it shows in the final receipt... the bill
+    preparation just shows everything the patient has spent since they were
+    admitted... and the lab test even if they paid separately... at the end
+    of the day they pay... the difference." (Bill counts doses Given.)
+    BUILDING: Admitted on date; prices fill in on the chart and learn;
+    unpriced doses on the bill; prescription chart lines kept off Medicines
+    given; Pharmacy chart with Dispense and Returned. SQL batch to show.
 
 246. **The antenatal visit chart: pick, do not type, and nothing twice.**
     (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
