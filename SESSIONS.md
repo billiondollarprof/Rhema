@@ -4,6 +4,14 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-24 (evening, pitch session): testing shows Jerou Hospital for a
+  pitch (name under the letters on sign in, the letters fit the lock
+  screen ring). 246 LIVE: the antenatal visit picks every number from a
+  list, fills BP, pulse, respiration and weight from today's vital signs,
+  takes drugs from the medicine list drop down with Other, and starts with
+  the doses ticked Given since the last visit; 19 antenatal drugs added to
+  the medicine list. Next: Rhema back on testing when he says.
+
 - 2026-11-24 (evening): 240h LIVE, lab results one test at a time (0
   security warnings). Merged the other agent's antenatal work first; both
   of us had used number 246, mine is now 247 (the Pharmacy's chart). Next:

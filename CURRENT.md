@@ -25,37 +25,6 @@ Numbers are kept from the full list, so older notes still match.
     (Numbered 247: the other agent recorded its own 246, the antenatal
     visit chart, on the same day.)
 
-246. **The antenatal visit chart: pick, do not type, and nothing twice.**
-    (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
-    handwritten list of antenatal drugs) "height of fundus... give them
-    options to pick from and Other... between 1 to 42 or thereabout...
-    foetal heart rate... between 50 to 200 or thereabout... verify that
-    online." "Drugs given... when nurses click given under medication
-    charts, the medications that nurses gave... they should be able to
-    click on the medicine." "Something they filled inside vital signs
-    should automatically appear inside the section for the antenatal
-    patient, so that they don't have to repeat it." "Make sure that
-    everything is represented as I sent it to you." "They gave me a list
-    of drugs here, but you can also check online... and add." "Other...
-    the system takes that option... standard for the next time." "Do not
-    bother about what I've been working on with the other agents."
-    Today (checked): the visit form exists (AntenatalVisits.tsx) with
-    every column on his card, but fundus, foetal heart, BP, pulse,
-    respiration, weight and Hb are typed, and drugs given are 7 fixed
-    chips. His yes 2026-11-24: "the plan is okay"; drugs given "just make
-    it a drop down... select the drug by typing the name... Other is also
-    there"; "If any medicine is not on the pharmacy list yet, include it."
-    Built: every number picked from a list (fundus 12 to 42, foetal heart
-    50 to 200 starting at 140, Hb 4 to 18), today's vital signs fill BP,
-    pulse, respiration and weight, doses ticked Given since the last visit
-    are already chosen, drugs from the medicine list drop down with Other.
-    His yes to the SQL 2026-11-24: "yes, go on... if there are others that
-    were not added, you could have still added... the milligrams, don't
-    guess that much... verify some of them online." Migration
-    20261124172708_antenatal_drug_list_2026_11_24 adds 19 lines: the
-    midwives' list plus common antenatal haematinics; a strength only where
-    the list or a check online gave it. Then live by section 9.
-
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an
     amount. If a line is not selected, it should not appear on the receipt.
