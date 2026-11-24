@@ -67,6 +67,22 @@ const BRANDS: Record<string, Brand> = {
     initials: 'OM',
     address: '159 Sapele Warri Road, Sapele, Delta State',
   },
+  // Pitched 2026-11-24 (Anthony at the hospital). The letters are the mark.
+  caringheights: {
+    key: 'caringheights',
+    name: 'Caring Heights',
+    short: 'Caring Heights',
+    initials: 'CH',
+    address: '',
+  },
+  // Pitched 2026-11-24 (Anthony: "Okay, now change to Jerou hospital").
+  jerou: {
+    key: 'jerou',
+    name: 'Jerou Hospital',
+    short: 'Jerou',
+    initials: 'JH',
+    address: '',
+  },
 }
 
 // ===== 3. The one in use for this build =====

@@ -41,6 +41,7 @@ import { roleLabel } from '@/lib/auth/roles'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { LEGAL_VERSION } from '@/components/legal/PrivacyText'
+import { BRAND } from '@/lib/brand/brand'
 
 type Step = 'choose' | 'email' | 'code'
 
@@ -388,6 +389,10 @@ function Shell({
       <SignInPhotos />
       <section className={`${styles.card} ${styles.overPhotos}`}>
         <Logo size={72} className={styles.logo} />
+        {/* A pitched hospital's mark is only its letters, so its name shows
+            under them (Anthony, 2026-11-24: "something is off"). Rhema's
+            logo already carries the name. */}
+        {BRAND.initials ? <p className={styles.brandName}>{BRAND.name}</p> : null}
         <h2>{title}</h2>
         {lead ? <p className={styles.lead}>{lead}</p> : null}
         {children}
