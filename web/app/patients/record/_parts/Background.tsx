@@ -283,6 +283,12 @@ export function ProfileSection({
   const [problem, setProblem] = useState<string | null>(null)
 
   async function save() {
+    // The database takes 0 to 30 for both (request 248: a bigger number was
+    // refused with words that did not say which).
+    if ((gravida !== '' && Number(gravida) > 30) || (para !== '' && Number(para) > 30)) {
+      setProblem('Gravida and para must be from 0 to 30.')
+      return
+    }
     const result = await saveProfile(
       client,
       {

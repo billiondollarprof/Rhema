@@ -13,6 +13,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { prepareSignature, uploadFile } from '../files/files'
+import { OLD_OPENING } from './record'
 
 // ===== 1. Shapes and words =====
 export const TEST_WORDS: [string, string][] = [
@@ -237,9 +238,21 @@ export async function saveBooking(
   exists: boolean,
 ): Promise<string | null> {
   const row = { ...values, updated_by: staffId }
-  const { error } = exists
-    ? await client.from('antenatal_bookings').update(row).eq('patient_id', patientId)
-    : await client.from('antenatal_bookings').insert({ ...row, patient_id: patientId })
+  // The changed row is read back. The database answers an update it may not
+  // make with no row and no error, so without this the screen said "Saved"
+  // while nothing was written (request 248, found 2026-11-25).
+  const { data, error } = exists
+    ? await client
+        .from('antenatal_bookings')
+        .update(row)
+        .eq('patient_id', patientId)
+        .select('patient_id')
+    : await client
+        .from('antenatal_bookings')
+        .insert({ ...row, patient_id: patientId })
+        .select('patient_id')
+  if (!error && (!data || data.length === 0)) return OLD_OPENING
+  if (error?.code === '42501') return OLD_OPENING
   if (error) {
     console.warn(`Antenatal booking for patient ${patientId} could not be saved: ${error.code}`)
     return error.code === '23514'

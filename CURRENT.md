@@ -15,6 +15,31 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+248. **Check the whole antenatal card works and saves, live.** (2026-11-25)
+    "Please check the system very well. Make sure that the antenatal...
+    you correctly built everything. Cross-check everything. Make sure it's
+    now live and everything is working well. Test it yourself. Save the
+    detail after entering it for the antenatal visit, because the matron
+    complained that she couldn't save some details... Make sure no step is
+    missing. Take your time."
+    Checked 2026-11-25 against a real local Supabase (every migration), as
+    a made up matron: every part of the card saved and survived a refresh
+    (visit, About her, history, delivery documented, next of kin, routine
+    test, previous pregnancy, last period, consent). Faults found and fixed:
+    (1) a record left open over 12 hours: the database refuses the save
+    (the opening rule), but the booking and profile showed "Saved" while
+    nothing was written, and a visit said "try again", which never works.
+    Now both say "Not saved: this record was opened more than 12 hours
+    ago. Go back to the patient, open the record again, then save."
+    (2) foetal heart list went down to 50; the database takes 60 to 220.
+    (3) a decimal in a whole number box, an empty visit, a future date, a
+    one letter witness, gravida or para over 30: refused without saying
+    which; now named on the screen before saving. Not changed (his design,
+    ask first): opening the record again by itself when a save meets an
+    old opening. Most likely what the matron met: (1), or before 2026-11-24
+    a typed number the database refused (BP typed as 120/80 became 12080).
+    Live logs would say which; reading them needs his yes.
+
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
     medicine chart as nurses but with a dispensed button in place of the
