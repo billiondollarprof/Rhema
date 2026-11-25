@@ -13,7 +13,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { prepareSignature, uploadFile } from '../files/files'
-import { OLD_OPENING } from './record'
+import { OLD_OPENING, isOldOpening } from './opening'
 
 // ===== 1. Shapes and words =====
 export const TEST_WORDS: [string, string][] = [
@@ -252,7 +252,7 @@ export async function saveBooking(
         .insert({ ...row, patient_id: patientId })
         .select('patient_id')
   if (!error && (!data || data.length === 0)) return OLD_OPENING
-  if (error?.code === '42501') return OLD_OPENING
+  if (isOldOpening(error)) return OLD_OPENING
   if (error) {
     console.warn(`Antenatal booking for patient ${patientId} could not be saved: ${error.code}`)
     return error.code === '23514'

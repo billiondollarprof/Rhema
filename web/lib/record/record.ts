@@ -19,6 +19,7 @@ import { HOSPITAL_TIME_ZONE } from '../time/zone'
 import { serverNow } from '../time/serverTime'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '@/lib/offline/outbox'
+import { OLD_OPENING, isOldOpening } from './opening'
 
 // ===== 1. Shapes =====
 type Voidable = {
@@ -343,13 +344,6 @@ const TIME_COLUMN: Partial<Record<VoidableTable, string>> = {
   consultation_notes: 'created_at',
 }
 
-// A record may only be written within 12 hours of opening it (the opening
-// is logged first). A page left open longer is refused by the database;
-// these words say so, instead of "try again", which can never work
-// (request 248, 2026-11-25: the matron could not save).
-export const OLD_OPENING =
-  'Not saved: this record was opened more than 12 hours ago. Go back to the patient, open the record again, then save.'
-
 export async function addLine(
   client: SupabaseClient,
   table: Exclude<VoidableTable, never> | 'medical_profiles',
@@ -382,7 +376,7 @@ export async function addLine(
   }
   if (error) {
     console.warn(`A line could not be added to ${table}: ${error.code}`)
-    if (error.code === '42501') return OLD_OPENING
+    if (isOldOpening(error)) return OLD_OPENING
     return error.code === '23514'
       ? 'One of the values is outside the normal range. Check it and try again.'
       : 'That could not be saved. Try again.'
@@ -411,7 +405,7 @@ export async function saveProfile(
         .insert({ ...values, patient_id: patientId })
         .select('patient_id')
   if (!error && (!data || data.length === 0)) return OLD_OPENING
-  if (error?.code === '42501') return OLD_OPENING
+  if (isOldOpening(error)) return OLD_OPENING
   if (error) {
     console.warn(`The profile for patient ${patientId} could not be saved: ${error.code}`)
     return 'That could not be saved. Try again.'
