@@ -4,6 +4,13 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-25: request 248, the antenatal card checked end to end as a
+  made up matron against a real local Supabase. Found and fixed: a record
+  open over 12 hours showed "Saved" with nothing written (booking, profile)
+  or "try again" (visit); foetal heart list below the database's 60; wrong
+  numbers not named. LIVE. Asked him: reopen by itself, and reading live
+  logs.
+
 - 2026-11-24 (evening, pitch session): testing shows Jerou Hospital for a
   pitch (name under the letters on sign in, the letters fit the lock
   screen ring). 246 LIVE: the antenatal visit picks every number from a
