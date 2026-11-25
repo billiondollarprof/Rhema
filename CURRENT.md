@@ -32,7 +32,16 @@ Numbers are kept from the full list, so older notes still match.
     whether it's the front desk person that made a mistake, so I need you to
     verify that. If the system lies or something went wrong, you should
     check 24 hours ago and beyond, and even today... anything shaky... in
-    that history and records." IN PROGRESS.
+    that history and records." IN PROGRESS. Code read: History adds each
+    payment under the kind it was saved with; the live records of 24 and 25
+    Nov are needed to tell entry from fault. Asked his yes for a live read
+    (no names), 2026-11-25; not answered yet.
+    2026-11-25 also: "make the vital sign visible to also the front desk, so
+    the front desk can also [chart] it. I believe we've done that already.
+    Just confirm." CONFIRMED: Take vitals for the Front Desk is live since
+    2026-11-19 (228c), with glucose, pain and BMI since 235; readings go into
+    the record; the Front Desk sees back only its own readings (by design;
+    seeing others' would be a change to who sees patient data, to ask).
 
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
