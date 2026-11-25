@@ -34,7 +34,7 @@ import {
   type Glucose,
 } from '../record/_parts/Observations'
 import { addLine } from '@/lib/record/record'
-import { bmiOf, bmiWords, glucoseWords } from '@/lib/record/vitals'
+import { bmiOf, bmiWords, glucoseWords, vitalsProblem } from '@/lib/record/vitals'
 
 // ===== 1. The boxes, in the nurses' order =====
 // label: above the box. name and unit: in the saved line ("Pulse 84 bpm").
@@ -110,6 +110,12 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
     if (read.values) Object.assign(numbers, read.values)
     if (Object.values(numbers).every((number) => number === null)) {
       setProblem('Fill in at least one reading.')
+      return
+    }
+    // A number the database would refuse is named first (request 248).
+    const wrong = vitalsProblem(numbers)
+    if (wrong) {
+      setProblem(wrong)
       return
     }
     setBusy(true)

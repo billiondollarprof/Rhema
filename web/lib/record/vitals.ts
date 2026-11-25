@@ -7,6 +7,10 @@
  * both [units]... we always use the UK standard", so mmol/L comes first; a
  * reading in either unit is shown in both, so nobody converts by hand.
  *
+ * Since 2026-11-25 (request 248) it also holds the limits the database
+ * takes for each reading, so every screen names a wrong box before saving.
+ * The live error log showed a BP top refused twice with no word of which.
+ *
  * Never: show a glucose without fasting or random, or without its unit.
  */
 
@@ -90,4 +94,29 @@ export function rememberNumber(staffId: string, measureId: number, value: number
   } catch {
     // No storage: the box stays a plain number box.
   }
+}
+
+// ===== The limits the database takes (vital_signs checks) =====
+// [column, words on the screen, lowest, highest, whole numbers only]
+const VITAL_LIMITS: [string, string, number, number, boolean][] = [
+  ['systolic', 'BP top', 40, 300, true],
+  ['diastolic', 'BP bottom', 20, 200, true],
+  ['pulse', 'Pulse', 20, 260, true],
+  ['temperature_c', 'Temperature', 30, 45, false],
+  ['breathing_rate', 'Breathing', 4, 80, true],
+  ['spo2', 'Oxygen (SpO2)', 50, 100, true],
+  ['weight_kg', 'Weight', 0.3, 400, false],
+  ['height_cm', 'Height', 20, 260, false],
+  ['pain_score', 'Pain score', 0, 10, true],
+]
+
+// The first reading the database would refuse, in words; null if none.
+export function vitalsProblem(numbers: Record<string, number | null | undefined>): string | null {
+  for (const [key, label, min, max, whole] of VITAL_LIMITS) {
+    const value = numbers[key]
+    if (value === null || value === undefined) continue
+    if (value < min || value > max) return `${label} must be between ${min} and ${max}.`
+    if (whole && !Number.isInteger(value)) return `${label} must be a whole number.`
+  }
+  return null
 }

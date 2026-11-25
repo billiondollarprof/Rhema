@@ -13,7 +13,8 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { prepareSignature, uploadFile } from '../files/files'
-import { OLD_OPENING, isOldOpening } from './opening'
+import { OLD_OPENING } from './opening'
+import { saveWithOpening } from './record'
 
 // ===== 1. Shapes and words =====
 export const TEST_WORDS: [string, string][] = [
@@ -238,21 +239,25 @@ export async function saveBooking(
   exists: boolean,
 ): Promise<string | null> {
   const row = { ...values, updated_by: staffId }
-  // The changed row is read back. The database answers an update it may not
-  // make with no row and no error, so without this the screen said "Saved"
-  // while nothing was written (request 248, found 2026-11-25).
-  const { data, error } = exists
-    ? await client
-        .from('antenatal_bookings')
-        .update(row)
-        .eq('patient_id', patientId)
-        .select('patient_id')
-    : await client
-        .from('antenatal_bookings')
-        .insert({ ...row, patient_id: patientId })
-        .select('patient_id')
-  if (!error && (!data || data.length === 0)) return OLD_OPENING
-  if (isOldOpening(error)) return OLD_OPENING
+  // The changed row is read back: the database answers an update it may
+  // not make with no row and no error, so without this the screen said
+  // "Saved" while nothing was written (request 248, found 2026-11-25). A
+  // save that meets an old opening opens the record again and tries once
+  // more (saveWithOpening, in record.ts).
+  const { error, oldOpening } = await saveWithOpening(client, patientId, async () => {
+    const { data, error } = exists
+      ? await client
+          .from('antenatal_bookings')
+          .update(row)
+          .eq('patient_id', patientId)
+          .select('patient_id')
+      : await client
+          .from('antenatal_bookings')
+          .insert({ ...row, patient_id: patientId })
+          .select('patient_id')
+    return { error, wrote: !error && (data?.length ?? 0) > 0 }
+  })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`Antenatal booking for patient ${patientId} could not be saved: ${error.code}`)
     return error.code === '23514'

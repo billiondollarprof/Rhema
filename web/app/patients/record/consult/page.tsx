@@ -30,6 +30,7 @@ import AppShell from '@/components/shell/AppShell'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { actsAsDoctor } from '@/lib/auth/roles'
+import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
 
 function Consult() {
   const auth = useAuth()
@@ -37,7 +38,7 @@ function Consult() {
   const id = Number(useSearchParams().get('p')) || null
   const { client, staff } = auth
   const allowed = Boolean(staff?.can_medical)
-  const { patient, record, savedAt, refused, reload } = useRecord(
+  const { patient, record, savedAt, refused, stale, reload } = useRecord(
     client,
     staff?.id ?? null,
     id,
@@ -63,6 +64,7 @@ function Consult() {
             Back to the record
           </Link>
         </div>
+        {stale ? <p className={styles.muted}>{OLD_OPENING_SCREEN}</p> : null}
         {savedAt ? (
           <p className={styles.muted}>No network: showing the copy kept on this device.</p>
         ) : null}

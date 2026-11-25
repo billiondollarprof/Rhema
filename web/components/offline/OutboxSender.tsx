@@ -35,6 +35,8 @@ import {
 import { refreshCopy } from '@/lib/offline/patientCopy'
 import { refreshRecordCopy, sendOfflineViews } from '@/lib/offline/recordCopy'
 import { CARD_COLUMNS } from '@/lib/patients/patients'
+import { writeOpening } from '@/lib/record/record'
+import { isOldOpening } from '@/lib/record/opening'
 
 // The column holding when a row was saved, per table.
 const TIME_COLUMN: Record<string, string> = { vital_signs: 'recorded_at' }
@@ -141,7 +143,25 @@ async function sendOne(client: SupabaseClient, staffId: string, task: OutboxTask
     return false
   }
   const table = task.kind === 'register' ? 'patients' : task.table
-  const { error } = await client.from(table).insert(task.values)
+  let { error } = await client.from(table).insert(task.values)
+  // A record entry sent after its opening grew old (request 248): open the
+  // record again (a new opening in the log, in this person's name), check
+  // it did not go in already, then send it once more.
+  if (
+    task.kind === 'record' &&
+    isOldOpening(error) &&
+    (await writeOpening(client, task.patientId))
+  ) {
+    try {
+      if (await alreadySaved(client, task)) {
+        removeFromOutbox(staffId, task.id)
+        return true
+      }
+    } catch {
+      return false
+    }
+    ;({ error } = await client.from(table).insert(task.values))
+  }
   if (isNetworkFailure(error)) return false
   // The double tap guard: the first one is in already.
   if (!error || error.code === '23505') {

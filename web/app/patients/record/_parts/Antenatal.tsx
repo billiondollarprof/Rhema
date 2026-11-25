@@ -30,7 +30,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
-import { addLine, when, type DoseGiven, type Vitals } from '@/lib/record/record'
+import { addLine, openingIsOld, when, type DoseGiven, type Vitals } from '@/lib/record/record'
 import {
   TEST_WORDS,
   loadAntenatal,
@@ -120,10 +120,12 @@ export function AntenatalSection({
   doses = [],
 }: SectionProps) {
   const [data, setData] = useState<Awaited<ReturnType<typeof loadAntenatal>> | null>(null)
-  const load = useCallback(
-    async () => setData(await loadAntenatal(client, patientId)),
-    [client, patientId],
-  )
+  // Past 12 hours since opening the database answers reads with nothing,
+  // so what shows is kept instead (request 248; the page says so).
+  const load = useCallback(async () => {
+    if (openingIsOld()) return
+    setData(await loadAntenatal(client, patientId))
+  }, [client, patientId])
   useEffect(() => {
     // First read straight after the screen shows, then again whenever
     // anybody saves something (request 157).
@@ -690,10 +692,11 @@ function PregnanciesPart({
 // ===== 3. Consent for an operation (every patient) =====
 export function ConsentSection({ client, staffId, patientId }: Props) {
   const [consents, setConsents] = useState<Consent[] | null>(null)
-  const load = useCallback(
-    async () => setConsents(await loadConsents(client, patientId)),
-    [client, patientId],
-  )
+  // Kept, not emptied, past 12 hours since opening (request 248).
+  const load = useCallback(async () => {
+    if (openingIsOld()) return
+    setConsents(await loadConsents(client, patientId))
+  }, [client, patientId])
   useEffect(() => {
     // First read straight after the screen shows, then again whenever
     // anybody saves something (request 157).

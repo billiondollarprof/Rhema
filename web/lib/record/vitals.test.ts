@@ -1,6 +1,6 @@
 // Tests for glucose and BMI in words (request 235).
 import { describe, expect, it } from 'vitest'
-import { bmiOf, bmiWords, glucoseWords } from './vitals'
+import { bmiOf, bmiWords, glucoseWords, vitalsProblem } from './vitals'
 
 describe('glucoseWords', () => {
   it('shows mmol/L with mg/dL beside it', () => {
@@ -30,5 +30,20 @@ describe('bmi', () => {
   it('names the bands', () => {
     expect(bmiWords(17)).toBe('BMI 17 (underweight)')
     expect(bmiWords(31)).toBe('BMI 31 (obese)')
+  })
+})
+
+// Request 248: the live log showed a BP top refused with no word of which.
+describe('vitalsProblem', () => {
+  it('names a reading the database would refuse', () => {
+    expect(vitalsProblem({ systolic: 12080 })).toBe('BP top must be between 40 and 300.')
+    expect(vitalsProblem({ pulse: 84.5 })).toBe('Pulse must be a whole number.')
+    expect(vitalsProblem({ spo2: 101 })).toBe('Oxygen (SpO2) must be between 50 and 100.')
+  })
+  it('lets normal readings through', () => {
+    expect(
+      vitalsProblem({ systolic: 120, diastolic: 80, temperature_c: 36.8, weight_kg: 68.5 }),
+    ).toBe(null)
+    expect(vitalsProblem({ systolic: null })).toBe(null)
   })
 })
