@@ -24,6 +24,15 @@ Numbers are kept from the full list, so older notes still match.
     have to touch that area later." Later, his word. Not started.
     (Numbered 249: the other agent recorded its own 248, the antenatal
     card check, the same day.)
+    2026-11-25: "The build and the lab results... I'll test it myself later.
+    And then the history... check it... yesterday they... collected... 2 lab
+    tests, 41,000, and there were no drugs, but the system recorded drugs
+    41,000, lab tests 16,000... they said they recorded two cards, but the
+    system recorded 1, 2 antenatal cards. System recorded 1. I don't know
+    whether it's the front desk person that made a mistake, so I need you to
+    verify that. If the system lies or something went wrong, you should
+    check 24 hours ago and beyond, and even today... anything shaky... in
+    that history and records." IN PROGRESS.
 
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
