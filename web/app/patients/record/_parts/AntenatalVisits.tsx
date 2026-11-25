@@ -102,11 +102,12 @@ function Choices({
 // The lists the card's numbers are picked from (request 246, 2026-11-24).
 // Fundus: palpable from about 12 weeks, and in centimetres it is close to
 // the weeks from 20 weeks on. Foetal heart: 110 to 160 is normal (NICE, and
-// the Irish national guideline); the list runs 50 to 200 so a worrying one
-// can still be written. "Other" types anything outside a list.
+// the Irish national guideline); the list runs 60 to 200 so a worrying one
+// can still be written (60 is the lowest the database takes, request 248).
+// "Other" types anything outside a list.
 const CARD_RANGES: Record<string, Range> = {
   fundal: { from: 12, to: 42, step: 1, start: '28', decimals: 0 },
-  fhr: { from: 50, to: 200, step: 1, start: '140', decimals: 0 },
+  fhr: { from: 60, to: 200, step: 1, start: '140', decimals: 0 },
   hb: { from: 4, to: 18, step: 0.1, start: '11', decimals: 1 },
 }
 
@@ -130,6 +131,35 @@ function PickBox({
       <VitalPick id={id} range={range} value={value} onChange={onChange} />
     </div>
   )
+}
+
+// What the database takes for each number on the card (the checks on
+// antenatal_visits). A number outside these, or a decimal where it takes a
+// whole number, was refused with words that did not say which one
+// (request 248, 2026-11-25). Now the form names it before saving.
+const LIMITS: [keyof typeof EMPTY, string, number, number, boolean][] = [
+  ['fundal', 'Height of fundus', 8, 45, true],
+  ['fhr', 'Foetal heart rate', 60, 220, true],
+  ['systolic', 'BP top', 40, 300, true],
+  ['diastolic', 'BP bottom', 20, 200, true],
+  ['pulse', 'Pulse', 20, 260, true],
+  ['respiration', 'Respiration', 4, 80, true],
+  ['weight', 'Weight', 20, 250, false],
+  ['hb', 'Hb', 2, 25, false],
+]
+
+// The first number that the database would refuse, in words; null if none.
+function numberProblem(form: typeof EMPTY): string | null {
+  for (const [key, label, min, max, whole] of LIMITS) {
+    const typed = form[key].trim()
+    if (typed === '') continue
+    const value = Number(typed)
+    if (Number.isNaN(value) || value < min || value > max) {
+      return `${label} must be between ${min} and ${max}.`
+    }
+    if (whole && !Number.isInteger(value)) return `${label} must be a whole number.`
+  }
+  return null
 }
 
 // The day of a moment, in the hospital's time zone, such as 2026-11-24.
@@ -280,6 +310,18 @@ export function VisitsPart({
   }
 
   async function save() {
+    // Checked here first, so the words name the reading (request 248).
+    const wrong = numberProblem(form)
+    if (wrong) {
+      setProblem(wrong)
+      return
+    }
+    const anything =
+      Object.entries(form).some(([, value]) => value.trim() !== '') || drugs.length > 0
+    if (!anything) {
+      setProblem('Fill in at least one reading before saving.')
+      return
+    }
     const result = await addLine(client, 'antenatal_visits', {
       patient_id: patientId,
       visit_on: today(),

@@ -1,5 +1,5 @@
 -- =============================================================================
--- 074_chart_prices_returns_admitted_on.sql: tests for request 247 and the
+-- 075_chart_prices_returns_admitted_on.sql: tests for request 247 and the
 -- bill (2026-11-24).
 --
 -- What this proves:

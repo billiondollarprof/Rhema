@@ -71,6 +71,7 @@ function Field({
   onChange,
   type = 'text',
   placeholder = '',
+  max,
 }: {
   id: string
   label: string
@@ -78,6 +79,8 @@ function Field({
   onChange: (value: string) => void
   type?: string
   placeholder?: string
+  // The latest date that may be picked (today: nothing in the future).
+  max?: string
 }) {
   return (
     <div className={styles.field}>
@@ -88,11 +91,23 @@ function Field({
         type={type}
         inputMode={type === 'number' ? 'numeric' : undefined}
         placeholder={placeholder}
+        max={max}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
     </div>
   )
+}
+
+// A whole number the database takes, or the words saying why not
+// (request 248: a refused number used to say only "could not be saved").
+function wholeProblem(label: string, typed: string, min: number, max: number): string | null {
+  if (typed.trim() === '') return null
+  const value = Number(typed)
+  if (!Number.isInteger(value) || value < min || value > max) {
+    return `${label} must be a whole number from ${min} to ${max}.`
+  }
+  return null
 }
 
 // ===== 2. The antenatal booking =====
@@ -277,6 +292,15 @@ function BookingForm({
   }
   const text = (value: string) => value.trim() || null
   async function save() {
+    const wrong =
+      wholeProblem('Age', values.kin_age, 0, 120) ??
+      wholeProblem('Number of abortions', values.abortions, 0, 30) ??
+      wholeProblem('Number of miscarriages', values.miscarriages, 0, 30) ??
+      wholeProblem('Total number of pregnancies', values.total_pregnancies, 0, 30)
+    if (wrong) {
+      setProblem(wrong)
+      return
+    }
     setBusy(true)
     const result = await saveBooking(
       client,
@@ -392,6 +416,10 @@ function TestsPart({
       setProblem('Type the result.')
       return
     }
+    if (testedOn && testedOn > today()) {
+      setProblem('The date done cannot be in the future.')
+      return
+    }
     const answer = await addLine(client, 'antenatal_tests', {
       patient_id: patientId,
       test,
@@ -445,6 +473,7 @@ function TestsPart({
             id="an-tested-on"
             label="Date done"
             type="date"
+            max={today()}
             value={testedOn}
             onChange={setTestedOn}
           />
@@ -495,6 +524,10 @@ function PregnanciesPart({
   const set = (key: keyof typeof empty) => (value: string) =>
     setValues((now) => ({ ...now, [key]: value }))
   async function add() {
+    if (values.born_on && values.born_on > today()) {
+      setProblem('The date of birth cannot be in the future.')
+      return
+    }
     const answer = await addLine(client, 'previous_pregnancies', {
       patient_id: patientId,
       born_on: values.born_on || null,
@@ -567,6 +600,7 @@ function PregnanciesPart({
               id="pp-born"
               label="Date of birth"
               type="date"
+              max={today()}
               value={values.born_on}
               onChange={set('born_on')}
             />
@@ -699,6 +733,11 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
       return
     }
     const witness = values.witness_name.trim()
+    // The database takes a witness name of 2 letters or more (request 248).
+    if (witness.length === 1) {
+      setProblem('Type the witness name in full, or leave it empty.')
+      return
+    }
     if (witness && !witnessTicked) {
       setProblem('Tick the witness box, or leave the witness name empty.')
       return

@@ -15,13 +15,40 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
-248. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
+249. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
     "I check the history section... The front desk is saying that money she
     entered today [for] drug medicine and [for] test is what she collected
     20,000 naira between... two patients but it recorded... 1000 for drugs
     instead of test then test recorded 16,000... she is surprised... she
     [does] not know where the price amount came from so I think we will
     have to touch that area later." Later, his word. Not started.
+    (Numbered 249: the other agent recorded its own 248, the antenatal
+    card check, the same day.)
+
+248. **Check the whole antenatal card works and saves, live.** (2026-11-25)
+    "Please check the system very well. Make sure that the antenatal...
+    you correctly built everything. Cross-check everything. Make sure it's
+    now live and everything is working well. Test it yourself. Save the
+    detail after entering it for the antenatal visit, because the matron
+    complained that she couldn't save some details... Make sure no step is
+    missing. Take your time."
+    Checked 2026-11-25 against a real local Supabase (every migration), as
+    a made up matron: every part of the card saved and survived a refresh
+    (visit, About her, history, delivery documented, next of kin, routine
+    test, previous pregnancy, last period, consent). Faults found and fixed:
+    (1) a record left open over 12 hours: the database refuses the save
+    (the opening rule), but the booking and profile showed "Saved" while
+    nothing was written, and a visit said "try again", which never works.
+    Now both say "Not saved: this record was opened more than 12 hours
+    ago. Go back to the patient, open the record again, then save."
+    (2) foetal heart list went down to 50; the database takes 60 to 220.
+    (3) a decimal in a whole number box, an empty visit, a future date, a
+    one letter witness, gravida or para over 30: refused without saying
+    which; now named on the screen before saving. Not changed (his design,
+    ask first): opening the record again by itself when a save meets an
+    old opening. Most likely what the matron met: (1), or before 2026-11-24
+    a typed number the database refused (BP typed as 120/80 became 12080).
+    Live logs would say which; reading them needs his yes.
 
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
@@ -77,34 +104,6 @@ Numbers are kept from the full list, so older notes still match.
     is 5000. I believe that's already designed." (It is: the box is the
     price of one dose, multiplied by the doses given and kept as the drug's
     price. Added the worked total beside each box so it reads plainly.)
-
-246. **The antenatal visit chart: pick, do not type, and nothing twice.**
-    (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a
-    handwritten list of antenatal drugs) "height of fundus... give them
-    options to pick from and Other... between 1 to 42 or thereabout...
-    foetal heart rate... between 50 to 200 or thereabout... verify that
-    online." "Drugs given... when nurses click given under medication
-    charts, the medications that nurses gave... they should be able to
-    click on the medicine." "Something they filled inside vital signs
-    should automatically appear inside the section for the antenatal
-    patient, so that they don't have to repeat it." "Make sure that
-    everything is represented as I sent it to you." "They gave me a list
-    of drugs here, but you can also check online... and add." "Other...
-    the system takes that option... standard for the next time." "Do not
-    bother about what I've been working on with the other agents."
-    Today (checked): the visit form exists (AntenatalVisits.tsx) with
-    every column on his card, but fundus, foetal heart, BP, pulse,
-    respiration, weight and Hb are typed, and drugs given are 7 fixed
-    chips. His yes 2026-11-24: "the plan is okay"; drugs given "just make
-    it a drop down... select the drug by typing the name... Other is also
-    there"; "If any medicine is not on the pharmacy list yet, include it."
-    Built: every number picked from a list (fundus 12 to 42, foetal heart
-    50 to 200 starting at 140, Hb 4 to 18), today's vital signs fill BP,
-    pulse, respiration and weight, doses ticked Given since the last visit
-    are already chosen, drugs from the medicine list drop down with Other.
-    Waiting: his yes to the SQL batch adding 11 antenatal drugs (migration
-    20261124172708_antenatal_drug_list_2026_11_24, kept off testing until
-    then).
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an

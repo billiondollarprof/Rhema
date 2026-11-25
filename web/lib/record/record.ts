@@ -19,6 +19,7 @@ import { HOSPITAL_TIME_ZONE } from '../time/zone'
 import { serverNow } from '../time/serverTime'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addToOutbox, isNetworkFailure } from '@/lib/offline/outbox'
+import { OLD_OPENING, isOldOpening } from './opening'
 
 // ===== 1. Shapes =====
 type Voidable = {
@@ -375,6 +376,7 @@ export async function addLine(
   }
   if (error) {
     console.warn(`A line could not be added to ${table}: ${error.code}`)
+    if (isOldOpening(error)) return OLD_OPENING
     return error.code === '23514'
       ? 'One of the values is outside the normal range. Check it and try again.'
       : 'That could not be saved. Try again.'
@@ -390,9 +392,20 @@ export async function saveProfile(
   exists: boolean,
 ): Promise<string | null> {
   const values = { ...profile, updated_by: staffId }
-  const { error } = exists
-    ? await client.from('medical_profiles').update(values).eq('patient_id', patientId)
-    : await client.from('medical_profiles').insert({ ...values, patient_id: patientId })
+  // Read back: an update the database may not make answers no row and no
+  // error, which used to show as saved (request 248, 2026-11-25).
+  const { data, error } = exists
+    ? await client
+        .from('medical_profiles')
+        .update(values)
+        .eq('patient_id', patientId)
+        .select('patient_id')
+    : await client
+        .from('medical_profiles')
+        .insert({ ...values, patient_id: patientId })
+        .select('patient_id')
+  if (!error && (!data || data.length === 0)) return OLD_OPENING
+  if (isOldOpening(error)) return OLD_OPENING
   if (error) {
     console.warn(`The profile for patient ${patientId} could not be saved: ${error.code}`)
     return 'That could not be saved. Try again.'
