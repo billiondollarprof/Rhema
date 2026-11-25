@@ -156,3 +156,20 @@ Small known edges, written down so nobody is surprised:
 - The double tap guard on doses given refuses the same person twice in one
   moment. A database test that writes several doses at once must use a
   different person for each (see test 071).
+
+## 7. After the handover was first written (24 and 25 November)
+
+- **245** (live): only the stay's lines ticked "Put on this bill" are
+  settled by the bill; Discharge with nothing owed settles the stay's bills.
+  Migration `20261124094742`, test 072.
+- **240h** (live): lab results one test at a time. Migration
+  `20261124172347`, test 073.
+- **247** (live): Admitted on; chart dose prices fill from the standard and
+  learn; unpriced doses on the bill with a one-dose price box; dispensed
+  prescriptions kept off Medicines given; the Pharmacy's chart with Dispense
+  and Returned. Migration `20261124200126`, test 075.
+- **249** (open, later, his word): History shows the Front Desk's day with
+  wrong amounts.
+- Numbering: the other agent works on the same repository. Check
+  `CURRENT.md` and `supabase/tests/` for the next free number after merging
+  `testing`, before naming a request or a test.

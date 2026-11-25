@@ -79,6 +79,11 @@ Numbers are kept from the full list, so older notes still match.
     is 5000. I believe that's already designed." (It is: the box is the
     price of one dose, multiplied by the doses given and kept as the drug's
     price. Added the worked total beside each box so it reads plainly.)
+    247 LIVE 2026-11-25: 0 security warnings on testing and live; smoke
+    tests passed; click-through none broke. Merged the other agent's
+    antenatal work first; my test renumbered 075 (theirs is 074), my
+    History request renumbered 249 (theirs is 248). Stays open until he says
+    it is done.
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an

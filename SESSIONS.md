@@ -4,6 +4,11 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-25: 247 LIVE (admitted on, chart prices that learn, unpriced
+  doses on the bill, the Pharmacy's chart with Dispense and Returned). 0
+  security warnings. Test renumbered 075 and History request 249 after the
+  other agent's 074 and 248.
+
 - 2026-11-25: request 248, the antenatal card checked end to end as a
   made up matron against a real local Supabase. Found and fixed: a record
   open over 12 hours showed "Saved" with nothing written (booking, profile)
