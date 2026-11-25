@@ -12,6 +12,10 @@
  * Discharge asks once. When the stay's bill is paid and nothing is owed,
  * the doctor or matron sees "The bill is paid. Discharge?".
  *
+ * Admitted on (request 247, 2026-11-24): the Front Desk, a doctor or the
+ * matron can set the day the stay began, for a patient already on the ward
+ * before the app had stays; everything given since that day is on the bill.
+ *
  * Never: decide access here. The database refuses anybody else.
  */
 'use client'
@@ -21,7 +25,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import styles from './patients.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
-import { admit, canAdmit, canDischarge, discharge, type Stay } from '@/lib/stay/stay'
+import { admit, canAdmit, canDischarge, discharge, setAdmittedOn, type Stay } from '@/lib/stay/stay'
 import type { Statement } from '@/lib/bills/bills'
 
 const since = (iso: string) =>
@@ -53,8 +57,29 @@ export default function StayCard({
   const [asking, setAsking] = useState<'admit' | 'discharge' | null>(null)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // Changing the day the stay began: the date box is open.
+  const [changingDay, setChangingDay] = useState(false)
+  const [day, setDay] = useState('')
 
   if (stay === undefined) return null
+
+  // Today in Lagos, for the date box's last day (no day in the future).
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: HOSPITAL_TIME_ZONE })
+
+  async function saveDay() {
+    if (!day) {
+      setProblem('Choose the day.')
+      return
+    }
+    setBusy(true)
+    const failed = await setAdmittedOn(client, patientId, day)
+    setBusy(false)
+    setProblem(failed)
+    if (!failed) {
+      setChangingDay(false)
+      onChanged()
+    }
+  }
 
   async function go(step: 'admit' | 'discharge') {
     setBusy(true)
@@ -121,6 +146,22 @@ export default function StayCard({
               Admit
             </button>
           ) : null}
+          {stay && canAdmit(staff) && !changingDay ? (
+            <button
+              type="button"
+              className={styles.button}
+              onClick={() => {
+                setDay(
+                  new Date(stay.admitted_at).toLocaleDateString('en-CA', {
+                    timeZone: HOSPITAL_TIME_ZONE,
+                  }),
+                )
+                setChangingDay(true)
+              }}
+            >
+              Change admitted on
+            </button>
+          ) : null}
           {stay && canDischarge(staff) ? (
             <button
               type="button"
@@ -132,6 +173,36 @@ export default function StayCard({
           ) : null}
         </div>
       )}
+      {/* The day the stay began: everything given since then is billed. */}
+      {changingDay ? (
+        <div className={styles.dispenseRow}>
+          <label htmlFor="admitted-on">Admitted on</label>
+          <input
+            id="admitted-on"
+            type="date"
+            className={`${styles.input} ${styles.dayInput}`}
+            max={today}
+            value={day}
+            onChange={(event) => setDay(event.target.value)}
+          />
+          <button
+            type="button"
+            className={styles.button}
+            disabled={busy}
+            onClick={() => setChangingDay(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className={`${styles.button} ${styles.primary}`}
+            disabled={busy}
+            onClick={saveDay}
+          >
+            {busy ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      ) : null}
       {problem ? <p className={styles.muted}>{problem}</p> : null}
     </div>
   )

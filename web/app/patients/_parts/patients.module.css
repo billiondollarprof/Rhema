@@ -1048,6 +1048,34 @@
   width: 80px;
 }
 
+/* The Pharmacy's chart line: Last given and Next due (request 247). */
+.chartLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 4px;
+}
+
+.chartLine > span {
+  display: grid;
+}
+
+.chartLine small {
+  font-size: 12px;
+  color: var(--ink2);
+}
+
+.chartLate {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* Admitted on (request 247): a date box that fits a narrow phone. */
+.dayInput {
+  width: auto;
+  max-width: 100%;
+}
+
 /* The folded "More details" on Register from old file (2026-11-16). */
 .more {
   display: grid;

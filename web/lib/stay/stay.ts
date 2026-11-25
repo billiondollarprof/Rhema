@@ -62,3 +62,21 @@ export async function discharge(client: SupabaseClient, patientId: number): Prom
   }
   return null
 }
+
+// ===== 4. Admitted on: the day the stay began (request 247, 2026-11-24) =====
+// For a patient already on the ward before the app had stays: "front desk
+// [or] Dr... put admitted on [a] date and then everything from [then on]".
+export async function setAdmittedOn(
+  client: SupabaseClient,
+  patientId: number,
+  day: string,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('set_admitted_on', {
+    patient: patientId,
+    admitted_on: day,
+  })
+  if (error?.code === '42501') return 'Only a doctor, the matron or the Front Desk sets this.'
+  if (error?.code === '22023') return 'Choose a day in the last 90 days, not in the future.'
+  if (error || data !== 'saved') return 'That could not be saved. Check the internet and try again.'
+  return null
+}

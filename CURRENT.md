@@ -15,6 +15,16 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+249. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
+    "I check the history section... The front desk is saying that money she
+    entered today [for] drug medicine and [for] test is what she collected
+    20,000 naira between... two patients but it recorded... 1000 for drugs
+    instead of test then test recorded 16,000... she is surprised... she
+    [does] not know where the price amount came from so I think we will
+    have to touch that area later." Later, his word. Not started.
+    (Numbered 249: the other agent recorded its own 248, the antenatal
+    card check, the same day.)
+
 247. **The Pharmacy sees the medicine chart like the nurses, with Dispense
     in place of Given.** (2026-11-24) "Remember the pharmacy needs to see
     medicine chart as nurses but with a dispensed button in place of the
@@ -24,6 +34,51 @@ Numbers are kept from the full list, so older notes still match.
     the nurses' chart layout (last given, next due). Next after 240h.
     (Numbered 247: the other agent recorded its own 246, the antenatal
     visit chart, on the same day.)
+    HIS ANSWERS 2026-11-24 (voice note, tidied, meaning kept): on prices:
+    "they don't necessarily have to type... the system should populate
+    prices... when the doctor is typing prices, the system should be
+    recording the price of that drug and then you can just make [it]
+    standard... as long as it's coming from the Dr or the Matron... any
+    price of any drug or the bed space... record it... next time the system
+    is suggesting it... our system should actually be learning." On old
+    patients: "if there is any medicine chart that the doctor entered before
+    now... when the doctor click[s the bill] you should show all of those...
+    we don't know whether the [patient] has been discharged because they were
+    registered... before we built this... you will know inpatient if their
+    medication appear[s] in the medicine chart." On the Pharmacy: "yes...
+    that's what I mean... the nurse can come and take medication at once...
+    they don't always take it as per dose... they can even take more
+    dosages for that patient... then be giving the patient [from] the
+    store... the [Given and Dispense] place is a little bit confusing for
+    me... explain it." Explained back with a plan and three questions.
+    HIS ANSWERS 2026-11-24: "there has to be a way to record [what is
+    returned]... maybe a button [that] records [it]... so that the patient
+    is not charged for... whatever is returned or wasted." "Thank you,
+    suggestions are correct." Admitted on: "front desk [or] Dr... can click
+    the details and put admitted on [a] date and then everything from [then
+    on]... that's nice." Prescriptions: "the prescription medicine that
+    [was] dispensed can show... with the price... paid... if the patient is
+    admitted and they still prescribed drug for them even if they had paid
+    for the prescription, it shows in the final receipt... the bill
+    preparation just shows everything the patient has spent since they were
+    admitted... and the lab test even if they paid separately... at the end
+    of the day they pay... the difference." (Bill counts doses Given.)
+    BUILT 2026-11-24 on the branch (not on testing): migration
+    20261124200126_chart_prices_returns_admitted_on (set_admitted_on; chart
+    lines marked with their prescription, older ones matched; Medicines
+    given priced from the chart, else the drug's standard, else none;
+    return_to_store; the Pharmacy's chart adds route, last given, returned),
+    test 074, 11 breaks caught. Screens: Change admitted on; the chart's
+    dose price fills from the standard and a new one is offered as standard;
+    a price box per unpriced medicine on the bill (offered as standard after
+    sending); the Pharmacy's medicines taken now with Last given, Next due,
+    Dispense and Returned. SQL batch shown. HIS YES 2026-11-25: "Yes".
+    And: "if the drug was given like two doses and the doctor entered 2000
+    naira, the system automatically know[s] [it] should be 1000 naira so
+    another time where it is five doses the system knows automatically that
+    is 5000. I believe that's already designed." (It is: the box is the
+    price of one dose, multiplied by the doses given and kept as the drug's
+    price. Added the worked total beside each box so it reads plainly.)
 
 245. **Only what was selected, with an amount, is on the receipt.**
     (2026-11-24) "the receipt must not contain what does not have an

@@ -105,6 +105,10 @@ export default function BillForm({
 
   // ===== 0. The stay: lines worked out from it, for an inpatient =====
   const [statement, setStatement] = useState<Statement | null>(null)
+  // A medicine given with no price (request 247): the price of one dose the
+  // doctor types, by the medicine's name. It adds into Medicines given, and
+  // is offered as the drug's standard price after sending.
+  const [dosePrices, setDosePrices] = useState<Record<string, string>>({})
   useEffect(() => {
     let current = true
     void loadStatement(client, patient.id).then((found) => {
@@ -258,6 +262,24 @@ export default function BillForm({
     : 0
   const stayBalance = statement?.admitted ? Number(statement.billed ?? 0) + total - paidSoFar : null
 
+  // Medicines given, worked out again when the doctor types a dose price.
+  function typeDosePrice(medicine: string, typed: string) {
+    const next = { ...dosePrices, [medicine]: typed }
+    setDosePrices(next)
+    const sum = sumOf(
+      (statement?.medicines ?? []).map((one) =>
+        one.amount != null ? one.amount : one.doses * (readAmount(next[one.medicine] ?? '') ?? 0),
+      ),
+    )
+    setLines((all) =>
+      all.map((line) =>
+        line.auto && line.kind === 'medicines_given'
+          ? { ...line, amount: sum > 0 ? String(sum) : '', on: sum > 0 ? true : line.on }
+          : line,
+      ),
+    )
+  }
+
   // Every line ready, or the words to show (Preview and Send both check).
   function readyLines(): { kind: BillKind; item: string; amount: number }[] | string {
     const ready: { kind: BillKind; item: string; amount: number }[] = []
@@ -294,15 +316,20 @@ export default function BillForm({
     draft.clear()
     // Amounts that are new, or not the standard: offer them as standard.
     // Not the lines worked out from the stay.
-    setToStandard(
-      ready.flatMap((line) => {
-        if (['medicines_given', 'take_home_drugs', 'lab_tests'].includes(line.kind)) return []
-        const now = priceOf(list, 'procedure', line.item)
-        return now === line.amount
-          ? []
-          : [{ kind: 'procedure' as const, item: line.item, amount: line.amount, now }]
-      }),
-    )
+    const linePrices: Candidate[] = ready.flatMap((line) => {
+      if (['medicines_given', 'take_home_drugs', 'lab_tests'].includes(line.kind)) return []
+      const now = priceOf(list, 'procedure', line.item)
+      return now === line.amount
+        ? []
+        : [{ kind: 'procedure' as const, item: line.item, amount: line.amount, now }]
+    })
+    // And a dose price typed for a medicine with none: the drug's standard
+    // (request 247: "the system should be learning").
+    const drugPrices: Candidate[] = Object.entries(dosePrices).flatMap(([medicine, typed]) => {
+      const amount = readAmount(typed)
+      return amount ? [{ kind: 'drug' as const, item: medicine, amount }] : []
+    })
+    setToStandard([...drugPrices, ...linePrices])
     setSent(`Bill sent to the Front Desk: ${naira(total)}.`)
   }
 
@@ -415,6 +442,8 @@ export default function BillForm({
             statement={statement}
             onAmount={(amount) => change(index, { amount })}
             onTick={(on) => change(index, { on })}
+            dosePrices={dosePrices}
+            onDosePrice={typeDosePrice}
           />
         ) : (
           <div key={line.key} className={styles.drug}>
@@ -556,19 +585,30 @@ function AutoLine({
   statement,
   onAmount,
   onTick,
+  dosePrices,
+  onDosePrice,
 }: {
   line: Line
   index: number
   statement: Statement | null
   onAmount: (amount: string) => void
   onTick: (on: boolean) => void
+  dosePrices: Record<string, string>
+  onDosePrice: (medicine: string, typed: string) => void
 }) {
+  // Medicines with no price: a box each for the price of one dose (247).
+  const unpriced =
+    line.kind === 'medicines_given'
+      ? (statement?.medicines ?? []).filter((one) => one.amount == null)
+      : []
   const parts: string[] =
     line.kind === 'medicines_given'
-      ? (statement?.medicines ?? []).map(
-          (one) =>
-            `${one.medicine}: ${naira(Number(one.dose_price))} × ${one.doses} = ${naira(Number(one.amount))}`,
-        )
+      ? (statement?.medicines ?? [])
+          .filter((one) => one.amount != null)
+          .map(
+            (one) =>
+              `${one.medicine}: ${naira(Number(one.dose_price))} × ${one.doses} = ${naira(Number(one.amount))}`,
+          )
       : line.kind === 'take_home_drugs'
         ? (statement?.prescriptions ?? []).map(
             (one) =>
@@ -591,13 +631,38 @@ function AutoLine({
         />
         <span>Put on this bill</span>
       </label>
-      <details>
-        <summary>What it is made of ({parts.length})</summary>
+      <details open={unpriced.length > 0}>
+        <summary>What it is made of ({parts.length + unpriced.length})</summary>
         <ul className={styles.autoParts}>
           {parts.map((part) => (
             <li key={part}>{part}</li>
           ))}
         </ul>
+        {/* No price on the chart or the list: type one dose's price. */}
+        {unpriced.map((one, at) => (
+          <div key={one.medicine} className={styles.priceRow}>
+            <label htmlFor={`dose-price-${index}-${at}`}>
+              {one.medicine} × {one.doses}: price of one dose ₦
+            </label>
+            <input
+              id={`dose-price-${index}-${at}`}
+              className={styles.input}
+              inputMode="decimal"
+              placeholder="No price yet"
+              value={dosePrices[one.medicine] ?? ''}
+              onChange={(event) =>
+                onDosePrice(one.medicine, event.target.value.replace(/[^\d.,\s]/g, ''))
+              }
+            />
+            {/* The worked total, so one dose's price reads plainly (2026-11-25). */}
+            {readAmount(dosePrices[one.medicine] ?? '') ? (
+              <small className={styles.muted}>
+                × {one.doses} ={' '}
+                {naira((readAmount(dosePrices[one.medicine] ?? '') ?? 0) * one.doses)}
+              </small>
+            ) : null}
+          </div>
+        ))}
       </details>
       {/* Not ticked: no amount, and it stays for the next bill. */}
       {line.on ? (

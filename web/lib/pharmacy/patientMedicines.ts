@@ -33,6 +33,11 @@ export type PharmacyMedicine = {
   doses?: number | null
   given?: number
   dispensed?: number
+  // Request 247 (2026-11-24): doses brought back to the store, the route,
+  // and the last dose the nurses gave (for Last given and Next due).
+  returned?: number
+  route?: string | null
+  last_given_at?: string | null
 }
 
 export function knownPatientMedicines(
@@ -72,6 +77,25 @@ export async function dispenseFromChart(
   if (error?.code === '42501') return 'Only the Pharmacy dispenses.'
   // "already_dispensed": the same, a moment ago (a double tap).
   if (error || (data !== 'dispensed' && data !== 'already_dispensed')) {
+    return 'That could not be saved. Check the internet and try again.'
+  }
+  return null
+}
+
+// Doses brought back to the store (request 247: "a button [that] records
+// [what is returned]"). Never more than went out; the database checks.
+export async function returnToStore(
+  client: SupabaseClient,
+  medicationId: number,
+  doses: number,
+): Promise<string | null> {
+  const { data, error } = await client.rpc('return_to_store', {
+    medication: medicationId,
+    how_many: doses,
+  })
+  if (error?.code === '42501') return 'Only the Pharmacy records a return.'
+  if (data === 'too_many') return 'That is more than was dispensed and not yet returned.'
+  if (error || (data !== 'returned' && data !== 'already_returned')) {
     return 'That could not be saved. Check the internet and try again.'
   }
   return null

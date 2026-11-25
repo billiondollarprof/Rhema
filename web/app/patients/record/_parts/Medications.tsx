@@ -12,7 +12,10 @@
  *      Suspend, Resume, Stop, Void. Adding asks for how many days; the
  *      doses work out from how often (the doctor can change them), and a
  *      doctor, the matron or anybody in a consulting room types the price
- *      of one dose, for the bill (request 240, 2026-11-23).
+ *      of one dose, for the bill (request 240, 2026-11-23). The price fills
+ *      in from the drug's standard price; a new one is offered as the
+ *      standard after adding (request 247: "the system should be
+ *      learning").
  *   2. Doses given: newest first, and Add a dose not on the list.
  *
  * Never: change a medicine's status without a reason, or record a dose in
@@ -21,7 +24,7 @@
 'use client'
 
 import { inputNow } from '@/lib/time/serverTime'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
@@ -32,7 +35,8 @@ import { medicineWords } from '@/lib/medicines/medicines'
 import { useAuth } from '@/lib/auth/session'
 import { setsPrices } from '@/lib/auth/roles'
 import { courseDoses, doseWords, givenCount } from '@/lib/record/doses'
-import { readAmount } from '@/lib/prices/prices'
+import { loadPrices, priceOf, readAmount, type Price } from '@/lib/prices/prices'
+import MakeStandard, { type Candidate } from '@/components/orders/MakeStandard'
 import { naira } from '@/lib/lab/lab'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
@@ -84,9 +88,25 @@ export function MedicationsSection({
   const [days, setDays] = useState('')
   const [typedDoses, setTypedDoses] = useState<string | null>(null)
   const [price, setPrice] = useState('')
+  // The price box was typed in: a medicine chosen after does not refill it.
+  const [priceTyped, setPriceTyped] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const { staff } = useAuth()
   const prices = staff ? setsPrices(staff) : false
+  // The standard prices, read when the form opens (request 247), and the
+  // price to offer as standard after adding.
+  const [list, setList] = useState<Price[]>([])
+  const [toStandard, setToStandard] = useState<Candidate[]>([])
+  useEffect(() => {
+    if (!adding || !prices) return
+    let current = true
+    void loadPrices(client).then((found) => {
+      if (current && found) setList(found)
+    })
+    return () => {
+      current = false
+    }
+  }, [adding, prices, client])
   const workedOut = courseDoses(howOften, Number(days) || null)
   const doses = typedDoses ?? (workedOut ? String(workedOut) : '')
 
@@ -122,6 +142,15 @@ export function MedicationsSection({
     })
     if (result) setProblem(result)
     else {
+      // A price new, or not the standard: offer it as the standard (247).
+      const name = medicineWords(medicine.trim(), strength.trim())
+      const now = priceOf(list, 'drug', name)
+      setToStandard(
+        prices && dosePrice && dosePrice !== now
+          ? [{ kind: 'drug', item: name, amount: dosePrice, now }]
+          : [],
+      )
+      setPriceTyped(false)
       setAdding(false)
       setMedicine('')
       setStrength('')
@@ -166,6 +195,9 @@ export function MedicationsSection({
                 onChange={(name, picked) => {
                   setMedicine(name)
                   setStrength(picked)
+                  // The drug's standard price fills in, unless one was typed.
+                  const known = priceOf(list, 'drug', medicineWords(name, picked))
+                  if (!priceTyped) setPrice(known ? String(known) : '')
                 }}
               />
             </div>
@@ -240,7 +272,10 @@ export function MedicationsSection({
                   inputMode="decimal"
                   placeholder="e.g. 2,500"
                   value={price}
-                  onChange={(event) => setPrice(event.target.value.replace(/[^\d.,\s]/g, ''))}
+                  onChange={(event) => {
+                    setPriceTyped(true)
+                    setPrice(event.target.value.replace(/[^\d.,\s]/g, ''))
+                  }}
                 />
               </div>
             ) : null}
@@ -257,7 +292,15 @@ export function MedicationsSection({
         </div>
       ) : (
         <div className={styles.actions}>
-          <button className={styles.small} onClick={() => setAdding(true)}>
+          {/* After adding: "Make these the standard prices?" (request 247). */}
+          {toStandard.length ? <MakeStandard client={client} candidates={toStandard} /> : null}
+          <button
+            className={styles.small}
+            onClick={() => {
+              setToStandard([])
+              setAdding(true)
+            }}
+          >
             + Add a medicine
           </button>
         </div>
