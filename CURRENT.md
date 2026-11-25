@@ -70,7 +70,13 @@ Numbers are kept from the full list, so older notes still match.
     dose price fills from the standard and a new one is offered as standard;
     a price box per unpriced medicine on the bill (offered as standard after
     sending); the Pharmacy's medicines taken now with Last given, Next due,
-    Dispense and Returned. SQL batch shown; waiting for his yes.
+    Dispense and Returned. SQL batch shown. HIS YES 2026-11-25: "Yes".
+    And: "if the drug was given like two doses and the doctor entered 2000
+    naira, the system automatically know[s] [it] should be 1000 naira so
+    another time where it is five doses the system knows automatically that
+    is 5000. I believe that's already designed." (It is: the box is the
+    price of one dose, multiplied by the doses given and kept as the drug's
+    price. Added the worked total beside each box so it reads plainly.)
 
 246. **The antenatal visit chart: pick, do not type, and nothing twice.**
     (2026-11-24, with a photo of the paper ANTI-NATAL RECORD and a

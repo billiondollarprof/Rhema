@@ -654,6 +654,13 @@ function AutoLine({
                 onDosePrice(one.medicine, event.target.value.replace(/[^\d.,\s]/g, ''))
               }
             />
+            {/* The worked total, so one dose's price reads plainly (2026-11-25). */}
+            {readAmount(dosePrices[one.medicine] ?? '') ? (
+              <small className={styles.muted}>
+                × {one.doses} ={' '}
+                {naira((readAmount(dosePrices[one.medicine] ?? '') ?? 0) * one.doses)}
+              </small>
+            ) : null}
           </div>
         ))}
       </details>

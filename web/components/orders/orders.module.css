@@ -242,6 +242,12 @@ textarea.input {
   overflow-wrap: anywhere;
 }
 
+/* The worked total under a one-dose price, on its own line (2026-11-25). */
+.priceRow small {
+  grid-column: 1 / -1;
+  text-align: right;
+}
+
 /* "Make these the standard prices?" after sending (request 236). */
 .standardCard {
   display: grid;
