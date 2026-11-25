@@ -1539,3 +1539,12 @@ this file.
     page carries the new words; layout, contrast, visibility and
     click-through checks passed; walk-through 25 of 25 and error checks 7
     of 7 against a real local Supabase.
+    Follow up, LIVE 2026-11-25: his yes, "allow them to continue even
+    after the 12 hours... the integrity of data is still solid." A save
+    that meets an old opening writes a new opening to the log and saves;
+    a screen past 12 hours keeps what it read and says it stopped
+    updating; offline entries do the same. Live error log (his yes): a
+    booking save refused for the number of abortions (24 Nov) and a BP
+    top refused twice (25 Nov); both now named before saving. Checked
+    against a real local Supabase: 13 hours of steady use, details and a
+    visit saved, the opening in the log, void before and after.

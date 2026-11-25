@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-25 (evening): 248 follow up LIVE. A save after 12 hours opens
+  the record again (logged) and saves; screens past 12 hours keep what they
+  read and say so; offline entries too; vital signs name a wrong number.
+  Live error log read with his yes. CI caught the sign-in walk-through
+  waiting for the old words; updated, run locally, green.
+
 - 2026-11-25: 247 LIVE (admitted on, chart prices that learn, unpriced
   doses on the bill, the Pharmacy's chart with Dispense and Returned). 0
   security warnings. Test renumbered 075 and History request 249 after the
