@@ -412,12 +412,13 @@ try {
   step('A reading out of range is refused; a normal one saves')
   await page.getByRole('button', { name: '+ Take new readings' }).click()
   // Vital signs are picked from a list (2026-11-16); a value outside it is
-  // typed with Other, which the database still checks.
+  // typed with Other. The screen names the reading the database would
+  // refuse before saving (request 248), and the database still checks it.
   await page.getByLabel('Temperature °C').click()
   await page.getByLabel('Type to find').fill('50')
   await page.getByRole('option', { name: 'Other: use "50"' }).click()
   await page.getByRole('button', { name: 'Save readings' }).click()
-  await page.getByText('One of the values is outside the normal range.').waitFor()
+  await page.getByText('Temperature must be between 30 and 45.').waitFor()
   await page.getByLabel('Temperature °C').click()
   await page.getByLabel('Type to find').fill('36.8')
   await page.getByRole('option', { name: '36.8', exact: true }).click()
