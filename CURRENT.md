@@ -1005,36 +1005,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     with the first error code. STILL TO DO: his phone tries the testing
     address; if the message shows an error code, send it. Not yet live.
 
-238. **The lab sets a test price, the doctor approves.** (2026-11-22)
-    "sometimes the lab scientists do set price for tests so the doctor can
-    approve". Said back to him how it would work; waiting for his yes. Not
-    started.
-    HIS ANSWER 2026-11-22: "yes, (a), wait for the doctor". So: on one
-    patient's lab request with no price, the lab scientist types a price per
-    test; the doctor who asked sees "Price from the lab" with Approve or
-    Change; the Front Desk takes payment only after the doctor approves.
-    And, same day: "The pharmacist sets price of drugs. They don't set price
-    of tests. The lab scientist sets price of tests. They don't set price of
-    drugs. But the nurses, the front desk, they see the price. Who can edit
-    and set price? The doctor or the matron, anyone with a consultant room.
-    Then for drug prices, the pharmacy can set price, but they still need the
-    doctor to approve it. If they ever set price, they need the director to
-    approve... in this case, they don't actually set the price. It's the
-    doctor that sets the price. But the lab scientist sets price because the
-    lab scientist is the one that does most of the price, and then the doctor
-    approves as it is designed."
-    OPEN QUESTIONS asked 2026-11-22: (1) today "doctor or matron" is by role;
-    should it be "anyone with a consultation room" instead? (2) the Pharmacy
-    drug price: doctor approves, or the director (admin) approves, or build
-    nothing for the Pharmacy now since the doctor sets drug prices?
-    NEXT after part 3 (bills).
-    HIS ANSWER 2026-11-22 (after bills went live): "the front desk should
-    not wait. most times the front desk already knows the price, and the
-    front desk can also edit the price set by the doctor. A set price only
-    acts as a suggestion not a blocker or a must." So for 238: the lab's
-    price shows to the Front Desk at once as a suggestion; the doctor's
-    Approve or Change is still there. See 239 for the Front Desk editing.
-
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major
@@ -1291,75 +1261,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     this session stays readable; keeping records on the device would be a
     patient data decision for him (NDPA), not made.
 
-218. **Go ahead with the proposal, Next.js, backups, and the whole flow.** (2026-11-16)
-    a. Live read allowed: "you have my permission to check the live database"
-       for why the doctor cannot write in consultation notes. He thinks the
-       doctor can see them in a consulting room, "it's just that... I can't
-       write freely normally."
-    b. "Your proposal is good. I think you should go ahead with this." (217c,
-       points 1 to 6.)
-    c. Next.js: "check and make your plan on what update you want to do...
-       whatever fix that we need to make to keep everything running smoothly
-       and not to get any error messages and not to allow the system to break
-       at usage. So let's make those fixes."
-    d. Backups: "check it again... that nothing goes away, nothing misses,
-       nothing is lost."
-    e. The whole flow: "how the front desk enters data, others send to room,
-       others get it, like the entire flow from one department to another...
-       look into those platforms (OpenMRS, Bahmni, Epic)... the pharmacy as
-       well, the population of the medicine, the arrangement, the lab as well
-       ... areas where our own look simpler and better, we keep. Where their
-       own seems better, we make adjustments... put all the plans together."
-    STATUS (2026-11-16, night):
-    a. Done. Live read: the director's account is a doctor in Consultant Room 1,
-       kind consultation, so he could write; the fault was placement and names.
-    b. LIVE: the four boxes with tap words, medicines to the chart, Send to the
-       nurses, the medication chart (Given, then Yes), the summary, the plan
-       banner for nurses, each role's work first, Visits by day. No SQL.
-    c. LIVE: Next.js 16.4.3 to 16.4.5. typescript-eslint 8.73.0 (clears a
-       dev-only minimatch notice) was published 2026-11-16, so it waits a week.
-    d. LIVE: the backup now proves every counted row is in the copy and every
-       live file is in the backup; a run by hand passed on live. FOUND:
-       GitHub starts scheduled runs hours late or not at all (the 01:17 run
-       came at about 08:00; 0 of the 2-hourly runs started in 9 hours).
-       Proposed fix waits for his yes and a token: a Cloudflare Worker timer
-       (free) that starts the backup every 2 hours.
-    e. Research done, the whole-flow plan sent to him. WAITING FOR HIS YES.
-
-217. **Download our data, a review of today, then simplicity.** (2026-11-16)
-    a. "Download our data: if you've checked it and everything checks out,
-       then you go on with it."
-    b. "Go through what you've done today in the last 24 hours... one after
-       the other. Check anything that is not in order, anything that drifted...
-       anything we've not run the SQL, then correct it."
-    c. Simplicity: "when it comes to inputting data, the steps they follow, the
-       arrangement seems to be a little bit cumbersome... look at how other
-       tools designed it (Swift, Helium, Neon, the US and India ones)... profile
-       a restructuring... so that the consultation notes, every section they
-       are working on... how they enter patient data, how they check patient
-       medical history, everything is seamless... both the doctors and the
-       nurses. After we do it now, it becomes easier to sell to other
-       hospitals."
-    The director's voice note (transcribed by Anthony): in his consulting room
-    "there is no proper place where I can write my medical findings... where I
-    can write the patient's symptoms, examination findings, then diagnosis,
-    then treatment plan... The only place I saw there is notes... my clinical
-    patient history... a place for patient's review, another for treatment
-    plan, so that when I forward it to the nurses... they will follow the
-    treatment plan." Nurses: "medication, the time given, the nurse that gave
-    it, the dose... like a column... something like a spreadsheet where they can
-    record... so-so drug given at so-so time, so-so dose by so-so person. So
-    that any person that comes around will see it." Picking drug, then
-    milligram, then dosage to record a dose "will more difficult".
-    STATUS: a. LIVE 2026-11-16 (Admin, Data tab; migration 20261116201525,
-    test 046; checked with made up data, ZIP opened, wrong PIN and cancel
-    checked). b. Done: all 13 of today's migrations on both databases, 0 new
-    warnings; fixed the emailed record missing note titles (LIVE). c. Research
-    done, proposal sent to him, WAITING FOR HIS YES before building.
-    Also asked: Next.js shows a moderate security notice (16.4.3, fix is a
-    small version bump; does not touch this app, which is static). Waiting
-    for his yes to bump it.
-
 203. **Pitch: testing shows Okparavero Memorial Hospital.** (2026-11-16, he was
     at their hospital) "Let's just switch the testing site... then we revert it
     back to Rhema. Then later we settle down and do the multiple ones... we will
@@ -1368,29 +1269,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     DO: put Rhema back on testing when he says (ops/pitch.json brand rhema), and
     give Okparavero its own lasting demo when the demos are built (198, 201).
     LAB (202) LIVE 2026-11-16, same day.
-
-201. **Profile, and the go ahead on Settings and the demos.** (2026-11-16)
-    "You can always go ahead with the settings the way you have described it,
-    one at a time." "What about profile?... they can, maybe put their profile
-    picture if they want to... cap it at maximum 500 kilobytes... the system
-    automatically strips the picture and reduces the size until it's below 500
-    kilobytes. If you can't get below 500 kilobytes, the system rejects it...
-    other things for their profile, if at all is needed... if it's not needed,
-    you can scrap that." Demos: "I think StellaXafe is better... we'll use my
-    StellaXafe account... arrange it in a way that I can easily delete them...
-    after a month of pitching a hospital and no response, I can delete it...
-    check that Cloudflare can accept as many demos as possible, or maybe if we
-    have built up to 20, we can delete some older ones... so Cloudflare
-    doesn't charge us money." He will set the demos up with me when he is back,
-    with the lab list. "After you check everything checks out, you can run the
-    SQL and give me the reports. Make sure everything passes on CI before
-    running the SQL."
-    DECIDED: Settings goes into Admin, one part at a time (hospital details and
-    prices first). Demos on the StellaXafe Cloudflare account, not Vercel.
-    BUILT 2026-11-16: Settings part 1, the price list (migration
-    20261116072103, test 040, Admin > Prices). Profile picture NOT built:
-    a staff photo is new personal data (NDPA), so it waits for his yes on the
-    plan in the chat.
 
 197. **Settings: do we need it?** (2026-11-16) "Find out if you are going to be
     needing a settings section and what are they going to be setting up... who
@@ -1404,18 +1282,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     select front desk from the login page... hospitalname.vessel.app... even if
     they want to come back to the demo later." Read back to him 2026-11-16,
     waits for his yes and the platform choice (a new service costs money).
-199. **Only the biodata is compulsory.** (2026-11-16) "None of them is a
-    compulsory detail... The only details that are compulsory is the biodata,
-    which is the patient name, phone number... the things that the front desk
-    enter... Every other detail is not compulsory, whether medical records...
-    They can enter whatever they have and save... Register from old file... it
-    is only the name that is compulsory."
-    CHECKED 2026-11-16: medical record forms save whatever is filled in (each
-    only refuses a completely empty line, such as a medicine with no name).
-    Register from old file needs only the name. OPEN QUESTION for him: a new
-    patient today needs name, date of birth and sex (his rule of 2026-11-10,
-    "for the new patients, it is needed"); phone is optional, because children
-    in a family may have none. Change to name and phone only? Not changed.
 200. **Pickers as drop downs with search, and clean pages.** (2026-11-16) "Like
     this chemistry now... shouldn't it be just like a drop down? When they click
     on the drop down, they will now select and they should be able to search...
@@ -1677,6 +1543,8 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- 2026-11-26: the profile picture for staff is cancelled (201). New patients keep name, date of birth and sex as compulsory (199). Test prices learn from use as built (238); a hospital price list goes into Admin > Prices when it comes.
 
 - **Outpatient bills are not filled in by themselves** (2026-11-26, closes
   request 257): "outpatients, they usually pay immediately for
