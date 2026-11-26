@@ -15,6 +15,15 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+258. **An Inpatient tag in Find patient.** (2026-11-26) "if a patient is
+    an outpatient or an inpatient, let the tag be among where you click to
+    find patient that you normally have the tag for family, individual,
+    sent to room. Let us have an extra tag that says inpatient. Find a way
+    to include it, even on mobile. Maybe just a little text. So it's easy
+    for somebody to select a patient that is inpatient or a patient that is
+    outpatient." Everybody signed in reads admissions already (no SQL).
+    Next after 256.
+
 257. **Every bill starts with what was already collected, admitted or
     not.** (2026-11-26) "every bill that is being made by the front desk,
     whether it's prescription, if the patient is admitted, they should
