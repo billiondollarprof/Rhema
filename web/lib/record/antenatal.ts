@@ -129,6 +129,11 @@ export const HISTORY = [
   // pre-eclampsia... they need that column for pre-eclampsia."
   'Pre-eclampsia',
   'Eclampsia',
+  // The matron's note, 2026-11-26 (request 254): "Spotting in pregnancy...
+  // threatening miscarriage." Threatened abortion is the same thing, so it
+  // is one line that either word finds.
+  'Spotting in pregnancy',
+  'Threatened miscarriage (threatened abortion)',
 ]
 export const SURGERIES = [
   'Caesarean section',

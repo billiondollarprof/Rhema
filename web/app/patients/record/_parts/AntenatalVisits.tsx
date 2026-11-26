@@ -32,6 +32,7 @@ import Line from './Line'
 import { EmptyLine } from './Section'
 import styles from './record.module.css'
 import OptionSelect from '@/components/options/OptionSelect'
+import SearchSelect from '@/components/options/SearchSelect'
 import { addLine, type DoseGiven, type Vitals } from '@/lib/record/record'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
@@ -725,6 +726,18 @@ export function HistoryPart({
   const [surgery, setSurgery] = useState(booking?.surgery_type ?? '')
   const [reason, setReason] = useState(booking?.surgery_reason ?? '')
   const [problem, setProblem] = useState<string | null>(null)
+  // Other: a box to type one that is not on the list (request 254).
+  const [typingHistory, setTypingHistory] = useState(false)
+  const [typedHistory, setTypedHistory] = useState('')
+  const [typingSurgery, setTypingSurgery] = useState(false)
+
+  // One more history line, typed or picked, once only.
+  function addHistory(item: string) {
+    const words = item.trim().slice(0, 120)
+    if (words && !yes.some((had) => had.toLowerCase() === words.toLowerCase())) {
+      setYes([...yes, words])
+    }
+  }
 
   async function save() {
     const result = await saveBooking(
@@ -781,28 +794,111 @@ export function HistoryPart({
   return (
     <div className={styles.form}>
       <b>Medical history</b>
-      <p className={styles.muted}>Tap each one she has had. Leave them all for Nil.</p>
-      <div className={styles.chips} role="group" aria-label="Medical history">
-        {HISTORY.map((item) => (
-          <button
-            key={item}
-            type="button"
-            className={styles.chip}
-            aria-pressed={yes.includes(item)}
-            onClick={() =>
-              setYes(yes.includes(item) ? yes.filter((y) => y !== item) : [...yes, item])
-            }
-          >
-            {item}
-          </button>
-        ))}
+      {/* More than 8 choices: a drop down with a search box, and Other to
+          type one that is missing (CLAUDE.md "Pick, never type", request
+          254). Each one chosen shows under it; tap it to take it off. */}
+      <div className={`${styles.field} ${styles.fieldWide}`}>
+        <label htmlFor="history-pick">Choose each one she has had. Leave empty for Nil.</label>
+        {typingHistory ? (
+          <div className={styles.vitalTyping}>
+            <input
+              id="history-pick"
+              className={styles.input}
+              autoFocus
+              maxLength={120}
+              placeholder="Type it"
+              value={typedHistory}
+              onChange={(event) => setTypedHistory(event.target.value)}
+            />
+            <button
+              type="button"
+              className={styles.small}
+              disabled={!typedHistory.trim()}
+              onClick={() => {
+                addHistory(typedHistory)
+                setTypedHistory('')
+                setTypingHistory(false)
+              }}
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => setTypingHistory(false)}
+            >
+              Back to the list
+            </button>
+          </div>
+        ) : (
+          <SearchSelect
+            id="history-pick"
+            value=""
+            placeholder="Choose"
+            options={HISTORY.filter((item) => !yes.includes(item)).map((item) => ({
+              value: item,
+              label: item,
+            }))}
+            onChange={addHistory}
+            onOther={(typed) => {
+              if (typed.trim()) addHistory(typed)
+              else setTypingHistory(true)
+            }}
+          />
+        )}
+        {yes.length ? (
+          <div className={styles.chips} role="group" aria-label="Medical history">
+            {yes.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={styles.chip}
+                aria-pressed
+                aria-label={`Remove ${item}`}
+                onClick={() => setYes(yes.filter((had) => had !== item))}
+              >
+                {item} ✕
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className={styles.muted}>Nil so far.</p>
+        )}
       </div>
+      {/* Up to 8 choices: quick buttons, and Other to type one (254). */}
       <Choices
         label="Surgical history (leave empty for Nil)"
-        options={SURGERIES}
+        options={[...SURGERIES, ...(surgery && !SURGERIES.includes(surgery) ? [surgery] : [])]}
         value={surgery}
-        onChange={setSurgery}
+        onChange={(value) => {
+          setTypingSurgery(false)
+          setSurgery(value)
+        }}
       />
+      {typingSurgery ? (
+        <div className={styles.field}>
+          <label htmlFor="surgery-other">Other surgery</label>
+          <input
+            id="surgery-other"
+            className={styles.input}
+            autoFocus
+            maxLength={120}
+            value={surgery}
+            onChange={(event) => setSurgery(event.target.value)}
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={styles.linkButton}
+          onClick={() => {
+            setSurgery('')
+            setTypingSurgery(true)
+          }}
+        >
+          Other surgery
+        </button>
+      )}
       {surgery ? (
         <div className={styles.field}>
           <label htmlFor="surgery-reason">Reason (optional)</label>

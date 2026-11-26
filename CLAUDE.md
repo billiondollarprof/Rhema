@@ -157,6 +157,25 @@ like one that works. That is why step 1 includes the refresh.
 - A briefing from Anthony is direction, not text to paste on a screen.
 - No disclaimers, no apologies, no internal status on a screen.
 
+### Pick, never type (Anthony, 2026-11-26)
+
+"Always there be always options for them to click on... so the system
+grows and becomes more intelligent, becomes better and better the more it
+is used." This is the design everywhere, not a feature to ask about.
+
+1. **Every box offers choices.** Words get a list; numbers get the usual
+   values to pick (a full blood count's WBC, a pulse, a dose), opening at
+   the common one. Typing is the exception, never the start.
+2. **Up to 8 choices: quick buttons. More than 8: a drop down with a
+   search box at the top**, where the first letters find it. Too many
+   buttons dazzle the eye.
+3. **"Other" is always there**, so a missing one can be typed.
+4. **What is typed with Other is kept and offered as standard**: "Save it
+   to the list for everybody" (or the Pharmacy's confirm, for medicines),
+   so next time it is one tap for everybody.
+5. A new list that must remember what people add is a pick list in the
+   database (`pick_options`), which is SQL: show the batch first.
+
 ## 8. The code
 
 - **One folder per part of the app.** Parts never import from inside each

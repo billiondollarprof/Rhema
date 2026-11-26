@@ -15,6 +15,24 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+254. **Spotting in pregnancy, threatened miscarriage; and the pick rule in
+    CLAUDE.md.** (2026-11-26) The matron's note: "Spotting in pregnancy, we
+    still need it. Spotting in pregnancy. Then threatening stage of
+    pregnancy and threatening miscarriage." Anthony: "everything you are
+    putting, you must be putting options that they can just be clicking...
+    if it's not available, then they can click other... write that as a
+    rule in Claude.md... when they add, the system can keep that and ask
+    them to make it a standard... more than 10 or thereabouts... turn it
+    into a drop down with that little search button at the top... So the
+    system grows and becomes more intelligent." DONE: rule written in
+    CLAUDE.md section 7 ("Pick, never type"; 8 is the line between quick
+    buttons and a drop down, the number the app's search already uses).
+    Medical history is a drop down with search and Other (Spotting in
+    pregnancy, Threatened miscarriage (threatened abortion) added);
+    surgical history got Other. ASKED: what "threatening stage of
+    pregnancy" means. WAITING his yes: a pick list so what is typed with
+    Other can be saved for everybody (SQL), and Duphaston (253).
+
 253. **Pre-eclampsia, Duphaston, and a full check of lab results and
     files.** (2026-11-26) "the matron just said something that's under the
     antenatal, that there's eclampsia, but there's no pre-eclampsia, that
