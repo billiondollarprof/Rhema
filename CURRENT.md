@@ -15,6 +15,18 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+255. **Not palpable, previous births, and CS before.** (2026-11-26) The
+    matron: "At palpation, there's something you need to add, not palpable
+    too... add the last [births], like all the child [births]... the
+    previous children they've had. And if they've done CS before or not.
+    If they've done any operation." Checked: Presentation already has "Not
+    yet palpable"; Previous pregnancies already records each child (date,
+    weight, duration, method, sex, if the baby died); Surgical history
+    already has Caesarean section and Other. DONE (his rule, CLAUDE.md
+    section 7): birth weight, duration and method of delivery are picked
+    with Other; the counts so far and the next of kin's age are picked.
+    ASKED: should "Not palpable" also be offered on Height of fundus.
+
 254. **Spotting in pregnancy, threatened miscarriage; and the pick rule in
     CLAUDE.md.** (2026-11-26) The matron's note: "Spotting in pregnancy, we
     still need it. Spotting in pregnancy. Then threatening stage of

@@ -46,6 +46,7 @@ import {
 import { onChange } from '@/lib/live/changes'
 import { openFile } from '@/lib/files/files'
 import { ClientPart, DueDate, HistoryPart, VisitsPart } from './AntenatalVisits'
+import { VitalPick, type Range } from './Observations'
 
 type Props = { client: SupabaseClient; staffId: string; patientId: number }
 // The last menstrual period, from the profile, for the due date.
@@ -102,6 +103,94 @@ function Field({
     </div>
   )
 }
+
+// ===== Quick buttons with Other (CLAUDE.md "Pick, never type") =====
+// Up to 8 choices as buttons; Other shows a box to type one that is
+// missing (request 255, the matron's previous births).
+function PickOrType({
+  id,
+  label,
+  options,
+  value,
+  onChange,
+  maxLength,
+}: {
+  id: string
+  label: string
+  options: string[]
+  value: string
+  onChange: (value: string) => void
+  maxLength: number
+}) {
+  // Other is open when asked for, or when what is saved is not on the list.
+  const [typing, setTyping] = useState(Boolean(value) && !options.includes(value))
+  return (
+    <div className={`${styles.field} ${styles.fieldWide}`}>
+      <span>{label}</span>
+      <div className={styles.chips} role="group" aria-label={label}>
+        {options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            className={styles.chip}
+            aria-pressed={!typing && value === option}
+            onClick={() => {
+              setTyping(false)
+              onChange(value === option ? '' : option)
+            }}
+          >
+            {option}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={styles.chip}
+          aria-pressed={typing}
+          onClick={() => {
+            setTyping(true)
+            onChange('')
+          }}
+        >
+          Other
+        </button>
+      </div>
+      {typing ? (
+        <input
+          id={id}
+          aria-label={`${label}, other`}
+          className={styles.input}
+          autoFocus
+          maxLength={maxLength}
+          placeholder="Type it"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+// "3.2" becomes "3.2 kg"; words typed with Other stay as typed.
+function weightWords(typed: string): string | null {
+  const words = typed.trim()
+  if (!words) return null
+  return /^\d+(\.\d+)?$/.test(words) ? `${words} kg` : words.slice(0, 20)
+}
+
+// Counts and an age, picked (CLAUDE.md "Pick, never type", request 255).
+const COUNT: Range = { from: 0, to: 20, step: 1, start: '0', decimals: 0 }
+const KIN_AGE: Range = { from: 16, to: 100, step: 1, start: '30', decimals: 0 }
+
+// The choices for a previous birth (request 255).
+const DURATIONS = ['Term', 'Preterm', 'Post-term']
+const DELIVERY_METHODS = [
+  'SVD',
+  'Caesarean section',
+  'Assisted (vacuum or forceps)',
+  'Breech delivery',
+]
+// A baby's weight at birth, picked from 0.5 to 6 kg, opening at 3.2.
+const BIRTH_WEIGHT: Range = { from: 0.5, to: 6, step: 0.1, start: '3.2', decimals: 1 }
 
 // A whole number the database takes, or the words saying why not
 // (request 248: a refused number used to say only "could not be saved").
@@ -364,42 +453,50 @@ function BookingForm({
           value={values.kin_education}
           onChange={set('kin_education')}
         />
-        <Field
-          id="kin-age"
-          label="Age"
-          type="number"
-          invalid={wrongKey === 'kin_age'}
-          value={values.kin_age}
-          onChange={set('kin_age')}
-        />
+        <div className={styles.field}>
+          <label htmlFor="kin-age">Age</label>
+          <VitalPick
+            id="kin-age"
+            range={KIN_AGE}
+            invalid={wrongKey === 'kin_age'}
+            value={values.kin_age}
+            onChange={set('kin_age')}
+          />
+        </div>
         <Field id="kin-tribe" label="Tribe" value={values.kin_tribe} onChange={set('kin_tribe')} />
       </div>
       <b>Pregnancies so far</b>
       <div className={styles.fields}>
-        <Field
-          id="an-abortions"
-          label="Number of abortions"
-          type="number"
-          invalid={wrongKey === 'abortions'}
-          value={values.abortions}
-          onChange={set('abortions')}
-        />
-        <Field
-          id="an-miscarriages"
-          label="Number of miscarriages"
-          type="number"
-          invalid={wrongKey === 'miscarriages'}
-          value={values.miscarriages}
-          onChange={set('miscarriages')}
-        />
-        <Field
-          id="an-total"
-          label="Total number of pregnancies"
-          type="number"
-          invalid={wrongKey === 'total_pregnancies'}
-          value={values.total_pregnancies}
-          onChange={set('total_pregnancies')}
-        />
+        <div className={styles.field}>
+          <label htmlFor="an-abortions">Number of abortions</label>
+          <VitalPick
+            id="an-abortions"
+            range={COUNT}
+            invalid={wrongKey === 'abortions'}
+            value={values.abortions}
+            onChange={set('abortions')}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="an-miscarriages">Number of miscarriages</label>
+          <VitalPick
+            id="an-miscarriages"
+            range={COUNT}
+            invalid={wrongKey === 'miscarriages'}
+            value={values.miscarriages}
+            onChange={set('miscarriages')}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="an-total">Total number of pregnancies</label>
+          <VitalPick
+            id="an-total"
+            range={COUNT}
+            invalid={wrongKey === 'total_pregnancies'}
+            value={values.total_pregnancies}
+            onChange={set('total_pregnancies')}
+          />
+        </div>
         <Field
           id="an-parity"
           label="Parity"
@@ -559,7 +656,8 @@ function PregnanciesPart({
       patient_id: patientId,
       born_on: values.born_on || null,
       duration: values.duration.trim() || null,
-      birth_weight: values.birth_weight.trim() || null,
+      // A number picked is saved with its unit, as before: "3.2 kg".
+      birth_weight: weightWords(values.birth_weight),
       delivery_method: values.delivery_method.trim() || null,
       baby_sex: values.baby_sex || null,
       baby_died: died,
@@ -632,26 +730,31 @@ function PregnanciesPart({
               value={values.born_on}
               onChange={set('born_on')}
             />
-            <Field
+            {/* Picked, not typed, with Other (request 255). */}
+            <div className={styles.field}>
+              <label htmlFor="pp-weight">Birth weight (kg)</label>
+              <VitalPick
+                id="pp-weight"
+                range={BIRTH_WEIGHT}
+                value={values.birth_weight}
+                onChange={set('birth_weight')}
+              />
+            </div>
+            <PickOrType
               id="pp-duration"
               label="Duration of pregnancy"
-              placeholder="e.g. Term"
+              options={DURATIONS}
               value={values.duration}
               onChange={set('duration')}
+              maxLength={40}
             />
-            <Field
-              id="pp-weight"
-              label="Birth weight"
-              placeholder="e.g. 3.2 kg"
-              value={values.birth_weight}
-              onChange={set('birth_weight')}
-            />
-            <Field
+            <PickOrType
               id="pp-method"
               label="Method of delivery"
-              placeholder="e.g. SVD"
+              options={DELIVERY_METHODS}
               value={values.delivery_method}
               onChange={set('delivery_method')}
+              maxLength={60}
             />
             <div className={styles.field}>
               <label htmlFor="pp-sex">Sex</label>
