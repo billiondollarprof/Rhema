@@ -4,6 +4,10 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-26 (later): request 251, the duplicate warning, handed over to the
+  other agent with a full spec (handover section 9). This branch stops here
+  until Anthony asks again.
+
 - 2026-11-26: 249 answered from live (read only, no names): History was
   right; a likely ₦8,000 double charge from a duplicate lab request found,
   not changed. 250 live consistency checks clean. Handover section 8.

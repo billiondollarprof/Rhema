@@ -15,6 +15,21 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+251. **Warn before the same test (or drug) is asked for, or paid, twice.**
+    (2026-11-26) "I think you should do number two a warning... if it's
+    going to take a lot of context... handover to the other agent to
+    continue... if requesting for the exact same test for the exact same
+    patient then [a warning] shows so they don't request for the test
+    twice... I'm not sure the patient paid twice... maybe the front desk
+    had to tap [it] twice because they requested [it] twice... [only] one
+    result... we entered so... treat duplication for that area as well...
+    the system shows [a] warning and then give them a key to continue
+    anyway or cancel. I don't even know what language to use." On the
+    ₦8,000 found in 249: "when I discussed with them, I will know what to
+    do" (his to settle; nothing to change on live). HANDED OVER to the other
+    agent: full spec in docs/HANDOVER-2026-11-24-front-desk-228.md section
+    9. Not started on this branch.
+
 250. **Go through every aspect of the platform: everything saves, everything
     is accurate, the system works.** (2026-11-26) "I also need you to go
     through every aspect of the platform to ensure that... very important

@@ -210,3 +210,45 @@ screen of the parts other agents built against live behaviour.
 2. 250: finish the walk through the other agents' parts.
 3. 245, 240h, 247: built and live; he will test, and says when done.
 4. 243 (Other in blue): later, his word.
+
+## 9. Next job for the other agent: the duplicate warning (request 251)
+
+Anthony, 2026-11-26, in short: when the exact same test is asked for the
+exact same patient again, show a warning, with a way to continue anyway or
+cancel. Do the same where the Front Desk takes payment, and for drugs.
+
+**Why (from the live check, section 8):** on 24 Nov a nurse sent the same
+three tests (MP, Widal, PCV) for the same patient at 21:40 and 21:46, and
+both were paid. Anthony is settling that one with the staff; do not change
+it on live. He says only one result has been entered since.
+
+**Suggested behaviour and words** (he asked for the wording; keep it short
+and plain, CLAUDE.md section 7):
+
+1. *Request lab* (`web/components/orders/LabRequestForm.tsx`), on Send:
+   if the patient already has a request not cancelled, not completed, with
+   any of the same tests (open or awaiting payment, any age), show:
+   "Widal and PCV were already requested for this patient at 21:40 and are
+   not done yet." Buttons: **Send anyway** and **Cancel**. Cancel keeps the
+   form as it is.
+2. *Prescribe* (`web/components/orders/PrescribeForm.tsx`): the same for a
+   drug already on a prescription of this patient that is not dispensed
+   and not cancelled: "Amoxicillin 500 mg was already prescribed for this
+   patient at 10:15 and is not given yet." **Send anyway** / **Cancel**.
+3. *Front Desk, Take payment* on a lab request or prescription
+   (`web/components/work/LabCard.tsx`, `PharmacyCard.tsx`): if another
+   unpaid or paid request of the same patient in the last 24 hours has the
+   same tests (or drugs), say before Record payment: "This patient has the
+   same tests on another request (paid at 21:52). Check before taking
+   payment twice." **Take payment anyway** / **Cancel**.
+4. The check is a reading the person already may do (their own lists), so
+   it can be done on screen without a new database rule. If it needs a
+   function (for example to see requests made by others), that is SQL:
+   show Anthony the batch first.
+5. Tests: a screen entry in `scripts/screens/screens-list.cjs` with a
+   made-up duplicate, and a walk that presses Send anyway and Cancel and
+   checks what is sent.
+
+**Also left from this branch** (section 8): 2 cases of the same tests and
+4 of the same drug within an hour in the last 14 days, to look at with
+Anthony; the rest of request 250 (walk the other agents' parts).
