@@ -35,7 +35,10 @@ Numbers are kept from the full list, so older notes still match.
     that history and records." IN PROGRESS. Code read: History adds each
     payment under the kind it was saved with; the live records of 24 and 25
     Nov are needed to tell entry from fault. Asked his yes for a live read
-    (no names), 2026-11-25; not answered yet.
+    (no names), 2026-11-25. HIS YES 2026-11-25: "yes". BLOCKED 2026-11-26:
+    the Supabase connector (the only read-only way in) failed to connect
+    (502), twice; not worked around (no new tool pointed at live). Waiting
+    for it to come back.
     2026-11-25 also: "make the vital sign visible to also the front desk, so
     the front desk can also [chart] it. I believe we've done that already.
     Just confirm." CONFIRMED: Take vitals for the Front Desk is live since
