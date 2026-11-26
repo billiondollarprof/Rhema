@@ -28,6 +28,18 @@ Numbers are kept from the full list, so older notes still match.
     remaining and the doctor sees those... the database is taking the data
     properly... files are saving in our Cloudflare storage." Also asked
     what "Not saved" after 12 hours means (answered in chat).
+    DONE 2026-11-26: Pre-eclampsia and Eclampsia on the antenatal Medical
+    history ticklist, LIVE (that list has no Other, so she could not add
+    them). Lab results one test at a time checked end to end on a local copy
+    with the Worker and its file storage: 3 tests asked, Malaria sent with a
+    photo, the doctor sees it and opens the photo, Widal and FBC pending,
+    then sent; 12 of 12 checks passed. Seen: the doctor's request line still
+    lists all three tests under "Pending results" after one is sent (the
+    other agent's 240h design; told him, not changed).
+    WAITING: (1) his yes to add Duphaston 10 mg tablet to the medicine list
+    (dydrogesterone 10 mg is there under its own name; staff could also add
+    it with Other, pending the Pharmacy); (2) his yes to read live, counts
+    only, to confirm files reach the live Cloudflare storage.
 
 250. **Go through every aspect of the platform: everything saves, everything
     is accurate, the system works.** (2026-11-26) "I also need you to go
