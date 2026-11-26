@@ -46,9 +46,11 @@ import {
   medicineWords,
 } from '@/lib/medicines/medicines'
 import { addLine, type MedicalRecord } from '@/lib/record/record'
+import { vitalsProblem } from '@/lib/record/vitals'
 import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
 import { useDraft } from '@/lib/drafts/drafts'
 import DraftBack from '@/components/drafts/DraftBack'
+import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
 
 // ===== 1. Small helpers =====
 // "now" in the form a time box expects, from the internet's time, not the
@@ -87,7 +89,7 @@ function Sheet() {
   const tab = params.get('s') === 'vitals' ? 'vitals' : 'drugs'
   const { client, staff } = auth
   const allowed = Boolean(staff?.can_medical)
-  const { patient, record, savedAt, refused, reload } = useRecord(
+  const { patient, record, savedAt, refused, stale, reload } = useRecord(
     client,
     staff?.id ?? null,
     id,
@@ -132,6 +134,7 @@ function Sheet() {
             Vital signs
           </Link>
         </div>
+        {stale ? <p className={styles.offline}>{OLD_OPENING_SCREEN}</p> : null}
         {savedAt ? (
           <p className={styles.offline}>
             No network. This is the copy kept on this device at{' '}
@@ -542,6 +545,12 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
     }
     if (Object.keys(numbers).length === 0 && !sugar) {
       setProblem('Type at least one reading.')
+      return
+    }
+    // A number the database would refuse is named first (request 248).
+    const wrong = vitalsProblem(numbers)
+    if (wrong) {
+      setProblem(wrong)
       return
     }
     setBusy(true)

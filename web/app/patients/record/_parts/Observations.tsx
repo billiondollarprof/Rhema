@@ -44,6 +44,7 @@ import {
   glucoseWords,
   rememberNumber,
   usedNumbers,
+  vitalsProblem,
   type GlucoseUnit,
   type GlucoseWhen,
 } from '@/lib/record/vitals'
@@ -303,6 +304,12 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     const hasFixed = Object.values(numbers).some((n) => n !== null)
     if (!hasFixed && extras.length === 0) {
       setProblem('Fill in at least one reading.')
+      return
+    }
+    // A number the database would refuse is named first (request 248).
+    const wrong = vitalsProblem(numbers)
+    if (wrong) {
+      setProblem(wrong)
       return
     }
     if (hasFixed) {

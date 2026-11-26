@@ -63,7 +63,8 @@ import buttons from '../_parts/patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
 import type { PatientFile } from '@/lib/patients/patientFiles'
 import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patients'
-import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
+import { loadRecord, openRecord, openingIsOld, type MedicalRecord } from '@/lib/record/record'
+import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { actsAsDoctor, setsPrices } from '@/lib/auth/roles'
@@ -112,6 +113,9 @@ function PatientRecord() {
     recall<MedicalRecord>(auth.staff?.id, `record:${id}`),
   )
   const [refused, setRefused] = useState(false)
+  // Past 12 hours since opening: what shows stays, and the screen says it
+  // has stopped updating (request 248).
+  const [stale, setStale] = useState(false)
   // The copy kept for no network (request 224): shown, with a banner, when
   // the record cannot be read now.
   const [saved, setSaved] = useState<(SavedRecord & { savedAt: number }) | null>(null)
@@ -194,9 +198,14 @@ function PatientRecord() {
 
   // Read again after a change. The opening is still fresh, so no new one.
   const reload = useCallback(() => {
+    if (openingIsOld()) {
+      setStale(true)
+      return
+    }
     if (client && id)
       loadRecord(client, id).then((loaded) => {
         if (!loaded) return
+        setStale(false)
         if (staffId) remember(staffId, `record:${id}`, loaded)
         setRecord(loaded)
       })
@@ -419,6 +428,11 @@ function PatientRecord() {
         {!stop && props && patient ? (
           <>
             <NotSent staffId={staff.id} patientId={props.patientId} />
+            {stale ? (
+              <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
+                {OLD_OPENING_SCREEN}
+              </div>
+            ) : null}
             {saved ? (
               <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
                 No network. This is the copy kept on this device at{' '}

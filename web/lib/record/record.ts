@@ -183,10 +183,73 @@ export type VoidableTable =
 const VOID = 'id, voided_at, void_reason, voider:staff!voided_by(full_name)'
 
 // ===== 2. Open, then read =====
-export async function openRecord(client: SupabaseClient, patientId: number): Promise<boolean> {
+// The record on this screen, so a save that meets an old opening can open
+// it again (2a). One record page shows one patient.
+let patientOnScreen: number | null = null
+// When it was last opened, by this device's clock (only the difference is
+// used, so a wrong clock does not matter).
+let openedAt = 0
+const TWELVE_HOURS = 12 * 60 * 60 * 1000
+
+// Writes "this person opened this record, now" (logged by the database).
+// Used on its own when a save or an offline entry needs the opening again.
+export async function writeOpening(client: SupabaseClient, patientId: number): Promise<boolean> {
   const { error } = await client.rpc('open_record', { patient: patientId })
   if (error) console.warn(`Record for patient ${patientId} could not be opened: ${error.code}`)
   return !error
+}
+
+// Opening the record page: the opening, and which patient is on screen.
+export async function openRecord(client: SupabaseClient, patientId: number): Promise<boolean> {
+  const opened = await writeOpening(client, patientId)
+  if (opened) {
+    patientOnScreen = patientId
+    openedAt = Date.now()
+  }
+  return opened
+}
+
+// Is the record on screen past its 12 hours? Then the database answers its
+// reads with nothing, and a read again would put empty lists on the screen
+// (no medicines, no notes) for a patient who has them. So the screens keep
+// what they last read and say they have stopped updating (request 248).
+// Ten minutes early, so a slow read never lands on the edge.
+export function openingIsOld(): boolean {
+  return openedAt > 0 && Date.now() - openedAt > TWELVE_HOURS - 10 * 60 * 1000
+}
+
+// ===== 2a. A save that meets an old opening =====
+// A record may be written only within 12 hours of opening it, and every
+// opening goes in the activity log first. Anthony, 2026-11-25 (request
+// 248): "allow them to continue even after the 12 hours... in a way that
+// the integrity of data is still solid." So when a save is refused for an
+// old opening, the record is opened again, which writes a new opening to
+// the log in this person's name, at this moment, and the same save is tried
+// once more. The opening is written only when somebody really saves, never
+// on a timer, so the log never shows an opening nobody made. The database
+// still checks the person may use medical records at all: somebody whose
+// access was taken away is still refused.
+//   run: does the save once, and says whether it wrote (an update that the
+//        database may not make answers no row and no error).
+type Attempt = { error: { code?: string; message?: string } | null; wrote: boolean }
+
+export async function saveWithOpening(
+  client: SupabaseClient,
+  patientId: number | null,
+  run: () => Promise<Attempt>,
+): Promise<Attempt & { oldOpening: boolean }> {
+  const refused = (attempt: Attempt) =>
+    isOldOpening(attempt.error) || (!attempt.error && !attempt.wrote)
+  const first = await run()
+  if (!refused(first)) return { ...first, oldOpening: false }
+  const patient = patientId ?? patientOnScreen
+  if (patient === null || !(await writeOpening(client, patient))) {
+    return { ...first, oldOpening: true }
+  }
+  // The record on screen is fresh again, so it may read again too.
+  if (patient === patientOnScreen) openedAt = Date.now()
+  const second = await run()
+  return { ...second, oldOpening: refused(second) }
 }
 
 export async function loadRecord(
@@ -325,7 +388,15 @@ export async function editMedication(
   id: number,
   values: { medicine: string; dose: string | null; how_often: string | null },
 ): Promise<string | null> {
-  const { error } = await client.from('patient_medications').update(values).eq('id', id)
+  const { error, oldOpening } = await saveWithOpening(client, null, async () => {
+    const { data, error } = await client
+      .from('patient_medications')
+      .update(values)
+      .eq('id', id)
+      .select('id')
+    return { error, wrote: !error && (data?.length ?? 0) > 0 }
+  })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`A medicine could not be edited: ${error.code}`)
     return error.code === '23514'
@@ -349,7 +420,16 @@ export async function addLine(
   table: Exclude<VoidableTable, never> | 'medical_profiles',
   values: Record<string, unknown>,
 ): Promise<string | null> {
-  const { error } = await client.from(table).insert(values)
+  // An insert that the double tap guard skips answers no error and no
+  // row, and counts as written: the first one is in already.
+  const { error, oldOpening } = await saveWithOpening(
+    client,
+    Number(values.patient_id) || null,
+    async () => {
+      const { error } = await client.from(table).insert(values)
+      return { error, wrote: !error }
+    },
+  )
   // No network: the entry waits on this device, marked not sent, and goes
   // when the network is back (request 128, step 3: "show that it has not
   // saved. But let it save").
@@ -376,7 +456,7 @@ export async function addLine(
   }
   if (error) {
     console.warn(`A line could not be added to ${table}: ${error.code}`)
-    if (isOldOpening(error)) return OLD_OPENING
+    if (oldOpening) return OLD_OPENING
     return error.code === '23514'
       ? 'One of the values is outside the normal range. Check it and try again.'
       : 'That could not be saved. Try again.'
@@ -394,18 +474,21 @@ export async function saveProfile(
   const values = { ...profile, updated_by: staffId }
   // Read back: an update the database may not make answers no row and no
   // error, which used to show as saved (request 248, 2026-11-25).
-  const { data, error } = exists
-    ? await client
-        .from('medical_profiles')
-        .update(values)
-        .eq('patient_id', patientId)
-        .select('patient_id')
-    : await client
-        .from('medical_profiles')
-        .insert({ ...values, patient_id: patientId })
-        .select('patient_id')
-  if (!error && (!data || data.length === 0)) return OLD_OPENING
-  if (isOldOpening(error)) return OLD_OPENING
+  // Opened again and tried once more if the opening is old (2a).
+  const { error, oldOpening } = await saveWithOpening(client, patientId, async () => {
+    const { data, error } = exists
+      ? await client
+          .from('medical_profiles')
+          .update(values)
+          .eq('patient_id', patientId)
+          .select('patient_id')
+      : await client
+          .from('medical_profiles')
+          .insert({ ...values, patient_id: patientId })
+          .select('patient_id')
+    return { error, wrote: !error && (data?.length ?? 0) > 0 }
+  })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`The profile for patient ${patientId} could not be saved: ${error.code}`)
     return 'That could not be saved. Try again.'
@@ -422,14 +505,19 @@ export async function voidItem(
   staffId: string,
 ): Promise<string | null> {
   if (!reason.trim()) return 'Give a short reason.'
-  const { error } = await client
-    .from(table)
-    .update({
-      voided_at: serverNow().toISOString(),
-      voided_by: staffId,
-      void_reason: reason.trim(),
-    })
-    .eq('id', id)
+  const { error, oldOpening } = await saveWithOpening(client, null, async () => {
+    const { data, error } = await client
+      .from(table)
+      .update({
+        voided_at: serverNow().toISOString(),
+        voided_by: staffId,
+        void_reason: reason.trim(),
+      })
+      .eq('id', id)
+      .select('id')
+    return { error, wrote: !error && (data?.length ?? 0) > 0 }
+  })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`${table} ${id} could not be voided: ${error.code}`)
     return 'That could not be voided. Try again.'
@@ -443,11 +531,19 @@ export async function changeMedicationStatus(
   status: MedicationStatus,
   reason: string,
 ): Promise<string | null> {
-  const { error } = await client.rpc('change_medication_status', {
-    medication: medicationId,
-    status,
-    reason: reason.trim(),
+  // The database answers "not found, or this record is not open" for an old
+  // opening; that counts as not written, so it opens again and tries once
+  // more (2a).
+  const { error, oldOpening } = await saveWithOpening(client, null, async () => {
+    const { error } = await client.rpc('change_medication_status', {
+      medication: medicationId,
+      status,
+      reason: reason.trim(),
+    })
+    const notOpen = (error?.message ?? '').includes('this record is not open')
+    return { error: notOpen ? null : error, wrote: !error }
   })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`Medication ${medicationId} status could not be changed: ${error.code}`)
     return 'That could not be saved. Try again.'
@@ -462,7 +558,15 @@ export async function setConditionStatus(
   conditionId: number,
   status: 'active' | 'resolved',
 ): Promise<string | null> {
-  const { error } = await client.from('conditions').update({ status }).eq('id', conditionId)
+  const { error, oldOpening } = await saveWithOpening(client, null, async () => {
+    const { data, error } = await client
+      .from('conditions')
+      .update({ status })
+      .eq('id', conditionId)
+      .select('id')
+    return { error, wrote: !error && (data?.length ?? 0) > 0 }
+  })
+  if (oldOpening) return OLD_OPENING
   if (error) {
     console.warn(`Condition ${conditionId} status could not be changed: ${error.code}`)
     return 'That could not be saved. Try again.'

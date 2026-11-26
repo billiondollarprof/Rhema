@@ -18,7 +18,7 @@ import { recall, remember } from '@/lib/cache/memory'
 import { onChange } from '@/lib/live/changes'
 import { noteOfflineView, readSavedRecord } from '@/lib/offline/recordCopy'
 import { getPatient, type PatientResult } from '@/lib/patients/patients'
-import { loadRecord, openRecord, type MedicalRecord } from '@/lib/record/record'
+import { loadRecord, openRecord, openingIsOld, type MedicalRecord } from '@/lib/record/record'
 
 export function useRecord(
   client: SupabaseClient | null,
@@ -35,6 +35,8 @@ export function useRecord(
   // When the copy kept for no network is what shows: the time it was saved.
   const [savedAt, setSavedAt] = useState<number | null>(null)
   const [refused, setRefused] = useState(false)
+  // Past 12 hours since opening: keep what shows, and say so (request 248).
+  const [stale, setStale] = useState(false)
 
   // ===== 1. Open, then read =====
   useEffect(() => {
@@ -75,8 +77,13 @@ export function useRecord(
   // ===== 2. Read again after a change (the opening is still fresh) =====
   const reload = useCallback(() => {
     if (!client || !patientId) return
+    if (openingIsOld()) {
+      setStale(true)
+      return
+    }
     loadRecord(client, patientId).then((loaded) => {
       if (!loaded) return
+      setStale(false)
       if (staffId) remember(staffId, `record:${patientId}`, loaded)
       setRecord(loaded)
     })
@@ -88,5 +95,5 @@ export function useRecord(
     return onChange(client, 'records', reload)
   }, [client, opened, reload])
 
-  return { patient, record, savedAt, refused, reload }
+  return { patient, record, savedAt, refused, stale, reload }
 }

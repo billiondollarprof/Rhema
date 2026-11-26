@@ -2591,6 +2591,19 @@ These never come off the list.
 
 ### Decided
 
+- **A save after 12 hours opens the record again by itself** (2026-11-25,
+  request 248): "what is the best option... as long as it doesn't affect
+  the integrity of the data... allow them to continue even after the 12
+  hours... the integrity of data is still solid." Built: a save refused for
+  an old opening writes a new opening to the log (this person, this
+  moment, only when somebody really saves, never on a timer), then tries
+  the same save once more; medical permission is still checked. A screen
+  past 12 hours keeps what it last read and says it has stopped updating,
+  never shows empty lists. Offline entries sent later do the same. And he
+  allowed reading the live error log: it showed a booking save refused for
+  the number of abortions (24 Nov) and a BP top refused twice (25 Nov);
+  both are now named on the screen before saving.
+
 - 2026-11-22: a price set by a doctor, the matron or the lab is a
   suggestion. The Front Desk can change it and never waits for an approval.
   "A set price only acts as a suggestion not a blocker or a must."
@@ -2756,12 +2769,6 @@ These never come off the list.
   is on the list.
 
 ### Waiting on Anthony
-
-- (2026-11-25, from request 248) Should a save that meets an old record
-  opening (over 12 hours) open the record again by itself and save,
-  writing the opening to the log as usual? Today it says so and asks the
-  person to open the record again. Also: may we read the live database's
-  error log to see exactly what the matron met?
 
 - Domain move from his Cloudflare account to the hospital's. Done so far:
   new account has the zone added (Free plan, bots blocked, Pending,
