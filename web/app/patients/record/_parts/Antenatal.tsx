@@ -30,7 +30,24 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import Line from './Line'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
-import { addLine, openingIsOld, when, type DoseGiven, type Vitals } from '@/lib/record/record'
+import {
+  addLine,
+  openingIsOld,
+  saveProfile,
+  when,
+  type Allergy,
+  type DoseGiven,
+  type Profile,
+  type Vitals,
+} from '@/lib/record/record'
+import { loadPatientLab } from '@/lib/lab/lab'
+import {
+  LAB_NAMES,
+  newestValue,
+  shortBloodGroup,
+  type Found,
+  type LabLine,
+} from '@/lib/record/fromLab'
 import {
   TEST_WORDS,
   loadAntenatal,
@@ -52,7 +69,18 @@ type Props = { client: SupabaseClient; staffId: string; patientId: number }
 // The last menstrual period, from the profile, for the due date.
 // The vital signs and the doses given come from the record already read, so
 // the visit form can fill itself in (request 246).
-type SectionProps = Props & { lmp?: string | null; vitals?: Vitals[]; doses?: DoseGiven[] }
+// Since request 256 (2026-11-26) the profile, the allergies and the lab
+// results come in too, so the visit shows everything in one place and
+// nothing is typed twice; reloadRecord refreshes the page after gravida and
+// para are saved to the profile.
+type SectionProps = Props & {
+  lmp?: string | null
+  vitals?: Vitals[]
+  doses?: DoseGiven[]
+  profile?: Profile | null
+  allergies?: Allergy[]
+  reloadRecord?: () => void
+}
 
 // Today, by the internet's clock (request 225).
 const today = () => serverNow().toISOString().slice(0, 10)
@@ -211,13 +239,23 @@ export function AntenatalSection({
   lmp = null,
   vitals = [],
   doses = [],
+  profile = null,
+  allergies = [],
+  reloadRecord,
 }: SectionProps) {
   const [data, setData] = useState<Awaited<ReturnType<typeof loadAntenatal>> | null>(null)
+  // The patient's lab results, for HB, urine, blood group (request 256).
+  const [lab, setLab] = useState<LabLine[]>([])
   // Past 12 hours since opening the database answers reads with nothing,
   // so what shows is kept instead (request 248; the page says so).
   const load = useCallback(async () => {
     if (openingIsOld()) return
-    setData(await loadAntenatal(client, patientId))
+    const [antenatal, results] = await Promise.all([
+      loadAntenatal(client, patientId),
+      loadPatientLab(client, patientId),
+    ])
+    setData(antenatal)
+    setLab(results.results)
   }, [client, patientId])
   useEffect(() => {
     // First read straight after the screen shows, then again whenever
@@ -248,6 +286,11 @@ export function AntenatalSection({
         visits={data.visits}
         vitals={vitals}
         doses={doses}
+        lab={lab}
+        profile={profile}
+        allergies={allergies}
+        booking={data.booking}
+        pregnancies={data.pregnancies}
         onDone={load}
       />
       <ClientPart
@@ -274,11 +317,15 @@ export function AntenatalSection({
         onDone={load}
       />
       <BookingForm
+        key={`booking-${profile?.gravida ?? ''}-${profile?.para ?? ''}-${live(data.pregnancies)}`}
         client={client}
         staffId={staffId}
         patientId={patientId}
         booking={data.booking}
         onDone={load}
+        profile={profile}
+        births={live(data.pregnancies)}
+        reloadRecord={reloadRecord}
       />
       <TestsPart
         client={client}
@@ -286,6 +333,8 @@ export function AntenatalSection({
         patientId={patientId}
         tests={data.tests}
         onDone={load}
+        lab={lab}
+        profile={profile}
       />
       <PregnanciesPart
         client={client}
@@ -364,7 +413,17 @@ function BookingForm({
   patientId,
   booking,
   onDone,
-}: PartProps & { booking: Booking | null }) {
+  profile,
+  births,
+  reloadRecord,
+}: PartProps & {
+  booking: Booking | null
+  // Gravida and para live once, in the record's profile (request 256).
+  profile: Profile | null
+  // How many previous pregnancies are written below, to suggest them.
+  births: number
+  reloadRecord?: () => void
+}) {
   const start = (value: string | number | null | undefined) =>
     value === null || value === undefined ? '' : String(value)
   const [values, setValues] = useState({
@@ -375,9 +434,15 @@ function BookingForm({
     kin_tribe: start(booking?.kin_tribe),
     abortions: start(booking?.abortions),
     miscarriages: start(booking?.miscarriages),
-    total_pregnancies: start(booking?.total_pregnancies),
-    parity: start(booking?.parity),
+    // Gravida and para: the profile's, else the booking's total from
+    // before, else worked out from the previous pregnancies (this one too).
+    gravida: start(
+      profile?.gravida ?? booking?.total_pregnancies ?? (births > 0 ? births + 1 : null),
+    ),
+    para: start(profile?.para ?? (births > 0 ? births : null)),
   })
+  // Worked out, not saved yet: say so under the boxes.
+  const suggested = profile?.gravida == null && profile?.para == null && births > 0
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
@@ -395,10 +460,8 @@ function BookingForm({
       ['kin_age', wholeProblem('Age', values.kin_age, 0, 120)],
       ['abortions', wholeProblem('Number of abortions', values.abortions, 0, 30)],
       ['miscarriages', wholeProblem('Number of miscarriages', values.miscarriages, 0, 30)],
-      [
-        'total_pregnancies',
-        wholeProblem('Total number of pregnancies', values.total_pregnancies, 0, 30),
-      ],
+      ['gravida', wholeProblem('Gravida', values.gravida, 0, 30)],
+      ['para', wholeProblem('Para', values.para, 0, 30)],
     ]
     const wrong = checks.find(([, words]) => words !== null)
     setWrongKey(wrong ? wrong[0] : null)
@@ -419,14 +482,34 @@ function BookingForm({
         kin_tribe: text(values.kin_tribe),
         abortions: numberOrNull(values.abortions),
         miscarriages: numberOrNull(values.miscarriages),
-        total_pregnancies: numberOrNull(values.total_pregnancies),
-        parity: text(values.parity),
       },
       booking !== null,
     )
+    // Gravida and para go to the profile, the one place they live, so
+    // "Blood group and profile" shows the same (request 256).
+    const gravida = numberOrNull(values.gravida)
+    const para = numberOrNull(values.para)
+    let profileProblem: string | null = null
+    if (!result && (gravida !== (profile?.gravida ?? null) || para !== (profile?.para ?? null))) {
+      profileProblem = await saveProfile(
+        client,
+        {
+          blood_group: profile?.blood_group ?? null,
+          genotype: profile?.genotype ?? null,
+          no_known_allergies: profile?.no_known_allergies ?? false,
+          last_menstrual_period: profile?.last_menstrual_period ?? null,
+          gravida,
+          para,
+        },
+        patientId,
+        staffId,
+        Boolean(profile),
+      )
+      if (!profileProblem) reloadRecord?.()
+    }
     setBusy(false)
-    setProblem(result)
-    if (!result) {
+    setProblem(result ?? profileProblem)
+    if (!result && !profileProblem) {
       setSaved(true)
       onDone()
     }
@@ -487,24 +570,34 @@ function BookingForm({
             onChange={set('miscarriages')}
           />
         </div>
+        {/* Kept once, with Blood group and profile (request 256). */}
         <div className={styles.field}>
-          <label htmlFor="an-total">Total number of pregnancies</label>
+          <label htmlFor="an-total">Gravida (all pregnancies, this one too)</label>
           <VitalPick
             id="an-total"
             range={COUNT}
-            invalid={wrongKey === 'total_pregnancies'}
-            value={values.total_pregnancies}
-            onChange={set('total_pregnancies')}
+            invalid={wrongKey === 'gravida'}
+            value={values.gravida}
+            onChange={set('gravida')}
           />
         </div>
-        <Field
-          id="an-parity"
-          label="Parity"
-          placeholder="e.g. Para 1+0"
-          value={values.parity}
-          onChange={set('parity')}
-        />
+        <div className={styles.field}>
+          <label htmlFor="an-para">Para (births)</label>
+          <VitalPick
+            id="an-para"
+            range={COUNT}
+            invalid={wrongKey === 'para'}
+            value={values.para}
+            onChange={set('para')}
+          />
+        </div>
       </div>
+      {suggested ? (
+        <p className={styles.muted}>
+          Worked out from the previous pregnancies below. Change it if it is wrong, then save.
+        </p>
+      ) : null}
+      {booking?.parity ? <p className={styles.muted}>Written before: {booking.parity}</p> : null}
       {problem ? <p className={styles.error}>{problem}</p> : null}
       <div className={styles.actions}>
         <button className={`${styles.small} ${styles.primary}`} disabled={busy} onClick={save}>
@@ -522,9 +615,34 @@ function TestsPart({
   patientId,
   tests,
   onDone,
-}: PartProps & { tests: AntenatalTest[] }) {
+  lab,
+  profile,
+}: PartProps & { tests: AntenatalTest[]; lab: LabLine[]; profile: Profile | null }) {
   const [adding, setAdding] = useState(false)
   const [test, setTest] = useState('pcv')
+  // Already done by the lab, or already in the record: shown, not typed
+  // again (request 256). The newest of each, with the day it was done.
+  const fromLab: [string, Found | null][] = [
+    ['PCV', newestValue(lab, LAB_NAMES.pcv)],
+    ['RVS', newestValue(lab, LAB_NAMES.rvs)],
+    [
+      'Blood group',
+      profile?.blood_group
+        ? { value: profile.blood_group, at: '' }
+        : newestValue(lab, LAB_NAMES.bloodGroup),
+    ],
+    [
+      'Genotype',
+      profile?.genotype
+        ? { value: profile.genotype, at: '' }
+        : newestValue(lab, LAB_NAMES.genotype),
+    ],
+    ['Hepatitis B', newestValue(lab, LAB_NAMES.hepatitisB)],
+    ['Hepatitis C', newestValue(lab, LAB_NAMES.hepatitisC)],
+    ['Urine protein', newestValue(lab, LAB_NAMES.protein)],
+    ['Urine sugar', newestValue(lab, LAB_NAMES.sugar)],
+  ]
+  const known = fromLab.filter((pair): pair is [string, Found] => pair[1] !== null)
   const [result, setResult] = useState('')
   const [testedOn, setTestedOn] = useState(today())
   const [problem, setProblem] = useState<string | null>(null)
@@ -554,7 +672,25 @@ function TestsPart({
   return (
     <div className={styles.form}>
       <b>Routine tests</b>
-      {tests.length === 0 ? <EmptyLine text="No tests recorded yet." /> : null}
+      {known.length ? (
+        <dl className={styles.readings} aria-label="From the lab and the record">
+          {known.map(([name, found]) => (
+            <div key={name}>
+              <dt>{name}</dt>
+              <dd>
+                {name === 'Blood group' ? shortBloodGroup(found.value) : found.value}
+                {found.at ? <small className={styles.muted}> · {dateWords(found.at)}</small> : null}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {known.length ? (
+        <p className={styles.muted}>From the lab and the record. Add only a test done elsewhere.</p>
+      ) : null}
+      {tests.length === 0 && known.length === 0 ? (
+        <EmptyLine text="No tests recorded yet." />
+      ) : null}
       {tests.map((line) => (
         <Line
           key={line.id}

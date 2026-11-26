@@ -47,8 +47,18 @@ import {
   SURGERIES,
   saveBooking,
   type Booking,
+  type Pregnancy,
   type Visit,
 } from '@/lib/record/antenatal'
+import type { Allergy, Profile } from '@/lib/record/record'
+import {
+  LAB_NAMES,
+  dipstickWords,
+  newestNumber,
+  newestValue,
+  shortBloodGroup,
+  type LabLine,
+} from '@/lib/record/fromLab'
 
 type Props = { client: SupabaseClient; staffId: string; patientId: number; onDone: () => void }
 
@@ -245,7 +255,22 @@ export function VisitsPart({
   visits,
   vitals = [],
   doses = [],
-}: Props & { visits: Visit[]; vitals?: Vitals[]; doses?: DoseGiven[] }) {
+  lab = [],
+  profile = null,
+  allergies = [],
+  booking = null,
+  pregnancies = [],
+}: Props & {
+  visits: Visit[]
+  vitals?: Vitals[]
+  doses?: DoseGiven[]
+  // Request 256: what is already in the record, shown and used, not typed.
+  lab?: LabLine[]
+  profile?: Profile | null
+  allergies?: Allergy[]
+  booking?: Booking | null
+  pregnancies?: Pregnancy[]
+}) {
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(EMPTY)
   const [drugs, setDrugs] = useState<string[]>([])
@@ -278,6 +303,11 @@ export function VisitsPart({
       const found = todays.find((row) => pick(row) !== null && pick(row) !== undefined)
       return found ? String(pick(found)) : ''
     }
+    // From the lab (request 256): HB in the last 4 weeks, urine in the
+    // last week. A word the visit does not take is left for her to pick.
+    const hb = newestNumber(lab, LAB_NAMES.hb, 28)
+    const protein = newestValue(lab, LAB_NAMES.protein, 7)
+    const sugar = newestValue(lab, LAB_NAMES.sugar, 7)
     const filled = {
       ...EMPTY,
       systolic: newest((row) => row.systolic),
@@ -285,12 +315,19 @@ export function VisitsPart({
       pulse: newest((row) => row.pulse),
       respiration: newest((row) => row.breathing_rate),
       weight: newest((row) => row.weight_kg),
+      hb: hb?.value ?? '',
+      protein: (protein && dipstickWords(protein.value)) ?? '',
+      sugar: (sugar && dipstickWords(sugar.value)) ?? '',
     }
     setForm(filled)
-    setFromVitals(
+    const sources = [
       todays.length
-        ? `Filled in from today's vital signs (${todays[0].signer?.full_name ?? todays[0].recorder?.full_name ?? 'staff'}). Change any that are wrong.`
-        : null,
+        ? `today's vital signs (${todays[0].signer?.full_name ?? todays[0].recorder?.full_name ?? 'staff'})`
+        : '',
+      hb || filled.protein || filled.sugar ? 'the lab results' : '',
+    ].filter(Boolean)
+    setFromVitals(
+      sources.length ? `Filled in from ${sources.join(' and ')}. Change any that are wrong.` : null,
     )
     // Medicines given since the last visit (or in the last 4 weeks).
     const lastVisit = visits.find((visit) => !visit.voided_at)
@@ -366,6 +403,17 @@ export function VisitsPart({
 
   return (
     <div className={styles.form}>
+      {/* ===== 3b. At a glance (request 256): everything she needs for the
+          visit, from wherever it was written, so she never scrolls or types
+          it twice. ===== */}
+      <AtAGlance
+        profile={profile}
+        allergies={allergies}
+        booking={booking}
+        pregnancies={pregnancies}
+        lab={lab}
+        visits={visits}
+      />
       <b>Visits</b>
       {visits.length === 0 ? <EmptyLine text="No visits recorded yet." /> : null}
       {visits.map((visit) => (
@@ -598,6 +646,92 @@ export function VisitsPart({
         </div>
       )}
     </div>
+  )
+}
+
+// ===== 3c. At a glance =====
+// Gravida and para, blood group and genotype, the last HB, allergies, her
+// medical history and the births before, in one small block. Each comes
+// from where it was written: the profile, the lab, the allergies, the
+// booking, the previous pregnancies. Nothing here is typed.
+function AtAGlance({
+  profile,
+  allergies,
+  booking,
+  pregnancies,
+  lab,
+  visits,
+}: {
+  profile: Profile | null
+  allergies: Allergy[]
+  booking: Booking | null
+  pregnancies: Pregnancy[]
+  lab: LabLine[]
+  visits: Visit[]
+}) {
+  const births = pregnancies.filter((one) => !one.voided_at)
+  const caesareans =
+    births.filter((one) => (one.delivery_method ?? '').toLowerCase().startsWith('caesarean'))
+      .length + (booking?.surgery_type === 'Caesarean section' && births.length === 0 ? 1 : 0)
+  // The last HB: the lab's, or else the last visit's.
+  const labHb = newestNumber(lab, LAB_NAMES.hb)
+  const visitHb = visits.find((visit) => !visit.voided_at && visit.hb !== null)
+  const hb = labHb
+    ? `${labHb.value} g/dl (lab, ${dateWords(labHb.at)})`
+    : visitHb
+      ? `${visitHb.hb} g/dl (visit, ${dateWords(visitHb.visit_on)})`
+      : 'Not done yet'
+  const labGroup = newestValue(lab, LAB_NAMES.bloodGroup)
+  const labGenotype = newestValue(lab, LAB_NAMES.genotype)
+  const live = allergies.filter((one) => !one.voided_at)
+  const facts: [string, string][] = [
+    [
+      'Gravida / para',
+      profile?.gravida != null || profile?.para != null
+        ? `G${profile?.gravida ?? '?'} P${profile?.para ?? '?'}`
+        : 'Not recorded',
+    ],
+    [
+      'Blood group',
+      profile?.blood_group ?? (labGroup ? shortBloodGroup(labGroup.value) : 'Not recorded'),
+    ],
+    ['Genotype', profile?.genotype ?? labGenotype?.value ?? 'Not recorded'],
+    ['Last HB', hb],
+    [
+      'Allergies',
+      live.length
+        ? live.map((one) => one.allergen).join(', ')
+        : profile?.no_known_allergies
+          ? 'None known'
+          : 'Not asked yet',
+    ],
+    [
+      'Medical history',
+      !booking?.history_asked
+        ? 'Not asked yet'
+        : booking.history_yes.length
+          ? booking.history_yes.join(', ')
+          : 'Nil',
+    ],
+    [
+      'Births before',
+      births.length
+        ? `${births.length}${caesareans ? `, ${caesareans} by caesarean section` : ''}`
+        : 'None recorded',
+    ],
+  ]
+  return (
+    <>
+      <b>At a glance</b>
+      <dl className={styles.readings} aria-label="At a glance">
+        {facts.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </>
   )
 }
 
