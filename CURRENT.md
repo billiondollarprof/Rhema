@@ -20,7 +20,13 @@ Numbers are kept from the full list, so older notes still match.
     through every aspect of the platform to ensure that... very important
     that everything is saving the work. Everything is accurate. The system
     is working fine." Also: "I have connected the right [Supabase] so you
-    check it out now." Not started; after 249.
+    check it out now." And: "When you're done document everything for a
+    handover so the next Agent can pick where you stopped."
+    DONE SO FAR 2026-11-26: live consistency checks (read only) all clean
+    (see 249); the full code and screen check of 2026-11-24 (244) and every
+    check on each ship since. NOT YET: a walk through every screen against
+    live behaviour for the parts other agents built. Handover:
+    docs/HANDOVER-2026-11-24-front-desk-228.md section 8.
 
 249. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
     "I check the history section... The front desk is saying that money she
@@ -52,6 +58,32 @@ Numbers are kept from the full list, so older notes still match.
     Supabase account connected at claude.ai/customize/connectors, then a new
     session. A GitHub workflow is not an option: its logs are public while
     the repository is public, and real payments must never reach a log.
+    2026-11-26: he connected the hospital's account. CHECKED (read only, no
+    names), payments 23 to 26 Nov:
+    - Every payment's kind matches where it came from: Drugs only from
+      prescriptions (drug lines), Lab tests only from lab requests, Cards
+      from registration. The system recorded what was entered.
+    - The figures he quoted are the Front Desk's evening shift of 24 Nov
+      (History shows the shift since the last email sign in): Drugs ₦41,000
+      = two prescriptions (₦9,000 and ₦32,000); Lab tests ₦16,000 = two lab
+      requests of ₦8,000. So the 41,000 was drugs, not lab tests.
+    - FOUND: those two lab requests were the same three tests (MP, Widal,
+      PCV) for the same patient, asked by the same nurse at 21:40 and 21:46,
+      and both were paid (21:52, 21:58): the patient was very likely charged
+      ₦8,000 twice. Neither has a result yet. Nothing changed on live; for
+      him to decide (void one payment with a reason through the app, or a
+      refund). The request double tap guard is only 30 seconds.
+    - Cards 24 Nov: one antenatal card fee recorded (₦5,000, 12:15); the
+      antenatal patient registered at 12:03 has no card fee recorded (the
+      fee is optional at registration; the screen shows "The card fee was
+      not saved" when saving fails, so it was most likely not typed). Two
+      Individual cards in the evening (₦3,000 each), both recorded.
+    PROPOSED (needs his yes): warn the nurse or doctor when the same tests
+    are already waiting unpaid for the patient, and warn the Front Desk
+    before paying a second identical request. Live consistency (250): 59
+    payments, totals all equal their lines, no paid item still waiting, no
+    completed lab request without a result; 2 same-tests-within-an-hour and
+    4 same-drug-within-an-hour cases in 14 days to look at.
     2026-11-25 also: "make the vital sign visible to also the front desk, so
     the front desk can also [chart] it. I believe we've done that already.
     Just confirm." CONFIRMED: Take vitals for the Front Desk is live since

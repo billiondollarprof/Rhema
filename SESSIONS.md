@@ -4,6 +4,10 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-26: 249 answered from live (read only, no names): History was
+  right; a likely ₦8,000 double charge from a duplicate lab request found,
+  not changed. 250 live consistency checks clean. Handover section 8.
+
 - 2026-11-25 (evening): 248 follow up LIVE. A save after 12 hours opens
   the record again (logged) and saves; screens past 12 hours keep what they
   read and say so; offline entries too; vital signs name a wrong number.

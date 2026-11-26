@@ -173,3 +173,40 @@ Small known edges, written down so nobody is surprised:
 - Numbering: the other agent works on the same repository. Check
   `CURRENT.md` and `supabase/tests/` for the next free number after merging
   `testing`, before naming a request or a test.
+
+## 8. 26 November: History (249), live checks (250), and where to pick up
+
+**Access.** The Supabase connector now reaches the hospital's account:
+live is `ntfvckqczpmylskusgft` ("RHEMA MEDICALS"), testing is
+`nfrvwvqmfxudaarfuwxg` ("Rhema-testing"). CLAUDE.md still applies: ask
+before any read on live, never write to live by hand, never put patient
+details in chat, logs or the repo.
+
+**249, History amounts: answered.** The system recorded what was entered.
+The Front Desk's quoted figures are her evening shift of 24 Nov: Drugs
+₦41,000 = two prescriptions (₦9,000 + ₦32,000), Lab tests ₦16,000 = two
+lab requests of ₦8,000. Every payment's kind matches where it came from.
+But those two lab requests were the same three tests for the same patient,
+asked six minutes apart by the same nurse, and both were paid: very likely
+a double charge of ₦8,000. Nothing was changed on live. Anthony decides
+(void one payment with a reason in the app, or refund). One antenatal
+patient registered at 12:03 on 24 Nov has no card fee recorded (most likely
+not typed; the screen warns when saving fails).
+
+**Proposed, waiting for his yes:** warn when the same tests are already
+waiting unpaid for the patient (nurse, doctor), and warn the Front Desk
+before paying a second identical request. Same idea for prescriptions.
+
+**250, everything saves and is accurate: partly done.** Live consistency
+(read only): 59 payments, every total equals its lines, none without
+lines, no paid prescription or lab request still waiting, no completed lab
+request without a result, no request with every result still open. To
+look at: 2 cases of the same tests twice within an hour and 4 of the same
+drug twice within an hour in the last 14 days. Not yet done: walking every
+screen of the parts other agents built against live behaviour.
+
+**Open requests of this branch, in order:**
+1. 249 follow-up: the duplicate warning (above), with his yes.
+2. 250: finish the walk through the other agents' parts.
+3. 245, 240h, 247: built and live; he will test, and says when done.
+4. 243 (Other in blue): later, his word.
