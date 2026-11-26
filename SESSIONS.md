@@ -4,6 +4,15 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-26 (evening): LIVE: 253 (pre-eclampsia, eclampsia; lab results
+  one test at a time with a file checked end to end), 254 (pick rule in
+  CLAUDE.md; history a drop down that remembers, with his yes to the SQL;
+  Duphaston), 255 (previous births picked), 256 (nothing typed twice, At a
+  glance), 258 (In and Out pill; Save and add another for previous
+  pregnancies). Open: 257 (bills for outpatients, his evening with the
+  other agent), 250 (walk the other agents' parts). The antenatal card
+  keeps its arrangement (Decided).
+
 - 2026-11-26: 252 LIVE (his word: only what keeps the data trustworthy):
   the save that reopened the record by itself is undone; a save after 12
   hours says Not saved and the record shows Open the record again; wrong

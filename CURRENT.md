@@ -15,22 +15,6 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
-258. **An Inpatient tag in Find patient.** (2026-11-26) "if a patient is
-    an outpatient or an inpatient, let the tag be among where you click to
-    find patient that you normally have the tag for family, individual,
-    sent to room. Let us have an extra tag that says inpatient. Find a way
-    to include it, even on mobile. Maybe just a little text. So it's easy
-    for somebody to select a patient that is inpatient or a patient that is
-    outpatient." Everybody signed in reads admissions already (no SQL).
-    His detail 2026-11-26: "Just make it small... a green pill, and put in
-    on it. Then for the other one, put an orange pill... and put out on it
-    ... something really small that will not clutter the card... the
-    patient always carries that logo, even when they appear on the doctor's
-    patient queue or anything." Also: "on previous pregnancies... you can
-    only add one baby... there's no button to add another baby or another
-    pregnancy." And: "an improved arrangement too can help as well,
-    especially for the antenatal stuff."
-
 257. **Every bill starts with what was already collected, admitted or
     not.** (2026-11-26) "every bill that is being made by the front desk,
     whether it's prescription, if the patient is admitted, they should
@@ -47,84 +31,6 @@ Numbers are kept from the full list, so older notes still match.
     given" is not in the list to pick (it is only that worked out line).
     Waiting for him: he may do it with the other agent this evening; asked
     whether outpatients should get the same.
-
-256. **Everything the matron needs inside the antenatal visit; nothing
-    filled twice.** (2026-11-26) "Please put everything the matron needs
-    inside of the antenatal visit so it's easy for her. When a row or a
-    detail is already filled in somewhere, let them automatically appear in
-    the antenatal section too so they don't have to fill any information
-    twice." Said back with a plan; his yes 2026-11-26 ("yes, go ahead").
-    Then, 2026-11-26: "It's okay the way everything is on its own section...
-    I like the arrangement that we did before. I don't think I want to
-    change that arrangement... if there are other details the matron is
-    asking for, let's record and probably work on it tonight." Built, not
-    shipped: every section stays where it is; added inside them only: an
-    "At a glance" block at the top of the antenatal booking, the visit
-    filling HB and urine from the lab, routine tests showing the lab's
-    results, gravida and para kept once in the profile. His answer
-    2026-11-26: "I think the at a glance is okay. You can keep it."
-
-255. **Not palpable, previous births, and CS before.** (2026-11-26) The
-    matron: "At palpation, there's something you need to add, not palpable
-    too... add the last [births], like all the child [births]... the
-    previous children they've had. And if they've done CS before or not.
-    If they've done any operation." Checked: Presentation already has "Not
-    yet palpable"; Previous pregnancies already records each child (date,
-    weight, duration, method, sex, if the baby died); Surgical history
-    already has Caesarean section and Other. DONE (his rule, CLAUDE.md
-    section 7): birth weight, duration and method of delivery are picked
-    with Other; the counts so far and the next of kin's age are picked.
-    ASKED: should "Not palpable" also be offered on Height of fundus.
-
-254. **Spotting in pregnancy, threatened miscarriage; and the pick rule in
-    CLAUDE.md.** (2026-11-26) The matron's note: "Spotting in pregnancy, we
-    still need it. Spotting in pregnancy. Then threatening stage of
-    pregnancy and threatening miscarriage." Anthony: "everything you are
-    putting, you must be putting options that they can just be clicking...
-    if it's not available, then they can click other... write that as a
-    rule in Claude.md... when they add, the system can keep that and ask
-    them to make it a standard... more than 10 or thereabouts... turn it
-    into a drop down with that little search button at the top... So the
-    system grows and becomes more intelligent." DONE: rule written in
-    CLAUDE.md section 7 ("Pick, never type"; 8 is the line between quick
-    buttons and a drop down, the number the app's search already uses).
-    Medical history is a drop down with search and Other (Spotting in
-    pregnancy, Threatened miscarriage (threatened abortion) added);
-    surgical history got Other. ASKED: what "threatening stage of
-    pregnancy" means. His yes to the batch 2026-11-26: migration
-    20261126183515_antenatal_history_list_and_duphaston (a new pick list,
-    antenatal_history, for anybody with medical access, its 14 starter
-    lines, the add function knows the new name; Duphaston 10 mg tablet).
-    The history drop down now reads that list, with "Save it to the list
-    for everybody". Tested on a local copy: 5 database tests, 4 deliberate
-    breaks caught, undo and redo; picked, added for everybody, one tap next
-    time, "Duph" finds Duphaston.
-
-253. **Pre-eclampsia, Duphaston, and a full check of lab results and
-    files.** (2026-11-26) "the matron just said something that's under the
-    antenatal, that there's eclampsia, but there's no pre-eclampsia, that
-    they need that column for pre-eclampsia." "She also said that
-    Dufrastone is not there... check if she could have added these things
-    herself if they were not there. So next time when I go, I will show
-    her how to add it." "Also check if the sending individual test back to
-    doctor is correct and working fine... 3 lab requests is sent to the
-    lab scientist, but only one result is ready... the doctor sees it...
-    when the other results are ready, the lab scientist sends the
-    remaining and the doctor sees those... the database is taking the data
-    properly... files are saving in our Cloudflare storage." Also asked
-    what "Not saved" after 12 hours means (answered in chat).
-    DONE 2026-11-26: Pre-eclampsia and Eclampsia on the antenatal Medical
-    history ticklist, LIVE (that list has no Other, so she could not add
-    them). Lab results one test at a time checked end to end on a local copy
-    with the Worker and its file storage: 3 tests asked, Malaria sent with a
-    photo, the doctor sees it and opens the photo, Widal and FBC pending,
-    then sent; 12 of 12 checks passed. Seen: the doctor's request line still
-    lists all three tests under "Pending results" after one is sent (the
-    other agent's 240h design; told him, not changed).
-    WAITING: (1) his yes to add Duphaston 10 mg tablet to the medicine list
-    (dydrogesterone 10 mg is there under its own name; staff could also add
-    it with Other, pending the Pharmacy); (2) his yes to read live, counts
-    only, to confirm files reach the live Cloudflare storage.
 
 250. **Go through every aspect of the platform: everything saves, everything
     is accurate, the system works.** (2026-11-26) "I also need you to go
