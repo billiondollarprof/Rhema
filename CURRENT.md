@@ -15,6 +15,13 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+250. **Go through every aspect of the platform: everything saves, everything
+    is accurate, the system works.** (2026-11-26) "I also need you to go
+    through every aspect of the platform to ensure that... very important
+    that everything is saving the work. Everything is accurate. The system
+    is working fine." Also: "I have connected the right [Supabase] so you
+    check it out now." Not started; after 249.
+
 249. **History: the Front Desk's day shows wrong amounts.** (2026-11-24)
     "I check the history section... The front desk is saying that money she
     entered today [for] drug medicine and [for] test is what she collected
