@@ -38,7 +38,13 @@ Numbers are kept from the full list, so older notes still match.
     (no names), 2026-11-25. HIS YES 2026-11-25: "yes". BLOCKED 2026-11-26:
     the Supabase connector (the only read-only way in) failed to connect
     (502), twice; not worked around (no new tool pointed at live). Waiting
-    for it to come back.
+    for it to come back. It came back, but it reaches only two other
+    projects in another account ("billiondollarprof's Project",
+    "stellaxafe"), not the hospital's live database (ref ntfvckqczpmylskusgft,
+    in the hospital's own account). Not queried. Needs the hospital's
+    Supabase account connected at claude.ai/customize/connectors, then a new
+    session. A GitHub workflow is not an option: its logs are public while
+    the repository is public, and real payments must never reach a log.
     2026-11-25 also: "make the vital sign visible to also the front desk, so
     the front desk can also [chart] it. I believe we've done that already.
     Just confirm." CONFIRMED: Take vitals for the Front Desk is live since
