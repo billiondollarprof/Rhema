@@ -3,8 +3,11 @@
  *
  * What it does: against a throwaway Supabase (started by CI) and the built
  * app, it walks through sign in as two made up nurses at one shared desk:
- *   (After Call attention: Nurse One requests a lab test, the front desk
- *   takes the payment in naira, and the record shows it awaiting its test.)
+ *   (After Call attention: Nurse One requests a lab test, then the same
+ *   test again: a warning, Cancel sends nothing, Send anyway sends it
+ *   (request 251). The front desk is warned of the same test on two
+ *   requests, takes each payment in naira, and the record shows it
+ *   awaiting its test.)
  *   0. A stranger is refused. An invited person opens the invitation link,
  *      finds the email typed in, signs in, chooses a PIN and reaches Home
  *      (Admin, 2026-10-30).
@@ -493,12 +496,50 @@ try {
     .getByText('Sent to the Lab, and to the Front Desk for payment: Malaria Parasite (MP).')
     .waitFor()
 
-  step('Lab: the front desk takes 2,000 naira by POS; it leaves the list and stays gone')
+  // Request 251: the same test again for the same patient warns first.
+  step('Lab: the same test again shows a warning; Cancel sends nothing and keeps the form')
+  const requestPage = page.url()
+  await page.goto(requestPage)
+  await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
+  await page.getByRole('button', { name: 'Malaria Parasite (MP)' }).click()
+  await page.getByRole('button', { name: 'Send request' }).click()
+  await page.getByText('Malaria Parasite (MP) was already requested for this patient at').waitFor()
+  await shot(page, 'lab-same-warning')
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await page.getByRole('button', { name: 'Send request' }).waitFor()
+  if (await page.getByText('Sent to the Lab').count()) {
+    throw new Error('Cancel on the warning still sent the request')
+  }
+
+  step('Lab: Send anyway sends it')
+  await page.getByRole('button', { name: 'Send request' }).click()
+  await page.getByRole('button', { name: 'Send anyway' }).click()
+  await page
+    .getByText('Sent to the Lab, and to the Front Desk for payment: Malaria Parasite (MP).')
+    .waitFor()
+
+  step('Lab: the front desk is warned of the same test on two requests, and takes each')
   await desk.reload()
   await desk.getByText('Lab tests to pay for').waitFor()
-  await desk.getByText('Asked by Test Nurse One').waitFor()
-  await desk.getByRole('button', { name: 'Take payment' }).click()
+  await desk.getByText('Asked by Test Nurse One').first().waitFor()
+  await desk.getByRole('button', { name: 'Take payment' }).first().click()
+  await desk.getByText('Check before taking payment twice.').waitFor()
+  await shot(desk, 'lab-pay-warning')
+  // Cancel first: no price form opens.
+  await desk.getByRole('button', { name: 'Cancel', exact: true }).click()
+  if (await desk.getByRole('button', { name: /^Record payment/ }).count()) {
+    throw new Error('Cancel on the payment warning still opened the price form')
+  }
+  await desk.getByRole('button', { name: 'Take payment' }).first().click()
+  await desk.getByRole('button', { name: 'Take payment anyway' }).click()
   // One price box per test; the app shows the total on the button.
+  await desk.getByLabel('Malaria Parasite (MP)').fill('2,000')
+  await desk.getByRole('button', { name: 'POS' }).click()
+  await desk.getByRole('button', { name: 'Record payment · ₦2,000' }).click()
+  // The second one: the first is paid now, and the warning says so.
+  await desk.getByRole('button', { name: 'Take payment' }).first().click()
+  await desk.getByText(/paid\). Check before taking payment twice\./).waitFor()
+  await desk.getByRole('button', { name: 'Take payment anyway' }).click()
   await desk.getByLabel('Malaria Parasite (MP)').fill('2,000')
   await desk.getByRole('button', { name: 'POS' }).click()
   await desk.getByRole('button', { name: 'Record payment · ₦2,000' }).click()
@@ -509,7 +550,7 @@ try {
 
   step('Lab: the record shows the test awaiting its result')
   await page.getByRole('link', { name: 'Open the record' }).click()
-  await page.getByText('Awaiting test').waitFor()
+  await page.getByText('Awaiting test').first().waitFor()
 
   step('A family: its details first, then its first member, saved together')
   await desk.goto(new URL('/patients/register/', desk.url()).href)

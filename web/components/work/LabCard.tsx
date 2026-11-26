@@ -4,7 +4,10 @@
  * list to each person (request 115):
  *   Front Desk, Admin     tests waiting for payment: a price for each test
  *                         (the app adds them up), the mode (Cash, POS,
- *                         Transfer), Record payment (PriceForm.tsx).
+ *                         Transfer), Record payment (PriceForm.tsx). The
+ *                         same tests on another request of the patient in
+ *                         the last 24 hours: a warning first, with Take
+ *                         payment anyway or Cancel (request 251).
  *   Laboratory            tests to do: Enter results; and a way to add a
  *                         result for a walk in.
  *   Doctor, Nurse, Matron results ready for the tests they asked for. A
@@ -25,6 +28,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
+import SameWarning from '@/components/warnings/SameWarning'
+import { elsewhereWords, sameTestsElsewhere, type Earlier } from '@/lib/orders/duplicates'
 import {
   loadPriceChanges,
   loadPrices,
@@ -205,8 +210,22 @@ function LabEntry({
   const [prices, setPrices] = useState<Price[] | null>(null)
   // Lab prices still waiting for the admin (request 208).
   const [waiting, setWaiting] = useState<PriceChange[]>([])
+  // The same tests on another request of this patient (request 251).
+  const [same, setSame] = useState<Earlier[] | null>(null)
+  const [checking, setChecking] = useState(false)
+
+  // Take payment: first look for the same tests on another request in the
+  // last 24 hours; if there are, warn before the price form opens.
+  async function askToPay() {
+    setChecking(true)
+    const earlier = await sameTestsElsewhere(client, request.patient_id, request.id, request.tests)
+    setChecking(false)
+    if (earlier.length > 0) setSame(earlier)
+    else startPaying()
+  }
 
   function startPaying() {
+    setSame(null)
     setPaying(true)
     Promise.all([loadPrices(client), loadPriceChanges(client)]).then(([found, changes]) => {
       setWaiting(changes ?? [])
@@ -258,9 +277,13 @@ function LabEntry({
       </div>
 
       <div className={styles.entryButtons}>
-        {view === 'pay' && !paying ? (
-          <button className={`${styles.button} ${styles.primary}`} onClick={() => startPaying()}>
-            Take payment
+        {view === 'pay' && !paying && !same ? (
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            disabled={checking}
+            onClick={() => void askToPay()}
+          >
+            {checking ? 'Checking…' : 'Take payment'}
           </button>
         ) : null}
         {/* Not paid yet: the test can still be done (request 232). The Front
@@ -318,6 +341,14 @@ function LabEntry({
       </div>
 
       {problem ? <p className={styles.muted}>{problem}</p> : null}
+      {same ? (
+        <SameWarning
+          words={elsewhereWords(same, 'tests')}
+          goLabel="Take payment anyway"
+          onGo={startPaying}
+          onCancel={() => setSame(null)}
+        />
+      ) : null}
       {paying && prices === null ? <p className={styles.muted}>Loading the prices…</p> : null}
       {paying && prices !== null ? (
         // A price for each test; the app adds them up (2026-10-31).

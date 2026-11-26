@@ -335,6 +335,70 @@ module.exports.SCREENS = [
     },
     mustSee: ["Doctor's price", 'Record payment · ₦2,500'],
   },
+  // Request 251: the same drug on two prescriptions of one patient. Take
+  // payment warns first, with Take payment anyway and Cancel.
+  {
+    path: '/',
+    waitFor: 'Amoxicillin 500 mg capsule',
+    roomId: 1,
+    press: 'Take payment',
+    extra: {
+      'rest/v1/prescriptions': [8, 9].map((id) => ({
+        id,
+        patient_id: 1,
+        note: null,
+        status: 'awaiting_payment',
+        prescribed_at: hoursAgo(id === 8 ? 2 : 1),
+        dispensed_at: null,
+        expired_at: null,
+        also_sent: false,
+        payment_id: null,
+        patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+        prescriber: DOCTOR,
+        items: [
+          {
+            id: id * 10,
+            drug: 'Amoxicillin',
+            strength: '500 mg capsule',
+            dose: '500 mg',
+            how_often: 'Three times daily',
+            days: 5,
+            quantity: '15',
+            note: null,
+            price: null,
+          },
+        ],
+      })),
+    },
+    mustSee: ['Take payment anyway', 'Check before taking payment twice.'],
+  },
+  // Request 251: the same test on two lab requests of one patient.
+  {
+    path: '/',
+    waitFor: 'Lab tests to pay for',
+    roomId: 1,
+    press: 'Take payment',
+    extra: {
+      'rest/v1/lab_requests': [5, 6].map((id) => ({
+        id,
+        patient_id: 1,
+        tests: ['Malaria Parasite (MP)', 'Widal'],
+        note: null,
+        status: 'awaiting_payment',
+        requested_at: hoursAgo(id === 5 ? 2 : 1),
+        completed_at: null,
+        sample_taken_at: null,
+        expired_at: null,
+        sent_to_lab: true,
+        prices: null,
+        results_at: null,
+        payment_id: null,
+        patient: { full_name: 'Adaeze Okafor', patient_number: 'RMC-000001' },
+        requester: DOCTOR,
+      })),
+    },
+    mustSee: ['Take payment anyway', 'Check before taking payment twice.'],
+  },
   // Request 233: the Pharmacy finds a patient's drugs to give, paid or not.
   {
     path: '/patients/?p=1',

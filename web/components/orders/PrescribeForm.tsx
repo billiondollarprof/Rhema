@@ -16,6 +16,8 @@
  *   2. Send to the Front Desk and the Pharmacy (the default), or to the
  *      Front Desk only: the Pharmacy gets it once it is paid (request 233).
  *   3. Sent: what happened; Front Desk only offers "Also send to Pharmacy".
+ *   4. A drug already prescribed for this patient and not given yet: a
+ *      warning first, with Send anyway or Cancel (request 251).
  *
  * Never: let anybody but a doctor send it. The database refuses it too.
  */
@@ -24,6 +26,8 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import SameWarning from '@/components/warnings/SameWarning'
+import { sameDrugsOpen, sameDrugsWords, type Earlier } from '@/lib/orders/duplicates'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
 import OptionSelect from '@/components/options/OptionSelect'
 import styles from './orders.module.css'
@@ -103,6 +107,10 @@ export default function PrescribeForm({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  // A drug already prescribed and not given yet (request 251): the warning
+  // shows instead of the Send button until Send anyway or Cancel. It
+  // belongs to the drugs it was found for; other drugs, no warning.
+  const [same, setSame] = useState<{ earlier: Earlier[]; forDrugs: string } | null>(null)
   // "Send also to" the other place, after sending (request 130c).
   const [alsoBusy, setAlsoBusy] = useState(false)
   const [alsoSent, setAlsoSent] = useState(false)
@@ -179,7 +187,20 @@ export default function PrescribeForm({
   const ready = drafts.every((draft) => draft.drug.trim().length >= 2 && !needsQuantity(draft))
 
   // ===== 3. Send =====
-  async function send() {
+  // The drugs on the form now, and one line naming them, so a warning found
+  // for other drugs is not shown (request 251).
+  const drugsNow = () =>
+    drafts
+      .filter((draft) => draft.drug.trim())
+      .map((draft) => ({ drug: draft.drug.trim(), strength: draft.strength.trim() || null }))
+  const drugsKey = () =>
+    drugsNow()
+      .map((one) => `${one.drug}/${one.strength ?? ''}`)
+      .join('|')
+  const warning = same && same.forDrugs === drugsKey() ? same.earlier : null
+
+  // anyway: true after the person saw the warning and chose Send anyway.
+  async function send(anyway = false) {
     // A price, when typed, must read as naira (request 235).
     if (
       drafts.some((draft) => (draft.price ?? '').trim() && readAmount(draft.price ?? '') === null)
@@ -189,6 +210,16 @@ export default function PrescribeForm({
     }
     setBusy(true)
     setError(null)
+    // ===== 3a. Already prescribed and not given? Warn first (request 251) =====
+    if (!anyway) {
+      const earlier = await sameDrugsOpen(client, patient.id, drugsNow())
+      if (earlier.length > 0) {
+        setBusy(false)
+        setSame({ earlier, forDrugs: drugsKey() })
+        return
+      }
+    }
+    setSame(null)
     const items: PrescriptionItem[] = drafts.map((draft) => ({
       drug: draft.drug.trim(),
       strength: draft.strength.trim() || null,
@@ -483,13 +514,24 @@ export default function PrescribeForm({
       </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}
-      <button
-        className={`${styles.button} ${styles.primary}`}
-        onClick={send}
-        disabled={!ready || busy}
-      >
-        {busy ? 'Sending…' : 'Send prescription'}
-      </button>
+      {warning ? (
+        <SameWarning
+          words={sameDrugsWords(warning)}
+          goLabel="Send anyway"
+          busy={busy}
+          onGo={() => void send(true)}
+          // Cancel keeps the form as it is.
+          onCancel={() => setSame(null)}
+        />
+      ) : (
+        <button
+          className={`${styles.button} ${styles.primary}`}
+          onClick={() => void send()}
+          disabled={!ready || busy}
+        >
+          {busy ? 'Sending…' : 'Send prescription'}
+        </button>
+      )}
     </>
   )
 }

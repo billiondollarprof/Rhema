@@ -1,0 +1,56 @@
+/* components/warnings/SameWarning.module.css: the amber "already asked
+   for" box with its two buttons (request 251). */
+
+/* ===== 1. The box ===== */
+.warning {
+  background: var(--warn-bg-2);
+  border: 1px solid var(--c-ffe0a3);
+  color: var(--c-9a5b00);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.warning p {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ===== 2. The buttons: side by side, wrapping on a narrow phone ===== */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.go,
+.cancel {
+  font: inherit;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.go {
+  background: var(--c-9a5b00);
+  border: 1px solid var(--c-9a5b00);
+  /* The box's own colour: near white in the light look, dark in the dark
+     look, so the words always stand out on the amber. */
+  color: var(--warn-bg-2);
+}
+
+.cancel {
+  background: var(--card);
+  border: 1px solid var(--c-9a5b00);
+  color: var(--c-9a5b00);
+}
+
+.go:disabled,
+.cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

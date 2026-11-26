@@ -15,6 +15,8 @@
  *      shows. A note for the lab, if needed.
  *   3. Send to the Front Desk and the Lab (the default), or to the Front
  *      Desk only: the Lab gets it once it is paid (request 233).
+ *   4. A test already asked for this patient and not done yet: a warning
+ *      first, with Send anyway or Cancel (request 251).
  *
  * Never: let somebody without medical record access send a request. The
  * database refuses it too.
@@ -27,6 +29,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import TestSearch from './TestSearch'
 import styles from './orders.module.css'
 import { COMMON_TESTS, naira, requestLab } from '@/lib/lab/lab'
+import SameWarning from '@/components/warnings/SameWarning'
+import { sameTestsOpen, sameTestsWords, type Earlier } from '@/lib/orders/duplicates'
 import { useAuth } from '@/lib/auth/session'
 import { setsPrices as canSetPrices } from '@/lib/auth/roles'
 import {
@@ -70,6 +74,11 @@ export default function LabRequestForm({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState<string | null>(null)
+  // The same tests already asked for and not done yet (request 251): the
+  // warning shows instead of the Send button until Send anyway or Cancel.
+  // It belongs to the tests it was found for; other tests, no warning.
+  const [same, setSame] = useState<{ earlier: Earlier[]; forTests: string } | null>(null)
+  const warning = same && same.forTests === tests.join('|') ? same.earlier : null
   // ===== 0. Prices (request 235): a doctor or the matron sets one per test,
   // filled in from their own last price, or else the price list. =====
   const { staff } = useAuth()
@@ -119,7 +128,8 @@ export default function LabRequestForm({
   }
 
   // ===== 2. Send =====
-  async function send() {
+  // anyway: true after the person saw the warning and chose Send anyway.
+  async function send(anyway = false) {
     const priced: Record<string, number> = {}
     if (setsPrices) {
       for (const test of tests) {
@@ -135,6 +145,16 @@ export default function LabRequestForm({
     }
     setBusy(true)
     setError(null)
+    // ===== 2a. Already asked for? Warn first (request 251) =====
+    if (!anyway) {
+      const earlier = await sameTestsOpen(client, patient.id, tests)
+      if (earlier.length > 0) {
+        setBusy(false)
+        setSame({ earlier, forTests: tests.join('|') })
+        return
+      }
+    }
+    setSame(null)
     const problem = await requestLab(client, patient.id, tests, note, sendTo, priced)
     setBusy(false)
     if (problem) {
@@ -295,16 +315,27 @@ export default function LabRequestForm({
       </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}
-      <div className={styles.buttons}>
-        <button
-          type="button"
-          className={`${styles.button} ${styles.primary}`}
-          onClick={send}
-          disabled={tests.length === 0 || busy}
-        >
-          {busy ? 'Sending…' : 'Send request'}
-        </button>
-      </div>
+      {warning ? (
+        <SameWarning
+          words={sameTestsWords(warning)}
+          goLabel="Send anyway"
+          busy={busy}
+          onGo={() => void send(true)}
+          // Cancel keeps the form as it is.
+          onCancel={() => setSame(null)}
+        />
+      ) : (
+        <div className={styles.buttons}>
+          <button
+            type="button"
+            className={`${styles.button} ${styles.primary}`}
+            onClick={() => void send()}
+            disabled={tests.length === 0 || busy}
+          >
+            {busy ? 'Sending…' : 'Send request'}
+          </button>
+        </div>
+      )}
     </>
   )
 }

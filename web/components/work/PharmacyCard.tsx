@@ -4,6 +4,9 @@
  * different list for each person:
  *   Front Desk, Admin   drugs waiting for payment: a price for each drug,
  *                       the app adds them up, then the mode, Record payment.
+ *                       The same drug on another prescription of the
+ *                       patient in the last 24 hours: a warning first, with
+ *                       Take payment anyway or Cancel (request 251).
  *   Pharmacy            prescriptions to dispense: the drugs, how to take
  *                       them, who prescribed; Dispensed.
  * Doctors see nothing here: their prescriptions are in the patient's record.
@@ -21,6 +24,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import PriceForm from './PriceForm'
+import SameWarning from '@/components/warnings/SameWarning'
+import { elsewhereWords, sameDrugsElsewhere, type Earlier } from '@/lib/orders/duplicates'
 import styles from './work.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { recall, remember } from '@/lib/cache/memory'
@@ -186,6 +191,24 @@ function Entry({
   const [paying, setPaying] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // The same drug on another prescription of this patient (request 251).
+  const [same, setSame] = useState<Earlier[] | null>(null)
+  const [checking, setChecking] = useState(false)
+
+  // Take payment: first look for the same drug on another prescription in
+  // the last 24 hours; if there is one, warn before the price form opens.
+  async function askToPay() {
+    setChecking(true)
+    const earlier = await sameDrugsElsewhere(
+      client,
+      prescription.patient_id,
+      prescription.id,
+      prescription.items.map((item) => ({ drug: item.drug, strength: item.strength })),
+    )
+    setChecking(false)
+    if (earlier.length > 0) setSame(earlier)
+    else setPaying(true)
+  }
 
   async function done() {
     setBusy(true)
@@ -235,9 +258,13 @@ function Entry({
       {error ? <p className={styles.error}>{error}</p> : null}
 
       <div className={styles.entryButtons}>
-        {view === 'pay' && !paying ? (
-          <button className={`${styles.button} ${styles.primary}`} onClick={() => setPaying(true)}>
-            Take payment
+        {view === 'pay' && !paying && !same ? (
+          <button
+            className={`${styles.button} ${styles.primary}`}
+            disabled={checking}
+            onClick={() => void askToPay()}
+          >
+            {checking ? 'Checking…' : 'Take payment'}
           </button>
         ) : null}
         {/* Not paid yet: it can still be given (request 232, 2026-11-20:
@@ -253,6 +280,17 @@ function Entry({
         ) : null}
       </div>
 
+      {same ? (
+        <SameWarning
+          words={elsewhereWords(same, 'drugs')}
+          goLabel="Take payment anyway"
+          onGo={() => {
+            setSame(null)
+            setPaying(true)
+          }}
+          onCancel={() => setSame(null)}
+        />
+      ) : null}
       {paying ? (
         <PriceForm
           formId={`rx-${prescription.id}`}
