@@ -15,6 +15,20 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+253. **Pre-eclampsia, Duphaston, and a full check of lab results and
+    files.** (2026-11-26) "the matron just said something that's under the
+    antenatal, that there's eclampsia, but there's no pre-eclampsia, that
+    they need that column for pre-eclampsia." "She also said that
+    Dufrastone is not there... check if she could have added these things
+    herself if they were not there. So next time when I go, I will show
+    her how to add it." "Also check if the sending individual test back to
+    doctor is correct and working fine... 3 lab requests is sent to the
+    lab scientist, but only one result is ready... the doctor sees it...
+    when the other results are ready, the lab scientist sends the
+    remaining and the doctor sees those... the database is taking the data
+    properly... files are saving in our Cloudflare storage." Also asked
+    what "Not saved" after 12 hours means (answered in chat).
+
 250. **Go through every aspect of the platform: everything saves, everything
     is accurate, the system works.** (2026-11-26) "I also need you to go
     through every aspect of the platform to ensure that... very important
