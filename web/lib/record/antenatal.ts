@@ -125,6 +125,10 @@ export const HISTORY = [
   'Anaemia',
   'Sickle cell anaemia',
   'Hypertension',
+  // The matron, 2026-11-26 (request 253): "there's eclampsia, but there's no
+  // pre-eclampsia... they need that column for pre-eclampsia."
+  'Pre-eclampsia',
+  'Eclampsia',
 ]
 export const SURGERIES = [
   'Caesarean section',
