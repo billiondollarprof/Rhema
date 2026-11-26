@@ -32,7 +32,6 @@ import Line from './Line'
 import { EmptyLine } from './Section'
 import styles from './record.module.css'
 import OptionSelect from '@/components/options/OptionSelect'
-import SearchSelect from '@/components/options/SearchSelect'
 import { addLine, type DoseGiven, type Vitals } from '@/lib/record/record'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
 import MedicinePicker from '@/components/medicines/MedicinePicker'
@@ -40,7 +39,6 @@ import { RANGES, VitalPick, type Range } from './Observations'
 import {
   DIPSTICK,
   EDUCATION,
-  HISTORY,
   MARITAL,
   OEDEMA,
   POSITIONS,
@@ -726,9 +724,6 @@ export function HistoryPart({
   const [surgery, setSurgery] = useState(booking?.surgery_type ?? '')
   const [reason, setReason] = useState(booking?.surgery_reason ?? '')
   const [problem, setProblem] = useState<string | null>(null)
-  // Other: a box to type one that is not on the list (request 254).
-  const [typingHistory, setTypingHistory] = useState(false)
-  const [typedHistory, setTypedHistory] = useState('')
   const [typingSurgery, setTypingSurgery] = useState(false)
 
   // One more history line, typed or picked, once only.
@@ -799,53 +794,19 @@ export function HistoryPart({
           254). Each one chosen shows under it; tap it to take it off. */}
       <div className={`${styles.field} ${styles.fieldWide}`}>
         <label htmlFor="history-pick">Choose each one she has had. Leave empty for Nil.</label>
-        {typingHistory ? (
-          <div className={styles.vitalTyping}>
-            <input
-              id="history-pick"
-              className={styles.input}
-              autoFocus
-              maxLength={120}
-              placeholder="Type it"
-              value={typedHistory}
-              onChange={(event) => setTypedHistory(event.target.value)}
-            />
-            <button
-              type="button"
-              className={styles.small}
-              disabled={!typedHistory.trim()}
-              onClick={() => {
-                addHistory(typedHistory)
-                setTypedHistory('')
-                setTypingHistory(false)
-              }}
-            >
-              Add
-            </button>
-            <button
-              type="button"
-              className={styles.linkButton}
-              onClick={() => setTypingHistory(false)}
-            >
-              Back to the list
-            </button>
-          </div>
-        ) : (
-          <SearchSelect
-            id="history-pick"
-            value=""
-            placeholder="Choose"
-            options={HISTORY.filter((item) => !yes.includes(item)).map((item) => ({
-              value: item,
-              label: item,
-            }))}
-            onChange={addHistory}
-            onOther={(typed) => {
-              if (typed.trim()) addHistory(typed)
-              else setTypingHistory(true)
-            }}
-          />
-        )}
+        {/* The hospital's list (pick_options, antenatal_history): Other
+            types one that is missing, with "Save it to the list for
+            everybody", so next time it is one tap (CLAUDE.md, 254). */}
+        <OptionSelect
+          client={client}
+          staffId={staffId}
+          list="antenatal_history"
+          id="history-pick"
+          value=""
+          onChange={addHistory}
+          placeholder="Choose"
+          otherLabel="Type it"
+        />
         {yes.length ? (
           <div className={styles.chips} role="group" aria-label="Medical history">
             {yes.map((item) => (

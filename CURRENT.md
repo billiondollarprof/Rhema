@@ -42,8 +42,14 @@ Numbers are kept from the full list, so older notes still match.
     Medical history is a drop down with search and Other (Spotting in
     pregnancy, Threatened miscarriage (threatened abortion) added);
     surgical history got Other. ASKED: what "threatening stage of
-    pregnancy" means. WAITING his yes: a pick list so what is typed with
-    Other can be saved for everybody (SQL), and Duphaston (253).
+    pregnancy" means. His yes to the batch 2026-11-26: migration
+    20261126183515_antenatal_history_list_and_duphaston (a new pick list,
+    antenatal_history, for anybody with medical access, its 14 starter
+    lines, the add function knows the new name; Duphaston 10 mg tablet).
+    The history drop down now reads that list, with "Save it to the list
+    for everybody". Tested on a local copy: 5 database tests, 4 deliberate
+    breaks caught, undo and redo; picked, added for everybody, one tap next
+    time, "Duph" finds Duphaston.
 
 253. **Pre-eclampsia, Duphaston, and a full check of lab results and
     files.** (2026-11-26) "the matron just said something that's under the

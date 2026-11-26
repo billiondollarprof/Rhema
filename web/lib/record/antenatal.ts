@@ -114,6 +114,9 @@ export const EDUCATION = [
   'BSc',
   'Postgraduate',
 ]
+// The card's medical history as it started. Since 2026-11-26 (request 254)
+// the screen reads the hospital's list (pick_options, antenatal_history),
+// which began with these same lines and grows with what staff save.
 export const HISTORY = [
   'Diabetes mellitus',
   'Chronic nephritis',

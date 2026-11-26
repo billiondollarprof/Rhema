@@ -36,6 +36,8 @@ export type PickList =
   | 'town'
   | 'occupation'
   | 'tribe'
+  // The antenatal card's medical history (request 254, 2026-11-26).
+  | 'antenatal_history'
 
 export type PickOption = {
   id: number
