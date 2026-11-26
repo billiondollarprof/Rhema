@@ -4,6 +4,12 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-26 (late): tidied the open list on his word. 58 finished
+  requests moved word for word to docs/DONE.md (121, 122, 129 to 131, 155,
+  158 to 161, 163 to 165, 168 to 171, 173 to 190, 192, 193, 195,
+  202, 204 to 216, 219, 220, 222, 224, 225, 244). 40 stay open: each has a
+  part waiting on him, not started, LATER, or "open until he says done".
+
 - 2026-11-26 (evening): LIVE: 253 (pre-eclampsia, eclampsia; lab results
   one test at a time with a file checked end to end), 254 (pick rule in
   CLAUDE.md; history a drop down that remembers, with his yes to the SQL;
