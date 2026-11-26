@@ -15,6 +15,23 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+257. **Every bill starts with what was already collected, admitted or
+    not.** (2026-11-26) "every bill that is being made by the front desk,
+    whether it's prescription, if the patient is admitted, they should
+    automatically be already populated inside the bill section. So when the
+    doctor or anybody opens the bill section, anything that the person has
+    collected before would automatically be showing... the other agent
+    started it, but right now I'm not even seeing it... even in the list, I
+    can't find medications given... I think it's on the testing branch, but
+    it's not here yet." Checked: testing and live are the same commit, and
+    the other agent's branch has nothing unmerged, so the inpatient bill
+    (request 240) is live. Add a bill fills in Medicines given, Take Home
+    Drugs and Laboratory tests only when the patient is ADMITTED (Admit on
+    the patient's page); for anybody else it starts empty, and "Medicines
+    given" is not in the list to pick (it is only that worked out line).
+    Waiting for him: he may do it with the other agent this evening; asked
+    whether outpatients should get the same.
+
 256. **Everything the matron needs inside the antenatal visit; nothing
     filled twice.** (2026-11-26) "Please put everything the matron needs
     inside of the antenatal visit so it's easy for her. When a row or a
