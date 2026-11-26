@@ -80,3 +80,16 @@ export async function setAdmittedOn(
   if (error || data !== 'saved') return 'That could not be saved. Check the internet and try again.'
   return null
 }
+
+// ===== 5. Everybody in the hospital now, for the In and Out pill =====
+// Request 258 (2026-11-26): every patient line carries a small "In" or
+// "Out". One read of the open stays (only the patient numbers), shared by
+// every line on the screen. null: no network; the pills wait.
+export async function loadInPatients(client: SupabaseClient): Promise<Set<number> | null> {
+  const { data, error } = await client
+    .from('admissions')
+    .select('patient_id')
+    .is('discharged_at', null)
+  if (error || !data) return null
+  return new Set((data as { patient_id: number }[]).map((row) => row.patient_id))
+}

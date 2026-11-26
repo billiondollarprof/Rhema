@@ -781,9 +781,12 @@ function PregnanciesPart({
   const [values, setValues] = useState(empty)
   const [died, setDied] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // A new number after each save, so the picks start fresh for the next one.
+  const [formKey, setFormKey] = useState(0)
   const set = (key: keyof typeof empty) => (value: string) =>
     setValues((now) => ({ ...now, [key]: value }))
-  async function add() {
+  // another: keep the form open for the next child.
+  async function add(another: boolean) {
     if (values.born_on && values.born_on > today()) {
       setProblem('The date of birth cannot be in the future.')
       return
@@ -803,9 +806,14 @@ function PregnanciesPart({
     })
     setProblem(answer)
     if (!answer) {
-      setAdding(false)
+      // "Save and add another" keeps the form open, empty, for the next
+      // child (request 258, 2026-11-26: "there's no button to add another
+      // baby or another pregnancy").
+      setAdding(another)
       setValues(empty)
       setDied(false)
+      // The picks inside the form start fresh too.
+      setFormKey((key) => key + 1)
       onDone()
     }
   }
@@ -856,7 +864,7 @@ function PregnanciesPart({
       ))}
       {adding ? (
         <>
-          <div className={styles.fields}>
+          <div className={styles.fields} key={formKey}>
             <Field
               id="pp-born"
               label="Date of birth"
@@ -937,8 +945,11 @@ function PregnanciesPart({
       <div className={styles.actions}>
         {adding ? (
           <>
-            <button className={`${styles.small} ${styles.primary}`} onClick={add}>
+            <button className={`${styles.small} ${styles.primary}`} onClick={() => add(false)}>
               Save pregnancy
+            </button>
+            <button className={styles.small} onClick={() => add(true)}>
+              Save and add another
             </button>
             <button className={styles.small} onClick={() => setAdding(false)}>
               Cancel
@@ -946,7 +957,9 @@ function PregnanciesPart({
           </>
         ) : (
           <button className={styles.small} onClick={() => setAdding(true)}>
-            + Add a previous pregnancy
+            {pregnancies.some((line) => !line.voided_at)
+              ? '+ Add another pregnancy'
+              : '+ Add a previous pregnancy'}
           </button>
         )}
       </div>

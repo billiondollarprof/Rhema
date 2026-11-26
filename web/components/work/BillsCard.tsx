@@ -38,6 +38,7 @@ import { recall, remember } from '@/lib/cache/memory'
 import { onChange } from '@/lib/live/changes'
 import { waitedSince } from '@/lib/patients/age'
 import { naira } from '@/lib/lab/lab'
+import StayPill from '@/components/stay/StayPill'
 import {
   billTotal,
   listBills,
@@ -191,6 +192,7 @@ function BillEntry({
           {onHome ? (
             <>
               <b>{bill.patient?.full_name ?? 'Patient'}</b>
+              <StayPill client={client} patientId={bill.patient_id} />
               <small>{bill.patient?.patient_number}</small>
             </>
           ) : (

@@ -41,6 +41,7 @@ import {
 } from '@/lib/pharmacy/pharmacy'
 import { onChange } from '@/lib/live/changes'
 import { takesPayments } from '@/lib/auth/roles'
+import StayPill from '@/components/stay/StayPill'
 import {
   loadMedicines,
   medicineWords,
@@ -229,6 +230,7 @@ function Entry({
       <div className={styles.entryTop}>
         <div>
           <b>{prescription.patient?.full_name ?? 'Patient'}</b>
+          <StayPill client={client} patientId={prescription.patient_id} />
           <small>
             {prescription.patient?.patient_number} · by{' '}
             {prescription.prescriber?.full_name ?? 'the doctor'} ·{' '}

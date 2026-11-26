@@ -32,6 +32,7 @@ import styles from './home.module.css'
 import type { StaffMember } from '@/lib/auth/session'
 import { worksWithPatients } from '@/lib/auth/roles'
 import { waitedSince } from '@/lib/patients/age'
+import StayPill from '@/components/stay/StayPill'
 import {
   CATEGORY_LABELS,
   STATUS_LABELS,
@@ -153,6 +154,7 @@ export default function QueueCard({ client, staff, entries, onChanged }: QueueCa
             <div className={styles.entryTop}>
               <div>
                 <b>{entry.patient?.full_name ?? 'Patient'}</b>
+                <StayPill client={client} patientId={entry.patient_id} />
                 <small>
                   {entry.patient?.patient_number} ·{' '}
                   {CATEGORY_LABELS[entry.patient?.category ?? ''] ?? entry.patient?.category} ·

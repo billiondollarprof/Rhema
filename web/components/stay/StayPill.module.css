@@ -1,0 +1,30 @@
+/* components/stay/StayPill.module.css: the small In (green) and Out
+   (orange) pill (request 258). Small on purpose, so it never crowds a line. */
+
+/* ===== 1. Both pills ===== */
+.in,
+.out {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ===== 2. In: green ===== */
+.in {
+  background: var(--c-e4f3ec);
+  color: var(--grn);
+  border: 1px solid var(--c-bfe3cf);
+}
+
+/* ===== 3. Out: orange ===== */
+.out {
+  background: var(--warn-bg-1);
+  color: var(--amb);
+  border: 1px solid var(--c-ffe0a3);
+}

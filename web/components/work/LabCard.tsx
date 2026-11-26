@@ -53,6 +53,7 @@ import {
 } from '@/lib/lab/lab'
 import { onChange } from '@/lib/live/changes'
 import { takesPayments } from '@/lib/auth/roles'
+import StayPill from '@/components/stay/StayPill'
 
 type View = 'pay' | 'lab' | 'mine'
 
@@ -248,6 +249,7 @@ function LabEntry({
       <div className={styles.entryTop}>
         <div>
           <b>{request.patient?.full_name ?? 'Patient'}</b>
+          <StayPill client={client} patientId={request.patient_id} />
           <small>
             {request.patient?.patient_number} · {request.tests.join(', ')}
           </small>

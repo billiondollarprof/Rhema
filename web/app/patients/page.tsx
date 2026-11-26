@@ -38,6 +38,7 @@ import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { CATEGORY_LABELS, STATUS_LABELS, type QueueStatus } from '@/lib/queue/queue'
 import { takesPayments } from '@/lib/auth/roles'
+import StayPill from '@/components/stay/StayPill'
 
 function FindPatient() {
   const auth = useAuth()
@@ -211,6 +212,8 @@ function FindPatient() {
                       <PersonBadge name={patient.full_name} />
                       <div>
                         <b>{patient.full_name}</b>
+                        {/* In or Out of the hospital (request 258). */}
+                        <StayPill client={client} patientId={patient.id} />
                         <small>
                           {patient.patient_number} · {ageFrom(patient.date_of_birth)}
                           {patient.phone ? ` · ${patient.phone}` : ''}

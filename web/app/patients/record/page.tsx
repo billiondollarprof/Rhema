@@ -70,6 +70,7 @@ import { useAuth } from '@/lib/auth/session'
 import { actsAsDoctor, setsPrices } from '@/lib/auth/roles'
 import { emailRecord } from '@/lib/record/emailRecord'
 import { recall, remember } from '@/lib/cache/memory'
+import StayPill from '@/components/stay/StayPill'
 
 // ===== 1. The allergy banner =====
 // Red: allergies on file. Green: asked, and none. Amber: nobody has asked yet.
@@ -315,7 +316,10 @@ function PatientRecord() {
         <div className={`${styles.header} ${styles.noPrint}`}>
           {patient ? <PersonBadge name={patient.full_name} /> : null}
           <div>
-            <h2>{patient ? patient.full_name : 'Medical record'}</h2>
+            <h2>
+              {patient ? patient.full_name : 'Medical record'}
+              {patient ? <StayPill client={client} patientId={patient.id} /> : null}
+            </h2>
             {patient ? (
               <small>
                 {patient.patient_number} · {ageFrom(patient.date_of_birth)} ·{' '}

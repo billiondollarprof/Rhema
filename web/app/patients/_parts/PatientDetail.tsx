@@ -46,6 +46,7 @@ import PersonBadge from '@/components/auth/PersonBadge'
 import Icon from '@/components/shell/Icon'
 import styles from './patients.module.css'
 import { ageFrom } from '@/lib/patients/age'
+import StayPill from '@/components/stay/StayPill'
 import {
   firstRegisteredWords,
   loadAntenatalDetails,
@@ -241,7 +242,10 @@ export default function PatientDetail({
       <div className={styles.head}>
         <PersonBadge name={patient.full_name} />
         <div className={styles.headName}>
-          <h2>{patient.full_name}</h2>
+          <h2>
+            {patient.full_name}
+            <StayPill client={client} patientId={patient.id} />
+          </h2>
           {patient.from_old_file ? (
             <span className={styles.oldFileMark}>
               <Icon name="file" size={13} /> From old file
