@@ -375,7 +375,7 @@ module.exports.SCREENS = [
   // Request 251: the same test on two lab requests of one patient.
   {
     path: '/',
-    waitFor: 'Lab tests to pay for',
+    waitFor: 'Malaria Parasite (MP), Widal',
     roomId: 1,
     press: 'Take payment',
     extra: {

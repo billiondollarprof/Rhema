@@ -498,6 +498,9 @@ try {
 
   // Request 251: the same test again for the same patient warns first.
   step('Lab: the same test again shows a warning; Cancel sends nothing and keeps the form')
+  // The database keeps an identical request inside 30 seconds as one (the
+  // double tap guard), so the walk sends the second one after that.
+  const firstSentAt = Date.now()
   const requestPage = page.url()
   await page.goto(requestPage)
   await page.getByRole('heading', { name: 'Request lab test' }).waitFor()
@@ -512,6 +515,7 @@ try {
   }
 
   step('Lab: Send anyway sends it')
+  await page.waitForTimeout(Math.max(0, 31000 - (Date.now() - firstSentAt)))
   await page.getByRole('button', { name: 'Send request' }).click()
   await page.getByRole('button', { name: 'Send anyway' }).click()
   await page

@@ -174,13 +174,18 @@ export async function sameTestsElsewhere(
     .gte('requested_at', since)
     .order('requested_at')
   if (error || !data) return []
-  return (data as { tests: string[]; requested_at: string; payment_id: number | null }[])
-    .map((row) => ({
-      same: row.tests.filter((test) => wanted.has(key(test))),
-      at: row.requested_at,
-      paid: row.payment_id !== null,
-    }))
-    .filter((one) => one.same.length > 0)
+  type Row = { id: number; tests: string[]; requested_at: string; payment_id: number | null }
+  return (
+    (data as Row[])
+      // Never the request being paid now (the database leaves it out too).
+      .filter((row) => row.id !== requestId)
+      .map((row) => ({
+        same: row.tests.filter((test) => wanted.has(key(test))),
+        at: row.requested_at,
+        paid: row.payment_id !== null,
+      }))
+      .filter((one) => one.same.length > 0)
+  )
 }
 
 export async function sameDrugsElsewhere(
@@ -199,24 +204,28 @@ export async function sameDrugsElsewhere(
     .gte('prescribed_at', since)
     .order('prescribed_at')
   if (error || !data) return []
-  return (data as { prescribed_at: string; payment_id: number | null; items: ItemRow[] }[])
-    .map((row) => ({
-      same: row.items.filter((item) => drugs.some((drug) => sameDrug(item, drug))).map(drugWords),
-      at: row.prescribed_at,
-      paid: row.payment_id !== null,
-    }))
-    .filter((one) => one.same.length > 0)
+  type Row = { id: number; prescribed_at: string; payment_id: number | null; items: ItemRow[] }
+  return (
+    (data as Row[])
+      // Never the prescription being paid now (the database leaves it out too).
+      .filter((row) => row.id !== prescriptionId)
+      .map((row) => ({
+        same: row.items.filter((item) => drugs.some((drug) => sameDrug(item, drug))).map(drugWords),
+        at: row.prescribed_at,
+        paid: row.payment_id !== null,
+      }))
+      .filter((one) => one.same.length > 0)
+  )
 }
 
-// "This patient has the same tests on another request (asked for at 21:40,
-// paid). Check before taking payment twice."
-export function elsewhereWords(earlier: Earlier[], what: 'tests' | 'drugs'): string {
+// "This patient has MP and Widal on another request too (asked for at
+// 21:40, paid). Check before taking payment twice."
+export function elsewhereWords(earlier: Earlier[]): string {
   const which = earlier
     .map((one) => `asked for at ${whenWords(one.at)}, ${one.paid ? 'paid' : 'not paid yet'}`)
     .join('; ')
-  const thing =
-    what === 'tests'
-      ? `the same tests (${listWords(sameNames(earlier))})`
-      : `the same drugs (${listWords(sameNames(earlier))})`
-  return `This patient has ${thing} on another request (${which}). Check before taking payment twice.`
+  return (
+    `This patient has ${listWords(sameNames(earlier))} on another request too (${which}). ` +
+    'Check before taking payment twice.'
+  )
 }

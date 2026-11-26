@@ -343,7 +343,7 @@ function LabEntry({
       {problem ? <p className={styles.muted}>{problem}</p> : null}
       {same ? (
         <SameWarning
-          words={elsewhereWords(same, 'tests')}
+          words={elsewhereWords(same)}
           goLabel="Take payment anyway"
           onGo={startPaying}
           onCancel={() => setSame(null)}

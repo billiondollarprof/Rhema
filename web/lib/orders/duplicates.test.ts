@@ -42,8 +42,8 @@ describe('sameDrugsWords', () => {
 
 describe('elsewhereWords', () => {
   it('says paid or not, for the Front Desk', () => {
-    expect(elsewhereWords([{ same: ['MP', 'Widal'], at, paid: true }], 'tests')).toBe(
-      'This patient has the same tests (MP and Widal) on another request (asked for at 24 Nov, 21:40, paid). Check before taking payment twice.',
+    expect(elsewhereWords([{ same: ['MP', 'Widal'], at, paid: true }])).toBe(
+      'This patient has MP and Widal on another request too (asked for at 24 Nov, 21:40, paid). Check before taking payment twice.',
     )
   })
 })

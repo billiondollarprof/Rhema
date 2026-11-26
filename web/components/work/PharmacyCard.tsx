@@ -282,7 +282,7 @@ function Entry({
 
       {same ? (
         <SameWarning
-          words={elsewhereWords(same, 'drugs')}
+          words={elsewhereWords(same)}
           goLabel="Take payment anyway"
           onGo={() => {
             setSame(null)
