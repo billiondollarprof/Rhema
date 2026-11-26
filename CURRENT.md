@@ -15,6 +15,13 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+256. **Everything the matron needs inside the antenatal visit; nothing
+    filled twice.** (2026-11-26) "Please put everything the matron needs
+    inside of the antenatal visit so it's easy for her. When a row or a
+    detail is already filled in somewhere, let them automatically appear in
+    the antenatal section too so they don't have to fill any information
+    twice." Said back with a plan, waiting for his yes.
+
 255. **Not palpable, previous births, and CS before.** (2026-11-26) The
     matron: "At palpation, there's something you need to add, not palpable
     too... add the last [births], like all the child [births]... the
