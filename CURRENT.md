@@ -46,7 +46,16 @@ Numbers are kept from the full list, so older notes still match.
     inside of the antenatal visit so it's easy for her. When a row or a
     detail is already filled in somewhere, let them automatically appear in
     the antenatal section too so they don't have to fill any information
-    twice." Said back with a plan, waiting for his yes.
+    twice." Said back with a plan; his yes 2026-11-26 ("yes, go ahead").
+    Then, 2026-11-26: "It's okay the way everything is on its own section...
+    I like the arrangement that we did before. I don't think I want to
+    change that arrangement... if there are other details the matron is
+    asking for, let's record and probably work on it tonight." Built, not
+    shipped: every section stays where it is; added inside them only: an
+    "At a glance" block at the top of the antenatal booking, the visit
+    filling HB and urine from the lab, routine tests showing the lab's
+    results, gravida and para kept once in the profile. ASKED him whether
+    the "At a glance" block stays, since he wants the arrangement kept.
 
 255. **Not palpable, previous births, and CS before.** (2026-11-26) The
     matron: "At palpation, there's something you need to add, not palpable
@@ -2717,6 +2726,12 @@ These never come off the list.
     small to tap, and Back on the receipt (now Back to patient).
 
 ### Decided
+
+- **The antenatal card keeps its arrangement** (2026-11-26): the antenatal
+  booking, About her, Medical history, Next of kin and more details,
+  Routine tests, Previous pregnancies and Consent for an operation, each in
+  its own section, in that order. "I like the arrangement that we did
+  before. I don't think I want to change that arrangement."
 
 - **CHANGED 2026-11-26 (request 252): no longer by itself. A save after 12
   hours is not saved; the screen sends them to open the record again.**
