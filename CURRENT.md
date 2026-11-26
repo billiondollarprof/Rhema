@@ -15,6 +15,18 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 Numbers are kept from the full list, so older notes still match.
 
+252. **Keep the data trustworthy: send staff to open the record again, and
+    show wrong values in red.** (2026-11-26) "We want to only do the things
+    that will keep the data trustworthy... if it is to only redirect the
+    page, the staff to go over it again, that will make it better, then do
+    it that way... make sure there's no error. And then if the system
+    refuses to save [a] number... the system should name it and show them
+    in red so they make their corrections... I think it should work that
+    way in other places where wrong values are entered." So: undo the save
+    that opens the record again by itself (live since 2026-11-25); a save
+    after 12 hours is not saved and the screen sends them to open the
+    record again; every box with a wrong value is named and shown in red.
+
 251. **Warn before the same test (or drug) is asked for, or paid, twice.**
     (2026-11-26) "I think you should do number two a warning... if it's
     going to take a lot of context... handover to the other agent to
@@ -2638,7 +2650,9 @@ These never come off the list.
 
 ### Decided
 
-- **A save after 12 hours opens the record again by itself** (2026-11-25,
+- **CHANGED 2026-11-26 (request 252): no longer by itself. A save after 12
+  hours is not saved; the screen sends them to open the record again.**
+  Was: **A save after 12 hours opens the record again by itself** (2026-11-25,
   request 248): "what is the best option... as long as it doesn't affect
   the integrity of the data... allow them to continue even after the 12
   hours... the integrity of data is still solid." Built: a save refused for
