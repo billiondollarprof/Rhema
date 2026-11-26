@@ -4,6 +4,13 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-26: 252 LIVE (his word: only what keeps the data trustworthy):
+  the save that reopened the record by itself is undone; a save after 12
+  hours says Not saved and the record shows Open the record again; wrong
+  values named and red on every form. 251 LIVE: Request lab and Prescribe
+  warn of the same test or drug not done yet (Send anyway or Cancel); the
+  Front Desk is warned before paying the same twice. No SQL.
+
 - 2026-11-26 (later): request 251, the duplicate warning, handed over to the
   other agent with a full spec (handover section 9). This branch stops here
   until Anthony asks again.

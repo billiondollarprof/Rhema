@@ -1548,3 +1548,53 @@ this file.
     top refused twice (25 Nov); both now named before saving. Checked
     against a real local Supabase: 13 hours of steady use, details and a
     visit saved, the opening in the log, void before and after.
+
+252. **Keep the data trustworthy: send staff to open the record again, and
+    show wrong values in red.** (2026-11-26) "We want to only do the things
+    that will keep the data trustworthy... if it is to only redirect the
+    page, the staff to go over it again, that will make it better, then do
+    it that way... make sure there's no error. And then if the system
+    refuses to save [a] number... the system should name it and show them
+    in red so they make their corrections... I think it should work that
+    way in other places where wrong values are entered." So: undo the save
+    that opens the record again by itself (live since 2026-11-25); a save
+    after 12 hours is not saved and the screen sends them to open the
+    record again; every box with a wrong value is named and shown in red.
+    Built 2026-11-26: the automatic reopening is undone (offline entries
+    too); a refused save says "Not saved" and the record shows "Open the
+    record again" at the top. Red boxes with the words under the form on:
+    antenatal visit, booking details, tests, pregnancies, consent, profile,
+    vital signs (record, sheet, Front Desk), medicine course, payments,
+    bills, prices (Front Desk, lab list), Request lab, Prescribe, pharmacy
+    stock. One red style for all (app/globals.css).
+    LIVE 2026-11-26: CI, testing and live deploys green; the live code
+    carries the new words; layout, contrast, visibility and click-through
+    passed; the sign in walk (Cancel, Send anyway, both payments) passed
+    locally and in CI.
+
+251. **Warn before the same test (or drug) is asked for, or paid, twice.**
+    (2026-11-26) "I think you should do number two a warning... if it's
+    going to take a lot of context... handover to the other agent to
+    continue... if requesting for the exact same test for the exact same
+    patient then [a warning] shows so they don't request for the test
+    twice... I'm not sure the patient paid twice... maybe the front desk
+    had to tap [it] twice because they requested [it] twice... [only] one
+    result... we entered so... treat duplication for that area as well...
+    the system shows [a] warning and then give them a key to continue
+    anyway or cancel. I don't even know what language to use." On the
+    ₦8,000 found in 249: "when I discussed with them, I will know what to
+    do" (his to settle; nothing to change on live). HANDED OVER to the other
+    agent: full spec in docs/HANDOVER-2026-11-24-front-desk-228.md section
+    9. Not started on that branch. Built here 2026-11-26 (Anthony: "Read
+    docs/HANDOVER-2026-11-24-front-desk-228.md section 9 and build request
+    251"): Request lab and Prescribe warn of the same test or drug not
+    done yet, with Send anyway or Cancel; the Front Desk's Take payment on
+    the Laboratory and Pharmacy cards warns of the same on another request
+    in the last 24 hours, with Take payment anyway or Cancel. No database
+    change: it reads what each person may already read. Screen entries
+    with made up duplicates; the sign in walk sends the same test twice
+    (Cancel, then Send anyway) and pays both through the warning.
+    LIVE 2026-11-26: CI, testing and live deploys green; the live code
+    carries the new words; layout, contrast, visibility and click-through
+    passed; the sign in walk (Cancel, Send anyway, both payments) passed
+    locally and in CI.
