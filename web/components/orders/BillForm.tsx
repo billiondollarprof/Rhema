@@ -64,6 +64,7 @@ import {
   myPriceOf,
   priceKey,
   priceOf,
+  amountWrong,
   readAmount,
   type MyPrice,
   type Price,
@@ -503,6 +504,7 @@ export default function BillForm({
                   className={styles.input}
                   inputMode="decimal"
                   placeholder="e.g. 5,000"
+                  aria-invalid={amountWrong(line.amount) ? 'true' : undefined}
                   value={line.amount}
                   onChange={(event) =>
                     change(index, { amount: event.target.value.replace(/[^\d.,\s]/g, '') })
@@ -555,6 +557,12 @@ export default function BillForm({
         />
       </div>
 
+      {lines.some((line) => amountWrong(line.amount)) ||
+      Object.values(dosePrices).some((price) => amountWrong(price)) ? (
+        <p className={styles.error}>
+          The amount in red is not an amount. Type it in naira, like 5,000.
+        </p>
+      ) : null}
       {error ? <p className={styles.error}>{error}</p> : null}
       <div className={styles.buttons}>
         <button
@@ -649,6 +657,7 @@ function AutoLine({
               className={styles.input}
               inputMode="decimal"
               placeholder="No price yet"
+              aria-invalid={amountWrong(dosePrices[one.medicine]) ? 'true' : undefined}
               value={dosePrices[one.medicine] ?? ''}
               onChange={(event) =>
                 onDosePrice(one.medicine, event.target.value.replace(/[^\d.,\s]/g, ''))
@@ -676,6 +685,7 @@ function AutoLine({
             inputMode="decimal"
             // No price on some of it yet: the doctor types the amount.
             placeholder="Type the amount"
+            aria-invalid={amountWrong(line.amount) ? 'true' : undefined}
             value={line.amount}
             onChange={(event) => onAmount(event.target.value.replace(/[^\d.,\s]/g, ''))}
           />

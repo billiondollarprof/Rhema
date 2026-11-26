@@ -14,7 +14,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { prepareSignature, uploadFile } from '../files/files'
 import { OLD_OPENING } from './opening'
-import { saveWithOpening } from './record'
+import { saveAndCheck } from './record'
 
 // ===== 1. Shapes and words =====
 export const TEST_WORDS: [string, string][] = [
@@ -241,10 +241,10 @@ export async function saveBooking(
   const row = { ...values, updated_by: staffId }
   // The changed row is read back: the database answers an update it may
   // not make with no row and no error, so without this the screen said
-  // "Saved" while nothing was written (request 248, found 2026-11-25). A
-  // save that meets an old opening opens the record again and tries once
-  // more (saveWithOpening, in record.ts).
-  const { error, oldOpening } = await saveWithOpening(client, patientId, async () => {
+  // "Saved" while nothing was written (request 248, found 2026-11-25). An
+  // old opening is not tried again: the screen sends the person back to
+  // open the record again (saveAndCheck, in record.ts, request 252).
+  const { error, oldOpening } = await saveAndCheck(async () => {
     const { data, error } = exists
       ? await client
           .from('antenatal_bookings')

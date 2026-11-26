@@ -50,7 +50,7 @@ import { vitalsProblem } from '@/lib/record/vitals'
 import { ROUTES, WARD_EVENTS } from '@/lib/record/signers'
 import { useDraft } from '@/lib/drafts/drafts'
 import DraftBack from '@/components/drafts/DraftBack'
-import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
+import OpenAgain from '../_parts/OpenAgain'
 
 // ===== 1. Small helpers =====
 // "now" in the form a time box expects, from the internet's time, not the
@@ -134,7 +134,7 @@ function Sheet() {
             Vital signs
           </Link>
         </div>
-        {stale ? <p className={styles.offline}>{OLD_OPENING_SCREEN}</p> : null}
+        <OpenAgain stale={stale} />
         {savedAt ? (
           <p className={styles.offline}>
             No network. This is the copy kept on this device at{' '}
@@ -496,6 +496,8 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
   const [values, setValues] = useState(empty)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // The box holding a value the database would refuse, shown red (252).
+  const [wrongKey, setWrongKey] = useState<string | null>(null)
   const KEYS = [
     'temperature_c',
     'pulse',
@@ -549,8 +551,9 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
     }
     // A number the database would refuse is named first (request 248).
     const wrong = vitalsProblem(numbers)
+    setWrongKey(wrong?.key ?? null)
     if (wrong) {
-      setProblem(wrong)
+      setProblem(wrong.words)
       return
     }
     setBusy(true)
@@ -581,10 +584,13 @@ function VitalsSheet({ client, staffId, patientId, record, me, reload }: SheetPr
       className={styles.input}
       inputMode="decimal"
       placeholder={/\d/.test(example) ? `e.g. ${example}` : example}
+      aria-invalid={wrongKey === key ? 'true' : undefined}
       value={values[key] ?? ''}
-      onChange={(event) =>
+      onChange={(event) => {
+        // Changing the red box takes the red off; it is checked again on Save.
+        if (wrongKey === key) setWrongKey(null)
         setValues({ ...values, [key]: event.target.value.replace(/[^\d.,]/g, '') })
-      }
+      }}
     />
   )
   const cell = (key: string, label: string, example: string) => (

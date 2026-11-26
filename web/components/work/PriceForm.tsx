@@ -92,6 +92,11 @@ export default function PriceForm({
               id={`${formId}-${at}`}
               inputMode="decimal"
               placeholder="e.g. 2,000"
+              aria-invalid={
+                typed[at].trim() !== '' && !(amounts[at] > 0 && amounts[at] < 100000000)
+                  ? 'true'
+                  : undefined
+              }
               value={typed[at]}
               autoFocus={at === 0 && !fromDoctor[at]}
               onChange={(event) => {
@@ -122,6 +127,13 @@ export default function PriceForm({
           </button>
         ))}
       </div>
+      {typed.some(
+        (text, at) => text.trim() !== '' && !(amounts[at] > 0 && amounts[at] < 100000000),
+      ) ? (
+        <p className={styles.error}>
+          The price in red is not an amount. Type it in naira, like 2,000.
+        </p>
+      ) : null}
       {error ? <p className={styles.error}>{error}</p> : null}
       <div className={styles.entryButtons}>
         <button className={styles.button} onClick={onCancel} disabled={busy}>

@@ -82,6 +82,13 @@
   color: var(--c-9a5b00);
 }
 
+/* The record past its 12 hours (request 252): the words, then the button
+   under them on a phone, beside them on a wide screen. */
+.openAgain {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
 /* ===== 3. The two columns on a wide screen ===== */
 .columns {
   display: grid;

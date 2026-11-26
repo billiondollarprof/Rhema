@@ -81,6 +81,12 @@ export function readAmount(typed: string): number | null {
   return Math.round(value * 100) / 100
 }
 
+// Something typed in an amount box that is not an amount (request 252):
+// the box shows red. An empty box is not wrong yet.
+export function amountWrong(typed: string | undefined | null): boolean {
+  return Boolean(typed && typed.trim() !== '' && readAmount(typed) === null)
+}
+
 // ===== 4. Lab test prices the Laboratory proposed (request 208) =====
 // A proposal waits for the admin. After 72 hours with no answer it becomes
 // standard on its own (the backup job runs it every 2 hours).

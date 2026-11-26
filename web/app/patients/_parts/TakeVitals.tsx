@@ -84,6 +84,8 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
   const [glucose, setGlucose] = useState<Glucose>(EMPTY_GLUCOSE)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // The box holding a value the database would refuse, shown red (252).
+  const [wrongKey, setWrongKey] = useState<string | null>(null)
   const [saved, setSaved] = useState<string[] | null>(null)
 
   // BMI, worked out from what is picked (request 235).
@@ -114,8 +116,9 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
     }
     // A number the database would refuse is named first (request 248).
     const wrong = vitalsProblem(numbers)
+    setWrongKey(wrong?.key ?? null)
     if (wrong) {
-      setProblem(wrong)
+      setProblem(wrong.words)
       return
     }
     setBusy(true)
@@ -177,9 +180,11 @@ export default function TakeVitals({ client, staffId, patientId, patientName, on
                 id={`desk-vit-${box.key}`}
                 range={RANGES[box.key]}
                 value={values[box.key]}
+                invalid={wrongKey === box.key}
                 onChange={(value) => {
                   setValues({ ...values, [box.key]: value })
                   setProblem(null)
+                  if (wrongKey === box.key) setWrongKey(null)
                 }}
               />
             </div>

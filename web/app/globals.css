@@ -276,3 +276,16 @@ body {
     'Segoe UI',
     sans-serif;
 }
+
+/* ===== A box holding a wrong value (request 252) =====
+   Anthony, 2026-11-26: "if the system refuses to save [a] number... the
+   system should name it and show them in red so they make their
+   corrections... it should work that way in other places." Every box the
+   screen marks aria-invalid shows red, in both looks; the words under the
+   form name it. */
+input[aria-invalid='true'],
+select[aria-invalid='true'],
+textarea[aria-invalid='true'] {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 1px var(--red);
+}

@@ -110,13 +110,17 @@ const VITAL_LIMITS: [string, string, number, number, boolean][] = [
   ['pain_score', 'Pain score', 0, 10, true],
 ]
 
-// The first reading the database would refuse, in words; null if none.
-export function vitalsProblem(numbers: Record<string, number | null | undefined>): string | null {
+// The first reading the database would refuse: its column (so the screen
+// shows that box in red, request 252) and the words; null if none.
+export function vitalsProblem(
+  numbers: Record<string, number | null | undefined>,
+): { key: string; words: string } | null {
   for (const [key, label, min, max, whole] of VITAL_LIMITS) {
     const value = numbers[key]
     if (value === null || value === undefined) continue
-    if (value < min || value > max) return `${label} must be between ${min} and ${max}.`
-    if (whole && !Number.isInteger(value)) return `${label} must be a whole number.`
+    if (value < min || value > max)
+      return { key, words: `${label} must be between ${min} and ${max}.` }
+    if (whole && !Number.isInteger(value)) return { key, words: `${label} must be a whole number.` }
   }
   return null
 }

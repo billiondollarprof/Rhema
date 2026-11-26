@@ -35,12 +35,13 @@ import { medicineWords } from '@/lib/medicines/medicines'
 import { useAuth } from '@/lib/auth/session'
 import { setsPrices } from '@/lib/auth/roles'
 import { courseDoses, doseWords, givenCount } from '@/lib/record/doses'
-import { loadPrices, priceOf, readAmount, type Price } from '@/lib/prices/prices'
+import { amountWrong, loadPrices, priceOf, readAmount, type Price } from '@/lib/prices/prices'
 import MakeStandard, { type Candidate } from '@/components/orders/MakeStandard'
 import { naira } from '@/lib/lab/lab'
 import ReasonForm from './ReasonForm'
 import Section, { EmptyLine } from './Section'
 import styles from './record.module.css'
+import { countWrong } from '@/lib/forms/wrong'
 import {
   MEDICATION_STATUS,
   addLine,
@@ -246,6 +247,7 @@ export function MedicationsSection({
                 className={styles.input}
                 inputMode="numeric"
                 placeholder="e.g. 5"
+                aria-invalid={countWrong(days, 1, 365) ? 'true' : undefined}
                 value={days}
                 onChange={(event) => setDays(event.target.value.replace(/\D/g, '').slice(0, 3))}
               />
@@ -257,6 +259,7 @@ export function MedicationsSection({
                 className={styles.input}
                 inputMode="numeric"
                 placeholder="e.g. 10"
+                aria-invalid={countWrong(doses, 1, 1000) ? 'true' : undefined}
                 value={doses}
                 onChange={(event) =>
                   setTypedDoses(event.target.value.replace(/\D/g, '').slice(0, 4))
@@ -271,6 +274,7 @@ export function MedicationsSection({
                   className={styles.input}
                   inputMode="decimal"
                   placeholder="e.g. 2,500"
+                  aria-invalid={amountWrong(price) ? 'true' : undefined}
                   value={price}
                   onChange={(event) => {
                     setPriceTyped(true)
@@ -280,6 +284,15 @@ export function MedicationsSection({
               </div>
             ) : null}
           </div>
+          {/* A wrong number shows red, and says what to type (request 252). */}
+          {countWrong(days, 1, 365) ||
+          countWrong(doses, 1, 1000) ||
+          (prices && amountWrong(price)) ? (
+            <p className={styles.error}>
+              The box in red is wrong: days from 1 to 365, doses from 1 to 1,000, and the price in
+              naira, like 2,500.
+            </p>
+          ) : null}
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.actions}>
             <button className={`${styles.small} ${styles.primary}`} onClick={add}>

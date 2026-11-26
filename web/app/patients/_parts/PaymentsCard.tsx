@@ -206,6 +206,9 @@ export default function PaymentsCard({
   const ready =
     lines.every((line) => line.label.trim().length > 0 && !qtyMissing(line)) &&
     amounts.every((amount) => amount > 0)
+  // A price typed that is not an amount (request 252): that box goes red and
+  // the line under the form says what to type. An empty box is not wrong yet.
+  const priceWrong = (at: number) => lines[at].price.trim() !== '' && !(amounts[at] > 0)
 
   function choose(next: PaymentPurpose) {
     setPurpose(next)
@@ -325,6 +328,7 @@ export default function PaymentsCard({
                   aria-label={`Price for ${line.label || `line ${at + 1}`}`}
                   inputMode="decimal"
                   placeholder="e.g. 2,000"
+                  aria-invalid={priceWrong(at) ? 'true' : undefined}
                   value={line.price}
                   onChange={(event) =>
                     change(at, 'price', event.target.value.replace(/[^\d.,\s]/g, ''))
@@ -337,6 +341,7 @@ export default function PaymentsCard({
                     className={styles.input}
                     aria-label={`How many of ${line.label}`}
                     inputMode="decimal"
+                    aria-invalid={line.qty && !(Number(line.qty) > 0) ? 'true' : undefined}
                     placeholder={
                       drugLines[line.label]?.unit
                         ? `How many ${drugLines[line.label]?.unit}s`
@@ -406,6 +411,11 @@ export default function PaymentsCard({
               </button>
             ))}
           </div>
+          {lines.some((_, at) => priceWrong(at)) ? (
+            <p className={styles.error}>
+              The price in red is not an amount. Type it in naira, like 2,000.
+            </p>
+          ) : null}
           {problem ? <p className={styles.error}>{problem}</p> : null}
           <div className={styles.buttons}>
             <button

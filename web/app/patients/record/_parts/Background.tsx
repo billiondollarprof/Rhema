@@ -392,6 +392,9 @@ export function ProfileSection({
                     id="gravida"
                     className={styles.input}
                     inputMode="numeric"
+                    aria-invalid={
+                      gravida !== '' && Number(gravida) > 30 && problem ? 'true' : undefined
+                    }
                     value={gravida}
                     onChange={(e) => setGravida(e.target.value.replace(/\D/g, ''))}
                   />
@@ -402,6 +405,7 @@ export function ProfileSection({
                     id="para"
                     className={styles.input}
                     inputMode="numeric"
+                    aria-invalid={para !== '' && Number(para) > 30 && problem ? 'true' : undefined}
                     value={para}
                     onChange={(e) => setPara(e.target.value.replace(/\D/g, ''))}
                   />

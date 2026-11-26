@@ -30,6 +30,7 @@ import { COMMON_TESTS, naira, requestLab } from '@/lib/lab/lab'
 import { useAuth } from '@/lib/auth/session'
 import { setsPrices as canSetPrices } from '@/lib/auth/roles'
 import {
+  amountWrong,
   loadMyPrices,
   loadPrices,
   myPriceOf,
@@ -240,6 +241,7 @@ export default function LabRequestForm({
                 className={styles.input}
                 inputMode="decimal"
                 placeholder="e.g. 3,000"
+                aria-invalid={amountWrong(priceFor(test)) ? 'true' : undefined}
                 value={priceFor(test)}
                 onChange={(event) =>
                   setPrices({ ...prices, [test]: event.target.value.replace(/[^\d.,\s]/g, '') })
@@ -247,6 +249,12 @@ export default function LabRequestForm({
               />
             </div>
           ))}
+          {/* A wrong price shows red, and says what to type (request 252). */}
+          {tests.some((test) => amountWrong(priceFor(test))) ? (
+            <small className={styles.error}>
+              The price in red is not an amount. Type it in naira, like 3,000.
+            </small>
+          ) : null}
           {total > 0 ? (
             <p className={styles.total}>
               Total <b>{naira(total)}</b>

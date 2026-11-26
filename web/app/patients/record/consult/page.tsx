@@ -30,7 +30,7 @@ import AppShell from '@/components/shell/AppShell'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { actsAsDoctor } from '@/lib/auth/roles'
-import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
+import OpenAgain from '../_parts/OpenAgain'
 
 function Consult() {
   const auth = useAuth()
@@ -64,7 +64,7 @@ function Consult() {
             Back to the record
           </Link>
         </div>
-        {stale ? <p className={styles.muted}>{OLD_OPENING_SCREEN}</p> : null}
+        <OpenAgain stale={stale} />
         {savedAt ? (
           <p className={styles.muted}>No network: showing the copy kept on this device.</p>
         ) : null}

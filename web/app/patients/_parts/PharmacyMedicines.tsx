@@ -38,6 +38,7 @@ import {
 import { isLate, nextDue } from '@/lib/record/chart'
 import type { DoseGiven, Medication } from '@/lib/record/record'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
+import { countWrong } from '@/lib/forms/wrong'
 
 // "14:05 today" or "23 Nov, 14:05".
 const at = (iso: string) => {
@@ -264,6 +265,7 @@ function DispenseButton({
         id={`${returning ? 'return' : 'dispense'}-${line.id}`}
         className={`${styles.input} ${styles.dispenseInput}`}
         inputMode="numeric"
+        aria-invalid={countWrong(count, 1) ? 'true' : undefined}
         value={count}
         onChange={(event) => setCount(event.target.value.replace(/\D/g, '').slice(0, 4))}
       />

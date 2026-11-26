@@ -43,6 +43,7 @@ import {
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { amountWrong } from '@/lib/prices/prices'
 
 export default function LabTestListPage() {
   const auth = useAuth()
@@ -303,6 +304,7 @@ function PriceChanger({
           aria-label={`New price of ${test}`}
           inputMode="decimal"
           placeholder="e.g. 2,000"
+          aria-invalid={amountWrong(typed) ? 'true' : undefined}
           value={typed}
           onChange={(event) => {
             setNote(null)
@@ -313,6 +315,11 @@ function PriceChanger({
           {busy ? 'Saving…' : isAdmin ? 'Set price' : 'Send new price'}
         </button>
       </div>
+      {amountWrong(typed) ? (
+        <small className={styles.error}>
+          The price in red is not an amount. Type it in naira, like 2,000.
+        </small>
+      ) : null}
       {note ? <small className={note.good ? styles.good : styles.error}>{note.words}</small> : null}
     </div>
   )

@@ -36,9 +36,15 @@ describe('bmi', () => {
 // Request 248: the live log showed a BP top refused with no word of which.
 describe('vitalsProblem', () => {
   it('names a reading the database would refuse', () => {
-    expect(vitalsProblem({ systolic: 12080 })).toBe('BP top must be between 40 and 300.')
-    expect(vitalsProblem({ pulse: 84.5 })).toBe('Pulse must be a whole number.')
-    expect(vitalsProblem({ spo2: 101 })).toBe('Oxygen (SpO2) must be between 50 and 100.')
+    expect(vitalsProblem({ systolic: 12080 })).toEqual({
+      key: 'systolic',
+      words: 'BP top must be between 40 and 300.',
+    })
+    expect(vitalsProblem({ pulse: 84.5 })).toEqual({
+      key: 'pulse',
+      words: 'Pulse must be a whole number.',
+    })
+    expect(vitalsProblem({ spo2: 101 })?.words).toBe('Oxygen (SpO2) must be between 50 and 100.')
   })
   it('lets normal readings through', () => {
     expect(

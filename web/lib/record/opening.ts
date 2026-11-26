@@ -13,11 +13,11 @@
 
 // ===== 1. The words =====
 export const OLD_OPENING =
-  'Not saved: this record was opened more than 12 hours ago. Go back to the patient, open the record again, then save.'
+  'Not saved: this record was opened more than 12 hours ago. Tap Open the record again at the top, then enter it again.'
 
 // The screen's notice when the record has stopped updating.
 export const OLD_OPENING_SCREEN =
-  'This record was opened more than 12 hours ago, so it has stopped updating. Save something, or go back to the patient and open the record again, to see the latest.'
+  'This record was opened more than 12 hours ago, so it has stopped updating and cannot save. Open it again to see the latest.'
 
 // ===== 2. Is this refusal an old opening? =====
 // Only the record rule's own refusal means an old opening. Other rules use

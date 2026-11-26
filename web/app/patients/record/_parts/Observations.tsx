@@ -224,6 +224,8 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
   const [values, setValues] = useState<Record<string, string>>(empty)
   const [glucose, setGlucose] = useState<Glucose>(EMPTY_GLUCOSE)
   const [problem, setProblem] = useState<string | null>(null)
+  // The box holding a value the database would refuse, shown red (252).
+  const [wrongKey, setWrongKey] = useState<string | null>(null)
   // "Other" vital signs: the measures this person has typed before, and the
   // standard ones, each with a box (Anthony, 2026-11-11).
   const [measures, setMeasures] = useState<VitalMeasure[]>(
@@ -308,8 +310,9 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
     }
     // A number the database would refuse is named first (request 248).
     const wrong = vitalsProblem(numbers)
+    setWrongKey(wrong?.key ?? null)
     if (wrong) {
-      setProblem(wrong)
+      setProblem(wrong.words)
       return
     }
     if (hasFixed) {
@@ -354,7 +357,12 @@ export function VitalsSection({ client, staffId, patientId, record, reload }: Pr
         id={`vit-${key}`}
         range={RANGES[key]}
         value={values[key]}
-        onChange={(value) => setValues({ ...values, [key]: value })}
+        invalid={wrongKey === key}
+        onChange={(value) => {
+          // Changing the red box takes the red off; it is checked again on Save.
+          if (wrongKey === key) setWrongKey(null)
+          setValues({ ...values, [key]: value })
+        }}
       />
     </div>
   )
@@ -703,11 +711,14 @@ export function VitalPick({
   range,
   value,
   onChange,
+  invalid = false,
 }: {
   id: string
   range: Range
   value: string
   onChange: (value: string) => void
+  // A value the database would refuse: the box shows red (request 252).
+  invalid?: boolean
 }) {
   // Other with nothing typed: a box to type the number in.
   const [typing, setTyping] = useState(false)
@@ -724,6 +735,7 @@ export function VitalPick({
           className={styles.input}
           inputMode="decimal"
           autoFocus
+          aria-invalid={invalid ? 'true' : undefined}
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />
@@ -741,6 +753,7 @@ export function VitalPick({
       options={options}
       startAt={range.start}
       focusSearch={false}
+      invalid={invalid}
       onChange={onChange}
       onOther={(typed) => {
         if (typed) onChange(typed)

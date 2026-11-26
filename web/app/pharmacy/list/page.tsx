@@ -51,6 +51,7 @@ import SearchSelect from '@/components/options/SearchSelect'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
+import { quantityWrong } from '@/lib/forms/wrong'
 
 export default function MedicineListPage() {
   const auth = useAuth()
@@ -630,9 +631,13 @@ function StockEditor({
             className={styles.input}
             inputMode="decimal"
             placeholder="e.g. 20"
+            aria-invalid={quantityWrong(low) ? 'true' : undefined}
             value={low}
             onChange={(event) => setLow(event.target.value.replace(/[^\d.]/g, ''))}
           />
+          {quantityWrong(low) ? (
+            <small className={styles.error}>Type a number, like 20.</small>
+          ) : null}
         </div>
       </div>
       <button
@@ -653,9 +658,13 @@ function StockEditor({
             className={styles.input}
             inputMode="decimal"
             placeholder="e.g. 200"
+            aria-invalid={quantityWrong(added, 0.01) ? 'true' : undefined}
             value={added}
             onChange={(event) => setAdded(event.target.value.replace(/[^\d.]/g, ''))}
           />
+          {quantityWrong(added, 0.01) ? (
+            <small className={styles.error}>Type how many arrived, like 200.</small>
+          ) : null}
         </div>
         <div>
           <label htmlFor={`expires-${line.id}`}>Expiry date (optional)</label>
@@ -686,9 +695,13 @@ function StockEditor({
             className={styles.input}
             inputMode="decimal"
             placeholder={now === null ? 'e.g. 150' : String(now)}
+            aria-invalid={quantityWrong(count) ? 'true' : undefined}
             value={count}
             onChange={(event) => setCount(event.target.value.replace(/[^\d.]/g, ''))}
           />
+          {quantityWrong(count) ? (
+            <small className={styles.error}>Type a number, like 150.</small>
+          ) : null}
         </div>
         <div>
           <label htmlFor={`why-${line.id}`}>Why</label>

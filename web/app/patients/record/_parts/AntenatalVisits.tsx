@@ -118,17 +118,20 @@ function PickBox({
   range,
   value,
   onChange,
+  invalid = false,
 }: {
   id: string
   label: string
   range: Range
   value: string
   onChange: (value: string) => void
+  // A value the database would refuse: red (request 252).
+  invalid?: boolean
 }) {
   return (
     <div className={styles.field}>
       <label htmlFor={id}>{label}</label>
-      <VitalPick id={id} range={range} value={value} onChange={onChange} />
+      <VitalPick id={id} range={range} value={value} onChange={onChange} invalid={invalid} />
     </div>
   )
 }
@@ -148,16 +151,17 @@ const LIMITS: [keyof typeof EMPTY, string, number, number, boolean][] = [
   ['hb', 'Hb', 2, 25, false],
 ]
 
-// The first number that the database would refuse, in words; null if none.
-function numberProblem(form: typeof EMPTY): string | null {
+// The first number that the database would refuse: its box (shown red,
+// request 252) and the words; null if none.
+function numberProblem(form: typeof EMPTY): { key: keyof typeof EMPTY; words: string } | null {
   for (const [key, label, min, max, whole] of LIMITS) {
     const typed = form[key].trim()
     if (typed === '') continue
     const value = Number(typed)
     if (Number.isNaN(value) || value < min || value > max) {
-      return `${label} must be between ${min} and ${max}.`
+      return { key, words: `${label} must be between ${min} and ${max}.` }
     }
-    if (whole && !Number.isInteger(value)) return `${label} must be a whole number.`
+    if (whole && !Number.isInteger(value)) return { key, words: `${label} must be a whole number.` }
   }
   return null
 }
@@ -252,7 +256,13 @@ export function VisitsPart({
   const [pickName, setPickName] = useState('')
   const [pickStrength, setPickStrength] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
-  const set = (key: keyof typeof EMPTY) => (value: string) => setForm({ ...form, [key]: value })
+  // The box holding a value the database would refuse, shown red (252).
+  const [wrongKey, setWrongKey] = useState<keyof typeof EMPTY | null>(null)
+  const set = (key: keyof typeof EMPTY) => (value: string) => {
+    // Changing the red box takes the red off; it is checked again on Save.
+    if (wrongKey === key) setWrongKey(null)
+    setForm({ ...form, [key]: value })
+  }
 
   // ===== 3a. Open the form, with what is already known filled in =====
   // Nothing typed twice (request 246): today's vital signs give the BP,
@@ -298,6 +308,7 @@ export function VisitsPart({
     setPickName('')
     setPickStrength('')
     setProblem(null)
+    setWrongKey(null)
     setAdding(true)
   }
 
@@ -312,8 +323,9 @@ export function VisitsPart({
   async function save() {
     // Checked here first, so the words name the reading (request 248).
     const wrong = numberProblem(form)
+    setWrongKey(wrong?.key ?? null)
     if (wrong) {
-      setProblem(wrong)
+      setProblem(wrong.words)
       return
     }
     const anything =
@@ -396,6 +408,7 @@ export function VisitsPart({
               range={CARD_RANGES.fundal}
               value={form.fundal}
               onChange={set('fundal')}
+              invalid={wrongKey === 'fundal'}
             />
             <PickBox
               id="v-fhr"
@@ -403,6 +416,7 @@ export function VisitsPart({
               range={CARD_RANGES.fhr}
               value={form.fhr}
               onChange={set('fhr')}
+              invalid={wrongKey === 'fhr'}
             />
             <Choices
               label="Presentation"
@@ -426,6 +440,7 @@ export function VisitsPart({
               range={RANGES.systolic}
               value={form.systolic}
               onChange={set('systolic')}
+              invalid={wrongKey === 'systolic'}
             />
             <PickBox
               id="v-dia"
@@ -433,6 +448,7 @@ export function VisitsPart({
               range={RANGES.diastolic}
               value={form.diastolic}
               onChange={set('diastolic')}
+              invalid={wrongKey === 'diastolic'}
             />
             <PickBox
               id="v-pulse"
@@ -440,6 +456,7 @@ export function VisitsPart({
               range={RANGES.pulse}
               value={form.pulse}
               onChange={set('pulse')}
+              invalid={wrongKey === 'pulse'}
             />
             <PickBox
               id="v-resp"
@@ -447,6 +464,7 @@ export function VisitsPart({
               range={RANGES.breathing_rate}
               value={form.respiration}
               onChange={set('respiration')}
+              invalid={wrongKey === 'respiration'}
             />
             <PickBox
               id="v-weight"
@@ -454,6 +472,7 @@ export function VisitsPart({
               range={RANGES.weight_kg}
               value={form.weight}
               onChange={set('weight')}
+              invalid={wrongKey === 'weight'}
             />
             <PickBox
               id="v-hb"
@@ -461,6 +480,7 @@ export function VisitsPart({
               range={CARD_RANGES.hb}
               value={form.hb}
               onChange={set('hb')}
+              invalid={wrongKey === 'hb'}
             />
             <Choices
               label="Urine protein"

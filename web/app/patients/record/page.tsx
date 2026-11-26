@@ -64,7 +64,7 @@ import { ageFrom } from '@/lib/patients/age'
 import type { PatientFile } from '@/lib/patients/patientFiles'
 import { getPatient, sexWords, type PatientResult } from '@/lib/patients/patients'
 import { loadRecord, openRecord, openingIsOld, type MedicalRecord } from '@/lib/record/record'
-import { OLD_OPENING_SCREEN } from '@/lib/record/opening'
+import OpenAgain from './_parts/OpenAgain'
 import { useRightPage } from '@/lib/auth/routes'
 import { useAuth } from '@/lib/auth/session'
 import { actsAsDoctor, setsPrices } from '@/lib/auth/roles'
@@ -428,11 +428,7 @@ function PatientRecord() {
         {!stop && props && patient ? (
           <>
             <NotSent staffId={staff.id} patientId={props.patientId} />
-            {stale ? (
-              <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
-                {OLD_OPENING_SCREEN}
-              </div>
-            ) : null}
+            <OpenAgain stale={stale} />
             {saved ? (
               <div className={`${styles.banner} ${styles.bannerAmber}`} role="status">
                 No network. This is the copy kept on this device at{' '}

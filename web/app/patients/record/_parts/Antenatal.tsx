@@ -72,6 +72,7 @@ function Field({
   type = 'text',
   placeholder = '',
   max,
+  invalid = false,
 }: {
   id: string
   label: string
@@ -81,6 +82,8 @@ function Field({
   placeholder?: string
   // The latest date that may be picked (today: nothing in the future).
   max?: string
+  // A value the database would refuse: red (request 252).
+  invalid?: boolean
 }) {
   return (
     <div className={styles.field}>
@@ -92,6 +95,7 @@ function Field({
         inputMode={type === 'number' ? 'numeric' : undefined}
         placeholder={placeholder}
         max={max}
+        aria-invalid={invalid ? 'true' : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -288,19 +292,29 @@ function BookingForm({
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
+  // The box holding a value the database would refuse, shown red (252).
+  const [wrongKey, setWrongKey] = useState<keyof typeof values | null>(null)
   const set = (key: keyof typeof values) => (value: string) => {
     setSaved(false)
+    if (wrongKey === key) setWrongKey(null)
     setValues((now) => ({ ...now, [key]: value }))
   }
   const text = (value: string) => value.trim() || null
   async function save() {
-    const wrong =
-      wholeProblem('Age', values.kin_age, 0, 120) ??
-      wholeProblem('Number of abortions', values.abortions, 0, 30) ??
-      wholeProblem('Number of miscarriages', values.miscarriages, 0, 30) ??
-      wholeProblem('Total number of pregnancies', values.total_pregnancies, 0, 30)
+    // Each number checked in order; the first wrong one is named and red.
+    const checks: [keyof typeof values, string | null][] = [
+      ['kin_age', wholeProblem('Age', values.kin_age, 0, 120)],
+      ['abortions', wholeProblem('Number of abortions', values.abortions, 0, 30)],
+      ['miscarriages', wholeProblem('Number of miscarriages', values.miscarriages, 0, 30)],
+      [
+        'total_pregnancies',
+        wholeProblem('Total number of pregnancies', values.total_pregnancies, 0, 30),
+      ],
+    ]
+    const wrong = checks.find(([, words]) => words !== null)
+    setWrongKey(wrong ? wrong[0] : null)
     if (wrong) {
-      setProblem(wrong)
+      setProblem(wrong[1])
       return
     }
     setBusy(true)
@@ -354,6 +368,7 @@ function BookingForm({
           id="kin-age"
           label="Age"
           type="number"
+          invalid={wrongKey === 'kin_age'}
           value={values.kin_age}
           onChange={set('kin_age')}
         />
@@ -365,6 +380,7 @@ function BookingForm({
           id="an-abortions"
           label="Number of abortions"
           type="number"
+          invalid={wrongKey === 'abortions'}
           value={values.abortions}
           onChange={set('abortions')}
         />
@@ -372,6 +388,7 @@ function BookingForm({
           id="an-miscarriages"
           label="Number of miscarriages"
           type="number"
+          invalid={wrongKey === 'miscarriages'}
           value={values.miscarriages}
           onChange={set('miscarriages')}
         />
@@ -379,6 +396,7 @@ function BookingForm({
           id="an-total"
           label="Total number of pregnancies"
           type="number"
+          invalid={wrongKey === 'total_pregnancies'}
           value={values.total_pregnancies}
           onChange={set('total_pregnancies')}
         />
@@ -470,12 +488,19 @@ function TestsPart({
               ))}
             </select>
           </div>
-          <Field id="an-result" label="Result" value={result} onChange={setResult} />
+          <Field
+            id="an-result"
+            label="Result"
+            invalid={problem === 'Type the result.'}
+            value={result}
+            onChange={setResult}
+          />
           <Field
             id="an-tested-on"
             label="Date done"
             type="date"
             max={today()}
+            invalid={problem === 'The date done cannot be in the future.'}
             value={testedOn}
             onChange={setTestedOn}
           />
@@ -603,6 +628,7 @@ function PregnanciesPart({
               label="Date of birth"
               type="date"
               max={today()}
+              invalid={problem === 'The date of birth cannot be in the future.'}
               value={values.born_on}
               onChange={set('born_on')}
             />
@@ -835,6 +861,10 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
             <Field
               id="oc-name"
               label="Name of the person giving consent"
+              invalid={
+                problem?.startsWith('Type the name of the person') &&
+                values.consenting_name.trim().length < 2
+              }
               value={values.consenting_name}
               onChange={set('consenting_name')}
             />
@@ -842,6 +872,10 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
               id="oc-operation"
               label="Operation"
               placeholder="e.g. Caesarean section"
+              invalid={
+                problem?.startsWith('Type the name of the person') &&
+                values.operation.trim().length < 2
+              }
               value={values.operation}
               onChange={set('operation')}
             />
@@ -872,6 +906,7 @@ export function ConsentSection({ client, staffId, patientId }: Props) {
             <Field
               id="oc-witness"
               label="Witness name (optional)"
+              invalid={problem === 'Type the witness name in full, or leave it empty.'}
               value={values.witness_name}
               onChange={set('witness_name')}
             />

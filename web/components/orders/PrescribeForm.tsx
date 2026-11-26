@@ -33,6 +33,7 @@ import { prescribe, sendAlso, type PrescriptionItem } from '@/lib/pharmacy/pharm
 import { useDraft } from '@/lib/drafts/drafts'
 import { naira } from '@/lib/lab/lab'
 import {
+  amountWrong,
   loadMyPrices,
   loadPrices,
   myPriceOf,
@@ -44,6 +45,7 @@ import {
 import MakeStandard, { type Candidate } from './MakeStandard'
 import DraftBack from '@/components/drafts/DraftBack'
 import { HOSPITAL_TIME_ZONE } from '@/lib/time/zone'
+import { countWrong } from '@/lib/forms/wrong'
 
 // The Front Desk and the Pharmacy at once (the default), or the Front Desk
 // only: the Pharmacy then gets it once it is paid. Never straight to the
@@ -375,6 +377,7 @@ export default function PrescribeForm({
                 className={styles.input}
                 inputMode="numeric"
                 placeholder="5"
+                aria-invalid={countWrong(draft.days, 1, 365) ? 'true' : undefined}
                 value={draft.days}
                 onChange={(event) =>
                   change(index, 'days', event.target.value.replace(/\D/g, '').slice(0, 3))
@@ -411,11 +414,15 @@ export default function PrescribeForm({
                 className={styles.input}
                 inputMode="decimal"
                 placeholder="e.g. 2,500"
+                aria-invalid={amountWrong(draft.price) ? 'true' : undefined}
                 value={draft.price ?? ''}
                 onChange={(event) =>
                   change(index, 'price', event.target.value.replace(/[^\d.,\s]/g, ''))
                 }
               />
+              {amountWrong(draft.price) ? (
+                <small className={styles.error}>Not an amount. Type it in naira, like 2,500.</small>
+              ) : null}
             </div>
             <div className={styles.wide}>
               <label className={styles.label} htmlFor={`note-${index}`}>
