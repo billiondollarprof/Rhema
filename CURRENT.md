@@ -22,7 +22,14 @@ Numbers are kept from the full list, so older notes still match.
     to include it, even on mobile. Maybe just a little text. So it's easy
     for somebody to select a patient that is inpatient or a patient that is
     outpatient." Everybody signed in reads admissions already (no SQL).
-    Next after 256.
+    His detail 2026-11-26: "Just make it small... a green pill, and put in
+    on it. Then for the other one, put an orange pill... and put out on it
+    ... something really small that will not clutter the card... the
+    patient always carries that logo, even when they appear on the doctor's
+    patient queue or anything." Also: "on previous pregnancies... you can
+    only add one baby... there's no button to add another baby or another
+    pregnancy." And: "an improved arrangement too can help as well,
+    especially for the antenatal stuff."
 
 257. **Every bill starts with what was already collected, admitted or
     not.** (2026-11-26) "every bill that is being made by the front desk,
@@ -54,8 +61,8 @@ Numbers are kept from the full list, so older notes still match.
     shipped: every section stays where it is; added inside them only: an
     "At a glance" block at the top of the antenatal booking, the visit
     filling HB and urine from the lab, routine tests showing the lab's
-    results, gravida and para kept once in the profile. ASKED him whether
-    the "At a glance" block stays, since he wants the arrangement kept.
+    results, gravida and para kept once in the profile. His answer
+    2026-11-26: "I think the at a glance is okay. You can keep it."
 
 255. **Not palpable, previous births, and CS before.** (2026-11-26) The
     matron: "At palpation, there's something you need to add, not palpable
