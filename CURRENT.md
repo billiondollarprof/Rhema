@@ -60,8 +60,14 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     steps to the manager's WhatsApp; Ask MASCAP; contact with both offices.
     Checked: 390 and 1440 wide, light and dark, every control pressed (two
     faults found and fixed: the demo box sat half off screen, and a mouse
-    could not press play). WAITING: Anthony connects the repo to Cloudflare
-    (StellaXafe account). Then the app demo (mascap-app).
+    could not press play). LIVE 2026-11-27 at https://mascap-web.stellaxafe.com
+    (deploy.yml with CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the
+    repo's GitHub secrets, his choice "in case I'm using a different agent";
+    the token's Account policy must name his account). The repo is public:
+    private repos cannot run Actions while the account's free minutes are
+    used up. Fixed on the way: the page redirected in a loop (assets
+    html_handling none). Every control pressed again on the live address.
+    NEXT: the app demo (mascap-app).
 
 263. **The humanizer is a rule in every repository.** (2026-11-27) "The
     humanizer should be a standard. It should be a rule in the Claude.md...
