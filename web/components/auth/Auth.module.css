@@ -122,6 +122,12 @@
   box-shadow: 0 8px 16px -8px rgba(31, 95, 208, 0.7);
 }
 
+/* The main button stays blue under the mouse, a little darker. Without this
+   the pale hover of .button showed white words on a pale blue (2026-11-27). */
+.primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #2466d0, #1a52b8);
+}
+
 .quiet {
   border: 0;
   background: none;

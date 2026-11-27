@@ -61,6 +61,18 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     straight back to the PIN screen, which is still locked, and signs them
     out again. Waiting does nothing because the lock has no time on it.
     Read back 2026-11-27, waits for his yes; needs SQL.
+    HIS YES TO THE PLAN 2026-11-27 ("So do the pin first"). BUILT on the
+    feature branch, not on testing: migration 20261127152844_pin_reset_by_
+    email_code (my_pin_state; set_my_pin replaces an existing PIN only within
+    15 minutes of an email code sign in), test 077 (7 of 7 breaks caught),
+    test 003 brought to the new rule; screens: Forgot PIN? on the lock card,
+    "Confirm it is you" (only the invited email), new PIN typed twice, no
+    sign out at 5 wrong tries. Checked: the real local Supabase token keeps
+    the sign in time after a refresh; the full sign in walk passed (Forgot,
+    Back, 5 wrong, another email refused, code, new PIN, unlock with it);
+    320 to 1440 wide and dark look clean. Also fixed: the blue button went
+    pale under the mouse on the sign in and lock screens. WAITS FOR HIS YES
+    TO THE SQL.
 
 Numbers are kept from the full list, so older notes still match.
 
