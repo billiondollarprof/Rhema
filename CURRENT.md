@@ -1621,6 +1621,8 @@ These never come off the list.
 
 ### Decided
 
+- 2026-11-27: demos never use Supabase. "Cloudflare should be able to handle everything, even if you want to do anything database... Cloudflare worker should have been enough for it... let's leave Supabase out of it." The MASCAP app demo runs on the Cloudflare Worker alone, with made up data.
+
 - 2026-11-26: the profile picture for staff is cancelled (201). New patients keep name, date of birth and sex as compulsory (199). Test prices learn from use as built (238); a hospital price list goes into Admin > Prices when it comes.
 
 - **Outpatient bills are not filled in by themselves** (2026-11-26, closes
