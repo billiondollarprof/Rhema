@@ -73,6 +73,7 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     320 to 1440 wide and dark look clean. Also fixed: the blue button went
     pale under the mouse on the sign in and lock screens. WAITS FOR HIS YES
     TO THE SQL.
+    HIS YES TO THE SQL 2026-11-27: "yes go ahead".
 
 Numbers are kept from the full list, so older notes still match.
 
