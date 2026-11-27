@@ -642,7 +642,7 @@ try {
   await page.getByRole('button', { name: /Test Nurse Two/ }).click()
   await openLockCard(page)
   await page.getByRole('button', { name: 'Forgot PIN?' }).click()
-  await page.getByText('Confirm it is you').waitFor()
+  await page.getByRole('heading', { name: 'Confirm it is you' }).waitFor()
   await shot(page, 'pin-forgot')
   await page.getByRole('button', { name: 'Back to the PIN' }).click()
   await openLockCard(page)
@@ -656,7 +656,7 @@ try {
   }
   await typeDigits(page, 'Your PIN', '9999')
   await page.getByText('The PIN was wrong 5 times.').waitFor()
-  await page.getByText('Confirm it is you').waitFor()
+  await page.getByRole('heading', { name: 'Confirm it is you' }).waitFor()
   await shot(page, 'pin-locked-out')
 
   step('Another email is refused; her own email gets a code; she chooses a new PIN')
