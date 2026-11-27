@@ -129,6 +129,7 @@ async function mockSupabase(page, extra = {}) {
       if (url.includes(part)) return json(typeof rows === 'function' ? rows(req) : rows)
     }
     if (url.includes('/rpc/i_have_a_pin')) return json(true)
+    if (url.includes('/rpc/my_pin_state')) return json('set')
     if (req.method() !== 'GET') {
       writes.push(`${req.method()} ${url.split('/v1/')[1]} ${req.postData() || ''}`)
       // Database functions answer in their own shape; table writes answer 201.

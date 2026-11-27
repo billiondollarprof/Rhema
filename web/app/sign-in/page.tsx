@@ -9,6 +9,9 @@
  *                       email, and a code is sent to it.
  *   3. Code             they type the 6 digit code from the email.
  *   4. First PIN        the first time, they choose a 4 digit PIN.
+ *   5. Confirm it is you the PIN is locked after 5 wrong tries, or they
+ *                       tapped Forgot PIN: a code to their email, then a
+ *                       new PIN, typed twice (request 259, 2026-11-27).
  *
  * An invitation link opens step 2 with the email already typed in. Typing
  * the email by hand works the same, as long as it was invited.
@@ -111,6 +114,9 @@ export default function SignInPage() {
 
   // ===== 4. First PIN =====
   if (auth.status === 'needs-pin') return <ChoosePin />
+
+  // ===== 5. Confirm it is you, then a new PIN =====
+  if (auth.status === 'confirm-email') return <ConfirmItIsYou />
 
   // ===== 1. Choose account =====
   if (step === 'choose') {
@@ -369,6 +375,128 @@ function ChoosePin() {
           </span>
         </label>
       ) : null}
+    </Shell>
+  )
+}
+
+// ===== 5. Confirm it is you: an email code, then a new PIN =====
+// The email the person was invited with is already in the box (this device
+// knows it), and only that email is accepted here, so the code always goes
+// to the inbox of the person whose PIN it is. After the code, the app
+// opens "Choose your PIN" (the session does that, lib/auth/session.tsx).
+function ConfirmItIsYou() {
+  const auth = useAuth()
+  const theirs = (auth.account?.email ?? '').trim().toLowerCase()
+  const [email, setEmail] = useState(auth.account?.email ?? '')
+  const [sent, setSent] = useState(false)
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const name = auth.account?.name ?? ''
+
+  async function sendCode() {
+    const typed = email.trim().toLowerCase()
+    if (theirs && typed !== theirs) {
+      setError(`That is not the email ${name} was invited with.`)
+      return
+    }
+    setBusy(true)
+    setError(null)
+    const problem = await auth.requestCode(typed)
+    setBusy(false)
+    if (problem) setError(problem)
+    else {
+      setCode('')
+      setSent(true)
+    }
+  }
+
+  async function checkCode(typed: string) {
+    setBusy(true)
+    setError(null)
+    const problem = await auth.verifyCode(email.trim().toLowerCase(), typed)
+    setBusy(false)
+    if (problem) {
+      setError(problem)
+      setCode('')
+    }
+  }
+
+  // Back: to the PIN boxes when the PIN still works (Forgot PIN), or to
+  // the list of names when it is locked.
+  const back = auth.pinLocked ? (
+    <button className={`${styles.button} ${styles.quiet}`} onClick={auth.useAnotherAccount}>
+      Sign in as someone else
+    </button>
+  ) : (
+    <button className={`${styles.button} ${styles.quiet}`} onClick={auth.cancelForgotPin}>
+      Back to the PIN
+    </button>
+  )
+
+  if (sent) {
+    return (
+      <Shell title="Enter your code" lead="">
+        <p className={styles.lead}>
+          We sent a {CODE_LENGTH} digit code to
+          <br />
+          <b>{email.trim()}</b>
+        </p>
+        <CodeBoxes
+          length={CODE_LENGTH}
+          value={code}
+          onChange={setCode}
+          onComplete={checkCode}
+          label="Email code"
+          autoFocus
+        />
+        {error ? <p className={styles.error}>{error}</p> : null}
+        <button
+          className={`${styles.button} ${styles.primary}`}
+          disabled={code.length !== CODE_LENGTH || busy}
+          onClick={() => checkCode(code)}
+        >
+          {busy ? 'Checking…' : 'Carry on'}
+        </button>
+        <button className={`${styles.button} ${styles.quiet}`} onClick={() => setSent(false)}>
+          Send the code again
+        </button>
+        {back}
+      </Shell>
+    )
+  }
+
+  const looksRight = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())
+  return (
+    <Shell
+      title="Confirm it is you"
+      lead={`We will send a code to the email ${name || 'you'} ${name ? 'was' : 'were'} invited with. Then you choose a new PIN.`}
+    >
+      {auth.notice ? <p className={styles.error}>{auth.notice}</p> : null}
+      <label className={styles.label} htmlFor="confirm-email">
+        Work email
+      </label>
+      <input
+        id="confirm-email"
+        className={styles.input}
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && looksRight && !busy) void sendCode()
+        }}
+      />
+      {error ? <p className={styles.error}>{error}</p> : null}
+      <button
+        className={`${styles.button} ${styles.primary}`}
+        disabled={!looksRight || busy}
+        onClick={sendCode}
+      >
+        {busy ? 'Sending…' : 'Send me a code'}
+      </button>
+      {back}
     </Shell>
   )
 }

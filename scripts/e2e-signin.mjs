@@ -638,9 +638,17 @@ try {
     throw new Error('Nurse One is still listed after signing out')
   }
 
-  step('Five wrong PINs sign Nurse Two out of the device')
+  step('Forgot PIN? goes to Confirm it is you, and Back returns to the PIN')
   await page.getByRole('button', { name: /Test Nurse Two/ }).click()
   await openLockCard(page)
+  await page.getByRole('button', { name: 'Forgot PIN?' }).click()
+  await page.getByText('Confirm it is you').waitFor()
+  await shot(page, 'pin-forgot')
+  await page.getByRole('button', { name: 'Back to the PIN' }).click()
+  await openLockCard(page)
+  await page.getByText('Welcome back, Test Nurse Two').waitFor()
+
+  step('Five wrong PINs go straight to Confirm it is you (request 259)')
   for (let i = 0; i < 4; i++) {
     await typeDigits(page, 'Your PIN', '9999')
     await page.getByText('That PIN is not right. Try again.').waitFor()
@@ -648,7 +656,22 @@ try {
   }
   await typeDigits(page, 'Your PIN', '9999')
   await page.getByText('The PIN was wrong 5 times.').waitFor()
+  await page.getByText('Confirm it is you').waitFor()
   await shot(page, 'pin-locked-out')
+
+  step('Another email is refused; her own email gets a code; she chooses a new PIN')
+  await page.getByLabel('Work email').fill('someone@test.rhema')
+  await page.getByRole('button', { name: 'Send me a code' }).click()
+  await page.getByText('That is not the email Test Nurse Two was invited with.').waitFor()
+  await signInWithCode(page, 'nurse2@test.rhema')
+  await choosePin(page, '3690')
+  await expectHome(page, 'Test Nurse Two')
+
+  step('The new PIN unlocks, so the lock is cleared')
+  await openMenuItem(page, 'Lock screen')
+  await openLockCard(page)
+  await typeDigits(page, 'Your PIN', '3690')
+  await expectHome(page, 'Test Nurse Two')
 
   if (problems.length) throw new Error(`Page errors: ${problems.join(' | ')}`)
   console.log('E2E SIGN IN PASSED')

@@ -10,13 +10,19 @@
  *   loading         working out who is here (a split second)
  *   not-configured  this build has no Supabase address (CI builds)
  *   signed-out      nobody is using the device: show the sign in page
- *   needs-pin       signed in with an email code, has no PIN yet
+ *   needs-pin       signed in with an email code, has no PIN yet (or is
+ *                   choosing a new one after confirming it is them)
+ *   confirm-email   the PIN is locked after 5 wrong tries, or they tapped
+ *                   Forgot PIN: an email code proves it is them, then they
+ *                   choose a new PIN (request 259, 2026-11-27)
  *   locked          signed in, but the PIN must be typed to carry on
  *   ready           signed in and unlocked
  *
  * Rules from Anthony (2026-10-28 and 29): lock after 15 minutes without use (10 minutes until 2026-10-31, 1 hour until 2026-11-08);
  * signed out of the device after 24 hours without use; 5 wrong PINs means
- * sign in again with an email code. The PIN is checked by the database.
+ * confirm it is you with an email code, then choose a new PIN. The PIN is
+ * checked by the database, and only an email code from the last 15 minutes
+ * lets a new PIN replace an old one (migration pin_reset_by_email_code).
  *
  * Never: keep patient data here, and never decide what a person may see
  * from this state. It only decides which screen to show. What a person may
@@ -53,7 +59,7 @@ import {
 
 // ===== 1. Shapes =====
 export type AuthStatus =
-  'loading' | 'not-configured' | 'signed-out' | 'needs-pin' | 'locked' | 'ready'
+  'loading' | 'not-configured' | 'signed-out' | 'needs-pin' | 'confirm-email' | 'locked' | 'ready'
 
 export type StaffMember = {
   id: string
@@ -89,6 +95,12 @@ type AuthState = {
   // the refresh button and when the app comes back to the front.
   refreshStaff: () => Promise<void>
   unlock: (pin: string) => Promise<UnlockResult>
+  // Forgot PIN on the lock screen: confirm with an email code, then a new PIN.
+  forgotPin: () => void
+  // Back from Forgot PIN to the PIN boxes (only when the PIN is not locked).
+  cancelForgotPin: () => void
+  // True while the PIN is locked after 5 wrong tries, so there is no going back.
+  pinLocked: boolean
   lock: () => void
   switchTo: (id: string) => Promise<void>
   useAnotherAccount: () => void
@@ -121,11 +133,17 @@ async function loadStaff(
   return (data as StaffMember | null) ?? null
 }
 
-async function hasPin(client: SupabaseClient): Promise<boolean | 'offline'> {
-  const { data, error } = await client.rpc('i_have_a_pin')
+// The PIN's state: 'none' (no PIN yet), 'set', or 'locked' (5 wrong tries).
+type PinState = 'none' | 'set' | 'locked'
+async function pinState(client: SupabaseClient): Promise<PinState | 'offline'> {
+  const { data, error } = await client.rpc('my_pin_state')
   if (error && isNetworkFailure(error)) return 'offline'
-  return data === true
+  return data === 'set' || data === 'locked' ? data : 'none'
 }
+
+// What the person reads when the PIN locks (request 259).
+const LOCKED_WORDS =
+  'The PIN was wrong 5 times. Confirm it is you with a code sent to your email, then choose a new PIN.'
 
 // Turn Supabase's sign in errors into words a person can act on.
 function codeErrorMessage(code: string | undefined, fallback: string): string {
@@ -158,6 +176,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [staff, setStaff] = useState<StaffMember | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [client, setClient] = useState<SupabaseClient | null>(null)
+  // Forgot PIN was tapped: after the email code, choose a new PIN even
+  // though one exists. Kept outside the screens, so a new screen keeps it.
+  const resetAsked = useRef(false)
+  const [pinLocked, setPinLocked] = useState(false)
 
   // ----- 3a. Sign one person out of this device only -----
   const signOutHere = useCallback(async (id: string, why: string | null) => {
@@ -194,8 +216,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ----- 3b. Make one remembered person the one using the device -----
   // `known`: the staff row when the caller has just read it (a fresh sign
   // in), so it is not asked for twice (request 188, 2026-11-16).
+  // `fresh`: the person has just used an email code, so a locked or
+  // forgotten PIN can be replaced now (request 259).
   const activate = useCallback(
-    async (id: string, known?: StaffMember) => {
+    async (id: string, known?: StaffMember, fresh = false) => {
       const remembered = getAccount(id)
       const personClient = clientFor(id)
       const { data } = await personClient.auth.getSession()
@@ -208,13 +232,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // after the other: on a slow network each question costs a second.
       const [asked, pinAsked] = await Promise.all([
         known ?? loadStaff(personClient, id),
-        hasPin(personClient),
+        pinState(personClient),
       ])
       // No network (request 224): carry on with what this device last read,
       // so nobody is signed out, and nothing is lost, because of the network.
       const member =
         asked === 'offline' ? ((remembered.member as StaffMember | undefined) ?? null) : asked
-      const pinSet = pinAsked === 'offline' ? remembered.hasPin !== false : pinAsked
+      const pin: PinState =
+        pinAsked === 'offline' ? (remembered.hasPin === false ? 'none' : 'set') : pinAsked
       if (!member && asked === 'offline') {
         // Never read before on this device: nothing to work with yet.
         setNotice('No network. Connect once to open the app.')
@@ -235,13 +260,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: member.full_name,
         role: member.role,
         member,
-        hasPin: pinSet,
+        hasPin: pin !== 'none',
       }
       saveAccount(current)
       setAccount(current)
 
-      if (!pinSet) setStatus('needs-pin')
-      else if (remembered.locked || idleTooLong) setStatus('locked')
+      setPinLocked(pin === 'locked')
+      if (pin === 'none') setStatus('needs-pin')
+      // Locked or forgotten, and the email code has just been used: choose
+      // a new PIN now.
+      else if (fresh && (pin === 'locked' || resetAsked.current)) setStatus('needs-pin')
+      // Locked: an email code first. Nobody is signed out, nothing is lost.
+      else if (pin === 'locked') {
+        setNotice(LOCKED_WORDS)
+        setStatus('confirm-email')
+      } else if (remembered.locked || idleTooLong) setStatus('locked')
       else setStatus('ready')
     },
     [signOutHere],
@@ -274,7 +307,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         locked: false,
       })
       setNotice(null)
-      await activate(member.id, member)
+      await activate(member.id, member, true)
       return null
     },
     [activate, signOutHere],
@@ -431,8 +464,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (pin: string) => {
       if (!client) return 'Please sign in again.'
       const { error } = await client.rpc('set_my_pin', { pin })
+      if (error?.message === 'fresh_sign_in_needed') {
+        // The email code is more than 15 minutes old: ask for a new one.
+        setNotice('That took a while. Confirm it is you with a new code, then choose your PIN.')
+        setStatus('confirm-email')
+        return null
+      }
       if (error) return 'The PIN could not be saved. Try again.'
       if (account) updateAccount(account.id, { locked: false, lastActive: Date.now() })
+      resetAsked.current = false
+      setPinLocked(false)
       setStatus('ready')
       return null
     },
@@ -450,10 +491,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return 'ok'
       }
       if (data === 'locked') {
-        await signOutHere(
-          account.id,
-          'The PIN was wrong 5 times. Sign in with an email code and choose a new PIN.',
-        )
+        // Not signed out any more (request 259): straight to the email code.
+        setPinLocked(true)
+        setNotice(LOCKED_WORDS)
+        setStatus('confirm-email')
         return 'locked-out'
       }
       if (data === 'no_pin') {
@@ -462,8 +503,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return 'wrong'
     },
-    [client, account, signOutHere],
+    [client, account],
   )
+
+  // Forgot PIN, from the lock screen (request 259).
+  const forgotPin = useCallback(() => {
+    resetAsked.current = true
+    setNotice(null)
+    setStatus('confirm-email')
+  }, [])
+
+  const cancelForgotPin = useCallback(() => {
+    resetAsked.current = false
+    setNotice(null)
+    setStatus('locked')
+  }, [])
 
   const lock = useCallback(() => {
     if (!account) return
@@ -489,6 +543,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStaff(null)
     setClient(null)
     setNotice(null)
+    resetAsked.current = false
     setStatus('signed-out')
   }, [account])
 
@@ -509,6 +564,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setPin,
         refreshStaff,
         unlock,
+        forgotPin,
+        cancelForgotPin,
+        pinLocked,
         lock,
         switchTo,
         useAnotherAccount,

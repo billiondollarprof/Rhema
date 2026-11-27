@@ -25,7 +25,8 @@ export function pathFor(status: AuthStatus, thisPage: string): string | null {
   if (status === 'loading') return null
   if (status === 'locked') return thisPage === LOCK ? null : LOCK
   if (status === 'ready') return thisPage === SIGN_IN || thisPage === LOCK ? '/' : null
-  // signed-out, needs-pin and not-configured all live on the sign in page.
+  // signed-out, needs-pin, confirm-email and not-configured all live on the
+  // sign in page.
   return thisPage === SIGN_IN ? null : SIGN_IN
 }
 

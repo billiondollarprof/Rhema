@@ -16,6 +16,10 @@
  * ready, and the cover keeps listening until then (Anthony, 2026-10-31:
  * a click on a desktop did nothing).
  *
+ * Forgot PIN? (Anthony, 2026-11-27, request 259) sends the person to
+ * "Confirm it is you" on the sign in page: a code to their email, then a
+ * new PIN. Five wrong PINs go there by themselves.
+ *
  * Never: show anything from a patient record here. Never unlock without the
  * database saying the PIN is right.
  */
@@ -124,6 +128,10 @@ function PinCard() {
           onClick={() => tryPin(pin)}
         >
           {busy ? 'Checking…' : 'Unlock'}
+        </button>
+        {/* Forgot PIN (request 259): a code to their email, then a new PIN. */}
+        <button className={`${styles.button} ${styles.quiet}`} onClick={auth.forgotPin}>
+          Forgot PIN?
         </button>
 
         {/* ===== 4. Somebody else at the same desk ===== */}

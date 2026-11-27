@@ -103,6 +103,14 @@ begin
 end $$;
 
 -- Setting a new PIN (after signing in again with an email code) unlocks it.
+-- Since 2026-11-27 (request 259) that needs the code's sign in time in the
+-- token, as Supabase writes it.
+reset role;
+select set_config('request.jwt.claims', json_build_object(
+  'sub', '00000000-0000-0000-0000-0000000000e1',
+  'amr', json_build_array(json_build_object('method', 'otp',
+         'timestamp', extract(epoch from now())::bigint)))::text, true);
+set local role authenticated;
 select public.set_my_pin('2580');
 do $$
 begin
