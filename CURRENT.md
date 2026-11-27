@@ -50,6 +50,19 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     craft and the humanizer. Write him prompts to generate more images. He
     will send images found online; asked whether to enhance them.
 
+    WEBSITE BUILT 2026-11-27 (night), not online yet: new private repo
+    billiondollarprof/stellaxafe-demos (his yes), sites/mascap-web, one
+    Worker for every demo (src/worker.js, address picks the folder),
+    noindex everywhere. Olympus layout in MASCAP navy and red on white,
+    light and dark; Rhema's card stack; scroll scenes front desk, vitals,
+    doctor, lab, pharmacy; ring of 10 sample patient stories, play shows
+    "This is a demo"; 6 real Google reviews as written; booking in four
+    steps to the manager's WhatsApp; Ask MASCAP; contact with both offices.
+    Checked: 390 and 1440 wide, light and dark, every control pressed (two
+    faults found and fixed: the demo box sat half off screen, and a mouse
+    could not press play). WAITING: Anthony connects the repo to Cloudflare
+    (StellaXafe account). Then the app demo (mascap-app).
+
 263. **The humanizer is a rule in every repository.** (2026-11-27) "The
     humanizer should be a standard. It should be a rule in the Claude.md...
     across all my repository... in fact, inside my Google Drive as I work,
