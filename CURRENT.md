@@ -45,38 +45,6 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     matron discharges (by role), with no PIN and no balance check. Read back
     2026-11-27, waits for his yes.
 
-259. **PIN: the lock after 5 tries never clears; Forgot PIN.** (2026-11-27)
-    "Somebody recently tried their PIN multiple times... the system is not
-    letting them log in again. Even after they have waited for so many
-    minutes... even when they remembered it." "The system should
-    automatically switch for them to verify their identity by entering the
-    email address they were invited with. Then the system sends them a
-    code... enter new [PIN] first time, then... the second time, and then it
-    saves that new PIN." "Under the place they used to put PIN... forget
-    PIN... enter their email, get a code, and reset their PIN."
-    FOUND (the fault): after 5 wrong tries the PIN is locked for good; the
-    app signs the person out and says "Sign in with an email code and choose
-    a new PIN", but after the email code the database still says they have
-    a PIN (i_have_a_pin only asks whether one is stored), so the app goes
-    straight back to the PIN screen, which is still locked, and signs them
-    out again. Waiting does nothing because the lock has no time on it.
-    Read back 2026-11-27, waits for his yes; needs SQL.
-    HIS YES TO THE PLAN 2026-11-27 ("So do the pin first"). BUILT on the
-    feature branch, not on testing: migration 20261127152844_pin_reset_by_
-    email_code (my_pin_state; set_my_pin replaces an existing PIN only within
-    15 minutes of an email code sign in), test 077 (7 of 7 breaks caught),
-    test 003 brought to the new rule; screens: Forgot PIN? on the lock card,
-    "Confirm it is you" (only the invited email), new PIN typed twice, no
-    sign out at 5 wrong tries. Checked: the real local Supabase token keeps
-    the sign in time after a refresh; the full sign in walk passed (Forgot,
-    Back, 5 wrong, another email refused, code, new PIN, unlock with it);
-    320 to 1440 wide and dark look clean. Also fixed: the blue button went
-    pale under the mouse on the sign in and lock screens. WAITS FOR HIS YES
-    TO THE SQL.
-    HIS YES TO THE SQL 2026-11-27: "yes go ahead".
-
-Numbers are kept from the full list, so older notes still match.
-
 250. **Go through every aspect of the platform: everything saves, everything
     is accurate, the system works.** (2026-11-26) "I also need you to go
     through every aspect of the platform to ensure that... very important

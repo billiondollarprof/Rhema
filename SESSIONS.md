@@ -4,6 +4,13 @@ Log of each work session. Newest at the top. Keep entries short.
 
 ---
 
+- 2026-11-27: LIVE: 259 (PIN locked after 5 tries now goes to an email
+  code and a new PIN; Forgot PIN? on the lock screen; a new PIN over an
+  old one needs an email code from the last 15 minutes). Also the blue
+  sign in buttons stay blue under the mouse. Closed 172 and 157a (admin
+  sees every message, recorded as 261). Next: 260 discharge, then 261,
+  then the outstanding balance list last.
+
 - 2026-11-26 (late): tidied the open list on his word. 58 finished
   requests moved word for word to docs/DONE.md (121, 122, 129 to 131, 155,
   158 to 161, 163 to 165, 168 to 171, 173 to 190, 192, 193, 195,
