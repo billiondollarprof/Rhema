@@ -13,6 +13,24 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 ### Open
 
+265. **Our footprint at the bottom of everything we design.** (2026-11-27)
+    "At the bottom of every of our design, we'll always put it, if it's a
+    website designed by StellaXafe Technologies Limited, at the bottom,
+    somewhere small, [and] the app powered by StellaXafe Technologies
+    Limited... so we're putting our footprint everywhere." Standing rule,
+    written into the stellaxafe-demos CLAUDE.md. MASCAP website: done the
+    same day. Rhema's app already shows "Developed by StellaXafe Technologies
+    Limited" on the sign in page.
+
+264. **LATER: give the MASCAP hero its own look, keep the signature.**
+    (2026-11-27) "Tweak the MASCAP website a little bit, so that the hero
+    section doesn't look so much like that of Rhema... search through the
+    web, something that matches this kind of premium design... especially
+    the two... animated strips... floating in the hero section... like a
+    spline. We can replace it with something else. Just some one or two
+    tweaks here and there... the signature still remains." After the app
+    demo.
+
 262. **MASCAP demo: the app and the website, by Saturday.** (2026-11-27)
     "There's a hospital that said I should send them a demo... MASCAP. So I
     need to do their own demo and put it under something like
