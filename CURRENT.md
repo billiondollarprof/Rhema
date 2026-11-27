@@ -25,6 +25,38 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     web.rhemamedical.app). Also 2026-11-27: "It's working now. She says
     she's been allowed" (259 confirmed by the person locked out).
 
+    HIS ANSWERS 2026-11-27 (evening): no database for the demo ("Why do we
+    need a database for the demo?... I thought the Cloudflare is enough...
+    We are not running a backend yet"; StellaXafe's Supabase already has 2
+    projects). Cloudflare only, code in GitHub, one StellaXafe home for
+    every hospital's demo. Addresses mascap-app and mascap-web.stellaxafe.com
+    are okay. Website FIRST, then the app. Details he gave: the manager's
+    WhatsApp 0813 399 3514; Facebook page phone 0806 591 1940 (the number at
+    the top of the page); Head Office 34 Adeola Road, Sapele, Delta State,
+    Branch Office Egbokodo Road; Google profile https://share.google/
+    Wi2GyAlLNoAPE2Poi; Facebook https://www.facebook.com/share/1AQ1zNgZQc/;
+    their logo is the MH caduceus (navy and red); mascaphospitals.com is
+    broken. Google reviews he showed (real public reviews, MASCAP's own).
+    The design: "repurpose the Rhema website"; images there were never
+    Rhema's own. Copy from the Olympus concept site he built
+    (olympus-sapele.vercel.app, on the connected Vercel): the ring becomes
+    the TESTIMONIAL section, made up video cards with a play button that
+    says it is a demo; the scroll section ("The lounge fills up", image 4)
+    shows the laboratory, pharmacy, radiology and other rooms as you
+    scroll; the moving gold highlight that jumps from section to section;
+    good layering. Keep Rhema's card stack instead of Olympus's. White
+    background, sleek, "closer to the Olympus website design though, much
+    more upgraded... I'm trying to win a contract here." Use the scroll
+    craft and the humanizer. Write him prompts to generate more images. He
+    will send images found online; asked whether to enhance them.
+
+263. **The humanizer is a rule in every repository.** (2026-11-27) "The
+    humanizer should be a standard. It should be a rule in the Claude.md...
+    across all my repository... in fact, inside my Google Drive as I work,
+    so every agent knows that they have to read that humanizer
+    repository." Rhema's CLAUDE.md already has it (section 6). Not started
+    for the other repositories or Drive.
+
 261. **The admin sees every message.** (2026-11-27, his answer to 157a)
     "The admin, because it's an admin, should see everybody's message,
     including their own. That's why it's an admin." FOUND: today an admin
