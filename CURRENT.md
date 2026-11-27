@@ -13,6 +13,55 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 ### Open
 
+261. **The admin sees every message.** (2026-11-27, his answer to 157a)
+    "The admin, because it's an admin, should see everybody's message,
+    including their own. That's why it's an admin." FOUND: today an admin
+    reads General, their own and their room's messages only
+    (private.can_read_message). Needs SQL: show the batch first.
+
+260. **Discharge: ask, show the bill, then the PIN; who may discharge.**
+    (2026-11-27) "When you click the discharge box, let it show something
+    like a pop-up in the middle of the screen asking you, do you want to
+    discharge this patient... yes and cancel... when you say yes, it takes
+    you to the bill section and then shows the bill. If the bill has been
+    prepared, it shows you the prepared bill... and then it says complete
+    the discharge... plus a cancel button." "If a doctor prepared a bill...
+    After sending the bill, the system should show a button that says
+    discharge this patient." "Anytime a patient is being discharged, the
+    last part should request for PIN." "The front desk can discharge a
+    patient, the doctor can discharge a patient, the admin can discharge a
+    patient, anybody with consultant room... no one else." "If the bills
+    are not yet prepared, the system should refuse the front desk... if the
+    bills are prepared and the person has paid their money, then allow the
+    front desk." "Until the person's money balance is 0, the doctor cannot
+    discharge a patient, except they are discharging the patient on
+    credit... patients with an outstanding balance... a particular
+    section... maybe at the back of the hamburger menu." "If that would
+    rather be an overbuild, then refuse discharge until the balance is 0,
+    except for an hospital that says, okay, allow us." "They can cancel the
+    outstanding balance for the patient using their PIN. Only people with
+    consultant room and admin can do that." "Front desk can only discharge
+    someone who has finished paying." FOUND: today only a doctor or the
+    matron discharges (by role), with no PIN and no balance check. Read back
+    2026-11-27, waits for his yes.
+
+259. **PIN: the lock after 5 tries never clears; Forgot PIN.** (2026-11-27)
+    "Somebody recently tried their PIN multiple times... the system is not
+    letting them log in again. Even after they have waited for so many
+    minutes... even when they remembered it." "The system should
+    automatically switch for them to verify their identity by entering the
+    email address they were invited with. Then the system sends them a
+    code... enter new [PIN] first time, then... the second time, and then it
+    saves that new PIN." "Under the place they used to put PIN... forget
+    PIN... enter their email, get a code, and reset their PIN."
+    FOUND (the fault): after 5 wrong tries the PIN is locked for good; the
+    app signs the person out and says "Sign in with an email code and choose
+    a new PIN", but after the email code the database still says they have
+    a PIN (i_have_a_pin only asks whether one is stored), so the app goes
+    straight back to the PIN screen, which is still locked, and signs them
+    out again. Waiting does nothing because the lock has no time on it.
+    Read back 2026-11-27, waits for his yes; needs SQL.
+
 Numbers are kept from the full list, so older notes still match.
 
 250. **Go through every aspect of the platform: everything saves, everything
@@ -995,16 +1044,6 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
     - His walk through the modules is gradual this week, with the hospital;
       he sends screenshots; I also fix what I find myself.
 
-172. **One phone shows only the loading screen.** (2026-11-09) "The director's
-    phone is not loading the website... only showing the loading screen...
-    different browsers, same phone... other phones open instantly." The phone
-    is new (an iPhone 15 or 16 he thinks), so an old iOS may not be the cause.
-    DONE ON TESTING 2026-11-09: build now also targets iOS 15 (package.json
-    browserslist); start up can no longer hang on the logo (falls to sign in);
-    after 15 seconds on the logo a plain message and Try again button show,
-    with the first error code. STILL TO DO: his phone tries the testing
-    address; if the message shows an error code, send it. Not yet live.
-
 227. **Sheets, consultation, drafts, history, install guide, antenatal, print, drug list.** (2026-11-18)
     a. 226b ENCRYPTION SUSPENDED: "Let's suspend this one first. It should
        be like part of the last things... when we are done with the major
@@ -1378,8 +1417,8 @@ F. NEW: for the hospital to own (NDPA 2023), not code:
         is not sent to your own department... general messages and
         messages sent to your department." "Everyone should have a room,
         including the admin, right? Or... the admin sees messages that are
-        being sent to different departments." OPEN: needs his choice (asked
-        2026-11-09).
+        being sent to different departments." ANSWERED 2026-11-27: the admin sees every
+        message (request 261).
     (b) "This refresh button, does it even work?" (Admin, Activity) It did,
         with no sign. Now it says Refreshing, shows the time, and the log
         updates by itself every 10 seconds. DONE on testing 2026-11-09.
