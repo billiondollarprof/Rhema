@@ -13,6 +13,18 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 ### Open
 
+262. **MASCAP demo: the app and the website, by Saturday.** (2026-11-27)
+    "There's a hospital that said I should send them a demo... MASCAP. So I
+    need to do their own demo and put it under something like
+    mascap-app.stellaxafe.com. They also want a demo website, so we'll do
+    mascap.web.stellaxafe.com. So we are going to... repurpose the Rhema
+    website... I promise to send them this weekend, which is tomorrow,
+    Saturday." Asked which comes first: discharge (260) or this. Goes with
+    198 and 201 (demos on the StellaXafe Cloudflare account). The website
+    to copy: billiondollarprof/rhema-website (testing branch, plain files,
+    web.rhemamedical.app). Also 2026-11-27: "It's working now. She says
+    she's been allowed" (259 confirmed by the person locked out).
+
 261. **The admin sees every message.** (2026-11-27, his answer to 157a)
     "The admin, because it's an admin, should see everybody's message,
     including their own. That's why it's an admin." FOUND: today an admin
