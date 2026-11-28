@@ -13,6 +13,24 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 ### Open
 
+267. **MASCAP website: tray and button fixes; app still slow on his iPhone.**
+    (2026-11-28, after /model sonnet to save credits; usage at 91%.) "The
+    tray disappears... it doesn't even allow you to scroll it." "The text on
+    the first button and the text on the second button... don't share the
+    same midpoint." DONE and deployed: tray opens on the side with room,
+    scrolls inside itself, closes only when the page really scrolls; labels
+    centred on both buttons (checked at 320, 390, 768). Then: "it's taking
+    more time to even load now than before... I don't think it's network...
+    I don't know if we should just do the Neon." Answered: the slowness is
+    the in-browser database on his iPhone (my tests ran on a computer
+    browser, not an iPhone); Neon (free PostgreSQL behind the same Worker)
+    removes it; one Neon database per hospital, each client keeps their own
+    demo, no switching. His earlier word 2026-11-28: "that server backend
+    stuff, we probably don't need it for now. This one is okay because it's
+    demo" is now overtaken by the slow open. NEEDS HIS YES, and his Neon
+    account and one secret (steps in chat); with usage at 91% the build
+    waits for the next session if credits run out.
+
 266. **MASCAP demo app: faster first open, two install buttons, top of
     Home, no announcement, role drop down.** (2026-11-28) "It took long to
     open... I had to reload... I don't want a situation whereby I send her
