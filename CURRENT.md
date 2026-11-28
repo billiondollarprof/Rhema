@@ -30,6 +30,10 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     demo" is now overtaken by the slow open. NEEDS HIS YES, and his Neon
     account and one secret (steps in chat); with usage at 91% the build
     waits for the next session if credits run out.
+    2026-11-28 later: "The button doesn't even show that it can be
+    scrolled." DONE and deployed: a fade and a bouncing MORE arrow in the
+    tray, gone at the end. He is setting up Neon himself; the website hero
+    plan (264) is proposed in chat, waiting for his pick.
 
 266. **MASCAP demo app: faster first open, two install buttons, top of
     Home, no announcement, role drop down.** (2026-11-28) "It took long to
