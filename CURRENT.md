@@ -85,7 +85,17 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     private repos cannot run Actions while the account's free minutes are
     used up. Fixed on the way: the page redirected in a loop (assets
     html_handling none). Every control pressed again on the live address.
-    NEXT: the app demo (mascap-app).
+    APP LIVE 2026-11-28 at https://mascap-app.stellaxafe.com: the real Rhema
+    app built from a clean copy (stellaxafe-demos apps/mascap-app/build.sh),
+    sign in by picking a role (PIN 1234), every Rhema migration running in
+    PGlite in the visitor's browser with made up data (MCP- numbers, MASCAP
+    name and logo), no backend, saves stay on the device, "Start the demo
+    again" button, "Powered by StellaXafe Technologies Limited". Checked
+    locally: every role's screens with no errors; register, send to room,
+    refresh, doctor's queue and record, lab request, payment, lab. Live:
+    files, sign in and Home checked; the full flow on live was cut by this
+    session's proxy dropping connections, so Anthony tries it on his phone.
+    First open downloads about 22 MB once (the database engine and data).
 
 263. **The humanizer is a rule in every repository.** (2026-11-27) "The
     humanizer should be a standard. It should be a rule in the Claude.md...
