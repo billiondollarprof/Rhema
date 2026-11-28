@@ -32,8 +32,17 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     waits for the next session if credits run out.
     2026-11-28 later: "The button doesn't even show that it can be
     scrolled." DONE and deployed: a fade and a bouncing MORE arrow in the
-    tray, gone at the end. He is setting up Neon himself; the website hero
-    plan (264) is proposed in chat, waiting for his pick.
+    tray, gone at the end. The hero (264) is live too.
+    2026-11-28 later: "that more button... clicks on the button that is
+    behind." DONE: More is a real button that scrolls the tray. "Check the
+    screen on desktop and tablet landscape... the card stack... make it fit
+    landscape." DONE and deployed: landscape layout for the card stack
+    (heading left, cards right, sized to the screen height; fits one screen
+    at 667x375 up to 1920x1080); smaller headline and no scroll hint on a
+    phone held sideways; floating buttons step aside over the booking form;
+    shorter chat window. Checked at 667x375, 844x390, 932x430, 1024x768,
+    1180x820, 1366x768, 1440x900, 1920x1080 and portrait. He is setting up
+    Neon himself.
 
 266. **MASCAP demo app: faster first open, two install buttons, top of
     Home, no announcement, role drop down.** (2026-11-28) "It took long to
