@@ -31,8 +31,19 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     instead of 6.3 MB), demo files cached a day; first open now about 11.6
     MB; Not now and Install side by side, no alerts step; Home opens at the
     top; no announcement. Checked live as an Android phone: ready in 3.3 s
-    on a fast line, Home 2 s after the tap, no page errors. Role drop down:
-    waits for his yes.
+    on a fast line, Home 2 s after the tap, no page errors.
+    2026-11-28 later, his words: "make the role a drop down", "make the
+    progress bar more visible... tell the person to hold on... the reason
+    it's taking long is because this is a demo", "make the [arrow] more
+    visible... animate it", "the first page... not many texts... icons...
+    clean and looking premium". LIVE: logo, name, Demo tag; a big progress
+    bar (Please hold on, loads onto your phone, first time only, a fast
+    network helps); one role drop down with a big moving arrow; three facts
+    with icons; Open as <role> opens Home with no page reload; Start the
+    demo again fixed (it waited for ever on an open database). Slow phone
+    network (1.6 MB/s): ready in about 12 s. Asked about a backend: Neon
+    (free PostgreSQL) behind the same Worker would make it as fast as Rhema,
+    one database per hospital, no switching; his decision, not started.
 
 265. **Our footprint at the bottom of everything we design.** (2026-11-27)
     "At the bottom of every of our design, we'll always put it, if it's a
