@@ -26,6 +26,13 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
     download on the first screen, show progress; two install buttons; Home
     at the top; no seeded announcement. Proposed a "Viewing as" role drop
     down inside the app; waiting for his yes on that part.
+    LIVE 2026-11-28 (all but the role drop down): download starts on the
+    first screen with a progress line; pglite.data sent compressed (1.9 MB
+    instead of 6.3 MB), demo files cached a day; first open now about 11.6
+    MB; Not now and Install side by side, no alerts step; Home opens at the
+    top; no announcement. Checked live as an Android phone: ready in 3.3 s
+    on a fast line, Home 2 s after the tap, no page errors. Role drop down:
+    waits for his yes.
 
 265. **Our footprint at the bottom of everything we design.** (2026-11-27)
     "At the bottom of every of our design, we'll always put it, if it's a
