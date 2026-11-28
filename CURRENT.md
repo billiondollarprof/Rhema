@@ -13,6 +13,20 @@ and checked, not when it is planned. (Rule from `CLAUDE.md`, section 1.)
 
 ### Open
 
+266. **MASCAP demo app: faster first open, two install buttons, top of
+    Home, no announcement, role drop down.** (2026-11-28) "It took long to
+    open... I had to reload... I don't want a situation whereby I send her
+    the link and then it's taking long." Install: "put a border button. So
+    it should be two buttons side by side." "It opened the bottom part of
+    the app... it's supposed to open normally." The announcement: "isn't it
+    really necessary to show an announcement?" Roles: "why not make the roles
+    a drop down?... so that they will be able to see the remaining interface
+    of the app properly. What do you think?" Answered: first open downloads
+    about 16 MB once per phone; plan: compress (to about 10 MB), start the
+    download on the first screen, show progress; two install buttons; Home
+    at the top; no seeded announcement. Proposed a "Viewing as" role drop
+    down inside the app; waiting for his yes on that part.
+
 265. **Our footprint at the bottom of everything we design.** (2026-11-27)
     "At the bottom of every of our design, we'll always put it, if it's a
     website designed by StellaXafe Technologies Limited, at the bottom,
