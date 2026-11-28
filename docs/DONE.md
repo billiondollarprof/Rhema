@@ -2859,3 +2859,13 @@ Numbers are kept from the full list, so older notes still match.
     LIVE 2026-11-27: testing and live databases took it, 0 new security
     warnings on both; CI, deploys and smoke tests green. The person locked out
     today gets in with the email code and a new PIN.
+
+264. **LATER: give the MASCAP hero its own look, keep the signature.**
+    (2026-11-27) "Tweak the MASCAP website a little bit, so that the hero
+    section doesn't look so much like that of Rhema... search through the
+    web, something that matches this kind of premium design... especially
+    the two... animated strips... floating in the hero section... like a
+    spline. We can replace it with something else. Just some one or two
+    tweaks here and there... the signature still remains." After the app
+    demo.
+    DONE 2026-11-28, his yes ("go ahead and do it"): the two wave lines became one self-drawing heartbeat line, the wave became a soft arch with a red edge; the optional glass chips were left out. Own clear band on phones.
